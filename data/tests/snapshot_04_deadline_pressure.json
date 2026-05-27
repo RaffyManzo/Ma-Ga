@@ -1,0 +1,55 @@
+{
+  "snapshotId": "snapshot_04_deadline_pressure",
+  "timeSeconds": 3.0,
+  "vehicles": [
+    {
+      "vehicleId": "vehicle_001",
+      "x": 0.0,
+      "y": 0.0,
+      "speed": 13.0,
+      "localCpu": 400000000.0
+    }
+  ],
+  "tasks": [
+    {
+      "taskId": "task_001",
+      "sourceVehicleId": "vehicle_001",
+      "inputSizeBits": 12000000.0,
+      "outputSizeBits": 1000000.0,
+      "cpuCycles": 2000000000.0,
+      "deadlineSeconds": 0.5
+    }
+  ],
+  "candidateNodes": [
+    {
+      "candidateId": "local_vehicle_001",
+      "sourceVehicleId": "vehicle_001",
+      "executionNodeId": "vehicle_001",
+      "type": "LOCAL",
+      "availableCpu": 400000000.0,
+      "availableBandwidth": 0.0,
+      "baseLatencySeconds": 0.0,
+      "coverageTimeSeconds": 0.0
+    },
+    {
+      "candidateId": "edge_001_for_vehicle_001",
+      "sourceVehicleId": "vehicle_001",
+      "executionNodeId": "edge_001",
+      "type": "EDGE",
+      "availableCpu": 2500000000.0,
+      "availableBandwidth": 10000000.0,
+      "baseLatencySeconds": 0.02,
+      "coverageTimeSeconds": 8.0
+    },
+    {
+      "candidateId": "cloud_001_for_vehicle_001",
+      "sourceVehicleId": "vehicle_001",
+      "executionNodeId": "cloud_001",
+      "type": "CLOUD",
+      "availableCpu": 9000000000.0,
+      "availableBandwidth": 8000000.0,
+      "baseLatencySeconds": 0.09,
+      "coverageTimeSeconds": 9999.0
+    }
+  ]
+}

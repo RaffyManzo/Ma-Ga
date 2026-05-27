@@ -1,10 +1,10 @@
 import config.MaGaConfig;
-import ga.MaGaOptimizer;
-import ga.MaGaResult;
-import io.ResultPrinter;
-import io.SnapshotLoader;
-import model.SystemSnapshot;
-import validation.SnapshotValidator;
+import ga.core.MaGaOptimizer;
+import ga.core.MaGaResult;
+import io.reporting.ResultPrinter;
+import io.snapshot.SnapshotLoader;
+import model.snapshot.SystemSnapshot;
+import validation.snapshot.SnapshotValidator;
 
 /**
  * Punto di ingresso del prototipo Java standalone del MA-GA.

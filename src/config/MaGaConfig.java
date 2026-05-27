@@ -1,5 +1,16 @@
 package config;
 
+import config.fitness.FitnessWeights;
+import config.fitness.NormalizationConfig;
+import config.fitness.PenaltyConfig;
+import config.ga.GeneticAlgorithmConfig;
+import model.genetic.Chromosome;
+import model.genetic.Gene;
+import model.node.NodeCandidate;
+import model.snapshot.SystemSnapshot;
+import model.snapshot.TaskInstance;
+import model.snapshot.VehicleSnapshot;
+
 import java.util.Objects;
 
 /**
@@ -94,3 +105,4 @@ public final class MaGaConfig {
                 '}';
     }
 }
+
