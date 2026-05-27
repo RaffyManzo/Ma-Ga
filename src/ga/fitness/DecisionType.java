@@ -1,7 +1,5 @@
 package ga.fitness;
 
-import model.genetic.Gene;
-
 /**
  * Descrive il tipo operativo di decisione rappresentata da un gene.
  *

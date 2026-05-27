@@ -1,9 +1,5 @@
 package window.event;
 
-import model.snapshot.SystemSnapshot;
-import window.trigger.ReoptimizationTrigger;
-import window.trigger.TriggerReason;
-
 import java.util.Objects;
 
 /**

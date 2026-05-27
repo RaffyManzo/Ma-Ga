@@ -1,9 +1,5 @@
 package io.reporting;
 
-import ga.core.MaGaOptimizer;
-import model.genetic.Chromosome;
-import model.genetic.Gene;
-
 import config.fitness.FitnessWeights;
 import config.ga.GeneticAlgorithmConfig;
 import config.MaGaConfig;

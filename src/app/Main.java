@@ -1,3 +1,5 @@
+package app;
+
 import config.MaGaConfig;
 import ga.core.MaGaOptimizer;
 import ga.core.MaGaResult;

@@ -1,0 +1,153 @@
+{
+  "snapshotId": "snapshot_window_003",
+  "timeSeconds": 8.5,
+  "vehicles": [
+    {
+      "vehicleId": "vehicle_001",
+      "x": 98.0,
+      "y": 0.0,
+      "speed": 13.8,
+      "localCpu": 500000000.0
+    },
+    {
+      "vehicleId": "vehicle_002",
+      "x": 158.0,
+      "y": 6.0,
+      "speed": 15.3,
+      "localCpu": 620000000.0
+    },
+    {
+      "vehicleId": "vehicle_003",
+      "x": 260.0,
+      "y": -8.0,
+      "speed": 20.4,
+      "localCpu": 430000000.0
+    }
+  ],
+  "tasks": [
+    {
+      "taskId": "task_001",
+      "sourceVehicleId": "vehicle_001",
+      "inputSizeBits": 8300000.0,
+      "outputSizeBits": 830000.0,
+      "cpuCycles": 1040000000.0,
+      "deadlineSeconds": 3.0
+    },
+    {
+      "taskId": "task_002",
+      "sourceVehicleId": "vehicle_002",
+      "inputSizeBits": 12000000.0,
+      "outputSizeBits": 1000000.0,
+      "cpuCycles": 1750000000.0,
+      "deadlineSeconds": 2.6
+    },
+    {
+      "taskId": "task_003",
+      "sourceVehicleId": "vehicle_003",
+      "inputSizeBits": 5200000.0,
+      "outputSizeBits": 520000.0,
+      "cpuCycles": 720000000.0,
+      "deadlineSeconds": 2.0
+    },
+    {
+      "taskId": "task_004",
+      "sourceVehicleId": "vehicle_002",
+      "inputSizeBits": 6000000.0,
+      "outputSizeBits": 600000.0,
+      "cpuCycles": 900000000.0,
+      "deadlineSeconds": 2.2
+    }
+  ],
+  "candidateNodes": [
+    {
+      "candidateId": "local_vehicle_001",
+      "sourceVehicleId": "vehicle_001",
+      "executionNodeId": "vehicle_001",
+      "type": "LOCAL",
+      "availableCpu": 500000000.0,
+      "availableBandwidth": 0.0,
+      "baseLatencySeconds": 0.0,
+      "coverageTimeSeconds": 0.0
+    },
+    {
+      "candidateId": "edge_001_for_vehicle_001",
+      "sourceVehicleId": "vehicle_001",
+      "executionNodeId": "edge_001",
+      "type": "EDGE",
+      "availableCpu": 2600000000.0,
+      "availableBandwidth": 20000000.0,
+      "baseLatencySeconds": 0.018,
+      "coverageTimeSeconds": 5.0
+    },
+    {
+      "candidateId": "cloud_001_for_vehicle_001",
+      "sourceVehicleId": "vehicle_001",
+      "executionNodeId": "cloud_001",
+      "type": "CLOUD",
+      "availableCpu": 9000000000.0,
+      "availableBandwidth": 14500000.0,
+      "baseLatencySeconds": 0.081,
+      "coverageTimeSeconds": 9999.0
+    },
+    {
+      "candidateId": "local_vehicle_002",
+      "sourceVehicleId": "vehicle_002",
+      "executionNodeId": "vehicle_002",
+      "type": "LOCAL",
+      "availableCpu": 620000000.0,
+      "availableBandwidth": 0.0,
+      "baseLatencySeconds": 0.0,
+      "coverageTimeSeconds": 0.0
+    },
+    {
+      "candidateId": "edge_001_for_vehicle_002",
+      "sourceVehicleId": "vehicle_002",
+      "executionNodeId": "edge_001",
+      "type": "EDGE",
+      "availableCpu": 2600000000.0,
+      "availableBandwidth": 12000000.0,
+      "baseLatencySeconds": 0.025,
+      "coverageTimeSeconds": 2.8
+    },
+    {
+      "candidateId": "cloud_001_for_vehicle_002",
+      "sourceVehicleId": "vehicle_002",
+      "executionNodeId": "cloud_001",
+      "type": "CLOUD",
+      "availableCpu": 9000000000.0,
+      "availableBandwidth": 13500000.0,
+      "baseLatencySeconds": 0.083,
+      "coverageTimeSeconds": 9999.0
+    },
+    {
+      "candidateId": "local_vehicle_003",
+      "sourceVehicleId": "vehicle_003",
+      "executionNodeId": "vehicle_003",
+      "type": "LOCAL",
+      "availableCpu": 430000000.0,
+      "availableBandwidth": 0.0,
+      "baseLatencySeconds": 0.0,
+      "coverageTimeSeconds": 0.0
+    },
+    {
+      "candidateId": "edge_001_for_vehicle_003",
+      "sourceVehicleId": "vehicle_003",
+      "executionNodeId": "edge_001",
+      "type": "EDGE",
+      "availableCpu": 2600000000.0,
+      "availableBandwidth": 16000000.0,
+      "baseLatencySeconds": 0.021,
+      "coverageTimeSeconds": 4.5
+    },
+    {
+      "candidateId": "cloud_001_for_vehicle_003",
+      "sourceVehicleId": "vehicle_003",
+      "executionNodeId": "cloud_001",
+      "type": "CLOUD",
+      "availableCpu": 9000000000.0,
+      "availableBandwidth": 12500000.0,
+      "baseLatencySeconds": 0.086,
+      "coverageTimeSeconds": 9999.0
+    }
+  ]
+}

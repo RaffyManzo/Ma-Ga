@@ -1,116 +1,39 @@
 package config.window;
 
-import window.dynamicity.DynamicityEvaluator;
-
 /**
  * Configurazione del gestore temporale del MA-GA.
  *
- * Contiene i parametri necessari al package window per decidere:
- *
- * - ogni quanto rieseguire il MA-GA;
- * - come interpretare la dinamicità tra due snapshot consecutivi;
- * - quanta popolazione genetica precedente riutilizzare;
- * - come predisporre, in futuro, l'adattamento della finestra temporale.
- *
- * Nella prima versione implementativa la finestra sarà statica.
- * Quindi il parametro realmente centrale sarà fixedIntervalSeconds.
- *
- * Gli altri parametri sono comunque presenti perché derivano dalla
- * formalizzazione e permettono di passare gradualmente da:
- *
- * - gestione temporale statica;
- * - a gestione temporale adattiva;
- * - a gestione reattiva con eventi critici.
+ * Contiene i parametri usati dal package window per:
+ * - programmare la riesecuzione periodica;
+ * - modellare il ritardo di raccolta dello stato;
+ * - classificare la dinamicità tra snapshot;
+ * - decidere il riuso della popolazione precedente.
  */
 public final class TemporalWindowConfig {
 
-    /**
-     * Intervallo fisso di riesecuzione del MA-GA.
-     *
-     * Nella prima versione:
-     *
-     * t_{k+1} = t_k + fixedIntervalSeconds
-     *
-     * salvo presenza di evento critico anticipato.
-     */
     private final double fixedIntervalSeconds;
+    private final double dataCollectionDelaySeconds;
 
-    /**
-     * Soglia inferiore della dinamicità.
-     *
-     * Se D_k < thetaLow, lo scenario è considerato stabile
-     * e il package window può scegliere WARM_START.
-     */
     private final double thetaLow;
-
-    /**
-     * Soglia superiore della dinamicità.
-     *
-     * Se D_k > thetaHigh, lo scenario è considerato molto dinamico
-     * e il package window può scegliere COLD_START.
-     */
     private final double thetaHigh;
-
-    /**
-     * Quota della popolazione precedente da conservare in caso di partial restart.
-     *
-     * Esempio:
-     *
-     * rhoKeep = 0.40
-     *
-     * significa conservare il 40% dei migliori cromosomi della popolazione finale
-     * precedente e rigenerare il restante 60%.
-     */
     private final double rhoKeep;
 
-    /**
-     * Peso della variazione dei veicoli nell'indice di dinamicità.
-     */
     private final double lambdaVehicles;
-
-    /**
-     * Peso della variazione dei task attivi nell'indice di dinamicità.
-     */
     private final double lambdaTasks;
-
-    /**
-     * Peso della variazione delle risorse computazionali nell'indice di dinamicità.
-     */
     private final double lambdaResources;
-
-    /**
-     * Peso della variazione dei link/candidati nell'indice di dinamicità.
-     */
     private final double lambdaLinks;
 
-    /**
-     * Peso di smoothing per la futura finestra adattiva.
-     *
-     * Non è necessario nella prima versione statica, ma viene mantenuto per
-     * evitare di dover cambiare la struttura della configurazione quando verrà
-     * introdotto l'adattamento di Delta t.
-     */
     private final double alphaT;
-
-    /**
-     * Fattore di incremento della finestra temporale adattiva.
-     *
-     * In futuro potrà essere usato quando lo scenario è stabile.
-     */
     private final double etaUp;
-
-    /**
-     * Fattore di riduzione della finestra temporale adattiva.
-     *
-     * In futuro potrà essere usato quando lo scenario è molto dinamico.
-     */
     private final double etaDown;
-
-    /**
-     * Soglia numerica per evitare aggiornamenti trascurabili della finestra.
-     */
     private final double epsilonT;
 
+    /**
+     * Costruttore compatibile con la versione precedente.
+     *
+     * Imposta dataCollectionDelaySeconds a 0.0, adatto alla simulazione statica
+     * basata su snapshot JSON già disponibili.
+     */
     public TemporalWindowConfig(
             double fixedIntervalSeconds,
             double thetaLow,
@@ -125,15 +48,63 @@ public final class TemporalWindowConfig {
             double etaDown,
             double epsilonT
     ) {
+        this(
+                fixedIntervalSeconds,
+                0.0,
+                thetaLow,
+                thetaHigh,
+                rhoKeep,
+                lambdaVehicles,
+                lambdaTasks,
+                lambdaResources,
+                lambdaLinks,
+                alphaT,
+                etaUp,
+                etaDown,
+                epsilonT
+        );
+    }
+
+    /**
+     * Costruisce la configurazione temporale completa.
+     *
+     * @param fixedIntervalSeconds intervallo programmato tra due riesecuzioni
+     * @param dataCollectionDelaySeconds ritardo tra trigger e snapshot osservato
+     * @param thetaLow soglia inferiore della dinamicità
+     * @param thetaHigh soglia superiore della dinamicità
+     * @param rhoKeep quota mantenuta in partial restart
+     * @param lambdaVehicles peso variazione veicoli
+     * @param lambdaTasks peso variazione task
+     * @param lambdaResources peso variazione risorse
+     * @param lambdaLinks peso variazione link
+     * @param alphaT coefficiente per futura finestra adattiva
+     * @param etaUp fattore di incremento futuro della finestra
+     * @param etaDown fattore di riduzione futuro della finestra
+     * @param epsilonT soglia numerica per aggiornamenti trascurabili
+     */
+    public TemporalWindowConfig(
+            double fixedIntervalSeconds,
+            double dataCollectionDelaySeconds,
+            double thetaLow,
+            double thetaHigh,
+            double rhoKeep,
+            double lambdaVehicles,
+            double lambdaTasks,
+            double lambdaResources,
+            double lambdaLinks,
+            double alphaT,
+            double etaUp,
+            double etaDown,
+            double epsilonT
+    ) {
         validatePositive("fixedIntervalSeconds", fixedIntervalSeconds);
+        validateFiniteAndNonNegative("dataCollectionDelaySeconds", dataCollectionDelaySeconds);
 
         validateRate("thetaLow", thetaLow);
         validateRate("thetaHigh", thetaHigh);
 
         if (thetaLow >= thetaHigh) {
-            throw new IllegalArgumentException(
-                    "thetaLow must be smaller than thetaHigh."
-            );
+            throw new IllegalArgumentException("thetaLow must be smaller than thetaHigh.");
         }
 
         validateRate("rhoKeep", rhoKeep);
@@ -143,15 +114,10 @@ public final class TemporalWindowConfig {
         validateFiniteAndNonNegative("lambdaResources", lambdaResources);
         validateFiniteAndNonNegative("lambdaLinks", lambdaLinks);
 
-        double lambdaSum = lambdaVehicles
-                + lambdaTasks
-                + lambdaResources
-                + lambdaLinks;
+        double lambdaSum = lambdaVehicles + lambdaTasks + lambdaResources + lambdaLinks;
 
         if (lambdaSum <= 0.0) {
-            throw new IllegalArgumentException(
-                    "At least one dynamicity lambda must be > 0."
-            );
+            throw new IllegalArgumentException("At least one dynamicity lambda must be > 0.");
         }
 
         validateRate("alphaT", alphaT);
@@ -160,18 +126,16 @@ public final class TemporalWindowConfig {
         validateFiniteAndNonNegative("epsilonT", epsilonT);
 
         if (etaUp < 1.0) {
-            throw new IllegalArgumentException(
-                    "etaUp should be >= 1.0 because it is an increase factor."
-            );
+            throw new IllegalArgumentException("etaUp should be >= 1.0.");
         }
 
         if (etaDown > 1.0) {
-            throw new IllegalArgumentException(
-                    "etaDown should be <= 1.0 because it is a decrease factor."
-            );
+            throw new IllegalArgumentException("etaDown should be <= 1.0.");
         }
 
         this.fixedIntervalSeconds = fixedIntervalSeconds;
+        this.dataCollectionDelaySeconds = dataCollectionDelaySeconds;
+
         this.thetaLow = thetaLow;
         this.thetaHigh = thetaHigh;
         this.rhoKeep = rhoKeep;
@@ -188,35 +152,52 @@ public final class TemporalWindowConfig {
     }
 
     /**
-     * Configurazione iniziale per il primo gestore temporale statico.
+     * Configurazione iniziale per test statici.
      *
-     * I valori sono scelti per testare il comportamento del sistema su una
-     * sequenza piccola di snapshot, non come configurazione definitiva.
+     * Il ritardo di raccolta dati è 0.0 perché gli snapshot JSON sono già pronti.
      */
     public static TemporalWindowConfig defaultConfig() {
         return new TemporalWindowConfig(
-                5.0,    // fixedIntervalSeconds
-                0.25,   // thetaLow
-                0.65,   // thetaHigh
-                0.40,   // rhoKeep
-                0.25,   // lambdaVehicles
-                0.25,   // lambdaTasks
-                0.25,   // lambdaResources
-                0.25,   // lambdaLinks
-                0.50,   // alphaT
-                1.20,   // etaUp
-                0.80,   // etaDown
-                1.0E-6  // epsilonT
+                5.0,
+                0.0,
+                0.25,
+                0.65,
+                0.40,
+                0.25,
+                0.25,
+                0.25,
+                0.25,
+                0.50,
+                1.20,
+                0.80,
+                1.0E-6
         );
     }
 
     /**
-     * Variante utile nei primi test quando si vuole forzare una finestra fissa
-     * senza ragionare ancora sui parametri adattivi.
+     * Crea una configurazione con finestra fissa e raccolta dati istantanea.
+     *
+     * @param fixedIntervalSeconds intervallo programmato
+     * @return configurazione temporale
      */
     public static TemporalWindowConfig fixedInterval(double fixedIntervalSeconds) {
+        return fixedIntervalWithCollectionDelay(fixedIntervalSeconds, 0.0);
+    }
+
+    /**
+     * Crea una configurazione con finestra fissa e ritardo di raccolta esplicito.
+     *
+     * @param fixedIntervalSeconds intervallo programmato
+     * @param dataCollectionDelaySeconds ritardo di raccolta dati
+     * @return configurazione temporale
+     */
+    public static TemporalWindowConfig fixedIntervalWithCollectionDelay(
+            double fixedIntervalSeconds,
+            double dataCollectionDelaySeconds
+    ) {
         return new TemporalWindowConfig(
                 fixedIntervalSeconds,
+                dataCollectionDelaySeconds,
                 0.25,
                 0.65,
                 0.40,
@@ -233,6 +214,10 @@ public final class TemporalWindowConfig {
 
     public double getFixedIntervalSeconds() {
         return fixedIntervalSeconds;
+    }
+
+    public double getDataCollectionDelaySeconds() {
+        return dataCollectionDelaySeconds;
     }
 
     public double getThetaLow() {
@@ -279,43 +264,22 @@ public final class TemporalWindowConfig {
         return epsilonT;
     }
 
-    /**
-     * Restituisce la somma dei pesi lambda.
-     *
-     * DynamicityEvaluator potrà usarla per normalizzare l'indice globale di
-     * dinamicità anche se i lambda non sommano esattamente a 1.
-     */
     public double getLambdaSum() {
-        return lambdaVehicles
-                + lambdaTasks
-                + lambdaResources
-                + lambdaLinks;
+        return lambdaVehicles + lambdaTasks + lambdaResources + lambdaLinks;
     }
 
-    /**
-     * Restituisce il peso normalizzato della componente veicoli.
-     */
     public double getNormalizedLambdaVehicles() {
         return lambdaVehicles / getLambdaSum();
     }
 
-    /**
-     * Restituisce il peso normalizzato della componente task.
-     */
     public double getNormalizedLambdaTasks() {
         return lambdaTasks / getLambdaSum();
     }
 
-    /**
-     * Restituisce il peso normalizzato della componente risorse.
-     */
     public double getNormalizedLambdaResources() {
         return lambdaResources / getLambdaSum();
     }
 
-    /**
-     * Restituisce il peso normalizzato della componente link.
-     */
     public double getNormalizedLambdaLinks() {
         return lambdaLinks / getLambdaSum();
     }
@@ -354,6 +318,7 @@ public final class TemporalWindowConfig {
     public String toString() {
         return "TemporalWindowConfig{"
                 + "fixedIntervalSeconds=" + fixedIntervalSeconds
+                + ", dataCollectionDelaySeconds=" + dataCollectionDelaySeconds
                 + ", thetaLow=" + thetaLow
                 + ", thetaHigh=" + thetaHigh
                 + ", rhoKeep=" + rhoKeep
@@ -368,5 +333,3 @@ public final class TemporalWindowConfig {
                 + '}';
     }
 }
-
-

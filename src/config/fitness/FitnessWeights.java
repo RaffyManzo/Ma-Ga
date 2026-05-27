@@ -1,7 +1,5 @@
 package config.fitness;
 
-import ga.fitness.FitnessEvaluator;
-
 /**
  * Rappresenta i pesi della funzione di fitness del MA-GA.
  *

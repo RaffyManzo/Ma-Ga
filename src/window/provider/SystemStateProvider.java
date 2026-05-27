@@ -1,42 +1,22 @@
 package window.provider;
 
-import window.core.TemporalWindowManager;
-
 import model.snapshot.SystemSnapshot;
 
 import java.util.Optional;
 
 /**
- * Astrazione per ottenere uno snapshot del sistema a partire da un tempo simulato.
+ * Astrazione per ottenere lo snapshot osservato a un tempo simulato.
  *
- * <p>Il {@link TemporalWindowManager} dipende da questa interfaccia per
- * recuperare lo stato del sistema su cui eseguire il MA-GA. In questo modo il
- * gestore temporale non deve sapere se gli snapshot arrivano da una lista
- * statica, da file caricati in memoria o da un simulatore integrato.</p>
- *
- * <p>La responsabilità dell'implementazione è trovare lo snapshot più adatto
- * alla richiesta temporale. La responsabilità del manager è invece usare quello
- * snapshot per valutare dinamicità, preparare la popolazione ed eseguire
- * l'ottimizzazione.</p>
+ * Il gestore temporale usa questa interfaccia dopo aver calcolato il tempo di
+ * osservazione: triggerTime + dataCollectionDelaySeconds.
  */
 public interface SystemStateProvider {
 
     /**
-     * Restituisce il primo snapshot disponibile al tempo indicato o dopo quel tempo.
+     * Cerca lo snapshot relativo al tempo di osservazione richiesto.
      *
-     * <p>Nella versione statica può selezionare uno snapshot già caricato. In
-     * una versione integrata con simulatore potrà invece costruire lo snapshot
-     * dallo stato corrente del simulatore.</p>
-     *
-     * <p>Se non esiste nessuno snapshot disponibile a partire dal tempo
-     * richiesto, il metodo restituisce {@link Optional#empty()} e il ciclo
-     * temporale può terminare senza errore.</p>
-     *
-     * @param timeSeconds tempo simulato richiesto
-     * @return snapshot disponibile, se presente
+     * @param observationTimeSeconds tempo in cui lo stato viene osservato
+     * @return snapshot osservato, se disponibile
      */
-    Optional<SystemSnapshot> findSnapshotAtOrAfter(double timeSeconds);
+    Optional<SystemSnapshot> findSnapshotAt(double observationTimeSeconds);
 }
-
-
-

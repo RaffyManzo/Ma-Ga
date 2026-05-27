@@ -1,8 +1,5 @@
 package window.event;
 
-import window.core.TemporalWindowManager;
-import window.trigger.TriggerReason;
-
 import java.util.Optional;
 
 /**

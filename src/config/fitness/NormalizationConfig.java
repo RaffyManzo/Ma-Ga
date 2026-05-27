@@ -1,7 +1,5 @@
 package config.fitness;
 
-import ga.fitness.FitnessEvaluator;
-
 /**
  * Configura i valori di riferimento usati per normalizzare i termini della fitness.
  *

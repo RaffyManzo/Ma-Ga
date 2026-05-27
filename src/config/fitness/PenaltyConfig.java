@@ -1,7 +1,5 @@
 package config.fitness;
 
-import ga.fitness.FitnessEvaluator;
-
 /**
  * Configura i coefficienti usati per costruire le penalità del MA-GA.
  *

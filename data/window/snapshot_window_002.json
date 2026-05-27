@@ -1,0 +1,145 @@
+{
+  "snapshotId": "snapshot_window_002",
+  "timeSeconds": 6.0,
+  "vehicles": [
+    {
+      "vehicleId": "vehicle_001",
+      "x": 65.0,
+      "y": 0.0,
+      "speed": 13.6,
+      "localCpu": 500000000.0
+    },
+    {
+      "vehicleId": "vehicle_002",
+      "x": 120.0,
+      "y": 6.0,
+      "speed": 15.1,
+      "localCpu": 620000000.0
+    },
+    {
+      "vehicleId": "vehicle_003",
+      "x": 210.0,
+      "y": -8.0,
+      "speed": 20.1,
+      "localCpu": 430000000.0
+    }
+  ],
+  "tasks": [
+    {
+      "taskId": "task_001",
+      "sourceVehicleId": "vehicle_001",
+      "inputSizeBits": 8200000.0,
+      "outputSizeBits": 820000.0,
+      "cpuCycles": 1030000000.0,
+      "deadlineSeconds": 3.0
+    },
+    {
+      "taskId": "task_002",
+      "sourceVehicleId": "vehicle_002",
+      "inputSizeBits": 11200000.0,
+      "outputSizeBits": 920000.0,
+      "cpuCycles": 1620000000.0,
+      "deadlineSeconds": 2.8
+    },
+    {
+      "taskId": "task_003",
+      "sourceVehicleId": "vehicle_003",
+      "inputSizeBits": 5100000.0,
+      "outputSizeBits": 510000.0,
+      "cpuCycles": 710000000.0,
+      "deadlineSeconds": 2.0
+    }
+  ],
+  "candidateNodes": [
+    {
+      "candidateId": "local_vehicle_001",
+      "sourceVehicleId": "vehicle_001",
+      "executionNodeId": "vehicle_001",
+      "type": "LOCAL",
+      "availableCpu": 500000000.0,
+      "availableBandwidth": 0.0,
+      "baseLatencySeconds": 0.0,
+      "coverageTimeSeconds": 0.0
+    },
+    {
+      "candidateId": "edge_001_for_vehicle_001",
+      "sourceVehicleId": "vehicle_001",
+      "executionNodeId": "edge_001",
+      "type": "EDGE",
+      "availableCpu": 3350000000.0,
+      "availableBandwidth": 24500000.0,
+      "baseLatencySeconds": 0.013,
+      "coverageTimeSeconds": 7.5
+    },
+    {
+      "candidateId": "cloud_001_for_vehicle_001",
+      "sourceVehicleId": "vehicle_001",
+      "executionNodeId": "cloud_001",
+      "type": "CLOUD",
+      "availableCpu": 9000000000.0,
+      "availableBandwidth": 15000000.0,
+      "baseLatencySeconds": 0.08,
+      "coverageTimeSeconds": 9999.0
+    },
+    {
+      "candidateId": "local_vehicle_002",
+      "sourceVehicleId": "vehicle_002",
+      "executionNodeId": "vehicle_002",
+      "type": "LOCAL",
+      "availableCpu": 620000000.0,
+      "availableBandwidth": 0.0,
+      "baseLatencySeconds": 0.0,
+      "coverageTimeSeconds": 0.0
+    },
+    {
+      "candidateId": "edge_001_for_vehicle_002",
+      "sourceVehicleId": "vehicle_002",
+      "executionNodeId": "edge_001",
+      "type": "EDGE",
+      "availableCpu": 3350000000.0,
+      "availableBandwidth": 22500000.0,
+      "baseLatencySeconds": 0.015,
+      "coverageTimeSeconds": 6.7
+    },
+    {
+      "candidateId": "cloud_001_for_vehicle_002",
+      "sourceVehicleId": "vehicle_002",
+      "executionNodeId": "cloud_001",
+      "type": "CLOUD",
+      "availableCpu": 9000000000.0,
+      "availableBandwidth": 14000000.0,
+      "baseLatencySeconds": 0.082,
+      "coverageTimeSeconds": 9999.0
+    },
+    {
+      "candidateId": "local_vehicle_003",
+      "sourceVehicleId": "vehicle_003",
+      "executionNodeId": "vehicle_003",
+      "type": "LOCAL",
+      "availableCpu": 430000000.0,
+      "availableBandwidth": 0.0,
+      "baseLatencySeconds": 0.0,
+      "coverageTimeSeconds": 0.0
+    },
+    {
+      "candidateId": "edge_001_for_vehicle_003",
+      "sourceVehicleId": "vehicle_003",
+      "executionNodeId": "edge_001",
+      "type": "EDGE",
+      "availableCpu": 3350000000.0,
+      "availableBandwidth": 19500000.0,
+      "baseLatencySeconds": 0.017,
+      "coverageTimeSeconds": 5.8
+    },
+    {
+      "candidateId": "cloud_001_for_vehicle_003",
+      "sourceVehicleId": "vehicle_003",
+      "executionNodeId": "cloud_001",
+      "type": "CLOUD",
+      "availableCpu": 9000000000.0,
+      "availableBandwidth": 13000000.0,
+      "baseLatencySeconds": 0.085,
+      "coverageTimeSeconds": 9999.0
+    }
+  ]
+}

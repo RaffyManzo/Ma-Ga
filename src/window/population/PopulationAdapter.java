@@ -1,7 +1,5 @@
 package window.population;
 
-import ga.core.MaGaOptimizer;
-
 import config.window.TemporalWindowConfig;
 import ga.operators.PopulationInitializer;
 import ga.operators.RepairOperator;
