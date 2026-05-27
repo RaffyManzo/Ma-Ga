@@ -4,27 +4,41 @@ import ga.MaGaResult;
 import io.ResultPrinter;
 import io.SnapshotLoader;
 import model.SystemSnapshot;
+import validation.SnapshotValidator;
 
 /**
- * Punto di ingresso del primo prototipo Java standalone del MA-GA.
+ * Punto di ingresso del prototipo Java standalone del MA-GA.
  *
- * Questa versione carica lo snapshot complesso snapshot_002.json.
+ * Questa versione integra SnapshotValidator.
+ *
+ * Flusso:
+ *
+ * 1. carica lo snapshot JSON;
+ * 2. valida lo snapshot;
+ * 3. crea la configurazione MA-GA;
+ * 4. esegue optimizeDetailed();
+ * 5. stampa il report tecnico.
  */
 public final class Main {
 
     /**
-     * Avvia il prototipo:
+     * Avvia il prototipo.
      *
-     * 1. carica uno snapshot statico;
-     * 2. crea la configurazione del MA-GA;
-     * 3. esegue l'ottimizzazione dettagliata;
-     * 4. stampa un report tecnico del risultato.
+     * Parametri in ingresso:
+     * - args[0], opzionale: percorso dello snapshot da eseguire.
+     *
+     * Se args[0] non viene fornito, usa uno snapshot di test di default.
      */
     public static void main(String[] args) throws Exception {
-        String snapshotPath = "data/snapshot_003.json";
+        String snapshotPath = args.length > 0
+                ? args[0]
+                : "data/tests/snapshot_01_local_only.json";
 
         SnapshotLoader snapshotLoader = new SnapshotLoader();
         SystemSnapshot snapshot = snapshotLoader.load(snapshotPath);
+
+        SnapshotValidator validator = new SnapshotValidator();
+        validator.validate(snapshot);
 
         MaGaConfig config = MaGaConfig.defaultConfig();
 
