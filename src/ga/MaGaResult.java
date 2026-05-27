@@ -1,8 +1,5 @@
 package ga;
 
-import ga.FitnessEvaluator;
-import ga.GenerationStat;
-import ga.StopReason;
 import model.Chromosome;
 
 import java.util.ArrayList;
@@ -13,15 +10,19 @@ import java.util.Objects;
 /**
  * Risultato completo di una esecuzione del MA-GA su uno snapshot.
  *
- * Questa classe è fondamentale perché separa:
+ * Questa classe separa:
  *
  * - ottimizzazione;
  * - valutazione;
  * - stampa;
- * - analisi sperimentale.
+ * - analisi sperimentale;
+ * - riuso temporale della popolazione.
  *
- * In futuro, quando il MA-GA sarà integrato con MOSAIC, un MaGaResult potrà
- * essere prodotto per ogni snapshot o finestra temporale.
+ * Nel gestore temporale, ogni finestra k deve poter conservare:
+ *
+ * - C*_k, cioè il miglior cromosoma trovato;
+ * - P_final_k, cioè la popolazione finale ottenuta al termine del GA.
+ *
  */
 public final class MaGaResult {
 
@@ -40,22 +41,13 @@ public final class MaGaResult {
     private final List<GenerationStat> generationHistory;
 
     /**
-     * Costruisce il risultato completo del MA-GA.
+     * Popolazione finale prodotta dall'esecuzione del MA-GA.
      *
-     * Parametri in ingresso:
-     * - snapshotId: identificativo dello snapshot ottimizzato;
-     * - snapshotTimeSeconds: tempo simulato associato allo snapshot;
-     * - bestChromosome: miglior cromosoma trovato;
-     * - bestEvaluation: breakdown della fitness del miglior cromosoma;
-     * - generationsExecuted: numero di generazioni effettivamente eseguite;
-     * - stopReason: motivo di arresto;
-     * - initialBestFitness: migliore fitness nella popolazione iniziale;
-     * - finalBestFitness: migliore fitness finale;
-     * - generationHistory: storico delle statistiche generazionali.
-     *
-     * Output:
-     * - nuova istanza immutabile di MaGaResult.
+     * Serve al gestore temporale per riutilizzare una parte o tutta la popolazione
+     * nella finestra successiva.
      */
+    private final List<Chromosome> finalPopulation;
+
     public MaGaResult(
             String snapshotId,
             double snapshotTimeSeconds,
@@ -65,120 +57,93 @@ public final class MaGaResult {
             StopReason stopReason,
             double initialBestFitness,
             double finalBestFitness,
-            List<GenerationStat> generationHistory
+            List<GenerationStat> generationHistory,
+            List<Chromosome> finalPopulation
     ) {
-        this.snapshotId = snapshotId;
+        this.snapshotId = Objects.requireNonNull(snapshotId, "snapshotId must not be null.");
         this.snapshotTimeSeconds = snapshotTimeSeconds;
+
         this.bestChromosome = Objects.requireNonNull(
                 bestChromosome,
                 "bestChromosome must not be null."
         );
+
         this.bestEvaluation = Objects.requireNonNull(
                 bestEvaluation,
                 "bestEvaluation must not be null."
         );
+
         this.generationsExecuted = generationsExecuted;
+
         this.stopReason = Objects.requireNonNull(
                 stopReason,
                 "stopReason must not be null."
         );
+
         this.initialBestFitness = initialBestFitness;
         this.finalBestFitness = finalBestFitness;
+
         this.generationHistory = Collections.unmodifiableList(
-                new ArrayList<>(Objects.requireNonNull(
-                        generationHistory,
-                        "generationHistory must not be null."
-                ))
+                new ArrayList<>(
+                        Objects.requireNonNull(
+                                generationHistory,
+                                "generationHistory must not be null."
+                        )
+                )
+        );
+
+        this.finalPopulation = Collections.unmodifiableList(
+                new ArrayList<>(
+                        Objects.requireNonNull(
+                                finalPopulation,
+                                "finalPopulation must not be null."
+                        )
+                )
         );
     }
 
-    /**
-     * Restituisce l'identificativo dello snapshot.
-     *
-     * Output:
-     * - snapshotId.
-     */
     public String getSnapshotId() {
         return snapshotId;
     }
 
-    /**
-     * Restituisce il tempo simulato dello snapshot.
-     *
-     * Output:
-     * - tempo simulato in secondi.
-     */
     public double getSnapshotTimeSeconds() {
         return snapshotTimeSeconds;
     }
 
-    /**
-     * Restituisce il miglior cromosoma trovato.
-     *
-     * Output:
-     * - Chromosome migliore.
-     */
     public Chromosome getBestChromosome() {
         return bestChromosome;
     }
 
-    /**
-     * Restituisce il breakdown della fitness del miglior cromosoma.
-     *
-     * Output:
-     * - EvaluationBreakdown del miglior cromosoma.
-     */
     public FitnessEvaluator.EvaluationBreakdown getBestEvaluation() {
         return bestEvaluation;
     }
 
-    /**
-     * Restituisce il numero di generazioni eseguite.
-     *
-     * Output:
-     * - numero di generazioni completate.
-     */
     public int getGenerationsExecuted() {
         return generationsExecuted;
     }
 
-    /**
-     * Restituisce il motivo di arresto del MA-GA.
-     *
-     * Output:
-     * - StopReason.
-     */
     public StopReason getStopReason() {
         return stopReason;
     }
 
-    /**
-     * Restituisce la migliore fitness iniziale.
-     *
-     * Output:
-     * - migliore fitness nella popolazione iniziale.
-     */
     public double getInitialBestFitness() {
         return initialBestFitness;
     }
 
-    /**
-     * Restituisce la fitness finale.
-     *
-     * Output:
-     * - fitness del miglior cromosoma finale.
-     */
     public double getFinalBestFitness() {
         return finalBestFitness;
     }
 
-    /**
-     * Restituisce lo storico delle generazioni.
-     *
-     * Output:
-     * - lista immutabile di GenerationStat.
-     */
     public List<GenerationStat> getGenerationHistory() {
         return generationHistory;
+    }
+
+    /**
+     * Restituisce la popolazione finale prodotta dal MA-GA.
+     *
+     * Questa lista è immutabile rispetto al riferimento esterno.
+     */
+    public List<Chromosome> getFinalPopulation() {
+        return finalPopulation;
     }
 }
