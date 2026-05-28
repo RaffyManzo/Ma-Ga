@@ -1,11 +1,11 @@
-package test.runner;
+package app;
 
 import config.MaGaConfig;
 import config.ga.GaParameterScalingMode;
 import config.window.TemporalWindowConfig;
 import ga.core.MaGaOptimizer;
-import io.reporting.DeepTemporalWindowStressPrinter;
-import io.reporting.TemporalWindowStressPrinter;
+import io.reporting.CandidateFilteringPrinter;
+import io.reporting.DeepTemporalWindowDiagnosticPrinter;
 import io.snapshot.SnapshotLoader;
 import model.snapshot.SystemSnapshot;
 import validation.snapshot.SnapshotValidator;
@@ -13,7 +13,11 @@ import window.core.TemporalWindowManager;
 import window.dynamicity.DynamicityEvaluator;
 import window.event.StaticCriticalEventDetector;
 import window.population.PopulationAdapter;
+import window.prefilter.CandidatePrefilter;
+import window.prefilter.CandidatePrefilterConfig;
+import window.provider.FilteringSystemStateProvider;
 import window.provider.StaticSystemStateProvider;
+import window.provider.SystemStateProvider;
 import window.state.TemporalWindowResult;
 
 import java.io.File;
@@ -23,21 +27,23 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * Main di stress test del sistema temporale completo.
+ * Main di stress test del sistema temporale completo MA-GA.
  *
- * Questo main usa davvero TemporalWindowManager:
+ * Questo main testa:
  *
- * - StaticSystemStateProvider per fornire snapshot JSON statici;
- * - StaticCriticalEventDetector.empty() per usare solo finestre programmate;
- * - DynamicityEvaluator per misurare il cambiamento tra snapshot;
- * - PopulationAdapter per FIRST_RUN/WARM_START/PARTIAL_RESTART/COLD_START;
- * - MaGaOptimizer per eseguire il MA-GA su ogni finestra.
- *
- * Lo scopo è testare il comportamento del package window sotto stress costante.
+ * - caricamento di snapshot statici consecutivi da JSON;
+ * - validazione snapshot;
+ * - prefiltraggio dei candidati prima del GA;
+ * - TemporalWindowManager;
+ * - DynamicityEvaluator;
+ * - PopulationAdapter;
+ * - MaGaOptimizer con scaling adattivo;
+ * - report diagnostico deadline-oriented;
+ * - report sintetico del candidate prefilter.
  */
 public final class TemporalWindowStressTestMain {
 
-    private static final String DEFAULT_FOLDER =
+    private static final String DEFAULT_SNAPSHOT_FOLDER =
             "data/window_static_stress";
 
     private static final double START_TIME_SECONDS = 0.0;
@@ -46,9 +52,12 @@ public final class TemporalWindowStressTestMain {
     }
 
     public static void main(String[] args) throws Exception {
-        String folderPath = args.length > 0 ? args[0] : DEFAULT_FOLDER;
+        String folderPath = args.length > 0
+                ? args[0]
+                : DEFAULT_SNAPSHOT_FOLDER;
 
-        List<SystemSnapshot> snapshots = loadAndValidateSnapshots(folderPath);
+        List<SystemSnapshot> snapshots =
+                loadAndValidateSnapshots(folderPath);
 
         if (snapshots.isEmpty()) {
             throw new IllegalArgumentException(
@@ -63,8 +72,28 @@ public final class TemporalWindowStressTestMain {
         TemporalWindowConfig windowConfig =
                 TemporalWindowConfig.defaultConfig();
 
+        CandidatePrefilterConfig prefilterConfig =
+                CandidatePrefilterConfig.defaultConfig();
+
+        CandidatePrefilter prefilter =
+                new CandidatePrefilter(prefilterConfig);
+
+        SystemStateProvider baseProvider =
+                new StaticSystemStateProvider(snapshots);
+
+        FilteringSystemStateProvider filteredProvider =
+                new FilteringSystemStateProvider(
+                        baseProvider,
+                        prefilter
+                );
+
+        SystemSnapshot firstFilteredSnapshot =
+                prefilter
+                        .filter(snapshots.get(0))
+                        .getFilteredSnapshot();
+
         int targetPopulationSize = maGaConfig
-                .resolveGeneticAlgorithmConfig(snapshots.get(0))
+                .resolveGeneticAlgorithmConfig(firstFilteredSnapshot)
                 .getPopulationSize();
 
         TemporalWindowManager manager = new TemporalWindowManager(
@@ -80,7 +109,7 @@ public final class TemporalWindowStressTestMain {
                         )
                 ),
                 StaticCriticalEventDetector.empty(),
-                new StaticSystemStateProvider(snapshots),
+                filteredProvider,
                 targetPopulationSize
         );
 
@@ -89,12 +118,25 @@ public final class TemporalWindowStressTestMain {
                 snapshots.size()
         );
 
-        DeepTemporalWindowStressPrinter printer =
-                new DeepTemporalWindowStressPrinter(maGaConfig);
+        DeepTemporalWindowDiagnosticPrinter diagnosticPrinter =
+                new DeepTemporalWindowDiagnosticPrinter(maGaConfig);
 
-        printer.print(result);
+        diagnosticPrinter.print(result);
+
+        CandidateFilteringPrinter filteringPrinter =
+                new CandidateFilteringPrinter();
+
+        filteringPrinter.print(
+                filteredProvider.getFilteringResults()
+        );
     }
 
+    /**
+     * Carica e valida tutti gli snapshot presenti nella cartella.
+     *
+     * Gli snapshot vengono ordinati in base al loro timeSeconds,
+     * non solo in base al nome del file.
+     */
     private static List<SystemSnapshot> loadAndValidateSnapshots(
             String folderPath
     ) throws Exception {
@@ -116,6 +158,9 @@ public final class TemporalWindowStressTestMain {
         return snapshots;
     }
 
+    /**
+     * Trova i file JSON dello stress test temporale.
+     */
     private static List<File> listSnapshotFiles(String folderPath) {
         File folder = new File(folderPath);
 
@@ -140,7 +185,10 @@ public final class TemporalWindowStressTestMain {
         }
 
         List<File> result = new ArrayList<>(List.of(files));
-        result.sort(Comparator.comparing(File::getName));
+
+        result.sort(
+                Comparator.comparing(File::getName)
+        );
 
         return result;
     }
