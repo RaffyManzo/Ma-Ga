@@ -2,6 +2,7 @@ package io.reporting;
 
 import ga.core.MaGaResult;
 import ga.fitness.FitnessEvaluator;
+import ga.fitness.breakdown.GeneEvaluationBreakdown;
 import model.snapshot.SystemSnapshot;
 import window.dynamicity.DynamicityBreakdown;
 import window.event.CriticalEvent;
@@ -209,7 +210,7 @@ public final class TemporalWindowPrinter {
     private void printBestDecisions(MaGaResult result) {
         out.println("Best decisions:");
 
-        for (FitnessEvaluator.GeneEvaluationBreakdown gene
+        for (GeneEvaluationBreakdown gene
                 : result.getBestEvaluation().getGeneBreakdowns()) {
             out.println("- " + gene.getTaskId()
                     + " | source=" + gene.getSourceVehicleId()

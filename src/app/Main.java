@@ -34,7 +34,7 @@ public final class Main {
     public static void main(String[] args) throws Exception {
         String snapshotPath = args.length > 0
                 ? args[0]
-                : "data/tests/snapshot_01_local_only.json";
+                : "data/maga/snapshot_maga_01_basic_edge_cloud.json";
 
         SnapshotLoader snapshotLoader = new SnapshotLoader();
         SystemSnapshot snapshot = snapshotLoader.load(snapshotPath);

@@ -4,30 +4,19 @@ import config.fitness.FitnessWeights;
 import config.fitness.NormalizationConfig;
 import config.fitness.PenaltyConfig;
 import config.ga.GeneticAlgorithmConfig;
+import config.mobility.MobilityConfig;
+
 import java.util.Objects;
 
 /**
  * Configurazione complessiva del Mobility-Aware Genetic Algorithm.
  *
- * Questa classe aggrega:
- *
- * - FitnessWeights: pesi wT, wL, wM, wR della funzione obiettivo;
- * - PenaltyConfig: coefficienti usati per costruire Pmob(C), Pres(C) e penalità di deadline;
- * - NormalizationConfig: riferimenti usati per normalizzare i termini della fitness;
- * - GeneticAlgorithmConfig: parametri evolutivi del GA.
- *
- * Non contiene:
- *
- * - SystemSnapshot;
- * - VehicleSnapshot;
- * - TaskInstance;
- * - NodeCandidate;
- * - Gene;
- * - Chromosome;
- * - logica di valutazione;
- * - logica di mutazione, crossover o selezione;
- * - logica di caricamento JSON;
- * - logica MOSAIC/SUMO.
+ * Aggrega le configurazioni necessarie al GA:
+ * - pesi della fitness;
+ * - penalità;
+ * - normalizzazione;
+ * - parametri evolutivi;
+ * - parametri di mobilità/copertura.
  */
 public final class MaGaConfig {
 
@@ -35,12 +24,43 @@ public final class MaGaConfig {
     private final PenaltyConfig penaltyConfig;
     private final NormalizationConfig normalizationConfig;
     private final GeneticAlgorithmConfig geneticAlgorithmConfig;
+    private final MobilityConfig mobilityConfig;
 
+    /**
+     * Costruttore compatibile con la versione precedente.
+     *
+     * Usa MobilityConfig.defaultConfig().
+     */
     public MaGaConfig(
             FitnessWeights fitnessWeights,
             PenaltyConfig penaltyConfig,
             NormalizationConfig normalizationConfig,
             GeneticAlgorithmConfig geneticAlgorithmConfig
+    ) {
+        this(
+                fitnessWeights,
+                penaltyConfig,
+                normalizationConfig,
+                geneticAlgorithmConfig,
+                MobilityConfig.defaultConfig()
+        );
+    }
+
+    /**
+     * Costruisce la configurazione completa del MA-GA.
+     *
+     * @param fitnessWeights pesi della funzione obiettivo
+     * @param penaltyConfig configurazione delle penalità
+     * @param normalizationConfig riferimenti di normalizzazione
+     * @param geneticAlgorithmConfig parametri evolutivi del GA
+     * @param mobilityConfig parametri per stimare copertura e mobilità
+     */
+    public MaGaConfig(
+            FitnessWeights fitnessWeights,
+            PenaltyConfig penaltyConfig,
+            NormalizationConfig normalizationConfig,
+            GeneticAlgorithmConfig geneticAlgorithmConfig,
+            MobilityConfig mobilityConfig
     ) {
         this.fitnessWeights = Objects.requireNonNull(
                 fitnessWeights,
@@ -61,14 +81,25 @@ public final class MaGaConfig {
                 geneticAlgorithmConfig,
                 "geneticAlgorithmConfig must not be null."
         );
+
+        this.mobilityConfig = Objects.requireNonNull(
+                mobilityConfig,
+                "mobilityConfig must not be null."
+        );
     }
 
+    /**
+     * Configurazione iniziale del prototipo.
+     *
+     * @return configurazione MA-GA completa
+     */
     public static MaGaConfig defaultConfig() {
         return new MaGaConfig(
                 FitnessWeights.defaultWeights(),
                 PenaltyConfig.defaultConfig(),
                 NormalizationConfig.neutral(),
-                GeneticAlgorithmConfig.defaultConfig()
+                GeneticAlgorithmConfig.defaultConfig(),
+                MobilityConfig.defaultConfig()
         );
     }
 
@@ -88,14 +119,18 @@ public final class MaGaConfig {
         return geneticAlgorithmConfig;
     }
 
+    public MobilityConfig getMobilityConfig() {
+        return mobilityConfig;
+    }
+
     @Override
     public String toString() {
-        return "MaGaConfig{" +
-                "fitnessWeights=" + fitnessWeights +
-                ", penaltyConfig=" + penaltyConfig +
-                ", normalizationConfig=" + normalizationConfig +
-                ", geneticAlgorithmConfig=" + geneticAlgorithmConfig +
-                '}';
+        return "MaGaConfig{"
+                + "fitnessWeights=" + fitnessWeights
+                + ", penaltyConfig=" + penaltyConfig
+                + ", normalizationConfig=" + normalizationConfig
+                + ", geneticAlgorithmConfig=" + geneticAlgorithmConfig
+                + ", mobilityConfig=" + mobilityConfig
+                + '}';
     }
 }
-

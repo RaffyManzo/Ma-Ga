@@ -58,8 +58,7 @@
       "type": "LOCAL",
       "availableCpu": 500000000.0,
       "availableBandwidth": 0.0,
-      "baseLatencySeconds": 0.0,
-      "coverageTimeSeconds": 0.0
+      "baseLatencySeconds": 0.0
     },
     {
       "candidateId": "edge_001_for_vehicle_001",
@@ -67,9 +66,11 @@
       "executionNodeId": "edge_001",
       "type": "EDGE",
       "availableCpu": 3350000000.0,
-      "availableBandwidth": 24500000.0,
-      "baseLatencySeconds": 0.013,
-      "coverageTimeSeconds": 7.5
+      "availableBandwidth": 25000000.0,
+      "baseLatencySeconds": 0.012,
+      "nodeX": 100.0,
+      "nodeY": 0.0,
+      "coverageRadiusMeters": 350.0
     },
     {
       "candidateId": "cloud_001_for_vehicle_001",
@@ -77,9 +78,8 @@
       "executionNodeId": "cloud_001",
       "type": "CLOUD",
       "availableCpu": 9000000000.0,
-      "availableBandwidth": 15000000.0,
-      "baseLatencySeconds": 0.08,
-      "coverageTimeSeconds": 9999.0
+      "availableBandwidth": 13750000.000000002,
+      "baseLatencySeconds": 0.08
     },
     {
       "candidateId": "local_vehicle_002",
@@ -88,8 +88,7 @@
       "type": "LOCAL",
       "availableCpu": 620000000.0,
       "availableBandwidth": 0.0,
-      "baseLatencySeconds": 0.0,
-      "coverageTimeSeconds": 0.0
+      "baseLatencySeconds": 0.0
     },
     {
       "candidateId": "edge_001_for_vehicle_002",
@@ -97,9 +96,11 @@
       "executionNodeId": "edge_001",
       "type": "EDGE",
       "availableCpu": 3350000000.0,
-      "availableBandwidth": 22500000.0,
-      "baseLatencySeconds": 0.015,
-      "coverageTimeSeconds": 6.7
+      "availableBandwidth": 23000000.0,
+      "baseLatencySeconds": 0.014,
+      "nodeX": 100.0,
+      "nodeY": 0.0,
+      "coverageRadiusMeters": 350.0
     },
     {
       "candidateId": "cloud_001_for_vehicle_002",
@@ -107,9 +108,8 @@
       "executionNodeId": "cloud_001",
       "type": "CLOUD",
       "availableCpu": 9000000000.0,
-      "availableBandwidth": 14000000.0,
-      "baseLatencySeconds": 0.082,
-      "coverageTimeSeconds": 9999.0
+      "availableBandwidth": 12650000.000000002,
+      "baseLatencySeconds": 0.08
     },
     {
       "candidateId": "local_vehicle_003",
@@ -118,8 +118,7 @@
       "type": "LOCAL",
       "availableCpu": 430000000.0,
       "availableBandwidth": 0.0,
-      "baseLatencySeconds": 0.0,
-      "coverageTimeSeconds": 0.0
+      "baseLatencySeconds": 0.0
     },
     {
       "candidateId": "edge_001_for_vehicle_003",
@@ -127,9 +126,11 @@
       "executionNodeId": "edge_001",
       "type": "EDGE",
       "availableCpu": 3350000000.0,
-      "availableBandwidth": 19500000.0,
-      "baseLatencySeconds": 0.017,
-      "coverageTimeSeconds": 5.8
+      "availableBandwidth": 20000000.0,
+      "baseLatencySeconds": 0.016,
+      "nodeX": 100.0,
+      "nodeY": 0.0,
+      "coverageRadiusMeters": 350.0
     },
     {
       "candidateId": "cloud_001_for_vehicle_003",
@@ -137,9 +138,8 @@
       "executionNodeId": "cloud_001",
       "type": "CLOUD",
       "availableCpu": 9000000000.0,
-      "availableBandwidth": 13000000.0,
-      "baseLatencySeconds": 0.085,
-      "coverageTimeSeconds": 9999.0
+      "availableBandwidth": 12000000.0,
+      "baseLatencySeconds": 0.08
     }
   ]
 }

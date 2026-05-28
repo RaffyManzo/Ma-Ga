@@ -15,19 +15,16 @@ import java.util.List;
 /**
  * Carica uno snapshot statico del sistema da file JSON.
  *
- * Il nuovo formato dei candidati è source-aware.
- * Ogni NodeCandidate indica:
- *
- * - per quale veicolo sorgente è valido;
- * - quale nodo fisico esegue il task;
- * - quali metriche di link e copertura sono stimate per quella relazione.
+ * Il loader converte il formato JSON in oggetti del modello interno.
+ * Non valida la correttezza dello scenario: la validazione è responsabilità
+ * di SnapshotValidator.
  */
 public final class SnapshotLoader {
 
     private final ObjectMapper objectMapper;
 
     /**
-     * Costruisce il loader.
+     * Costruisce un loader basato su Jackson.
      */
     public SnapshotLoader() {
         this.objectMapper = new ObjectMapper();
@@ -36,14 +33,9 @@ public final class SnapshotLoader {
     /**
      * Carica uno snapshot da file JSON.
      *
-     * Parametri in ingresso:
-     * - filePath: percorso del file JSON.
-     *
-     * Output:
-     * - SystemSnapshot costruito dal file.
-     *
-     * Eccezioni:
-     * - IOException se il file non è leggibile o il JSON non è valido.
+     * @param filePath percorso del file JSON
+     * @return snapshot convertito nel modello interno
+     * @throws IOException se il file non è leggibile o il JSON non è valido
      */
     public SystemSnapshot load(String filePath) throws IOException {
         if (filePath == null || filePath.isBlank()) {
@@ -86,13 +78,15 @@ public final class SnapshotLoader {
         }
 
         for (VehicleDto dto : vehicleDtos) {
-            vehicles.add(new VehicleSnapshot(
-                    dto.vehicleId,
-                    dto.x,
-                    dto.y,
-                    dto.speed,
-                    dto.localCpu
-            ));
+            vehicles.add(
+                    new VehicleSnapshot(
+                            dto.vehicleId,
+                            dto.x,
+                            dto.y,
+                            dto.speed,
+                            dto.localCpu
+                    )
+            );
         }
 
         return vehicles;
@@ -109,14 +103,16 @@ public final class SnapshotLoader {
         }
 
         for (TaskDto dto : taskDtos) {
-            tasks.add(new TaskInstance(
-                    dto.taskId,
-                    dto.sourceVehicleId,
-                    dto.inputSizeBits,
-                    dto.outputSizeBits,
-                    dto.cpuCycles,
-                    dto.deadlineSeconds
-            ));
+            tasks.add(
+                    new TaskInstance(
+                            dto.taskId,
+                            dto.sourceVehicleId,
+                            dto.inputSizeBits,
+                            dto.outputSizeBits,
+                            dto.cpuCycles,
+                            dto.deadlineSeconds
+                    )
+            );
         }
 
         return tasks;
@@ -124,6 +120,10 @@ public final class SnapshotLoader {
 
     /**
      * Converte i candidati JSON in NodeCandidate source-aware.
+     *
+     * Il JSON non contiene più coverageTimeSeconds.
+     * Per EDGE/RSU deve contenere nodeX, nodeY e coverageRadiusMeters.
+     * Per LOCAL, CLOUD e VEHICLE questi campi possono essere assenti.
      */
     private List<NodeCandidate> toCandidateNodes(List<NodeDto> nodeDtos) {
         List<NodeCandidate> candidateNodes = new ArrayList<>();
@@ -133,19 +133,34 @@ public final class SnapshotLoader {
         }
 
         for (NodeDto dto : nodeDtos) {
-            candidateNodes.add(new NodeCandidate(
-                    dto.candidateId,
-                    dto.sourceVehicleId,
-                    dto.executionNodeId,
-                    NodeType.valueOf(dto.type.toUpperCase()),
-                    dto.availableCpu,
-                    dto.availableBandwidth,
-                    dto.baseLatencySeconds,
-                    dto.coverageTimeSeconds
-            ));
+            candidateNodes.add(
+                    new NodeCandidate(
+                            dto.candidateId,
+                            dto.sourceVehicleId,
+                            dto.executionNodeId,
+                            parseNodeType(dto.type),
+                            dto.availableCpu,
+                            dto.availableBandwidth,
+                            dto.baseLatencySeconds,
+                            dto.nodeX,
+                            dto.nodeY,
+                            dto.coverageRadiusMeters
+                    )
+            );
         }
 
         return candidateNodes;
+    }
+
+    /**
+     * Converte il tipo del nodo da stringa JSON a enum.
+     */
+    private NodeType parseNodeType(String value) {
+        if (value == null || value.isBlank()) {
+            throw new IllegalArgumentException("candidate type must not be null or blank.");
+        }
+
+        return NodeType.valueOf(value.trim().toUpperCase());
     }
 
     private static final class SnapshotDto {
@@ -178,10 +193,13 @@ public final class SnapshotLoader {
         public String sourceVehicleId;
         public String executionNodeId;
         public String type;
+
         public double availableCpu;
         public double availableBandwidth;
         public double baseLatencySeconds;
-        public double coverageTimeSeconds;
+
+        public Double nodeX;
+        public Double nodeY;
+        public Double coverageRadiusMeters;
     }
 }
-

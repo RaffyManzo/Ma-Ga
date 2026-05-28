@@ -6,29 +6,13 @@ import java.util.Objects;
  * Rappresenta una possibile opzione di esecuzione per un task generato
  * da uno specifico veicolo sorgente.
  *
- * Nel modello precedente il candidato era trattato come nodo globale.
- * In questa versione, invece, il candidato è source-aware:
+ * Il candidato è source-aware:
+ * - sourceVehicleId indica il veicolo che può usare questo candidato;
+ * - executionNodeId indica il nodo fisico che eseguirà il task.
  *
- * candidateId      = identificativo dell'opzione di esecuzione
- * sourceVehicleId  = veicolo per cui questo candidato è valido
- * executionNodeId  = nodo fisico che esegue il task
- *
- * Esempi:
- *
- * LOCAL:
- * candidateId     = local_vehicle_003
- * sourceVehicleId = vehicle_003
- * executionNodeId = vehicle_003
- *
- * V2V:
- * candidateId     = v2v_vehicle_001_to_vehicle_002
- * sourceVehicleId = vehicle_001
- * executionNodeId = vehicle_002
- *
- * EDGE:
- * candidateId     = edge_001_for_vehicle_003
- * sourceVehicleId = vehicle_003
- * executionNodeId = edge_001
+ * Il tempo di copertura non è memorizzato in questa classe.
+ * Verrà calcolato da una classe dedicata usando veicoli, posizione del nodo,
+ * raggio di copertura e, nel caso V2V, veicolo target.
  */
 public final class NodeCandidate {
 
@@ -40,23 +24,24 @@ public final class NodeCandidate {
     private final double availableCpu;
     private final double availableBandwidth;
     private final double baseLatencySeconds;
-    private final double coverageTimeSeconds;
+
+    private final Double nodeX;
+    private final Double nodeY;
+    private final Double coverageRadiusMeters;
 
     /**
      * Costruisce un candidato di esecuzione source-aware.
      *
-     * Parametri in ingresso:
-     * - candidateId: identificativo univoco del candidato;
-     * - sourceVehicleId: veicolo sorgente per cui il candidato è valido;
-     * - executionNodeId: nodo fisico che eseguirà il task;
-     * - type: tipo del candidato, cioè LOCAL, VEHICLE, EDGE o CLOUD;
-     * - availableCpu: CPU disponibile sul nodo di esecuzione;
-     * - availableBandwidth: banda stimata sul link sorgente-destinazione;
-     * - baseLatencySeconds: latenza base stimata;
-     * - coverageTimeSeconds: tempo di copertura stimato.
-     *
-     * Output:
-     * - nuova istanza immutabile di NodeCandidate.
+     * @param candidateId identificativo univoco del candidato
+     * @param sourceVehicleId veicolo sorgente per cui il candidato è valido
+     * @param executionNodeId nodo fisico che esegue il task
+     * @param type tipo del candidato
+     * @param availableCpu CPU disponibile sul nodo di esecuzione
+     * @param availableBandwidth banda disponibile sul link sorgente-destinazione
+     * @param baseLatencySeconds latenza base del collegamento
+     * @param nodeX coordinata X del nodo infrastrutturale, se applicabile
+     * @param nodeY coordinata Y del nodo infrastrutturale, se applicabile
+     * @param coverageRadiusMeters raggio di copertura del nodo, se applicabile
      */
     public NodeCandidate(
             String candidateId,
@@ -66,159 +51,153 @@ public final class NodeCandidate {
             double availableCpu,
             double availableBandwidth,
             double baseLatencySeconds,
-            double coverageTimeSeconds
+            Double nodeX,
+            Double nodeY,
+            Double coverageRadiusMeters
     ) {
         this.candidateId = requireText(candidateId, "candidateId");
         this.sourceVehicleId = requireText(sourceVehicleId, "sourceVehicleId");
         this.executionNodeId = requireText(executionNodeId, "executionNodeId");
-        this.type = Objects.requireNonNull(type, "type must not be null.");
-        this.availableCpu = validateFiniteNonNegative("availableCpu", availableCpu);
-        this.availableBandwidth = validateFiniteNonNegative("availableBandwidth", availableBandwidth);
-        this.baseLatencySeconds = validateFiniteNonNegative("baseLatencySeconds", baseLatencySeconds);
-        this.coverageTimeSeconds = validateFiniteNonNegative("coverageTimeSeconds", coverageTimeSeconds);
+
+        this.type = Objects.requireNonNull(
+                type,
+                "type must not be null."
+        );
+
+        this.availableCpu = validateFiniteNonNegative(
+                "availableCpu",
+                availableCpu
+        );
+
+        this.availableBandwidth = validateFiniteNonNegative(
+                "availableBandwidth",
+                availableBandwidth
+        );
+
+        this.baseLatencySeconds = validateFiniteNonNegative(
+                "baseLatencySeconds",
+                baseLatencySeconds
+        );
+
+        this.nodeX = validateOptionalFinite("nodeX", nodeX);
+        this.nodeY = validateOptionalFinite("nodeY", nodeY);
+
+        this.coverageRadiusMeters = validateOptionalPositive(
+                "coverageRadiusMeters",
+                coverageRadiusMeters
+        );
 
         validateLocalCandidate();
         validateVehicleCandidate();
+        validateInfrastructureCandidate();
     }
 
-    /**
-     * Restituisce l'identificativo del candidato.
-     *
-     * Output:
-     * - candidateId.
-     */
     public String getCandidateId() {
         return candidateId;
     }
 
     /**
-     * Metodo di compatibilità temporanea.
+     * Metodo di compatibilità con vecchie parti del codice.
      *
-     * Output:
-     * - candidateId.
-     *
-     * Nota:
-     * nel nuovo modello è preferibile usare getCandidateId().
+     * @return identificativo del candidato
      */
     public String getNodeId() {
         return candidateId;
     }
 
-    /**
-     * Restituisce il veicolo sorgente per cui il candidato è valido.
-     *
-     * Output:
-     * - sourceVehicleId.
-     */
     public String getSourceVehicleId() {
         return sourceVehicleId;
     }
 
-    /**
-     * Restituisce il nodo fisico che esegue il task.
-     *
-     * Output:
-     * - executionNodeId.
-     */
     public String getExecutionNodeId() {
         return executionNodeId;
     }
 
-    /**
-     * Restituisce il tipo del candidato.
-     *
-     * Output:
-     * - NodeType.
-     */
     public NodeType getType() {
         return type;
     }
 
-    /**
-     * Restituisce la CPU disponibile sul nodo di esecuzione.
-     *
-     * Output:
-     * - CPU disponibile in cycles/s.
-     */
     public double getAvailableCpu() {
         return availableCpu;
     }
 
-    /**
-     * Restituisce la banda disponibile sul link sorgente-destinazione.
-     *
-     * Output:
-     * - banda disponibile in bit/s.
-     */
     public double getAvailableBandwidth() {
         return availableBandwidth;
     }
 
-    /**
-     * Restituisce la latenza base stimata.
-     *
-     * Output:
-     * - latenza in secondi.
-     */
     public double getBaseLatencySeconds() {
         return baseLatencySeconds;
     }
 
     /**
-     * Restituisce il tempo di copertura stimato.
-     *
-     * Output:
-     * - tempo di copertura in secondi.
+     * @return coordinata X del nodo, se presente
      */
-    public double getCoverageTimeSeconds() {
-        return coverageTimeSeconds;
+    public Double getNodeX() {
+        return nodeX;
     }
 
     /**
-     * Verifica se il candidato è locale.
-     *
-     * Output:
-     * - true se type == LOCAL;
-     * - false altrimenti.
+     * @return coordinata Y del nodo, se presente
      */
+    public Double getNodeY() {
+        return nodeY;
+    }
+
+    /**
+     * @return raggio di copertura del nodo, se presente
+     */
+    public Double getCoverageRadiusMeters() {
+        return coverageRadiusMeters;
+    }
+
     public boolean isLocal() {
         return type == NodeType.LOCAL;
     }
 
-    /**
-     * Verifica se il candidato è remoto.
-     *
-     * Output:
-     * - true se type != LOCAL;
-     * - false altrimenti.
-     */
+    public boolean isVehicle() {
+        return type == NodeType.VEHICLE;
+    }
+
+    public boolean isEdge() {
+        return type == NodeType.EDGE;
+    }
+
+    public boolean isCloud() {
+        return type == NodeType.CLOUD;
+    }
+
     public boolean isRemote() {
         return type != NodeType.LOCAL;
     }
 
     /**
-     * Verifica se il candidato è valido per un certo veicolo sorgente.
+     * @return true se il candidato rappresenta un nodo con posizione e raggio fisici
+     */
+    public boolean isInfrastructureCandidate() {
+        return type == NodeType.EDGE;
+    }
+
+    /**
+     * @return true se posizione e raggio sono disponibili
+     */
+    public boolean hasCoverageGeometry() {
+        return nodeX != null
+                && nodeY != null
+                && coverageRadiusMeters != null;
+    }
+
+    /**
+     * Verifica se il candidato è utilizzabile dal veicolo sorgente indicato.
      *
-     * Parametri in ingresso:
-     * - vehicleId: veicolo sorgente da controllare.
-     *
-     * Output:
-     * - true se il candidato è valido per quel veicolo;
-     * - false altrimenti.
+     * @param vehicleId veicolo sorgente da controllare
+     * @return true se il candidato è valido per quel veicolo
      */
     public boolean isValidForSourceVehicle(String vehicleId) {
         return sourceVehicleId.equals(vehicleId);
     }
 
     /**
-     * Valida la regola dei candidati locali.
-     *
-     * Parametri in ingresso:
-     * - nessuno.
-     *
-     * Output:
-     * - nessun valore restituito;
-     * - solleva eccezione se LOCAL non rispetta sourceVehicleId == executionNodeId.
+     * Verifica la regola dei candidati locali.
      */
     private void validateLocalCandidate() {
         if (type == NodeType.LOCAL && !sourceVehicleId.equals(executionNodeId)) {
@@ -229,52 +208,41 @@ public final class NodeCandidate {
     }
 
     /**
-     * Valida la regola dei candidati V2V.
-     *
-     * Parametri in ingresso:
-     * - nessuno.
-     *
-     * Output:
-     * - nessun valore restituito;
-     * - solleva eccezione se VEHICLE rappresenta lo stesso veicolo sorgente.
+     * Verifica la regola dei candidati V2V.
      */
     private void validateVehicleCandidate() {
         if (type == NodeType.VEHICLE && sourceVehicleId.equals(executionNodeId)) {
             throw new IllegalArgumentException(
-                    "VEHICLE candidate should represent a remote vehicle, not the source vehicle itself."
+                    "VEHICLE candidate must have sourceVehicleId != executionNodeId."
             );
         }
     }
 
     /**
-     * Verifica che una stringa sia valorizzata.
-     *
-     * Parametri in ingresso:
-     * - value: stringa da validare;
-     * - fieldName: nome del campo.
-     *
-     * Output:
-     * - stringa validata.
+     * Verifica che i candidati infrastrutturali abbiano dati geometrici.
      */
+    private void validateInfrastructureCandidate() {
+        if (type == NodeType.EDGE && !hasCoverageGeometry()) {
+            throw new IllegalArgumentException(
+                    "EDGE candidate must define nodeX, nodeY and coverageRadiusMeters."
+            );
+        }
+    }
+
     private static String requireText(String value, String fieldName) {
         if (value == null || value.isBlank()) {
-            throw new IllegalArgumentException(fieldName + " must not be null or blank.");
+            throw new IllegalArgumentException(
+                    fieldName + " must not be null or blank."
+            );
         }
 
         return value;
     }
 
-    /**
-     * Verifica che un valore numerico sia finito e non negativo.
-     *
-     * Parametri in ingresso:
-     * - fieldName: nome del campo;
-     * - value: valore da validare.
-     *
-     * Output:
-     * - valore validato.
-     */
-    private static double validateFiniteNonNegative(String fieldName, double value) {
+    private static double validateFiniteNonNegative(
+            String fieldName,
+            double value
+    ) {
         if (!Double.isFinite(value)) {
             throw new IllegalArgumentException(fieldName + " must be finite.");
         }
@@ -286,18 +254,53 @@ public final class NodeCandidate {
         return value;
     }
 
+    private static Double validateOptionalFinite(
+            String fieldName,
+            Double value
+    ) {
+        if (value == null) {
+            return null;
+        }
+
+        if (!Double.isFinite(value)) {
+            throw new IllegalArgumentException(fieldName + " must be finite.");
+        }
+
+        return value;
+    }
+
+    private static Double validateOptionalPositive(
+            String fieldName,
+            Double value
+    ) {
+        if (value == null) {
+            return null;
+        }
+
+        if (!Double.isFinite(value)) {
+            throw new IllegalArgumentException(fieldName + " must be finite.");
+        }
+
+        if (value <= 0.0) {
+            throw new IllegalArgumentException(fieldName + " must be > 0.");
+        }
+
+        return value;
+    }
+
     @Override
     public String toString() {
-        return "NodeCandidate{" +
-                "candidateId='" + candidateId + '\'' +
-                ", sourceVehicleId='" + sourceVehicleId + '\'' +
-                ", executionNodeId='" + executionNodeId + '\'' +
-                ", type=" + type +
-                ", availableCpu=" + availableCpu +
-                ", availableBandwidth=" + availableBandwidth +
-                ", baseLatencySeconds=" + baseLatencySeconds +
-                ", coverageTimeSeconds=" + coverageTimeSeconds +
-                '}';
+        return "NodeCandidate{"
+                + "candidateId='" + candidateId + '\''
+                + ", sourceVehicleId='" + sourceVehicleId + '\''
+                + ", executionNodeId='" + executionNodeId + '\''
+                + ", type=" + type
+                + ", availableCpu=" + availableCpu
+                + ", availableBandwidth=" + availableBandwidth
+                + ", baseLatencySeconds=" + baseLatencySeconds
+                + ", nodeX=" + nodeX
+                + ", nodeY=" + nodeY
+                + ", coverageRadiusMeters=" + coverageRadiusMeters
+                + '}';
     }
 }
-

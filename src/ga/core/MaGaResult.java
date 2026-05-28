@@ -2,6 +2,7 @@ package ga.core;
 
 import ga.fitness.FitnessEvaluator;
 
+import ga.fitness.breakdown.EvaluationBreakdown;
 import model.genetic.Chromosome;
 
 import java.util.ArrayList;
@@ -32,7 +33,7 @@ public final class MaGaResult {
     private final double snapshotTimeSeconds;
 
     private final Chromosome bestChromosome;
-    private final FitnessEvaluator.EvaluationBreakdown bestEvaluation;
+    private final EvaluationBreakdown bestEvaluation;
 
     private final int generationsExecuted;
     private final StopReason stopReason;
@@ -54,7 +55,7 @@ public final class MaGaResult {
             String snapshotId,
             double snapshotTimeSeconds,
             Chromosome bestChromosome,
-            FitnessEvaluator.EvaluationBreakdown bestEvaluation,
+            EvaluationBreakdown bestEvaluation,
             int generationsExecuted,
             StopReason stopReason,
             double initialBestFitness,
@@ -116,7 +117,7 @@ public final class MaGaResult {
         return bestChromosome;
     }
 
-    public FitnessEvaluator.EvaluationBreakdown getBestEvaluation() {
+    public EvaluationBreakdown getBestEvaluation() {
         return bestEvaluation;
     }
 

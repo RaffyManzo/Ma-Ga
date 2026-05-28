@@ -12,56 +12,69 @@ import java.util.Objects;
 import java.util.Set;
 
 /**
- * Valida uno SystemSnapshot prima che venga passato al MA-GA.
+ * Valida uno SystemSnapshot prima dell'esecuzione del MA-GA.
  *
- * Questa classe serve a intercettare errori strutturali nello snapshot:
- *
- * - veicoli duplicati;
- * - task senza veicolo sorgente valido;
- * - candidati duplicati;
- * - candidati senza sourceVehicleId valido;
- * - candidati LOCAL incoerenti;
- * - candidati VEHICLE incoerenti;
- * - task senza candidati validi;
- * - task senza candidato LOCAL.
- *
- * È particolarmente importante in vista di MOSAIC, perché gli snapshot
- * saranno generati automaticamente da dati simulativi.
+ * Controlla coerenza strutturale, riferimenti tra task/veicoli/candidati
+ * e vincoli minimi dei diversi tipi di NodeCandidate.
  */
 public final class SnapshotValidator {
 
     /**
      * Valida uno snapshot completo.
      *
-     * Parametri in ingresso:
-     * - snapshot: snapshot da validare.
-     *
-     * Output:
-     * - nessun valore restituito.
-     *
-     * Eccezioni:
-     * - IllegalArgumentException se lo snapshot non è valido.
+     * @param snapshot snapshot da controllare
      */
     public void validate(SystemSnapshot snapshot) {
         Objects.requireNonNull(snapshot, "snapshot must not be null.");
 
-        List<VehicleSnapshot> vehicles = requireList(snapshot.getVehicles(), "vehicles");
-        List<TaskInstance> tasks = requireList(snapshot.getTasks(), "tasks");
-        List<NodeCandidate> candidates = requireList(snapshot.getCandidateNodes(), "candidateNodes");
+        validateSnapshotHeader(snapshot);
+
+        List<VehicleSnapshot> vehicles = requireList(
+                snapshot.getVehicles(),
+                "vehicles"
+        );
+
+        List<TaskInstance> tasks = requireList(
+                snapshot.getTasks(),
+                "tasks"
+        );
+
+        List<NodeCandidate> candidates = requireList(
+                snapshot.getCandidateNodes(),
+                "candidateNodes"
+        );
 
         validateVehicleIds(vehicles);
         validateTaskIds(tasks);
         validateCandidateIds(candidates);
-        validateTasksReferenceExistingVehicles(tasks, vehicles);
-        validateCandidatesReferenceExistingSourceVehicles(candidates, vehicles);
-        validateCandidateSemanticRules(candidates);
-        validateEachTaskHasValidCandidates(tasks, candidates);
+
+        validateNumericVehicleFields(vehicles);
         validateNumericTaskFields(tasks);
         validateNumericCandidateFields(candidates);
+
+        validateTasksReferenceExistingVehicles(tasks, vehicles);
+        validateCandidatesReferenceExistingSourceVehicles(candidates, vehicles);
+        validateCandidateSemanticRules(candidates, vehicles);
+        validateEachTaskHasValidCandidates(tasks, candidates);
     }
 
     /**
-     * Verifica che la lista non sia nulla.
+     * Verifica i dati base dello snapshot.
+     */
+    private void validateSnapshotHeader(SystemSnapshot snapshot) {
+        if (snapshot.getSnapshotId() == null || snapshot.getSnapshotId().isBlank()) {
+            throw new IllegalArgumentException("snapshotId must not be null or blank.");
+        }
+
+        requireNonNegativeFinite(
+                snapshot.getTimeSeconds(),
+                "timeSeconds",
+                snapshot.getSnapshotId()
+        );
+    }
+
+    /**
+     * Verifica che una lista dello snapshot non sia nulla.
      */
     private <T> List<T> requireList(List<T> list, String name) {
         if (list == null) {
@@ -72,7 +85,7 @@ public final class SnapshotValidator {
     }
 
     /**
-     * Verifica che i vehicleId siano univoci.
+     * Verifica unicità e presenza dei vehicleId.
      */
     private void validateVehicleIds(List<VehicleSnapshot> vehicles) {
         Set<String> ids = new HashSet<>();
@@ -91,7 +104,7 @@ public final class SnapshotValidator {
     }
 
     /**
-     * Verifica che i taskId siano univoci.
+     * Verifica unicità e presenza dei taskId.
      */
     private void validateTaskIds(List<TaskInstance> tasks) {
         Set<String> ids = new HashSet<>();
@@ -110,7 +123,7 @@ public final class SnapshotValidator {
     }
 
     /**
-     * Verifica che i candidateId siano univoci.
+     * Verifica unicità e presenza dei candidateId.
      */
     private void validateCandidateIds(List<NodeCandidate> candidates) {
         Set<String> ids = new HashSet<>();
@@ -125,6 +138,92 @@ public final class SnapshotValidator {
                         "Duplicated candidateId: " + candidate.getCandidateId()
                 );
             }
+        }
+    }
+
+    /**
+     * Verifica che i campi numerici dei veicoli siano validi.
+     */
+    private void validateNumericVehicleFields(List<VehicleSnapshot> vehicles) {
+        for (VehicleSnapshot vehicle : vehicles) {
+            requireFinite(vehicle.getX(), "x", vehicle.getVehicleId());
+            requireFinite(vehicle.getY(), "y", vehicle.getVehicleId());
+            requireNonNegativeFinite(vehicle.getSpeed(), "speed", vehicle.getVehicleId());
+            requirePositiveFinite(vehicle.getLocalCpu(), "localCpu", vehicle.getVehicleId());
+        }
+    }
+
+    /**
+     * Verifica che i campi numerici dei task siano validi.
+     */
+    private void validateNumericTaskFields(List<TaskInstance> tasks) {
+        for (TaskInstance task : tasks) {
+            requireNonNegativeFinite(
+                    task.getInputSizeBits(),
+                    "inputSizeBits",
+                    task.getTaskId()
+            );
+
+            requireNonNegativeFinite(
+                    task.getOutputSizeBits(),
+                    "outputSizeBits",
+                    task.getTaskId()
+            );
+
+            requirePositiveFinite(
+                    task.getCpuCycles(),
+                    "cpuCycles",
+                    task.getTaskId()
+            );
+
+            requirePositiveFinite(
+                    task.getDeadlineSeconds(),
+                    "deadlineSeconds",
+                    task.getTaskId()
+            );
+        }
+    }
+
+    /**
+     * Verifica i valori numerici comuni dei candidati.
+     */
+    private void validateNumericCandidateFields(List<NodeCandidate> candidates) {
+        for (NodeCandidate candidate : candidates) {
+            requirePositiveFinite(
+                    candidate.getAvailableCpu(),
+                    "availableCpu",
+                    candidate.getCandidateId()
+            );
+
+            requireNonNegativeFinite(
+                    candidate.getAvailableBandwidth(),
+                    "availableBandwidth",
+                    candidate.getCandidateId()
+            );
+
+            requireNonNegativeFinite(
+                    candidate.getBaseLatencySeconds(),
+                    "baseLatencySeconds",
+                    candidate.getCandidateId()
+            );
+
+            validateOptionalFinite(
+                    candidate.getNodeX(),
+                    "nodeX",
+                    candidate.getCandidateId()
+            );
+
+            validateOptionalFinite(
+                    candidate.getNodeY(),
+                    "nodeY",
+                    candidate.getCandidateId()
+            );
+
+            validateOptionalPositive(
+                    candidate.getCoverageRadiusMeters(),
+                    "coverageRadiusMeters",
+                    candidate.getCandidateId()
+            );
         }
     }
 
@@ -169,30 +268,127 @@ public final class SnapshotValidator {
     }
 
     /**
-     * Verifica le regole semantiche dei candidati source-aware.
+     * Verifica le regole specifiche dei tipi di candidato.
      */
-    private void validateCandidateSemanticRules(List<NodeCandidate> candidates) {
-        for (NodeCandidate candidate : candidates) {
-            if (candidate.getType() == NodeType.LOCAL
-                    && !candidate.getSourceVehicleId().equals(candidate.getExecutionNodeId())) {
-                throw new IllegalArgumentException(
-                        "LOCAL candidate " + candidate.getCandidateId()
-                                + " must have sourceVehicleId == executionNodeId."
-                );
-            }
+    private void validateCandidateSemanticRules(
+            List<NodeCandidate> candidates,
+            List<VehicleSnapshot> vehicles
+    ) {
+        Set<String> vehicleIds = collectVehicleIds(vehicles);
 
-            if (candidate.getType() == NodeType.VEHICLE
-                    && candidate.getSourceVehicleId().equals(candidate.getExecutionNodeId())) {
-                throw new IllegalArgumentException(
-                        "VEHICLE candidate " + candidate.getCandidateId()
-                                + " must have sourceVehicleId != executionNodeId."
-                );
-            }
+        for (NodeCandidate candidate : candidates) {
+            validateLocalCandidate(candidate);
+            validateVehicleCandidate(candidate, vehicleIds);
+            validateEdgeCandidate(candidate);
+            validateCloudCandidate(candidate);
         }
     }
 
     /**
-     * Verifica che ogni task abbia candidati validi e almeno un candidato LOCAL.
+     * Verifica i candidati LOCAL.
+     */
+    private void validateLocalCandidate(NodeCandidate candidate) {
+        if (candidate.getType() != NodeType.LOCAL) {
+            return;
+        }
+
+        if (!candidate.getSourceVehicleId().equals(candidate.getExecutionNodeId())) {
+            throw new IllegalArgumentException(
+                    "LOCAL candidate " + candidate.getCandidateId()
+                            + " must have sourceVehicleId == executionNodeId."
+            );
+        }
+
+        if (candidate.getAvailableBandwidth() != 0.0) {
+            throw new IllegalArgumentException(
+                    "LOCAL candidate " + candidate.getCandidateId()
+                            + " must have availableBandwidth == 0."
+            );
+        }
+
+        if (candidate.getBaseLatencySeconds() != 0.0) {
+            throw new IllegalArgumentException(
+                    "LOCAL candidate " + candidate.getCandidateId()
+                            + " must have baseLatencySeconds == 0."
+            );
+        }
+    }
+
+    /**
+     * Verifica i candidati VEHICLE usati per V2V.
+     */
+    private void validateVehicleCandidate(
+            NodeCandidate candidate,
+            Set<String> vehicleIds
+    ) {
+        if (candidate.getType() != NodeType.VEHICLE) {
+            return;
+        }
+
+        if (candidate.getSourceVehicleId().equals(candidate.getExecutionNodeId())) {
+            throw new IllegalArgumentException(
+                    "VEHICLE candidate " + candidate.getCandidateId()
+                            + " must have sourceVehicleId != executionNodeId."
+            );
+        }
+
+        if (!vehicleIds.contains(candidate.getExecutionNodeId())) {
+            throw new IllegalArgumentException(
+                    "VEHICLE candidate " + candidate.getCandidateId()
+                            + " references missing execution vehicle: "
+                            + candidate.getExecutionNodeId()
+            );
+        }
+
+        if (candidate.getAvailableBandwidth() <= 0.0) {
+            throw new IllegalArgumentException(
+                    "VEHICLE candidate " + candidate.getCandidateId()
+                            + " must have availableBandwidth > 0."
+            );
+        }
+    }
+
+    /**
+     * Verifica i candidati EDGE/RSU.
+     */
+    private void validateEdgeCandidate(NodeCandidate candidate) {
+        if (candidate.getType() != NodeType.EDGE) {
+            return;
+        }
+
+        if (!candidate.hasCoverageGeometry()) {
+            throw new IllegalArgumentException(
+                    "EDGE candidate " + candidate.getCandidateId()
+                            + " must define nodeX, nodeY and coverageRadiusMeters."
+            );
+        }
+
+        if (candidate.getAvailableBandwidth() <= 0.0) {
+            throw new IllegalArgumentException(
+                    "EDGE candidate " + candidate.getCandidateId()
+                            + " must have availableBandwidth > 0."
+            );
+        }
+    }
+
+    /**
+     * Verifica i candidati CLOUD.
+     */
+    private void validateCloudCandidate(NodeCandidate candidate) {
+        if (candidate.getType() != NodeType.CLOUD) {
+            return;
+        }
+
+        if (candidate.getAvailableBandwidth() <= 0.0) {
+            throw new IllegalArgumentException(
+                    "CLOUD candidate " + candidate.getCandidateId()
+                            + " must have availableBandwidth > 0."
+            );
+        }
+    }
+
+    /**
+     * Verifica che ogni task abbia candidati compatibili e almeno un LOCAL.
      */
     private void validateEachTaskHasValidCandidates(
             List<TaskInstance> tasks,
@@ -232,50 +428,7 @@ public final class SnapshotValidator {
     }
 
     /**
-     * Verifica i valori numerici dei task.
-     */
-    private void validateNumericTaskFields(List<TaskInstance> tasks) {
-        for (TaskInstance task : tasks) {
-            requireNonNegativeFinite(task.getInputSizeBits(), "inputSizeBits", task.getTaskId());
-            requireNonNegativeFinite(task.getOutputSizeBits(), "outputSizeBits", task.getTaskId());
-            requireNonNegativeFinite(task.getCpuCycles(), "cpuCycles", task.getTaskId());
-            requireNonNegativeFinite(task.getDeadlineSeconds(), "deadlineSeconds", task.getTaskId());
-        }
-    }
-
-    /**
-     * Verifica i valori numerici dei candidati.
-     */
-    private void validateNumericCandidateFields(List<NodeCandidate> candidates) {
-        for (NodeCandidate candidate : candidates) {
-            requireNonNegativeFinite(
-                    candidate.getAvailableCpu(),
-                    "availableCpu",
-                    candidate.getCandidateId()
-            );
-
-            requireNonNegativeFinite(
-                    candidate.getAvailableBandwidth(),
-                    "availableBandwidth",
-                    candidate.getCandidateId()
-            );
-
-            requireNonNegativeFinite(
-                    candidate.getBaseLatencySeconds(),
-                    "baseLatencySeconds",
-                    candidate.getCandidateId()
-            );
-
-            requireNonNegativeFinite(
-                    candidate.getCoverageTimeSeconds(),
-                    "coverageTimeSeconds",
-                    candidate.getCandidateId()
-            );
-        }
-    }
-
-    /**
-     * Colleziona gli id dei veicoli.
+     * Colleziona gli identificativi dei veicoli.
      */
     private Set<String> collectVehicleIds(List<VehicleSnapshot> vehicles) {
         Set<String> ids = new HashSet<>();
@@ -287,10 +440,7 @@ public final class SnapshotValidator {
         return ids;
     }
 
-    /**
-     * Verifica che un numero sia finito e non negativo.
-     */
-    private void requireNonNegativeFinite(
+    private void requireFinite(
             double value,
             String fieldName,
             String ownerId
@@ -300,6 +450,14 @@ public final class SnapshotValidator {
                     fieldName + " of " + ownerId + " must be finite."
             );
         }
+    }
+
+    private void requireNonNegativeFinite(
+            double value,
+            String fieldName,
+            String ownerId
+    ) {
+        requireFinite(value, fieldName, ownerId);
 
         if (value < 0.0) {
             throw new IllegalArgumentException(
@@ -307,5 +465,56 @@ public final class SnapshotValidator {
             );
         }
     }
-}
 
+    private void requirePositiveFinite(
+            double value,
+            String fieldName,
+            String ownerId
+    ) {
+        requireFinite(value, fieldName, ownerId);
+
+        if (value <= 0.0) {
+            throw new IllegalArgumentException(
+                    fieldName + " of " + ownerId + " must be > 0."
+            );
+        }
+    }
+
+    private void validateOptionalFinite(
+            Double value,
+            String fieldName,
+            String ownerId
+    ) {
+        if (value == null) {
+            return;
+        }
+
+        if (!Double.isFinite(value)) {
+            throw new IllegalArgumentException(
+                    fieldName + " of " + ownerId + " must be finite."
+            );
+        }
+    }
+
+    private void validateOptionalPositive(
+            Double value,
+            String fieldName,
+            String ownerId
+    ) {
+        if (value == null) {
+            return;
+        }
+
+        if (!Double.isFinite(value)) {
+            throw new IllegalArgumentException(
+                    fieldName + " of " + ownerId + " must be finite."
+            );
+        }
+
+        if (value <= 0.0) {
+            throw new IllegalArgumentException(
+                    fieldName + " of " + ownerId + " must be > 0."
+            );
+        }
+    }
+}

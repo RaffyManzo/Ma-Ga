@@ -2,6 +2,11 @@ package test.runner;
 
 import config.MaGaConfig;
 import ga.fitness.FitnessEvaluator;
+import ga.fitness.breakdown.EvaluationBreakdown;
+import ga.fitness.breakdown.ExecutionNodeResourceUsageBreakdown;
+import ga.fitness.breakdown.GeneEvaluationBreakdown;
+import ga.fitness.breakdown.LinkBandwidthUsageBreakdown;
+import ga.fitness.breakdown.LocalResourceUsageBreakdown;
 import ga.operators.MutationOperator;
 import ga.operators.PopulationInitializer;
 import ga.operators.RepairOperator;
@@ -131,10 +136,10 @@ public final class TestRunner {
 
         Chromosome chromosome = new Chromosome(List.of(gene));
 
-        FitnessEvaluator.EvaluationBreakdown breakdown =
+        EvaluationBreakdown breakdown =
                 evaluator().evaluateDetailed(chromosome, snapshot);
 
-        FitnessEvaluator.GeneEvaluationBreakdown geneBreakdown =
+        GeneEvaluationBreakdown geneBreakdown =
                 breakdown.getGeneBreakdowns().get(0);
 
         assertTrue(
@@ -154,6 +159,111 @@ public final class TestRunner {
     }
 
     /**
+     * Crea un candidato LOCAL per il veicolo indicato.
+     */
+    private static NodeCandidate localCandidate(
+            String vehicleId,
+            double localCpu
+    ) {
+        return new NodeCandidate(
+                "local_" + vehicleId,
+                vehicleId,
+                vehicleId,
+                NodeType.LOCAL,
+                localCpu,
+                0.0,
+                0.0,
+                null,
+                null,
+                null
+        );
+    }
+
+    /**
+     * Crea un candidato EDGE con geometria di copertura esplicita.
+     */
+    private static NodeCandidate edgeCandidate(
+            String candidateId,
+            String sourceVehicleId,
+            String executionNodeId,
+            double availableCpu,
+            double availableBandwidth,
+            double baseLatencySeconds,
+            double nodeX,
+            double nodeY,
+            double coverageRadiusMeters
+    ) {
+        return new NodeCandidate(
+                candidateId,
+                sourceVehicleId,
+                executionNodeId,
+                NodeType.EDGE,
+                availableCpu,
+                availableBandwidth,
+                baseLatencySeconds,
+                nodeX,
+                nodeY,
+                coverageRadiusMeters
+        );
+    }
+
+    /**
+     * Crea un candidato CLOUD.
+     *
+     * La copertura cloud non viene descritta geometricamente.
+     * Sarà gestita da MobilityConfig/CoverageEstimator.
+     */
+    private static NodeCandidate cloudCandidate(
+            String candidateId,
+            String sourceVehicleId,
+            String executionNodeId,
+            double availableCpu,
+            double availableBandwidth,
+            double baseLatencySeconds
+    ) {
+        return new NodeCandidate(
+                candidateId,
+                sourceVehicleId,
+                executionNodeId,
+                NodeType.CLOUD,
+                availableCpu,
+                availableBandwidth,
+                baseLatencySeconds,
+                null,
+                null,
+                null
+        );
+    }
+
+    /**
+     * Crea un candidato V2V.
+     *
+     * La posizione del target non viene duplicata nel candidato.
+     * CoverageEstimator la ricava dallo snapshot tramite executionNodeId.
+     */
+    private static NodeCandidate vehicleCandidate(
+            String candidateId,
+            String sourceVehicleId,
+            String targetVehicleId,
+            double availableCpu,
+            double availableBandwidth,
+            double baseLatencySeconds
+    ) {
+        return new NodeCandidate(
+                candidateId,
+                sourceVehicleId,
+                targetVehicleId,
+                NodeType.VEHICLE,
+                availableCpu,
+                availableBandwidth,
+                baseLatencySeconds,
+                null,
+                null,
+                null
+        );
+    }
+
+    /**
      * Verifica che due candidati con lo stesso candidateId vengano rifiutati.
      */
     private static void testSnapshotValidatorRejectsDuplicatedCandidateId() {
@@ -162,30 +272,19 @@ public final class TestRunner {
         );
 
         List<TaskInstance> tasks = List.of(
-                new TaskInstance("task_001", "vehicle_001", 100.0, 20.0, 1000.0, 10.0)
+                new TaskInstance(
+                        "task_001",
+                        "vehicle_001",
+                        100.0,
+                        20.0,
+                        1000.0,
+                        10.0
+                )
         );
 
         List<NodeCandidate> candidates = List.of(
-                new NodeCandidate(
-                        "local_vehicle_001",
-                        "vehicle_001",
-                        "vehicle_001",
-                        NodeType.LOCAL,
-                        500.0,
-                        0.0,
-                        0.0,
-                        0.0
-                ),
-                new NodeCandidate(
-                        "local_vehicle_001",
-                        "vehicle_001",
-                        "vehicle_001",
-                        NodeType.LOCAL,
-                        500.0,
-                        0.0,
-                        0.0,
-                        0.0
-                )
+                localCandidate("vehicle_001", 500.0),
+                localCandidate("vehicle_001", 500.0)
         );
 
         SystemSnapshot snapshot = new SystemSnapshot(
@@ -223,10 +322,10 @@ public final class TestRunner {
 
         Chromosome chromosome = new Chromosome(List.of(gene));
 
-        FitnessEvaluator.EvaluationBreakdown breakdown =
+        EvaluationBreakdown breakdown =
                 evaluator().evaluateDetailed(chromosome, snapshot);
 
-        FitnessEvaluator.GeneEvaluationBreakdown geneBreakdown =
+        GeneEvaluationBreakdown geneBreakdown =
                 breakdown.getGeneBreakdowns().get(0);
 
         assertAlmostEquals(
@@ -271,10 +370,10 @@ public final class TestRunner {
 
         Chromosome chromosome = new Chromosome(List.of(gene));
 
-        FitnessEvaluator.EvaluationBreakdown breakdown =
+        EvaluationBreakdown breakdown =
                 evaluator().evaluateDetailed(chromosome, snapshot);
 
-        FitnessEvaluator.GeneEvaluationBreakdown geneBreakdown =
+        GeneEvaluationBreakdown geneBreakdown =
                 breakdown.getGeneBreakdowns().get(0);
 
         assertAlmostEquals(
@@ -325,10 +424,10 @@ public final class TestRunner {
 
         Chromosome chromosome = new Chromosome(List.of(gene));
 
-        FitnessEvaluator.EvaluationBreakdown breakdown =
+        EvaluationBreakdown breakdown =
                 evaluator().evaluateDetailed(chromosome, snapshot);
 
-        FitnessEvaluator.GeneEvaluationBreakdown geneBreakdown =
+        GeneEvaluationBreakdown geneBreakdown =
                 breakdown.getGeneBreakdowns().get(0);
 
         assertAlmostEquals(
@@ -378,7 +477,7 @@ public final class TestRunner {
 
         Chromosome chromosome = new Chromosome(List.of(invalidGene));
 
-        FitnessEvaluator.EvaluationBreakdown breakdown =
+        EvaluationBreakdown breakdown =
                 evaluator().evaluateDetailed(chromosome, snapshot);
 
         assertTrue(
@@ -419,10 +518,10 @@ public final class TestRunner {
                 )
         ));
 
-        FitnessEvaluator.EvaluationBreakdown breakdown =
+        EvaluationBreakdown breakdown =
                 evaluator().evaluateDetailed(chromosome, snapshot);
 
-        FitnessEvaluator.ExecutionNodeResourceUsageBreakdown edgeUsage =
+        ExecutionNodeResourceUsageBreakdown edgeUsage =
                 findExecutionNodeUsage(breakdown, "edge_001");
 
         assertAlmostEquals(
@@ -457,13 +556,13 @@ public final class TestRunner {
                 )
         ));
 
-        FitnessEvaluator.EvaluationBreakdown breakdown =
+        EvaluationBreakdown breakdown =
                 evaluator().evaluateDetailed(chromosome, snapshot);
 
-        FitnessEvaluator.LinkBandwidthUsageBreakdown linkVehicle1 =
+        LinkBandwidthUsageBreakdown linkVehicle1 =
                 findLinkUsage(breakdown, "edge_001_for_vehicle_001");
 
-        FitnessEvaluator.LinkBandwidthUsageBreakdown linkVehicle2 =
+        LinkBandwidthUsageBreakdown linkVehicle2 =
                 findLinkUsage(breakdown, "edge_001_for_vehicle_002");
 
         assertAlmostEquals(
@@ -567,7 +666,15 @@ public final class TestRunner {
     /**
      * Crea uno snapshot minimo per testare la copertura insufficiente.
      *
-     * Il candidato EDGE ha coverageTimeSeconds = 0.5 s.
+     * Il candidato EDGE non contiene più coverageTimeSeconds.
+     * La copertura viene calcolata da CoverageEstimator usando:
+     *
+     * distance = 0 m
+     * coverageRadius = 12.5 m
+     * vehicleSpeed = 25 m/s
+     *
+     * coverageTime = 12.5 / 25 = 0.5 s
+     *
      * Il gene del test forza full offloading su quel candidato.
      *
      * Con i valori scelti:
@@ -605,25 +712,17 @@ public final class TestRunner {
         );
 
         List<NodeCandidate> candidates = List.of(
-                new NodeCandidate(
-                        "local_vehicle_001",
-                        "vehicle_001",
-                        "vehicle_001",
-                        NodeType.LOCAL,
-                        500.0,
-                        0.0,
-                        0.0,
-                        0.0
-                ),
-                new NodeCandidate(
+                localCandidate("vehicle_001", 500.0),
+                edgeCandidate(
                         "edge_short_coverage_for_vehicle_001",
                         "vehicle_001",
                         "edge_short_coverage",
-                        NodeType.EDGE,
                         400.0,
                         100.0,
                         0.1,
-                        0.5
+                        0.0,
+                        0.0,
+                        12.5
                 )
         );
 
@@ -667,25 +766,17 @@ public final class TestRunner {
         );
 
         List<NodeCandidate> candidates = List.of(
-                new NodeCandidate(
-                        "local_vehicle_001",
-                        "vehicle_001",
-                        "vehicle_001",
-                        NodeType.LOCAL,
-                        500.0,
-                        0.0,
-                        0.0,
-                        0.0
-                ),
-                new NodeCandidate(
+                localCandidate("vehicle_001", 500.0),
+                edgeCandidate(
                         "edge_001_for_vehicle_001",
                         "vehicle_001",
                         "edge_001",
-                        NodeType.EDGE,
                         4000.0,
                         100.0,
                         0.1,
-                        100.0
+                        0.0,
+                        0.0,
+                        300.0
                 )
         );
 
@@ -742,45 +833,29 @@ public final class TestRunner {
         );
 
         List<NodeCandidate> candidates = List.of(
-                new NodeCandidate(
-                        "local_vehicle_001",
-                        "vehicle_001",
-                        "vehicle_001",
-                        NodeType.LOCAL,
-                        500.0,
-                        0.0,
-                        0.0,
-                        0.0
-                ),
-                new NodeCandidate(
+                localCandidate("vehicle_001", 500.0),
+                edgeCandidate(
                         "edge_001_for_vehicle_001",
                         "vehicle_001",
                         "edge_001",
-                        NodeType.EDGE,
                         4000.0,
                         100.0,
                         0.1,
-                        100.0
-                ),
-                new NodeCandidate(
-                        "local_vehicle_002",
-                        "vehicle_002",
-                        "vehicle_002",
-                        NodeType.LOCAL,
-                        650.0,
                         0.0,
                         0.0,
-                        0.0
+                        300.0
                 ),
-                new NodeCandidate(
+                localCandidate("vehicle_002", 650.0),
+                edgeCandidate(
                         "edge_001_for_vehicle_002",
                         "vehicle_002",
                         "edge_001",
-                        NodeType.EDGE,
                         4000.0,
                         120.0,
                         0.1,
-                        100.0
+                        0.0,
+                        0.0,
+                        300.0
                 )
         );
 
@@ -832,11 +907,11 @@ public final class TestRunner {
     /**
      * Trova uso CPU per executionNodeId.
      */
-    private static FitnessEvaluator.ExecutionNodeResourceUsageBreakdown findExecutionNodeUsage(
-            FitnessEvaluator.EvaluationBreakdown breakdown,
+    private static ExecutionNodeResourceUsageBreakdown findExecutionNodeUsage(
+            EvaluationBreakdown breakdown,
             String executionNodeId
     ) {
-        for (FitnessEvaluator.ExecutionNodeResourceUsageBreakdown usage
+        for (ExecutionNodeResourceUsageBreakdown usage
                 : breakdown.getExecutionNodeResourceUsageBreakdowns()) {
             if (usage.getExecutionNodeId().equals(executionNodeId)) {
                 return usage;
@@ -849,11 +924,11 @@ public final class TestRunner {
     /**
      * Trova uso banda per candidateId.
      */
-    private static FitnessEvaluator.LinkBandwidthUsageBreakdown findLinkUsage(
-            FitnessEvaluator.EvaluationBreakdown breakdown,
+    private static LinkBandwidthUsageBreakdown findLinkUsage(
+            EvaluationBreakdown breakdown,
             String candidateId
     ) {
-        for (FitnessEvaluator.LinkBandwidthUsageBreakdown usage
+        for (LinkBandwidthUsageBreakdown usage
                 : breakdown.getLinkBandwidthUsageBreakdowns()) {
             if (usage.getCandidateId().equals(candidateId)) {
                 return usage;

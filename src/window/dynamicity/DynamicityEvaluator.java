@@ -389,10 +389,8 @@ public final class DynamicityEvaluator {
     /**
      * Costruisce una mappa dei link/candidati confrontabili tra snapshot.
      *
-     * <p>Ogni {@link NodeCandidate} viene indicizzato tramite
-     * {@code candidateId}. Il valore associato conserva solo le metriche che
-     * descrivono la qualità del collegamento source-aware: banda, latenza e
-     * tempo di copertura.</p>
+     * In questa versione il tempo di copertura non viene più letto dal candidato.
+     * La variazione del link considera banda disponibile e latenza base.
      */
     private Map<String, LinkMetrics> buildLinkMap(SystemSnapshot snapshot) {
         Map<String, LinkMetrics> links = new HashMap<>();
@@ -402,8 +400,7 @@ public final class DynamicityEvaluator {
                     candidate.getCandidateId(),
                     new LinkMetrics(
                             candidate.getAvailableBandwidth(),
-                            candidate.getBaseLatencySeconds(),
-                            candidate.getCoverageTimeSeconds()
+                            candidate.getBaseLatencySeconds()
                     )
             );
         }
@@ -589,48 +586,24 @@ public final class DynamicityEvaluator {
     }
 
     /**
-     * Metriche descrittive di un candidato/link source-aware.
+     * Metriche usate per confrontare un candidato/link tra due snapshot.
      *
-     * <p>Questo piccolo value object interno isola le grandezze che descrivono
-     * la qualità del link associato a un {@link NodeCandidate}. Tenerle insieme
-     * rende esplicito che la variazione del link è una media tra banda, latenza
-     * e copertura.</p>
+     * La copertura non è più una proprietà statica del candidato.
+     * Verrà gestita da CoverageEstimator e dai futuri componenti temporali.
      */
     private final class LinkMetrics {
 
-        /**
-         * Banda disponibile stimata sul collegamento sorgente-destinazione.
-         */
         private final double availableBandwidth;
-
-        /**
-         * Latenza base stimata sul collegamento.
-         */
         private final double baseLatencySeconds;
-
-        /**
-         * Tempo di copertura stimato, cioè per quanto tempo il collegamento
-         * resta utilizzabile secondo lo snapshot.
-         */
-        private final double coverageTimeSeconds;
 
         private LinkMetrics(
                 double availableBandwidth,
-                double baseLatencySeconds,
-                double coverageTimeSeconds
+                double baseLatencySeconds
         ) {
             this.availableBandwidth = availableBandwidth;
             this.baseLatencySeconds = baseLatencySeconds;
-            this.coverageTimeSeconds = coverageTimeSeconds;
         }
 
-        /**
-         * Confronta questo link con la versione osservata nello snapshot corrente.
-         *
-         * <p>Le tre metriche hanno lo stesso peso. Il risultato è quindi una
-         * media aritmetica delle differenze relative di banda, latenza e
-         * copertura.</p>
-         */
         private double relativeVariation(LinkMetrics other) {
             double bandwidthVariation = relativeDifference(
                     availableBandwidth,
@@ -642,13 +615,8 @@ public final class DynamicityEvaluator {
                     other.baseLatencySeconds
             );
 
-            double coverageVariation = relativeDifference(
-                    coverageTimeSeconds,
-                    other.coverageTimeSeconds
-            );
-
             return clamp01(
-                    (bandwidthVariation + latencyVariation + coverageVariation) / 3.0
+                    (bandwidthVariation + latencyVariation) / 2.0
             );
         }
     }

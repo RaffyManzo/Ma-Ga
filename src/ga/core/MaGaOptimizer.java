@@ -1,6 +1,7 @@
 package ga.core;
 
 import ga.fitness.FitnessEvaluator;
+import ga.fitness.breakdown.EvaluationBreakdown;
 import ga.operators.CrossoverOperator;
 import ga.operators.ElitismOperator;
 import ga.operators.MutationOperator;
@@ -133,7 +134,7 @@ public final class MaGaOptimizer {
             Chromosome empty = new Chromosome(new ArrayList<>());
             empty.setFitness(0.0);
 
-            FitnessEvaluator.EvaluationBreakdown evaluation =
+            EvaluationBreakdown evaluation =
                     fitnessEvaluator.evaluateDetailed(empty, snapshot);
 
             List<Chromosome> finalPopulation = new ArrayList<>();
@@ -229,7 +230,7 @@ public final class MaGaOptimizer {
             }
         }
 
-        FitnessEvaluator.EvaluationBreakdown bestEvaluation =
+        EvaluationBreakdown bestEvaluation =
                 fitnessEvaluator.evaluateDetailed(bestOverall, snapshot);
 
         List<Chromosome> finalPopulation = prepareFinalPopulationForResult(

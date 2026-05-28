@@ -6,6 +6,11 @@ import config.MaGaConfig;
 import config.fitness.NormalizationConfig;
 import config.fitness.PenaltyConfig;
 import ga.fitness.FitnessEvaluator;
+import ga.fitness.breakdown.EvaluationBreakdown;
+import ga.fitness.breakdown.ExecutionNodeResourceUsageBreakdown;
+import ga.fitness.breakdown.GeneEvaluationBreakdown;
+import ga.fitness.breakdown.LinkBandwidthUsageBreakdown;
+import ga.fitness.breakdown.LocalResourceUsageBreakdown;
 import ga.core.GenerationStat;
 import ga.core.MaGaResult;
 import model.node.NodeCandidate;
@@ -129,7 +134,18 @@ public final class ResultPrinter {
             out.println("  available CPU: " + format(candidate.getAvailableCpu()) + " cycles/s");
             out.println("  available bandwidth: " + format(candidate.getAvailableBandwidth()) + " bit/s");
             out.println("  base latency: " + formatSeconds(candidate.getBaseLatencySeconds()));
-            out.println("  coverage time: " + formatSeconds(candidate.getCoverageTimeSeconds()));
+            if (candidate.hasCoverageGeometry()) {
+                out.println(" node position: ("
+                        + format(candidate.getNodeX())
+                        + ", "
+                        + format(candidate.getNodeY())
+                        + ")");
+                out.println(" coverage radius: "
+                        + format(candidate.getCoverageRadiusMeters())
+                        + " m");
+            } else {
+                out.println(" coverage geometry: not directly defined");
+            }
         }
         out.println();
     }
@@ -206,7 +222,7 @@ public final class ResultPrinter {
 
         int index = 1;
 
-        for (FitnessEvaluator.GeneEvaluationBreakdown gene
+        for (GeneEvaluationBreakdown gene
                 : result.getBestEvaluation().getGeneBreakdowns()) {
 
             out.println("[" + index + "] Task: " + gene.getTaskId());
@@ -224,7 +240,7 @@ public final class ResultPrinter {
         out.println();
     }
 
-    private void printFitnessBreakdown(FitnessEvaluator.EvaluationBreakdown breakdown) {
+    private void printFitnessBreakdown(EvaluationBreakdown breakdown) {
         printSectionTitle("5. FITNESS BREAKDOWN");
 
         FitnessWeights weights = config.getFitnessWeights();
@@ -258,10 +274,10 @@ public final class ResultPrinter {
         out.println();
     }
 
-    private void printTaskLevelAnalysis(FitnessEvaluator.EvaluationBreakdown breakdown) {
+    private void printTaskLevelAnalysis(EvaluationBreakdown breakdown) {
         printSectionTitle("6. TASK-LEVEL ANALYSIS");
 
-        for (FitnessEvaluator.GeneEvaluationBreakdown gene : breakdown.getGeneBreakdowns()) {
+        for (GeneEvaluationBreakdown gene : breakdown.getGeneBreakdowns()) {
             out.println("Task " + gene.getTaskId() + ":");
             out.println("source vehicle: " + gene.getSourceVehicleId());
             out.println("selected candidate: " + gene.getSelectedCandidateId());
@@ -296,13 +312,13 @@ public final class ResultPrinter {
         }
     }
 
-    private void printResourceUsage(FitnessEvaluator.EvaluationBreakdown breakdown) {
+    private void printResourceUsage(EvaluationBreakdown breakdown) {
         printSectionTitle("7. RESOURCE USAGE");
 
         out.println("CPU usage by physical execution node:");
         out.println();
 
-        for (FitnessEvaluator.ExecutionNodeResourceUsageBreakdown usage
+        for (ExecutionNodeResourceUsageBreakdown usage
                 : breakdown.getExecutionNodeResourceUsageBreakdowns()) {
 
             out.println("Execution node " + usage.getExecutionNodeId() + " [" + usage.getNodeType() + "]:");
@@ -324,7 +340,7 @@ public final class ResultPrinter {
         out.println("Bandwidth usage by source-execution link candidate:");
         out.println();
 
-        for (FitnessEvaluator.LinkBandwidthUsageBreakdown usage
+        for (LinkBandwidthUsageBreakdown usage
                 : breakdown.getLinkBandwidthUsageBreakdowns()) {
 
             out.println("Candidate " + usage.getCandidateId() + " [" + usage.getNodeType() + "]:");
@@ -348,7 +364,7 @@ public final class ResultPrinter {
         out.println("Estimated local computational workload by vehicle:");
         out.println();
 
-        for (FitnessEvaluator.LocalResourceUsageBreakdown local
+        for (LocalResourceUsageBreakdown local
                 : breakdown.getLocalResourceUsageBreakdowns()) {
 
             out.println("Vehicle " + local.getVehicleId() + ":");
@@ -366,7 +382,7 @@ public final class ResultPrinter {
 
         boolean hasMessages = false;
 
-        for (FitnessEvaluator.GeneEvaluationBreakdown gene
+        for (GeneEvaluationBreakdown gene
                 : result.getBestEvaluation().getGeneBreakdowns()) {
 
             if (!gene.isDeadlineRespected()) {
@@ -389,7 +405,7 @@ public final class ResultPrinter {
             }
         }
 
-        for (FitnessEvaluator.ExecutionNodeResourceUsageBreakdown usage
+        for (ExecutionNodeResourceUsageBreakdown usage
                 : result.getBestEvaluation().getExecutionNodeResourceUsageBreakdowns()) {
 
             if (usage.hasCpuViolation()) {
@@ -405,7 +421,7 @@ public final class ResultPrinter {
             }
         }
 
-        for (FitnessEvaluator.LinkBandwidthUsageBreakdown usage
+        for (LinkBandwidthUsageBreakdown usage
                 : result.getBestEvaluation().getLinkBandwidthUsageBreakdowns()) {
 
             if (usage.hasBandwidthViolation()) {
@@ -441,7 +457,7 @@ public final class ResultPrinter {
         out.println("Bandwidth is tracked by candidate/link because it depends on the source-execution relation.");
         out.println();
 
-        for (FitnessEvaluator.GeneEvaluationBreakdown gene
+        for (GeneEvaluationBreakdown gene
                 : result.getBestEvaluation().getGeneBreakdowns()) {
 
             out.println("- Task " + gene.getTaskId()
