@@ -357,7 +357,8 @@ public final class TemporalWindowStressPrinter {
         out.println("- Trigger, observation time, dynamicity and reuse mode are read from TemporalStepResult.");
         out.println("- Static stress means scheduled windows are used unless critical events are configured.");
         out.println("- Bandwidth repair is intentionally still an OpenIssue.");
-        out.println("- CPU aggregate repair is recommended if CPU violations persist.");
+        out.println("- CPU aggregate repair is active in the GA repair pipeline.");
+        out.println("- Residual CPU violations may indicate real infeasibility, repair integration gaps, or numerical tolerance issues.");
 
         out.println();
 
@@ -376,8 +377,8 @@ public final class TemporalWindowStressPrinter {
         }
 
         if (hasCpuViolation) {
-            out.println("DIAGNOSIS: CPU violations occur in at least one window.");
-            out.println("Action: introduce aggregate CPU repair in the GA repair pipeline.");
+            out.println("DIAGNOSIS: CPU violations persist after aggregate CPU repair.");
+            out.println("Action: verify repair integration, numerical tolerance, and the genes assigned to the overloaded executionNodeId.");
         }
 
         if (hasBandwidthViolation) {

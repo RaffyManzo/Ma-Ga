@@ -650,9 +650,8 @@ public final class StressResultPrinter {
         }
 
         if (cpuViolations > 0) {
-            out.println("DIAGNOSIS: CPU violations detected on physical execution nodes: "
-                    + cpuViolations + ".");
-            out.println("Suggested action: verify availableCpu coherence per executionNodeId and inspect CPU aggregation.");
+            out.println("DIAGNOSIS: CPU violations persist after aggregate CPU repair.");
+            out.println("Action: verify repair integration, numerical tolerance, and the genes assigned to the overloaded executionNodeId.");
         }
 
         if (bandwidthViolations > 0) {

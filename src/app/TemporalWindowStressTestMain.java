@@ -4,6 +4,7 @@ import config.MaGaConfig;
 import config.ga.GaParameterScalingMode;
 import config.window.TemporalWindowConfig;
 import ga.core.MaGaOptimizer;
+import io.reporting.DeepTemporalWindowStressPrinter;
 import io.reporting.TemporalWindowStressPrinter;
 import io.snapshot.SnapshotLoader;
 import model.snapshot.SystemSnapshot;
@@ -88,8 +89,8 @@ public final class TemporalWindowStressTestMain {
                 snapshots.size()
         );
 
-        TemporalWindowStressPrinter printer =
-                new TemporalWindowStressPrinter();
+        DeepTemporalWindowStressPrinter printer =
+                new DeepTemporalWindowStressPrinter(maGaConfig);
 
         printer.print(result);
     }
