@@ -11,6 +11,8 @@ import model.node.NodeType;
 public final class ExecutionNodeResourceUsageBreakdown {
 
     private static final double EPSILON = 1.0E-9;
+    private static final double RELATIVE_CPU_TOLERANCE = 1.0E-9;
+    private static final double ABSOLUTE_CPU_TOLERANCE = 1.0E-6;
 
     private final String executionNodeId;
     private final NodeType nodeType;
@@ -70,16 +72,35 @@ public final class ExecutionNodeResourceUsageBreakdown {
 
     public double getCpuOverflowRatio() {
         if (availableCpu <= EPSILON) {
-            return usedCpu > 0.0 ? 1.0 : 0.0;
+            return usedCpu > EPSILON ? 1.0 : 0.0;
         }
 
-        return Math.max(0.0, (usedCpu - availableCpu) / availableCpu);
+        double tolerance = Math.max(
+                ABSOLUTE_CPU_TOLERANCE,
+                availableCpu * RELATIVE_CPU_TOLERANCE
+        );
+
+        double overflow = usedCpu - availableCpu;
+
+        if (overflow <= tolerance) {
+            return 0.0;
+        }
+
+        return overflow / availableCpu;
     }
 
     public boolean hasCpuViolation() {
-        return usedCpu > availableCpu;
-    }
+        if (availableCpu <= EPSILON) {
+            return usedCpu > EPSILON;
+        }
 
+        double tolerance = Math.max(
+                ABSOLUTE_CPU_TOLERANCE,
+                availableCpu * RELATIVE_CPU_TOLERANCE
+        );
+
+        return usedCpu > availableCpu + tolerance;
+    }
     public boolean isCpuSaturated(double thresholdPercent) {
         return !hasCpuViolation()
                 && getCpuUsagePercent() >= thresholdPercent;
