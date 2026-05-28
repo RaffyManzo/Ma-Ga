@@ -33,12 +33,11 @@ import java.util.Random;
  */
 public final class PopulationInitializer {
 
-    private static final double MIN_RESOURCE_FRACTION = 0.05;
-
     private final Random random;
     private final RepairOperator repairOperator;
     private final OffloadingRatioPolicy offloadingRatioPolicy;
 
+    private final ResourceAllocationPolicy resourceAllocationPolicy;
     /**
      * Costruisce l'inizializzatore.
      *
@@ -60,6 +59,7 @@ public final class PopulationInitializer {
         );
 
         this.offloadingRatioPolicy = new OffloadingRatioPolicy();
+        this.resourceAllocationPolicy = new ResourceAllocationPolicy();
     }
 
     /**
@@ -111,16 +111,16 @@ public final class PopulationInitializer {
     }
 
     /**
-     * Seleziona il profilo di inizializzazione per un cromosoma.
+     * Seleziona il profilo di inizializzazione.
      *
-     * La distribuzione è volutamente semplice:
+     * Distribuzione più prudente:
      *
-     * - circa 10% LOCAL_BIASED;
+     * - circa 15% LOCAL_BIASED;
      * - circa 35% BALANCED_REMOTE;
-     * - circa 20% FULL_REMOTE_TRIAL;
-     * - il resto RANDOM.
+     * - circa 10% FULL_REMOTE_TRIAL;
+     * - circa 40% RANDOM.
      *
-     * RANDOM resta la quota più libera e preserva diversità.
+     * Il full offloading resta esplorabile, ma non domina più la popolazione.
      */
     private InitializationProfile selectProfile(
             int index,
@@ -128,15 +128,15 @@ public final class PopulationInitializer {
     ) {
         double position = (double) index / populationSize;
 
-        if (position < 0.10) {
+        if (position < 0.15) {
             return InitializationProfile.LOCAL_BIASED;
         }
 
-        if (position < 0.45) {
+        if (position < 0.50) {
             return InitializationProfile.BALANCED_REMOTE;
         }
 
-        if (position < 0.65) {
+        if (position < 0.60) {
             return InitializationProfile.FULL_REMOTE_TRIAL;
         }
 
@@ -275,15 +275,17 @@ public final class PopulationInitializer {
                 );
 
         double offloadingRatio =
-                offloadingRatioPolicy.balancedRemoteRatio(
+                offloadingRatioPolicy.deadlineAwareRatio(
                         task,
                         candidate,
-                        sourceVehicle
+                        sourceVehicle,
+                        random
                 );
 
         return createRemoteGene(
                 task,
                 candidate,
+                sourceVehicle,
                 offloadingRatio
         );
     }
@@ -320,6 +322,7 @@ public final class PopulationInitializer {
         return createRemoteGene(
                 task,
                 candidate,
+                sourceVehicle,
                 offloadingRatioPolicy.fullRatio()
         );
     }
@@ -354,6 +357,7 @@ public final class PopulationInitializer {
         return createRemoteGene(
                 task,
                 candidate,
+                sourceVehicle,
                 offloadingRatio
         );
     }
@@ -381,23 +385,40 @@ public final class PopulationInitializer {
         );
     }
 
+
     /**
      * Crea un gene remoto.
      *
-     * CPU e banda vengono inizializzate in modo casuale entro i limiti
-     * del candidato. La quota p viene invece scelta dal profilo.
+     * CPU e banda non sono più generate solo in modo cieco.
+     * La ResourceAllocationPolicy mantiene una componente casuale,
+     * ma prova a rendere le risorse coerenti con:
+     *
+     * - quota di offloading;
+     * - deadline;
+     * - capacità del candidato;
+     * - dimensione del task.
      */
     private Gene createRemoteGene(
             TaskInstance task,
             NodeCandidate candidate,
+            VehicleSnapshot sourceVehicle,
             double offloadingRatio
     ) {
+        ResourceAllocationDecision allocation =
+                resourceAllocationPolicy.allocateInitial(
+                        task,
+                        candidate,
+                        sourceVehicle,
+                        offloadingRatio,
+                        random
+                );
+
         return new Gene(
                 task.getTaskId(),
                 candidate.getCandidateId(),
                 offloadingRatio,
-                randomResource(candidate.getAvailableCpu()),
-                randomResource(candidate.getAvailableBandwidth())
+                allocation.getAllocatedCpu(),
+                allocation.getAllocatedBandwidth()
         );
     }
 
@@ -588,22 +609,6 @@ public final class PopulationInitializer {
         }
 
         return null;
-    }
-
-    /**
-     * Genera una quantità casuale di risorsa.
-     *
-     * La risorsa è almeno una piccola frazione della disponibilità,
-     * così il gene remoto non parte con CPU o banda praticamente nulle.
-     */
-    private double randomResource(double available) {
-        if (!Double.isFinite(available) || available <= 0.0) {
-            return 0.0;
-        }
-
-        double min = available * MIN_RESOURCE_FRACTION;
-
-        return min + random.nextDouble() * (available - min);
     }
 
     /**

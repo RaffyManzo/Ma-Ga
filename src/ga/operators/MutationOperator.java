@@ -42,16 +42,17 @@ public final class MutationOperator {
     /**
      * Probabilità di preferire candidati remoti quando viene cambiato candidato.
      */
-    private static final double REMOTE_CANDIDATE_PREFERENCE = 0.75;
+    private static final double REMOTE_CANDIDATE_PREFERENCE = 0.60;
 
     /**
      * Probabilità di scegliere il candidato remoto con migliore stima euristica
      * invece di un remoto casuale.
      */
-    private static final double BEST_REMOTE_CANDIDATE_PROBABILITY = 0.60;
+    private static final double BEST_REMOTE_CANDIDATE_PROBABILITY = 0.55;
 
     private final Random random;
     private final OffloadingRatioPolicy offloadingRatioPolicy;
+    private final ResourceAllocationPolicy resourceAllocationPolicy;
 
     /**
      * Costruisce l'operatore di mutazione.
@@ -65,6 +66,7 @@ public final class MutationOperator {
         );
 
         this.offloadingRatioPolicy = new OffloadingRatioPolicy();
+        this.resourceAllocationPolicy = new ResourceAllocationPolicy();
     }
 
     /**
@@ -181,26 +183,23 @@ public final class MutationOperator {
                 candidateChanged
         );
 
-        double allocatedCpu = candidateChanged
-                ? randomResource(selectedCandidate.getAvailableCpu())
-                : mutateResource(
-                gene.getAllocatedCpu(),
-                selectedCandidate.getAvailableCpu()
-        );
-
-        double allocatedBandwidth = candidateChanged
-                ? randomResource(selectedCandidate.getAvailableBandwidth())
-                : mutateResource(
-                gene.getAllocatedBandwidth(),
-                selectedCandidate.getAvailableBandwidth()
-        );
+        ResourceAllocationDecision allocation =
+                resourceAllocationPolicy.mutate(
+                        gene,
+                        task,
+                        selectedCandidate,
+                        sourceVehicle,
+                        offloadingRatio,
+                        candidateChanged,
+                        random
+                );
 
         return new Gene(
                 task.getTaskId(),
                 selectedCandidate.getCandidateId(),
                 offloadingRatio,
-                allocatedCpu,
-                allocatedBandwidth
+                allocation.getAllocatedCpu(),
+                allocation.getAllocatedBandwidth()
         );
     }
 
@@ -249,11 +248,9 @@ public final class MutationOperator {
     /**
      * Muta la quota di offloading p_i.
      *
-     * Se il candidato è appena cambiato, evita di riusare troppo il vecchio p_i,
-     * perché quel valore era legato a un candidato diverso.
-     *
-     * Se il candidato resta lo stesso, mantiene più spesso una piccola
-     * perturbazione locale, ma introduce anche salti verso balanced/full/random.
+     * La mutazione resta genetica e casuale, ma quando serve una quota
+     * "ragionata" usa una stima deadline-aware invece del solo bilanciamento
+     * locale/remoto.
      */
     private double mutateOffloadingRatio(
             Gene gene,
@@ -269,19 +266,20 @@ public final class MutationOperator {
         double roll = random.nextDouble();
 
         if (candidateChanged) {
-            if (roll < 0.45) {
-                return offloadingRatioPolicy.mutateToBalancedRatio(
+            if (roll < 0.50) {
+                return offloadingRatioPolicy.deadlineAwareRatio(
                         task,
                         candidate,
-                        sourceVehicle
+                        sourceVehicle,
+                        random
                 );
             }
 
-            if (roll < 0.70) {
+            if (roll < 0.62) {
                 return offloadingRatioPolicy.mutateToFullOffloading();
             }
 
-            if (roll < 0.90) {
+            if (roll < 0.85) {
                 return offloadingRatioPolicy.mutateByRandomReset(random);
             }
 
@@ -298,15 +296,16 @@ public final class MutationOperator {
             );
         }
 
-        if (roll < 0.70) {
-            return offloadingRatioPolicy.mutateToBalancedRatio(
+        if (roll < 0.78) {
+            return offloadingRatioPolicy.deadlineAwareRatio(
                     task,
                     candidate,
-                    sourceVehicle
+                    sourceVehicle,
+                    random
             );
         }
 
-        if (roll < 0.85) {
+        if (roll < 0.88) {
             return offloadingRatioPolicy.mutateToFullOffloading();
         }
 
@@ -453,66 +452,6 @@ public final class MutationOperator {
     }
 
     /**
-     * Muta una risorsa assegnata con una variazione moltiplicativa controllata.
-     */
-    private double mutateResource(
-            double currentValue,
-            double maxAvailable
-    ) {
-        if (!Double.isFinite(maxAvailable) || maxAvailable <= 0.0) {
-            return 0.0;
-        }
-
-        if (!Double.isFinite(currentValue) || currentValue <= 0.0) {
-            return randomResource(maxAvailable);
-        }
-
-        double factor = 0.75 + random.nextDouble() * 0.50;
-
-        return clampResource(
-                currentValue * factor,
-                maxAvailable
-        );
-    }
-
-    /**
-     * Genera casualmente una quantità di risorsa.
-     */
-    private double randomResource(double available) {
-        if (!Double.isFinite(available) || available <= 0.0) {
-            return 0.0;
-        }
-
-        double min = available * MIN_RESOURCE_FRACTION;
-
-        return min + random.nextDouble() * (available - min);
-    }
-
-    /**
-     * Limita una risorsa assegnata entro l'intervallo ammesso.
-     */
-    private double clampResource(
-            double value,
-            double maxAvailable
-    ) {
-        if (!Double.isFinite(maxAvailable) || maxAvailable <= 0.0) {
-            return 0.0;
-        }
-
-        double min = maxAvailable * MIN_RESOURCE_FRACTION;
-
-        if (!Double.isFinite(value) || value <= 0.0) {
-            return min;
-        }
-
-        return clamp(
-                value,
-                min,
-                maxAvailable
-        );
-    }
-
-    /**
      * Trova i candidati validi per il veicolo sorgente del task.
      */
     private List<NodeCandidate> findCandidatesForTask(
@@ -623,21 +562,4 @@ public final class MutationOperator {
         }
     }
 
-    /**
-     * Limita un valore dentro un intervallo.
-     */
-    private double clamp(
-            double value,
-            double min,
-            double max
-    ) {
-        if (!Double.isFinite(value)) {
-            return min;
-        }
-
-        return Math.max(
-                min,
-                Math.min(max, value)
-        );
-    }
 }
