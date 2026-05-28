@@ -9,148 +9,195 @@ import model.snapshot.TaskInstance;
 import model.snapshot.VehicleSnapshot;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 import java.util.Random;
 
 /**
- * Operatore di mutazione.
+ * Operatore di mutazione del MA-GA.
  *
- * La mutazione introduce variazioni casuali nei cromosomi, così il GA mantiene
- * diversità nella popolazione e riduce il rischio di convergenza prematura.
+ * La mutazione mantiene la componente casuale dell'algoritmo genetico,
+ * ma non agisce più solo con piccole variazioni locali.
+ *
+ * Per la quota di offloading p_i usa più modalità:
+ *
+ * - piccola perturbazione locale;
+ * - reset casuale;
+ * - salto verso p = 1;
+ * - salto verso p bilanciato tra ramo locale e ramo remoto.
+ *
+ * Inoltre, quando muta il candidato, sceglie solo candidati validi
+ * per il veicolo sorgente del task.
  */
 public final class MutationOperator {
 
-    private static final double EPSILON = 1.0E-9;
-    private static final double MIN_REMOTE_OFFLOADING_RATIO = 0.05;
     private static final double MIN_RESOURCE_FRACTION = 0.05;
 
+    /**
+     * Probabilità interna di cambiare candidato quando un gene muta.
+     */
+    private static final double CANDIDATE_MUTATION_PROBABILITY = 0.25;
+
+    /**
+     * Probabilità di preferire candidati remoti quando viene cambiato candidato.
+     */
+    private static final double REMOTE_CANDIDATE_PREFERENCE = 0.75;
+
+    /**
+     * Probabilità di scegliere il candidato remoto con migliore stima euristica
+     * invece di un remoto casuale.
+     */
+    private static final double BEST_REMOTE_CANDIDATE_PROBABILITY = 0.60;
+
     private final Random random;
+    private final OffloadingRatioPolicy offloadingRatioPolicy;
 
     /**
      * Costruisce l'operatore di mutazione.
      *
-     * Parametri in ingresso:
-     * - random: generatore casuale usato per decidere se e come mutare.
-     *
-     * Output:
-     * - un MutationOperator pronto ad applicare mutazioni.
+     * @param random generatore casuale condiviso dal GA
      */
     public MutationOperator(Random random) {
-        // Salva il generatore casuale, impedendo che sia nullo.
-        this.random = Objects.requireNonNull(random, "random must not be null.");
+        this.random = Objects.requireNonNull(
+                random,
+                "random must not be null."
+        );
+
+        this.offloadingRatioPolicy = new OffloadingRatioPolicy();
     }
 
     /**
-     * Applica mutazione ai geni di un cromosoma.
+     * Applica la mutazione a un cromosoma.
      *
-     * Parametri in ingresso:
-     * - chromosome: cromosoma da mutare;
-     * - snapshot: stato statico del sistema;
-     * - mutationRate: probabilità di mutazione applicata a ogni gene.
+     * Ogni gene viene mutato con probabilità mutationRate.
+     * I geni non mutati vengono copiati senza modifiche.
      *
-     * Output:
-     * - nuovo Chromosome mutato.
+     * @param chromosome cromosoma da mutare
+     * @param snapshot snapshot corrente
+     * @param mutationRate probabilità di mutazione per gene
+     * @return cromosoma mutato
      */
     public Chromosome mutate(
             Chromosome chromosome,
             SystemSnapshot snapshot,
             double mutationRate
     ) {
-        // Verifica che il mutation rate sia nell'intervallo [0, 1].
         validateRate(mutationRate);
 
-        // Crea la lista dei geni del nuovo cromosoma.
         List<Gene> mutatedGenes = new ArrayList<>();
 
-        // Scorre tutti i geni del cromosoma originale.
         for (Gene gene : chromosome.getGenes()) {
-
-            // Decide casualmente se mutare il gene corrente.
             if (random.nextDouble() < mutationRate) {
-                mutatedGenes.add(mutateGene(gene, snapshot));
-            }
-
-            // Se il gene non muta, viene copiato così com'è.
-            else {
+                mutatedGenes.add(
+                        mutateGene(
+                                gene,
+                                snapshot
+                        )
+                );
+            } else {
                 mutatedGenes.add(gene);
             }
         }
 
-        // Crea il cromosoma mutato.
         Chromosome mutated = new Chromosome(mutatedGenes);
-
-        // Copia temporaneamente la fitness precedente, anche se verrà ricalcolata dopo.
         mutated.setFitness(chromosome.getFitness());
 
-        // Restituisce il cromosoma mutato.
         return mutated;
     }
 
     /**
-     * Applica una mutazione a un singolo gene.
+     * Muta un singolo gene.
      *
-     * Parametri in ingresso:
-     * - gene: gene da mutare;
-     * - snapshot: stato statico del sistema.
+     * La mutazione può:
      *
-     * Output:
-     * - nuovo Gene mutato.
+     * - mantenere il candidato e cambiare solo p_i/risorse;
+     * - cambiare candidato e ricalcolare p_i in modo coerente;
+     * - trasformare una decisione locale in una remota;
+     * - trasformare una decisione remota in locale, se il candidato locale viene scelto.
      */
-    private Gene mutateGene(Gene gene, SystemSnapshot snapshot) {
-        // Cerca il task associato al gene.
-        TaskInstance task = findTask(snapshot, gene.getTaskId());
+    private Gene mutateGene(
+            Gene gene,
+            SystemSnapshot snapshot
+    ) {
+        TaskInstance task = findTask(
+                snapshot,
+                gene.getTaskId()
+        );
 
-        // Se il task non esiste, il gene non può essere mutato in modo sicuro.
         if (task == null) {
             return gene;
         }
 
-        // Cerca il nodo attualmente selezionato dal gene.
-        NodeCandidate node = findNode(snapshot, gene.getSelectedNodeId());
+        VehicleSnapshot sourceVehicle = findVehicle(
+                snapshot,
+                task.getSourceVehicleId()
+        );
 
-        // Con una certa probabilità cambia anche il nodo selezionato.
-        if (node == null || random.nextDouble() < 0.25) {
-            node = randomNode(snapshot.getCandidateNodes());
+        List<NodeCandidate> validCandidates =
+                findCandidatesForTask(
+                        task,
+                        snapshot
+                );
+
+        if (validCandidates.isEmpty()) {
+            return gene;
         }
 
-        // Cerca il veicolo sorgente del task.
-        VehicleSnapshot sourceVehicle = findVehicle(snapshot, task.getSourceVehicleId());
+        NodeCandidate currentCandidate = findCandidate(
+                snapshot,
+                gene.getSelectedCandidateId()
+        );
 
-        // Se il nodo mutato è locale, forza una decisione locale coerente.
-        if (node.getType() == NodeType.LOCAL) {
-            double localCpu = sourceVehicle == null
-                    ? 0.0
-                    : Math.max(0.0, sourceVehicle.getLocalCpu());
+        boolean candidateChanged =
+                currentCandidate == null
+                        || !currentCandidate.isValidForSourceVehicle(
+                        task.getSourceVehicleId()
+                )
+                        || random.nextDouble()
+                        < CANDIDATE_MUTATION_PROBABILITY;
 
-            return new Gene(
-                    task.getTaskId(),
-                    node.getNodeId(),
-                    0.0,
-                    localCpu,
-                    0.0
+        NodeCandidate selectedCandidate = candidateChanged
+                ? selectCandidateForMutation(
+                task,
+                validCandidates,
+                sourceVehicle
+        )
+                : currentCandidate;
+
+        if (selectedCandidate.getType() == NodeType.LOCAL) {
+            return createLocalGene(
+                    task,
+                    selectedCandidate,
+                    sourceVehicle
             );
         }
 
-        // Muta la quota di offloading mantenendola positiva.
-        double offloadingRatio = mutateRatio(gene.getOffloadingRatio());
+        double offloadingRatio = mutateOffloadingRatio(
+                gene,
+                task,
+                selectedCandidate,
+                sourceVehicle,
+                candidateChanged
+        );
 
-        // Muta le risorse computazionali assegnate.
-        double allocatedCpu = mutateResource(
+        double allocatedCpu = candidateChanged
+                ? randomResource(selectedCandidate.getAvailableCpu())
+                : mutateResource(
                 gene.getAllocatedCpu(),
-                node.getAvailableCpu()
+                selectedCandidate.getAvailableCpu()
         );
 
-        // Muta la banda assegnata.
-        double allocatedBandwidth = mutateResource(
+        double allocatedBandwidth = candidateChanged
+                ? randomResource(selectedCandidate.getAvailableBandwidth())
+                : mutateResource(
                 gene.getAllocatedBandwidth(),
-                node.getAvailableBandwidth()
+                selectedCandidate.getAvailableBandwidth()
         );
 
-        // Restituisce il gene remoto mutato.
         return new Gene(
                 task.getTaskId(),
-                node.getNodeId(),
+                selectedCandidate.getCandidateId(),
                 offloadingRatio,
                 allocatedCpu,
                 allocatedBandwidth
@@ -158,250 +205,439 @@ public final class MutationOperator {
     }
 
     /**
-     * Muta la quota di offloading.
+     * Sceglie un candidato valido per la mutazione.
      *
-     * Parametri in ingresso:
-     * - currentRatio: quota di offloading attuale.
-     *
-     * Output:
-     * - nuova quota di offloading compresa tra MIN_REMOTE_OFFLOADING_RATIO e 1.
+     * Preferisce candidati remoti perché il problema osservato nei report
+     * è un uso troppo conservativo del locale. Non elimina però il locale:
+     * mantiene una quota di casualità e quindi di diversità.
      */
-    private double mutateRatio(double currentRatio) {
-        // Se la quota attuale non è valida, parte dal minimo remoto.
-        if (!Double.isFinite(currentRatio) || currentRatio <= EPSILON) {
-            currentRatio = MIN_REMOTE_OFFLOADING_RATIO;
+    private NodeCandidate selectCandidateForMutation(
+            TaskInstance task,
+            List<NodeCandidate> validCandidates,
+            VehicleSnapshot sourceVehicle
+    ) {
+        List<NodeCandidate> remoteCandidates =
+                findRemoteCandidates(validCandidates);
+
+        NodeCandidate localCandidate =
+                findLocalCandidate(validCandidates);
+
+        if (!remoteCandidates.isEmpty()
+                && random.nextDouble() < REMOTE_CANDIDATE_PREFERENCE) {
+            if (random.nextDouble() < BEST_REMOTE_CANDIDATE_PROBABILITY) {
+                return selectBestEstimatedRemoteCandidate(
+                        task,
+                        remoteCandidates,
+                        sourceVehicle
+                );
+            }
+
+            return remoteCandidates.get(
+                    random.nextInt(remoteCandidates.size())
+            );
         }
 
-        // Calcola una variazione casuale limitata.
-        double delta = (random.nextDouble() - 0.5) * 0.30;
+        if (localCandidate != null && random.nextDouble() < 0.50) {
+            return localCandidate;
+        }
 
-        // Applica la variazione e limita il risultato.
-        return clamp(
-                currentRatio + delta,
-                MIN_REMOTE_OFFLOADING_RATIO,
-                1.0
+        return validCandidates.get(
+                random.nextInt(validCandidates.size())
         );
     }
 
     /**
-     * Muta una risorsa assegnata.
+     * Muta la quota di offloading p_i.
      *
-     * Parametri in ingresso:
-     * - currentValue: valore corrente della risorsa;
-     * - maxAvailable: massimo disponibile sul nodo.
+     * Se il candidato è appena cambiato, evita di riusare troppo il vecchio p_i,
+     * perché quel valore era legato a un candidato diverso.
      *
-     * Output:
-     * - nuovo valore di risorsa entro i limiti disponibili.
+     * Se il candidato resta lo stesso, mantiene più spesso una piccola
+     * perturbazione locale, ma introduce anche salti verso balanced/full/random.
      */
-    private double mutateResource(double currentValue, double maxAvailable) {
-        // Se non esiste risorsa disponibile, restituisce zero.
+    private double mutateOffloadingRatio(
+            Gene gene,
+            TaskInstance task,
+            NodeCandidate candidate,
+            VehicleSnapshot sourceVehicle,
+            boolean candidateChanged
+    ) {
+        if (candidate.getType() == NodeType.LOCAL) {
+            return offloadingRatioPolicy.localRatio();
+        }
+
+        double roll = random.nextDouble();
+
+        if (candidateChanged) {
+            if (roll < 0.45) {
+                return offloadingRatioPolicy.mutateToBalancedRatio(
+                        task,
+                        candidate,
+                        sourceVehicle
+                );
+            }
+
+            if (roll < 0.70) {
+                return offloadingRatioPolicy.mutateToFullOffloading();
+            }
+
+            if (roll < 0.90) {
+                return offloadingRatioPolicy.mutateByRandomReset(random);
+            }
+
+            return offloadingRatioPolicy.mutateBySmallStep(
+                    gene.getOffloadingRatio(),
+                    random
+            );
+        }
+
+        if (roll < 0.50) {
+            return offloadingRatioPolicy.mutateBySmallStep(
+                    gene.getOffloadingRatio(),
+                    random
+            );
+        }
+
+        if (roll < 0.70) {
+            return offloadingRatioPolicy.mutateToBalancedRatio(
+                    task,
+                    candidate,
+                    sourceVehicle
+            );
+        }
+
+        if (roll < 0.85) {
+            return offloadingRatioPolicy.mutateToFullOffloading();
+        }
+
+        return offloadingRatioPolicy.mutateByRandomReset(random);
+    }
+
+    /**
+     * Crea un gene locale coerente.
+     */
+    private Gene createLocalGene(
+            TaskInstance task,
+            NodeCandidate candidate,
+            VehicleSnapshot sourceVehicle
+    ) {
+        double localCpu = sourceVehicle == null
+                ? candidate.getAvailableCpu()
+                : Math.max(0.0, sourceVehicle.getLocalCpu());
+
+        return new Gene(
+                task.getTaskId(),
+                candidate.getCandidateId(),
+                offloadingRatioPolicy.localRatio(),
+                localCpu,
+                0.0
+        );
+    }
+
+    /**
+     * Sceglie il candidato remoto con migliore stima euristica.
+     *
+     * La stima non sostituisce la fitness.
+     * Serve solo a non sprecare mutazioni su candidati palesemente peggiori.
+     */
+    private NodeCandidate selectBestEstimatedRemoteCandidate(
+            TaskInstance task,
+            List<NodeCandidate> remoteCandidates,
+            VehicleSnapshot sourceVehicle
+    ) {
+        return remoteCandidates
+                .stream()
+                .min(
+                        Comparator.comparingDouble(
+                                candidate ->
+                                        estimateBestCompletion(
+                                                task,
+                                                candidate,
+                                                sourceVehicle
+                                        )
+                        )
+                )
+                .orElse(
+                        remoteCandidates.get(
+                                random.nextInt(remoteCandidates.size())
+                        )
+                );
+    }
+
+    /**
+     * Stima euristica del miglior completion ottenibile con un candidato remoto.
+     *
+     * Usa lo stesso modello usato dalla policy di p:
+     *
+     * local(p)  = (1 - p) * A
+     * remote(p) = L + p * B
+     */
+    private double estimateBestCompletion(
+            TaskInstance task,
+            NodeCandidate candidate,
+            VehicleSnapshot sourceVehicle
+    ) {
+        double localOnlyTime =
+                estimateLocalOnlyTime(task, sourceVehicle);
+
+        double remoteLinearTime =
+                estimateRemoteLinearTime(task, candidate);
+
+        double baseLatency =
+                Math.max(0.0, candidate.getBaseLatencySeconds());
+
+        if (!Double.isFinite(localOnlyTime)) {
+            return baseLatency + remoteLinearTime;
+        }
+
+        if (!Double.isFinite(remoteLinearTime)) {
+            return localOnlyTime;
+        }
+
+        double p =
+                offloadingRatioPolicy.balancedRemoteRatio(
+                        task,
+                        candidate,
+                        sourceVehicle
+                );
+
+        double localBranch =
+                (1.0 - p) * localOnlyTime;
+
+        double remoteBranch =
+                baseLatency + p * remoteLinearTime;
+
+        return Math.max(localBranch, remoteBranch);
+    }
+
+    /**
+     * Stima il tempo locale puro.
+     */
+    private double estimateLocalOnlyTime(
+            TaskInstance task,
+            VehicleSnapshot sourceVehicle
+    ) {
+        if (sourceVehicle == null || sourceVehicle.getLocalCpu() <= 0.0) {
+            return Double.POSITIVE_INFINITY;
+        }
+
+        return Math.max(0.0, task.getCpuCycles())
+                / sourceVehicle.getLocalCpu();
+    }
+
+    /**
+     * Stima upload + esecuzione remota + download per p = 1.
+     */
+    private double estimateRemoteLinearTime(
+            TaskInstance task,
+            NodeCandidate candidate
+    ) {
+        if (candidate.getAvailableBandwidth() <= 0.0
+                || candidate.getAvailableCpu() <= 0.0) {
+            return Double.POSITIVE_INFINITY;
+        }
+
+        double upload =
+                Math.max(0.0, task.getInputSizeBits())
+                        / candidate.getAvailableBandwidth();
+
+        double remoteExecution =
+                Math.max(0.0, task.getCpuCycles())
+                        / candidate.getAvailableCpu();
+
+        double download =
+                Math.max(0.0, task.getOutputSizeBits())
+                        / candidate.getAvailableBandwidth();
+
+        return upload + remoteExecution + download;
+    }
+
+    /**
+     * Muta una risorsa assegnata con una variazione moltiplicativa controllata.
+     */
+    private double mutateResource(
+            double currentValue,
+            double maxAvailable
+    ) {
         if (!Double.isFinite(maxAvailable) || maxAvailable <= 0.0) {
             return 0.0;
         }
 
-        // Se il valore corrente non è valido, genera una risorsa casuale.
         if (!Double.isFinite(currentValue) || currentValue <= 0.0) {
             return randomResource(maxAvailable);
         }
 
-        // Applica una variazione moltiplicativa controllata.
         double factor = 0.75 + random.nextDouble() * 0.50;
 
-        // Limita il nuovo valore entro le risorse disponibili.
-        return clampResource(currentValue * factor, maxAvailable);
+        return clampResource(
+                currentValue * factor,
+                maxAvailable
+        );
     }
 
     /**
      * Genera casualmente una quantità di risorsa.
-     *
-     * Parametri in ingresso:
-     * - available: quantità massima disponibile.
-     *
-     * Output:
-     * - valore casuale positivo se available è valido;
-     * - 0 altrimenti.
      */
     private double randomResource(double available) {
-        // Se la risorsa disponibile non è valida, restituisce zero.
         if (!Double.isFinite(available) || available <= 0.0) {
             return 0.0;
         }
 
-        // Calcola una soglia minima positiva.
         double min = available * MIN_RESOURCE_FRACTION;
 
-        // Restituisce un valore casuale tra minimo e massimo.
         return min + random.nextDouble() * (available - min);
     }
 
     /**
-     * Limita una risorsa assegnata entro l'intervallo valido.
-     *
-     * Parametri in ingresso:
-     * - value: valore proposto;
-     * - maxAvailable: massimo disponibile.
-     *
-     * Output:
-     * - valore compreso tra una soglia minima e maxAvailable;
-     * - 0 se maxAvailable non è valido.
+     * Limita una risorsa assegnata entro l'intervallo ammesso.
      */
-    private double clampResource(double value, double maxAvailable) {
-        // Se la risorsa massima non è valida, restituisce zero.
+    private double clampResource(
+            double value,
+            double maxAvailable
+    ) {
         if (!Double.isFinite(maxAvailable) || maxAvailable <= 0.0) {
             return 0.0;
         }
 
-        // Calcola una quantità minima positiva.
         double min = maxAvailable * MIN_RESOURCE_FRACTION;
 
-        // Se il valore proposto non è valido, usa il minimo.
         if (!Double.isFinite(value) || value <= 0.0) {
             return min;
         }
 
-        // Limita il valore tra minimo e massimo disponibile.
-        return clamp(value, min, maxAvailable);
+        return clamp(
+                value,
+                min,
+                maxAvailable
+        );
     }
 
     /**
-     * Seleziona casualmente un nodo candidato.
-     *
-     * Parametri in ingresso:
-     * - nodes: lista dei nodi candidati.
-     *
-     * Output:
-     * - nodo candidato scelto casualmente.
+     * Trova i candidati validi per il veicolo sorgente del task.
      */
-    private NodeCandidate randomNode(List<NodeCandidate> nodes) {
-        // Verifica che la lista dei nodi sia valida.
-        if (nodes == null || nodes.isEmpty()) {
-            throw new IllegalArgumentException(
-                    "The snapshot must contain at least one candidate node."
-            );
+    private List<NodeCandidate> findCandidatesForTask(
+            TaskInstance task,
+            SystemSnapshot snapshot
+    ) {
+        List<NodeCandidate> result = new ArrayList<>();
+
+        for (NodeCandidate candidate : snapshot.getCandidateNodes()) {
+            if (candidate.isValidForSourceVehicle(
+                    task.getSourceVehicleId()
+            )) {
+                result.add(candidate);
+            }
         }
 
-        // Estrae casualmente un nodo.
-        return nodes.get(random.nextInt(nodes.size()));
+        return result;
     }
 
     /**
-     * Cerca un nodo nello snapshot tramite nodeId.
-     *
-     * Parametri in ingresso:
-     * - snapshot: stato statico del sistema;
-     * - nodeId: identificativo del nodo.
-     *
-     * Output:
-     * - NodeCandidate corrispondente se trovato;
-     * - null altrimenti.
+     * Estrae i candidati remoti.
      */
-    private NodeCandidate findNode(SystemSnapshot snapshot, String nodeId) {
-        // Cerca il nodo tramite id esatto.
-        for (NodeCandidate node : snapshot.getCandidateNodes()) {
-            if (node.getNodeId().equals(nodeId)) {
-                return node;
+    private List<NodeCandidate> findRemoteCandidates(
+            List<NodeCandidate> candidates
+    ) {
+        List<NodeCandidate> result = new ArrayList<>();
+
+        for (NodeCandidate candidate : candidates) {
+            if (candidate.getType() != NodeType.LOCAL) {
+                result.add(candidate);
             }
         }
 
-        // Gestisce il caso testuale "LOCAL".
-        if ("LOCAL".equalsIgnoreCase(nodeId) || "local".equalsIgnoreCase(nodeId)) {
-            for (NodeCandidate node : snapshot.getCandidateNodes()) {
-                if (node.getType() == NodeType.LOCAL) {
-                    return node;
-                }
+        return result;
+    }
+
+    /**
+     * Trova il candidato locale, se presente.
+     */
+    private NodeCandidate findLocalCandidate(
+            List<NodeCandidate> candidates
+    ) {
+        for (NodeCandidate candidate : candidates) {
+            if (candidate.getType() == NodeType.LOCAL) {
+                return candidate;
             }
         }
 
-        // Nessun nodo trovato.
         return null;
     }
 
     /**
-     * Cerca un veicolo nello snapshot tramite vehicleId.
-     *
-     * Parametri in ingresso:
-     * - snapshot: stato statico del sistema;
-     * - vehicleId: identificativo del veicolo.
-     *
-     * Output:
-     * - VehicleSnapshot corrispondente se trovato;
-     * - null altrimenti.
+     * Cerca un candidato tramite candidateId.
      */
-    private VehicleSnapshot findVehicle(SystemSnapshot snapshot, String vehicleId) {
-        // Scorre tutti i veicoli osservati.
-        for (VehicleSnapshot vehicle : snapshot.getVehicles()) {
+    private NodeCandidate findCandidate(
+            SystemSnapshot snapshot,
+            String candidateId
+    ) {
+        for (NodeCandidate candidate : snapshot.getCandidateNodes()) {
+            if (candidate.getCandidateId().equals(candidateId)) {
+                return candidate;
+            }
+        }
 
-            // Restituisce il veicolo se l'id coincide.
+        return null;
+    }
+
+    /**
+     * Cerca il veicolo sorgente.
+     */
+    private VehicleSnapshot findVehicle(
+            SystemSnapshot snapshot,
+            String vehicleId
+    ) {
+        for (VehicleSnapshot vehicle : snapshot.getVehicles()) {
             if (vehicle.getVehicleId().equals(vehicleId)) {
                 return vehicle;
             }
         }
 
-        // Nessun veicolo trovato.
         return null;
     }
 
     /**
-     * Cerca un task nello snapshot tramite taskId.
-     *
-     * Parametri in ingresso:
-     * - snapshot: stato statico del sistema;
-     * - taskId: identificativo del task.
-     *
-     * Output:
-     * - TaskInstance corrispondente se trovato;
-     * - null altrimenti.
+     * Cerca il task associato al gene.
      */
-    private TaskInstance findTask(SystemSnapshot snapshot, String taskId) {
-        // Scorre tutti i task dello snapshot.
+    private TaskInstance findTask(
+            SystemSnapshot snapshot,
+            String taskId
+    ) {
         for (TaskInstance task : snapshot.getTasks()) {
-
-            // Restituisce il task se l'id coincide.
             if (task.getTaskId().equals(taskId)) {
                 return task;
             }
         }
 
-        // Nessun task trovato.
         return null;
     }
 
     /**
-     * Valida una probabilità di mutazione.
-     *
-     * Parametri in ingresso:
-     * - value: mutation rate da verificare.
-     *
-     * Output:
-     * - nessun valore restituito;
-     * - solleva IllegalArgumentException se il valore non è in [0, 1].
+     * Valida una probabilità.
      */
     private void validateRate(double value) {
-        // Verifica che il valore sia finito e compreso nell'intervallo ammesso.
         if (!Double.isFinite(value) || value < 0.0 || value > 1.0) {
-            throw new IllegalArgumentException("mutationRate must be in [0, 1].");
+            throw new IllegalArgumentException(
+                    "mutationRate must be in [0, 1]."
+            );
         }
     }
 
     /**
      * Limita un valore dentro un intervallo.
-     *
-     * Parametri in ingresso:
-     * - value: valore da limitare;
-     * - min: limite inferiore;
-     * - max: limite superiore.
-     *
-     * Output:
-     * - valore limitato nell'intervallo [min, max].
      */
-    private double clamp(double value, double min, double max) {
-        // Se il valore non è finito, restituisce il minimo.
+    private double clamp(
+            double value,
+            double min,
+            double max
+    ) {
         if (!Double.isFinite(value)) {
             return min;
         }
 
-        // Applica i limiti inferiore e superiore.
-        return Math.max(min, Math.min(max, value));
+        return Math.max(
+                min,
+                Math.min(max, value)
+        );
     }
 }
-
