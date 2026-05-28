@@ -44,7 +44,7 @@ public final class MaGaOptimizer {
     private static final int DEFAULT_TOURNAMENT_SIZE = 3;
 
     private final MaGaConfig config;
-    private final GeneticAlgorithmConfig gaConfig;
+    private GeneticAlgorithmConfig gaConfig;
 
     private final FitnessEvaluator fitnessEvaluator;
     private final PopulationInitializer populationInitializer;
@@ -125,6 +125,8 @@ public final class MaGaOptimizer {
             List<Chromosome> initialPopulation
     ) {
         Objects.requireNonNull(snapshot, "snapshot must not be null.");
+
+        this.gaConfig = config.resolveGeneticAlgorithmConfig(snapshot);
 
         validateSnapshot(snapshot);
 

@@ -3,20 +3,29 @@ package config;
 import config.fitness.FitnessWeights;
 import config.fitness.NormalizationConfig;
 import config.fitness.PenaltyConfig;
+import config.ga.GaParameterScaler;
+import config.ga.GaParameterScalingMode;
+import config.ga.GaParameterScalingResult;
 import config.ga.GeneticAlgorithmConfig;
 import config.mobility.MobilityConfig;
+import model.snapshot.SystemSnapshot;
 
 import java.util.Objects;
 
 /**
  * Configurazione complessiva del Mobility-Aware Genetic Algorithm.
  *
- * Aggrega le configurazioni necessarie al GA:
+ * Aggrega:
  * - pesi della fitness;
  * - penalità;
  * - normalizzazione;
- * - parametri evolutivi;
- * - parametri di mobilità/copertura.
+ * - configurazione GA di base;
+ * - configurazione di mobilità;
+ * - modalità di scaling dei parametri GA.
+ *
+ * Il main deve scegliere solo la modalità di scaling.
+ * Il calcolo della GeneticAlgorithmConfig effettiva viene risolto
+ * internamente quando è disponibile lo snapshot.
  */
 public final class MaGaConfig {
 
@@ -26,10 +35,13 @@ public final class MaGaConfig {
     private final GeneticAlgorithmConfig geneticAlgorithmConfig;
     private final MobilityConfig mobilityConfig;
 
+    private final GaParameterScalingMode gaParameterScalingMode;
+    private final GaParameterScaler gaParameterScaler;
+
     /**
      * Costruttore compatibile con la versione precedente.
      *
-     * Usa MobilityConfig.defaultConfig().
+     * Usa modalità STATIC.
      */
     public MaGaConfig(
             FitnessWeights fitnessWeights,
@@ -42,18 +54,15 @@ public final class MaGaConfig {
                 penaltyConfig,
                 normalizationConfig,
                 geneticAlgorithmConfig,
-                MobilityConfig.defaultConfig()
+                MobilityConfig.defaultConfig(),
+                GaParameterScalingMode.STATIC
         );
     }
 
     /**
-     * Costruisce la configurazione completa del MA-GA.
+     * Costruttore con configurazione di mobilità.
      *
-     * @param fitnessWeights pesi della funzione obiettivo
-     * @param penaltyConfig configurazione delle penalità
-     * @param normalizationConfig riferimenti di normalizzazione
-     * @param geneticAlgorithmConfig parametri evolutivi del GA
-     * @param mobilityConfig parametri per stimare copertura e mobilità
+     * Usa modalità STATIC.
      */
     public MaGaConfig(
             FitnessWeights fitnessWeights,
@@ -61,6 +70,34 @@ public final class MaGaConfig {
             NormalizationConfig normalizationConfig,
             GeneticAlgorithmConfig geneticAlgorithmConfig,
             MobilityConfig mobilityConfig
+    ) {
+        this(
+                fitnessWeights,
+                penaltyConfig,
+                normalizationConfig,
+                geneticAlgorithmConfig,
+                mobilityConfig,
+                GaParameterScalingMode.STATIC
+        );
+    }
+
+    /**
+     * Costruttore principale.
+     *
+     * @param fitnessWeights pesi della funzione obiettivo
+     * @param penaltyConfig configurazione delle penalità
+     * @param normalizationConfig riferimenti di normalizzazione
+     * @param geneticAlgorithmConfig configurazione GA di base
+     * @param mobilityConfig configurazione di mobilità/copertura
+     * @param gaParameterScalingMode modalità STATIC o ADAPTIVE
+     */
+    public MaGaConfig(
+            FitnessWeights fitnessWeights,
+            PenaltyConfig penaltyConfig,
+            NormalizationConfig normalizationConfig,
+            GeneticAlgorithmConfig geneticAlgorithmConfig,
+            MobilityConfig mobilityConfig,
+            GaParameterScalingMode gaParameterScalingMode
     ) {
         this.fitnessWeights = Objects.requireNonNull(
                 fitnessWeights,
@@ -86,20 +123,40 @@ public final class MaGaConfig {
                 mobilityConfig,
                 "mobilityConfig must not be null."
         );
+
+        this.gaParameterScalingMode = Objects.requireNonNull(
+                gaParameterScalingMode,
+                "gaParameterScalingMode must not be null."
+        );
+
+        this.gaParameterScaler = createScaler(gaParameterScalingMode);
     }
 
     /**
-     * Configurazione iniziale del prototipo.
-     *
-     * @return configurazione MA-GA completa
+     * Configurazione default in modalità STATIC.
      */
     public static MaGaConfig defaultConfig() {
+        return defaultConfig(GaParameterScalingMode.STATIC);
+    }
+
+    /**
+     * Configurazione default scegliendo solo la modalità di scaling.
+     *
+     * Questo è il metodo consigliato nel main.
+     *
+     * @param scalingMode modalità STATIC o ADAPTIVE
+     * @return configurazione MA-GA completa
+     */
+    public static MaGaConfig defaultConfig(
+            GaParameterScalingMode scalingMode
+    ) {
         return new MaGaConfig(
                 FitnessWeights.defaultWeights(),
                 PenaltyConfig.defaultConfig(),
                 NormalizationConfig.neutral(),
                 GeneticAlgorithmConfig.defaultConfig(),
-                MobilityConfig.defaultConfig()
+                MobilityConfig.defaultConfig(),
+                scalingMode
         );
     }
 
@@ -115,12 +172,67 @@ public final class MaGaConfig {
         return normalizationConfig;
     }
 
+    /**
+     * Restituisce la configurazione GA di base.
+     *
+     * Attenzione: in modalità ADAPTIVE questa non è necessariamente
+     * la configurazione usata durante una specifica esecuzione.
+     * Per ottenere la configurazione effettiva usare
+     * resolveGeneticAlgorithmConfig(snapshot).
+     */
     public GeneticAlgorithmConfig getGeneticAlgorithmConfig() {
         return geneticAlgorithmConfig;
     }
 
     public MobilityConfig getMobilityConfig() {
         return mobilityConfig;
+    }
+
+    public GaParameterScalingMode getGaParameterScalingMode() {
+        return gaParameterScalingMode;
+    }
+
+    /**
+     * Risolve la configurazione GA effettiva per lo snapshot corrente.
+     *
+     * In modalità STATIC restituisce geneticAlgorithmConfig.
+     * In modalità ADAPTIVE restituisce una configurazione scalata.
+     *
+     * @param snapshot snapshot da ottimizzare
+     * @return configurazione GA effettiva
+     */
+    public GeneticAlgorithmConfig resolveGeneticAlgorithmConfig(
+            SystemSnapshot snapshot
+    ) {
+        return resolveGaParameterScaling(snapshot).getScaledConfig();
+    }
+
+    /**
+     * Risolve la configurazione GA effettiva e restituisce anche
+     * informazioni diagnostiche.
+     *
+     * @param snapshot snapshot da ottimizzare
+     * @return risultato dello scaling
+     */
+    public GaParameterScalingResult resolveGaParameterScaling(
+            SystemSnapshot snapshot
+    ) {
+        Objects.requireNonNull(snapshot, "snapshot must not be null.");
+
+        return gaParameterScaler.scaleDetailed(
+                snapshot,
+                geneticAlgorithmConfig
+        );
+    }
+
+    private static GaParameterScaler createScaler(
+            GaParameterScalingMode mode
+    ) {
+        if (mode == GaParameterScalingMode.ADAPTIVE) {
+            return GaParameterScaler.adaptiveDefault();
+        }
+
+        return GaParameterScaler.staticScaler();
     }
 
     @Override
@@ -131,6 +243,7 @@ public final class MaGaConfig {
                 + ", normalizationConfig=" + normalizationConfig
                 + ", geneticAlgorithmConfig=" + geneticAlgorithmConfig
                 + ", mobilityConfig=" + mobilityConfig
+                + ", gaParameterScalingMode=" + gaParameterScalingMode
                 + '}';
     }
 }

@@ -1,9 +1,11 @@
 package app;
 
 import config.MaGaConfig;
+import config.ga.GaParameterScalingMode;
 import ga.core.MaGaOptimizer;
 import ga.core.MaGaResult;
 import io.reporting.ResultPrinter;
+import io.reporting.StressResultPrinter;
 import io.snapshot.SnapshotLoader;
 import model.snapshot.SystemSnapshot;
 import validation.snapshot.SnapshotValidator;
@@ -34,7 +36,7 @@ public final class Main {
     public static void main(String[] args) throws Exception {
         String snapshotPath = args.length > 0
                 ? args[0]
-                : "data/maga/snapshot_maga_01_basic_edge_cloud.json";
+                : "data/maga/snapshot_maga_stress_100v_60tasks_coherent_cpu.json";
 
         SnapshotLoader snapshotLoader = new SnapshotLoader();
         SystemSnapshot snapshot = snapshotLoader.load(snapshotPath);
@@ -42,12 +44,19 @@ public final class Main {
         SnapshotValidator validator = new SnapshotValidator();
         validator.validate(snapshot);
 
-        MaGaConfig config = MaGaConfig.defaultConfig();
-
+        MaGaConfig config = MaGaConfig.defaultConfig(
+                GaParameterScalingMode.ADAPTIVE
+        );
         MaGaOptimizer optimizer = new MaGaOptimizer(config);
         MaGaResult result = optimizer.optimizeDetailed(snapshot);
 
-        ResultPrinter resultPrinter = new ResultPrinter(config);
-        resultPrinter.printOptimizationResult(snapshot, result);
+        //  resultPrinter = new ResultPrinter(config);
+        // resultPrinter.printOptimizationResult(snapshot, result);
+
+
+
+
+        StressResultPrinter resultPrinter = new StressResultPrinter(config);
+        resultPrinter.printStressReport(snapshot, result);
     }
 }
