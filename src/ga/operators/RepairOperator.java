@@ -16,6 +16,18 @@ import java.util.List;
  *
  * Nel modello source-aware, un gene è valido solo se il candidato scelto
  * è compatibile con il veicolo sorgente del task.
+ *
+ * La riparazione avviene su due livelli:
+ *
+ * 1. livello gene:
+ *    corregge candidato, quota di offloading, CPU e banda del singolo gene;
+ *
+ * 2. livello cromosoma:
+ *    ridimensiona la CPU aggregata sui nodi fisici remoti tramite
+ *    CpuAggregateRepairOperator.
+ *
+ * La banda resta riparata solo a livello di singolo candidato.
+ * Il repair aggregato della banda è una OpenIssue.
  */
 public final class RepairOperator {
 
@@ -23,10 +35,26 @@ public final class RepairOperator {
     private static final double MIN_REMOTE_OFFLOADING_RATIO = 0.05;
     private static final double MIN_RESOURCE_FRACTION = 0.05;
 
+    private final CpuAggregateRepairOperator cpuAggregateRepairOperator;
+
     /**
-     * Ripara un cromosoma.
+     * Costruisce il repair operator principale.
      */
-    public Chromosome repairChromosome(Chromosome chromosome, SystemSnapshot snapshot) {
+    public RepairOperator() {
+        this.cpuAggregateRepairOperator = new CpuAggregateRepairOperator();
+    }
+
+    /**
+     * Ripara un cromosoma rispetto allo snapshot corrente.
+     *
+     * @param chromosome cromosoma da riparare
+     * @param snapshot snapshot corrente
+     * @return cromosoma riparato
+     */
+    public Chromosome repairChromosome(
+            Chromosome chromosome,
+            SystemSnapshot snapshot
+    ) {
         List<Gene> repairedGenes = new ArrayList<>();
 
         for (TaskInstance task : snapshot.getTasks()) {
@@ -42,22 +70,48 @@ public final class RepairOperator {
         Chromosome repaired = new Chromosome(repairedGenes);
         repaired.setFitness(chromosome.getFitness());
 
-        return repaired;
+        return cpuAggregateRepairOperator.repairChromosome(
+                repaired,
+                snapshot
+        );
     }
 
     /**
-     * Ripara un gene.
+     * Ripara un gene rispetto al task e allo snapshot corrente.
+     *
+     * @param gene gene da riparare
+     * @param task task associato al gene
+     * @param snapshot snapshot corrente
+     * @return gene coerente con il task
      */
-    public Gene repairGene(Gene gene, TaskInstance task, SystemSnapshot snapshot) {
-        NodeCandidate candidate = findCandidate(snapshot, gene.getSelectedCandidateId());
+    public Gene repairGene(
+            Gene gene,
+            TaskInstance task,
+            SystemSnapshot snapshot
+    ) {
+        NodeCandidate candidate = findCandidate(
+                snapshot,
+                gene.getSelectedCandidateId()
+        );
 
-        if (candidate == null || !candidate.isValidForSourceVehicle(task.getSourceVehicleId())) {
+        if (candidate == null
+                || !candidate.isValidForSourceVehicle(
+                task.getSourceVehicleId()
+        )) {
             candidate = defaultCandidate(task, snapshot);
         }
 
-        VehicleSnapshot sourceVehicle = findVehicle(snapshot, task.getSourceVehicleId());
+        VehicleSnapshot sourceVehicle = findVehicle(
+                snapshot,
+                task.getSourceVehicleId()
+        );
 
-        double offloadingRatio = clamp(gene.getOffloadingRatio(), 0.0, 1.0);
+        double offloadingRatio = clamp(
+                gene.getOffloadingRatio(),
+                0.0,
+                1.0
+        );
+
         double allocatedCpu = Math.max(0.0, gene.getAllocatedCpu());
         double allocatedBandwidth = Math.max(0.0, gene.getAllocatedBandwidth());
 
@@ -79,8 +133,15 @@ public final class RepairOperator {
             offloadingRatio = MIN_REMOTE_OFFLOADING_RATIO;
         }
 
-        allocatedCpu = clampResource(allocatedCpu, candidate.getAvailableCpu());
-        allocatedBandwidth = clampResource(allocatedBandwidth, candidate.getAvailableBandwidth());
+        allocatedCpu = clampResource(
+                allocatedCpu,
+                candidate.getAvailableCpu()
+        );
+
+        allocatedBandwidth = clampResource(
+                allocatedBandwidth,
+                candidate.getAvailableBandwidth()
+        );
 
         return new Gene(
                 task.getTaskId(),
@@ -92,11 +153,18 @@ public final class RepairOperator {
     }
 
     /**
-     * Crea un gene di fallback.
+     * Crea un gene di fallback quando il cromosoma non contiene il task.
      */
-    private Gene createFallbackGene(TaskInstance task, SystemSnapshot snapshot) {
+    private Gene createFallbackGene(
+            TaskInstance task,
+            SystemSnapshot snapshot
+    ) {
         NodeCandidate candidate = defaultCandidate(task, snapshot);
-        VehicleSnapshot sourceVehicle = findVehicle(snapshot, task.getSourceVehicleId());
+
+        VehicleSnapshot sourceVehicle = findVehicle(
+                snapshot,
+                task.getSourceVehicleId()
+        );
 
         if (candidate.getType() == NodeType.LOCAL) {
             double localCpu = sourceVehicle == null
@@ -126,8 +194,14 @@ public final class RepairOperator {
      *
      * Preferisce LOCAL del veicolo sorgente, se presente.
      */
-    private NodeCandidate defaultCandidate(TaskInstance task, SystemSnapshot snapshot) {
-        List<NodeCandidate> validCandidates = findCandidatesForTask(task, snapshot);
+    private NodeCandidate defaultCandidate(
+            TaskInstance task,
+            SystemSnapshot snapshot
+    ) {
+        List<NodeCandidate> validCandidates = findCandidatesForTask(
+                task,
+                snapshot
+        );
 
         for (NodeCandidate candidate : validCandidates) {
             if (candidate.getType() == NodeType.LOCAL) {
@@ -157,7 +231,9 @@ public final class RepairOperator {
         List<NodeCandidate> result = new ArrayList<>();
 
         for (NodeCandidate candidate : snapshot.getCandidateNodes()) {
-            if (candidate.isValidForSourceVehicle(task.getSourceVehicleId())) {
+            if (candidate.isValidForSourceVehicle(
+                    task.getSourceVehicleId()
+            )) {
                 result.add(candidate);
             }
         }
@@ -168,7 +244,14 @@ public final class RepairOperator {
     /**
      * Cerca un gene per taskId.
      */
-    private Gene findGene(Chromosome chromosome, String taskId) {
+    private Gene findGene(
+            Chromosome chromosome,
+            String taskId
+    ) {
+        if (chromosome == null || chromosome.getGenes() == null) {
+            return null;
+        }
+
         for (Gene gene : chromosome.getGenes()) {
             if (gene.getTaskId().equals(taskId)) {
                 return gene;
@@ -181,7 +264,10 @@ public final class RepairOperator {
     /**
      * Cerca un candidato per candidateId.
      */
-    private NodeCandidate findCandidate(SystemSnapshot snapshot, String candidateId) {
+    private NodeCandidate findCandidate(
+            SystemSnapshot snapshot,
+            String candidateId
+    ) {
         for (NodeCandidate candidate : snapshot.getCandidateNodes()) {
             if (candidate.getCandidateId().equals(candidateId)) {
                 return candidate;
@@ -194,7 +280,10 @@ public final class RepairOperator {
     /**
      * Cerca un veicolo.
      */
-    private VehicleSnapshot findVehicle(SystemSnapshot snapshot, String vehicleId) {
+    private VehicleSnapshot findVehicle(
+            SystemSnapshot snapshot,
+            String vehicleId
+    ) {
         for (VehicleSnapshot vehicle : snapshot.getVehicles()) {
             if (vehicle.getVehicleId().equals(vehicleId)) {
                 return vehicle;
@@ -205,9 +294,12 @@ public final class RepairOperator {
     }
 
     /**
-     * Limita una risorsa.
+     * Limita una risorsa al range ammesso dal singolo candidato.
      */
-    private double clampResource(double value, double maxAvailable) {
+    private double clampResource(
+            double value,
+            double maxAvailable
+    ) {
         if (!Double.isFinite(maxAvailable) || maxAvailable <= 0.0) {
             return 0.0;
         }
@@ -224,7 +316,11 @@ public final class RepairOperator {
     /**
      * Limita un valore dentro un intervallo.
      */
-    private double clamp(double value, double min, double max) {
+    private double clamp(
+            double value,
+            double min,
+            double max
+    ) {
         if (!Double.isFinite(value)) {
             return min;
         }
@@ -232,4 +328,3 @@ public final class RepairOperator {
         return Math.max(min, Math.min(max, value));
     }
 }
-
