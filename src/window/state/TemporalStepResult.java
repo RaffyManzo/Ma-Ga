@@ -6,12 +6,14 @@ import window.dynamicity.DynamicityBreakdown;
 import window.population.PopulationReuseDecision;
 import window.population.PopulationReuseMode;
 import window.population.WindowPerformanceSignal;
+import window.source.SystemStateObservation;
 import window.timing.AdaptiveWindowDecision;
 import window.timing.TemporalOperationalMetrics;
 import window.timing.TemporalWindowBounds;
 import window.trigger.ReoptimizationTrigger;
 
 import java.util.Objects;
+import java.util.Optional;
 
 /**
  * Risultato di una singola finestra temporale.
@@ -23,6 +25,7 @@ public final class TemporalStepResult {
     private final double dataCollectionDelaySeconds;
     private final double observationTimeSeconds;
     private final SystemSnapshot snapshot;
+    private final SystemStateObservation systemStateObservation;
     private final DynamicityBreakdown dynamicityBreakdown;
     private final PopulationReuseDecision populationReuseDecision;
     private final PopulationReuseMode reuseMode;
@@ -38,6 +41,7 @@ public final class TemporalStepResult {
             double dataCollectionDelaySeconds,
             double observationTimeSeconds,
             SystemSnapshot snapshot,
+            SystemStateObservation systemStateObservation,
             DynamicityBreakdown dynamicityBreakdown,
             PopulationReuseDecision populationReuseDecision,
             AdaptiveWindowDecision adaptiveWindowDecision,
@@ -73,6 +77,7 @@ public final class TemporalStepResult {
         this.dataCollectionDelaySeconds = dataCollectionDelaySeconds;
         this.observationTimeSeconds = observationTimeSeconds;
         this.snapshot = Objects.requireNonNull(snapshot, "snapshot must not be null.");
+        this.systemStateObservation = systemStateObservation;
         this.dynamicityBreakdown = Objects.requireNonNull(
                 dynamicityBreakdown,
                 "dynamicityBreakdown must not be null."
@@ -101,6 +106,38 @@ public final class TemporalStepResult {
         );
         validateSnapshotConsistency(snapshot, maGaResult);
         validateSnapshotObservationTime(snapshot, observationTimeSeconds);
+        validateSourceObservationConsistency(snapshot, systemStateObservation);
+    }
+
+    public TemporalStepResult(
+            int windowIndex,
+            ReoptimizationTrigger trigger,
+            double dataCollectionDelaySeconds,
+            double observationTimeSeconds,
+            SystemSnapshot snapshot,
+            DynamicityBreakdown dynamicityBreakdown,
+            PopulationReuseDecision populationReuseDecision,
+            AdaptiveWindowDecision adaptiveWindowDecision,
+            TemporalOperationalMetrics operationalMetrics,
+            int initialPopulationSize,
+            int finalPopulationSize,
+            MaGaResult maGaResult
+    ) {
+        this(
+                windowIndex,
+                trigger,
+                dataCollectionDelaySeconds,
+                observationTimeSeconds,
+                snapshot,
+                null,
+                dynamicityBreakdown,
+                populationReuseDecision,
+                adaptiveWindowDecision,
+                operationalMetrics,
+                initialPopulationSize,
+                finalPopulationSize,
+                maGaResult
+        );
     }
 
     /**
@@ -124,6 +161,7 @@ public final class TemporalStepResult {
                 dataCollectionDelaySeconds,
                 observationTimeSeconds,
                 snapshot,
+                null,
                 dynamicityBreakdown,
                 new PopulationReuseDecision(
                         dynamicityBreakdown.getSuggestedReuseMode(),
@@ -135,7 +173,12 @@ public final class TemporalStepResult {
                 ),
                 AdaptiveWindowDecision.fixed(
                         Math.max(1.0, trigger.getTriggerTimeSeconds()),
-                        new TemporalWindowBounds(1.0, Math.max(1.0, trigger.getTriggerTimeSeconds()), 0.0, false),
+                        new TemporalWindowBounds(
+                                1.0,
+                                Math.max(1.0, trigger.getTriggerTimeSeconds()),
+                                0.0,
+                                false
+                        ),
                         dynamicityBreakdown.getDynamicityLevel(),
                         "Legacy constructor."
                 ),
@@ -169,6 +212,10 @@ public final class TemporalStepResult {
 
     public SystemSnapshot getSnapshot() {
         return snapshot;
+    }
+
+    public Optional<SystemStateObservation> getSystemStateObservation() {
+        return Optional.ofNullable(systemStateObservation);
     }
 
     public DynamicityBreakdown getDynamicityBreakdown() {
@@ -248,6 +295,20 @@ public final class TemporalStepResult {
         if (Math.abs(snapshot.getTimeSeconds() - observationTimeSeconds) > 1.0E-6) {
             throw new IllegalArgumentException(
                     "snapshot.timeSeconds must match observationTimeSeconds."
+            );
+        }
+    }
+
+    private static void validateSourceObservationConsistency(
+            SystemSnapshot snapshot,
+            SystemStateObservation observation
+    ) {
+        if (observation == null) {
+            return;
+        }
+        if (!snapshot.getSnapshotId().equals(observation.getSnapshot().getSnapshotId())) {
+            throw new IllegalArgumentException(
+                    "snapshot and systemStateObservation must refer to the same snapshotId."
             );
         }
     }

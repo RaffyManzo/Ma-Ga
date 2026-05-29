@@ -13,7 +13,9 @@ import window.population.PopulationAdapter;
 import window.population.PopulationReuseDecision;
 import window.population.PopulationReuseDecisionPolicy;
 import window.population.PopulationReuseMode;
-import window.provider.SystemStateProvider;
+import window.source.SystemStateObservation;
+import window.source.SystemStateRequest;
+import window.source.SystemStateSource;
 import window.state.TemporalStepResult;
 import window.state.TemporalWindowResult;
 import window.state.TemporalWindowState;
@@ -30,8 +32,8 @@ import java.util.Objects;
 /**
  * Orchestratore del ciclo temporale del MA-GA.
  *
- * <p>Coordina trigger, raccolta snapshot, dinamicità, riuso popolazione,
- * finestra adattiva ed esecuzione del MA-GA.</p>
+ * <p>Il manager non conosce la sorgente concreta degli snapshot. Riceve una
+ * SystemStateSource, che può essere basata su JSON, MOSAIC o altri adapter.</p>
  */
 public final class TemporalWindowManager {
 
@@ -42,7 +44,7 @@ public final class TemporalWindowManager {
     private final PopulationReuseDecisionPolicy reuseDecisionPolicy;
     private final AdaptiveWindowController adaptiveWindowController;
     private final CriticalEventDetector criticalEventDetector;
-    private final SystemStateProvider systemStateProvider;
+    private final SystemStateSource systemStateSource;
     private final int targetPopulationSize;
 
     public TemporalWindowManager(
@@ -51,7 +53,7 @@ public final class TemporalWindowManager {
             DynamicityEvaluator dynamicityEvaluator,
             PopulationAdapter populationAdapter,
             CriticalEventDetector criticalEventDetector,
-            SystemStateProvider systemStateProvider,
+            SystemStateSource systemStateSource,
             int targetPopulationSize
     ) {
         this(
@@ -60,9 +62,12 @@ public final class TemporalWindowManager {
                 dynamicityEvaluator,
                 populationAdapter,
                 new PopulationReuseDecisionPolicy(),
-                defaultAdaptiveWindowController(windowConfig, MobilityConfig.defaultConfig()),
+                defaultAdaptiveWindowController(
+                        windowConfig,
+                        MobilityConfig.defaultConfig()
+                ),
                 criticalEventDetector,
-                systemStateProvider,
+                systemStateSource,
                 targetPopulationSize
         );
     }
@@ -75,7 +80,7 @@ public final class TemporalWindowManager {
             PopulationReuseDecisionPolicy reuseDecisionPolicy,
             AdaptiveWindowController adaptiveWindowController,
             CriticalEventDetector criticalEventDetector,
-            SystemStateProvider systemStateProvider,
+            SystemStateSource systemStateSource,
             int targetPopulationSize
     ) {
         this.windowConfig = Objects.requireNonNull(
@@ -106,9 +111,9 @@ public final class TemporalWindowManager {
                 criticalEventDetector,
                 "criticalEventDetector must not be null."
         );
-        this.systemStateProvider = Objects.requireNonNull(
-                systemStateProvider,
-                "systemStateProvider must not be null."
+        this.systemStateSource = Objects.requireNonNull(
+                systemStateSource,
+                "systemStateSource must not be null."
         );
         if (targetPopulationSize < 1) {
             throw new IllegalArgumentException("targetPopulationSize must be >= 1.");
@@ -168,20 +173,29 @@ public final class TemporalWindowManager {
         ReoptimizationTrigger plannedTrigger = resolveTrigger(state);
         double requestedObservationTimeSeconds = computeObservationTime(plannedTrigger);
 
-        SystemSnapshot currentSnapshot = systemStateProvider
-                .findSnapshotAtOrAfter(requestedObservationTimeSeconds)
+        SystemStateRequest request = new SystemStateRequest(
+                state.getWindowIndex(),
+                plannedTrigger,
+                requestedObservationTimeSeconds,
+                state.getCurrentWindowDurationSeconds()
+        );
+
+        SystemStateObservation observation = systemStateSource
+                .nextObservation(request)
                 .orElse(null);
 
-        if (currentSnapshot == null) {
+        if (observation == null) {
             return null;
         }
 
-        ReoptimizationTrigger effectiveTrigger = alignTriggerToSnapshotTime(
+        SystemSnapshot currentSnapshot = observation.getSnapshot();
+
+        ReoptimizationTrigger effectiveTrigger = alignTriggerToObservation(
                 plannedTrigger,
-                currentSnapshot
+                observation.getActualObservationTimeSeconds()
         );
 
-        double observationTimeSeconds = computeObservationTime(effectiveTrigger);
+        double observationTimeSeconds = observation.getActualObservationTimeSeconds();
 
         DynamicityBreakdown dynamicityBreakdown = dynamicityEvaluator.evaluate(
                 state.getLastSnapshot(),
@@ -231,6 +245,7 @@ public final class TemporalWindowManager {
                 windowConfig.getDataCollectionDelaySeconds(),
                 observationTimeSeconds,
                 currentSnapshot,
+                observation,
                 dynamicityBreakdown,
                 reuseDecision,
                 adaptiveWindowDecision,
@@ -261,11 +276,11 @@ public final class TemporalWindowManager {
                 );
     }
 
-    private ReoptimizationTrigger alignTriggerToSnapshotTime(
+    private ReoptimizationTrigger alignTriggerToObservation(
             ReoptimizationTrigger plannedTrigger,
-            SystemSnapshot snapshot
+            double actualObservationTimeSeconds
     ) {
-        double alignedTriggerTime = snapshot.getTimeSeconds()
+        double alignedTriggerTime = actualObservationTimeSeconds
                 - windowConfig.getDataCollectionDelaySeconds();
 
         if (Math.abs(plannedTrigger.getTriggerTimeSeconds() - alignedTriggerTime)
@@ -278,7 +293,9 @@ public final class TemporalWindowManager {
         }
 
         if (plannedTrigger.isCriticalEventTrigger()) {
-            return plannedTrigger;
+            return ReoptimizationTrigger.criticalEvent(
+                    plannedTrigger.getCriticalEvent()
+            );
         }
 
         return ReoptimizationTrigger.scheduledExpiration(alignedTriggerTime);
@@ -321,6 +338,10 @@ public final class TemporalWindowManager {
 
     public int getTargetPopulationSize() {
         return targetPopulationSize;
+    }
+
+    public SystemStateSource getSystemStateSource() {
+        return systemStateSource;
     }
 
     private static void validateFiniteAndNonNegative(
