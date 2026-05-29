@@ -7,9 +7,10 @@ import java.util.Objects;
 /**
  * Richiesta di osservazione dello stato del sistema.
  *
- * <p>Il gestore temporale produce questa richiesta. La sorgente dati decide come
- * soddisfarla. Nei test JSON può restituire il prossimo snapshot della sequenza;
- * con MOSAIC potrà interrogare il simulatore al tempo richiesto.</p>
+ * <p>La richiesta contiene il tempo logico scelto dal TemporalWindowManager.
+ * La sorgente dati decide come soddisfarlo: nei test JSON può restituire il
+ * prossimo file della sequenza; in MOSAIC potrà interrogare il simulatore al
+ * tempo richiesto.</p>
  */
 public final class SystemStateRequest {
 
@@ -53,6 +54,9 @@ public final class SystemStateRequest {
         return plannedTrigger;
     }
 
+    /**
+     * Tempo logico/adattivo richiesto dal manager.
+     */
     public double getRequestedObservationTimeSeconds() {
         return requestedObservationTimeSeconds;
     }

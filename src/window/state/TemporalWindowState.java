@@ -11,6 +11,11 @@ import java.util.List;
 
 /**
  * Stato interno del gestore temporale.
+ *
+ * <p>Il tempo gestito da questa classe è il tempo logico del manager. Non deve
+ * essere confuso con il tempo salvato dentro lo snapshot JSON. Lo snapshot resta
+ * una fotografia del sistema; il manager decide quando chiedere una nuova
+ * fotografia.</p>
  */
 public final class TemporalWindowState {
 
@@ -99,7 +104,7 @@ public final class TemporalWindowState {
             throw new IllegalArgumentException("stepResult must not be null.");
         }
 
-        double currentTimeSeconds = stepResult.getSnapshot().getTimeSeconds();
+        double currentTimeSeconds = stepResult.getLogicalObservationTimeSeconds();
         double nextWindowDuration = stepResult
                 .getAdaptiveWindowDecision()
                 .getNextWindowDurationSeconds();
@@ -127,7 +132,7 @@ public final class TemporalWindowState {
             throw new IllegalArgumentException("stepResult must not be null.");
         }
 
-        double currentTimeSeconds = stepResult.getSnapshot().getTimeSeconds();
+        double currentTimeSeconds = stepResult.getLogicalObservationTimeSeconds();
 
         return new TemporalWindowState(
                 stepResult.getWindowIndex() + 1,

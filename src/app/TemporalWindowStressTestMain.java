@@ -1,5 +1,7 @@
 package app;
 
+import io.snapshot.SnapshotPaths;
+
 /**
  * Main storico mantenuto per compatibilità.
  *
@@ -10,7 +12,8 @@ package app;
  */
 public final class TemporalWindowStressTestMain {
 
-    private static final String DEFAULT_SNAPSHOT_FOLDER = "data/window_static_stress";
+    private static final String DEFAULT_SNAPSHOT_FOLDER =
+            SnapshotPaths.TEMPORAL_WINDOW_URBAN_CALIBRATED_FOLDER;
 
     private TemporalWindowStressTestMain() {
     }

@@ -17,13 +17,26 @@ import java.util.Optional;
 
 /**
  * Risultato di una singola finestra temporale.
+ *
+ * <p>Il risultato conserva due tempi diversi:</p>
+ *
+ * <ul>
+ *     <li>tempo logico della finestra, deciso dal TemporalWindowManager;</li>
+ *     <li>tempo sorgente dello snapshot, salvato nel SystemSnapshot.</li>
+ * </ul>
+ *
+ * <p>Questa separazione è necessaria perché nei test JSON sequenziali il
+ * manager può avanzare con finestre adattive, mentre gli snapshot restano una
+ * sequenza di fotografie salvate su disco.</p>
  */
 public final class TemporalStepResult {
+
+    private static final double EPSILON = 1.0E-6;
 
     private final int windowIndex;
     private final ReoptimizationTrigger trigger;
     private final double dataCollectionDelaySeconds;
-    private final double observationTimeSeconds;
+    private final double logicalObservationTimeSeconds;
     private final SystemSnapshot snapshot;
     private final SystemStateObservation systemStateObservation;
     private final DynamicityBreakdown dynamicityBreakdown;
@@ -39,7 +52,7 @@ public final class TemporalStepResult {
             int windowIndex,
             ReoptimizationTrigger trigger,
             double dataCollectionDelaySeconds,
-            double observationTimeSeconds,
+            double logicalObservationTimeSeconds,
             SystemSnapshot snapshot,
             SystemStateObservation systemStateObservation,
             DynamicityBreakdown dynamicityBreakdown,
@@ -58,8 +71,8 @@ public final class TemporalStepResult {
                 dataCollectionDelaySeconds
         );
         validateFiniteAndNonNegative(
-                "observationTimeSeconds",
-                observationTimeSeconds
+                "logicalObservationTimeSeconds",
+                logicalObservationTimeSeconds
         );
         if (initialPopulationSize < 0) {
             throw new IllegalArgumentException(
@@ -75,7 +88,7 @@ public final class TemporalStepResult {
         this.windowIndex = windowIndex;
         this.trigger = Objects.requireNonNull(trigger, "trigger must not be null.");
         this.dataCollectionDelaySeconds = dataCollectionDelaySeconds;
-        this.observationTimeSeconds = observationTimeSeconds;
+        this.logicalObservationTimeSeconds = logicalObservationTimeSeconds;
         this.snapshot = Objects.requireNonNull(snapshot, "snapshot must not be null.");
         this.systemStateObservation = systemStateObservation;
         this.dynamicityBreakdown = Objects.requireNonNull(
@@ -95,25 +108,28 @@ public final class TemporalStepResult {
                 operationalMetrics,
                 "operationalMetrics must not be null."
         );
-        this.maGaResult = Objects.requireNonNull(maGaResult, "maGaResult must not be null.");
         this.initialPopulationSize = initialPopulationSize;
         this.finalPopulationSize = finalPopulationSize;
+        this.maGaResult = Objects.requireNonNull(maGaResult, "maGaResult must not be null.");
 
         validateObservationConsistency(
                 trigger,
-                observationTimeSeconds,
+                logicalObservationTimeSeconds,
                 dataCollectionDelaySeconds
         );
         validateSnapshotConsistency(snapshot, maGaResult);
-        validateSnapshotObservationTime(snapshot, observationTimeSeconds);
-        validateSourceObservationConsistency(snapshot, systemStateObservation);
+        validateSourceObservationConsistency(
+                snapshot,
+                systemStateObservation,
+                logicalObservationTimeSeconds
+        );
     }
 
     public TemporalStepResult(
             int windowIndex,
             ReoptimizationTrigger trigger,
             double dataCollectionDelaySeconds,
-            double observationTimeSeconds,
+            double logicalObservationTimeSeconds,
             SystemSnapshot snapshot,
             DynamicityBreakdown dynamicityBreakdown,
             PopulationReuseDecision populationReuseDecision,
@@ -127,7 +143,7 @@ public final class TemporalStepResult {
                 windowIndex,
                 trigger,
                 dataCollectionDelaySeconds,
-                observationTimeSeconds,
+                logicalObservationTimeSeconds,
                 snapshot,
                 null,
                 dynamicityBreakdown,
@@ -206,8 +222,28 @@ public final class TemporalStepResult {
         return dataCollectionDelaySeconds;
     }
 
+    /**
+     * Tempo logico/adattivo della finestra.
+     *
+     * <p>Il nome resta compatibile con i printer esistenti. Da ora questo valore
+     * non deve essere interpretato come tempo interno del JSON.</p>
+     */
     public double getObservationTimeSeconds() {
-        return observationTimeSeconds;
+        return logicalObservationTimeSeconds;
+    }
+
+    public double getLogicalObservationTimeSeconds() {
+        return logicalObservationTimeSeconds;
+    }
+
+    public double getSourceObservationTimeSeconds() {
+        return systemStateObservation == null
+                ? snapshot.getTimeSeconds()
+                : systemStateObservation.getSourceObservationTimeSeconds();
+    }
+
+    public double getSnapshotTimeSeconds() {
+        return snapshot.getTimeSeconds();
     }
 
     public SystemSnapshot getSnapshot() {
@@ -264,15 +300,15 @@ public final class TemporalStepResult {
 
     private static void validateObservationConsistency(
             ReoptimizationTrigger trigger,
-            double observationTimeSeconds,
+            double logicalObservationTimeSeconds,
             double dataCollectionDelaySeconds
     ) {
         double expectedObservationTime = trigger.getTriggerTimeSeconds()
                 + dataCollectionDelaySeconds;
 
-        if (Math.abs(expectedObservationTime - observationTimeSeconds) > 1.0E-6) {
+        if (Math.abs(expectedObservationTime - logicalObservationTimeSeconds) > EPSILON) {
             throw new IllegalArgumentException(
-                    "observationTimeSeconds must be triggerTimeSeconds + dataCollectionDelaySeconds."
+                    "logicalObservationTimeSeconds must be triggerTimeSeconds + dataCollectionDelaySeconds."
             );
         }
     }
@@ -288,20 +324,10 @@ public final class TemporalStepResult {
         }
     }
 
-    private static void validateSnapshotObservationTime(
-            SystemSnapshot snapshot,
-            double observationTimeSeconds
-    ) {
-        if (Math.abs(snapshot.getTimeSeconds() - observationTimeSeconds) > 1.0E-6) {
-            throw new IllegalArgumentException(
-                    "snapshot.timeSeconds must match observationTimeSeconds."
-            );
-        }
-    }
-
     private static void validateSourceObservationConsistency(
             SystemSnapshot snapshot,
-            SystemStateObservation observation
+            SystemStateObservation observation,
+            double logicalObservationTimeSeconds
     ) {
         if (observation == null) {
             return;
@@ -309,6 +335,12 @@ public final class TemporalStepResult {
         if (!snapshot.getSnapshotId().equals(observation.getSnapshot().getSnapshotId())) {
             throw new IllegalArgumentException(
                     "snapshot and systemStateObservation must refer to the same snapshotId."
+            );
+        }
+        if (Math.abs(observation.getRequestedObservationTimeSeconds()
+                - logicalObservationTimeSeconds) > EPSILON) {
+            throw new IllegalArgumentException(
+                    "observation requested time must match logicalObservationTimeSeconds."
             );
         }
     }
@@ -330,7 +362,8 @@ public final class TemporalStepResult {
         return "TemporalStepResult{" +
                 "windowIndex=" + windowIndex +
                 ", triggerTimeSeconds=" + getTriggerTimeSeconds() +
-                ", observationTimeSeconds=" + observationTimeSeconds +
+                ", logicalObservationTimeSeconds=" + logicalObservationTimeSeconds +
+                ", sourceObservationTimeSeconds=" + getSourceObservationTimeSeconds() +
                 ", snapshotId='" + snapshot.getSnapshotId() + '\'' +
                 ", dynamicity=" + dynamicityBreakdown.getGlobalDynamicity() +
                 ", reuseMode=" + reuseMode +

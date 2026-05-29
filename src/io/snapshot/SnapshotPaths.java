@@ -53,8 +53,14 @@ public final class SnapshotPaths {
     public static final String TEMPORAL_WINDOW_STRESS_FOLDER =
             path("snapshots", "window", "stress", "urban_moderate");
 
-    public static final String TEMPORAL_WINDOW_URBAN_CALIBRRATED_FOLDER =
-            path("snapshots", "window", "stress", "realistic_scenarios", "urban_dynamic_calibrated");
+    public static final String TEMPORAL_WINDOW_URBAN_CALIBRATED_FOLDER =
+            path(
+                    "snapshots",
+                    "window",
+                    "stress",
+                    "realistic_scenarios",
+                    "urban_realistic_dynamic_calibrated"
+            );
 
     public static final String WINDOW_VALIDATION_FOLDER =
             path("snapshots", "window", "validation");

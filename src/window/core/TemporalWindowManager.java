@@ -190,12 +190,9 @@ public final class TemporalWindowManager {
 
         SystemSnapshot currentSnapshot = observation.getSnapshot();
 
-        ReoptimizationTrigger effectiveTrigger = alignTriggerToObservation(
-                plannedTrigger,
-                observation.getActualObservationTimeSeconds()
-        );
+        ReoptimizationTrigger effectiveTrigger = plannedTrigger;
 
-        double observationTimeSeconds = observation.getActualObservationTimeSeconds();
+        double observationTimeSeconds = request.getRequestedObservationTimeSeconds();
 
         DynamicityBreakdown dynamicityBreakdown = dynamicityEvaluator.evaluate(
                 state.getLastSnapshot(),
@@ -274,31 +271,6 @@ public final class TemporalWindowManager {
                                 scheduledTimeSeconds
                         )
                 );
-    }
-
-    private ReoptimizationTrigger alignTriggerToObservation(
-            ReoptimizationTrigger plannedTrigger,
-            double actualObservationTimeSeconds
-    ) {
-        double alignedTriggerTime = actualObservationTimeSeconds
-                - windowConfig.getDataCollectionDelaySeconds();
-
-        if (Math.abs(plannedTrigger.getTriggerTimeSeconds() - alignedTriggerTime)
-                <= 1.0E-6) {
-            return plannedTrigger;
-        }
-
-        if (plannedTrigger.isFirstRun()) {
-            return ReoptimizationTrigger.firstRun(alignedTriggerTime);
-        }
-
-        if (plannedTrigger.isCriticalEventTrigger()) {
-            return ReoptimizationTrigger.criticalEvent(
-                    plannedTrigger.getCriticalEvent()
-            );
-        }
-
-        return ReoptimizationTrigger.scheduledExpiration(alignedTriggerTime);
     }
 
     private double computeObservationTime(ReoptimizationTrigger trigger) {

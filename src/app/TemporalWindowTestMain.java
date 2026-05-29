@@ -10,12 +10,10 @@ import model.snapshot.SystemSnapshot;
 import validation.snapshot.SnapshotValidator;
 import window.core.TemporalWindowManager;
 import window.dynamicity.DynamicityEvaluator;
-import window.event.CriticalEvent;
-import window.event.CriticalEventSeverity;
-import window.event.CriticalEventType;
-import window.event.StaticCriticalEventDetector;
+import window.event.*;
 import window.population.PopulationAdapter;
-import window.provider.StaticSystemStateProvider;
+import window.source.SequentialSnapshotReplaySource;
+import window.source.SystemStateSource;
 import window.state.TemporalWindowResult;
 
 import java.util.ArrayList;
@@ -70,8 +68,11 @@ public final class TemporalWindowTestMain {
                         new Random(maGaConfig.getGeneticAlgorithmConfig().getRandomSeed())
                 );
 
-        StaticSystemStateProvider stateProvider =
-                new StaticSystemStateProvider(snapshots);
+        SystemStateSource stateSource =
+                new SequentialSnapshotReplaySource(
+                        snapshots,
+                        "window example sequential replay"
+                );
 
         StaticCriticalEventDetector eventDetector =
                 new StaticCriticalEventDetector(createCriticalEvents());
@@ -83,7 +84,7 @@ public final class TemporalWindowTestMain {
                         dynamicityEvaluator,
                         populationAdapter,
                         eventDetector,
-                        stateProvider,
+                        stateSource,
                         maGaConfig.getGeneticAlgorithmConfig().getPopulationSize()
                 );
 

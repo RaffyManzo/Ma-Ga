@@ -8,6 +8,8 @@ import io.reporting.AdaptiveWindowDiagnosticPrinter;
 import io.reporting.CandidateFilteringPrinter;
 import io.reporting.DeepTemporalWindowDiagnosticPrinter;
 import io.reporting.SystemStateSourceDiagnosticPrinter;
+import io.reporting.TemporalTimingDiagnosticPrinter;
+import io.snapshot.SnapshotPaths;
 import model.snapshot.SystemSnapshot;
 import window.core.TemporalWindowManager;
 import window.dynamicity.DynamicityEvaluator;
@@ -35,8 +37,8 @@ import java.util.Random;
  * <p>Modalità supportate per ora:</p>
  *
  * <pre>
- * JSON_SEQUENCE  data/realistic_scenarios/urban_realistic_dynamic_calibrated  8
- * JSON_TIME      data/realistic_scenarios/urban_realistic_dynamic_calibrated  8
+ * JSON_SEQUENCE  data/snapshots/window/stress/realistic_scenarios/urban_realistic_dynamic_calibrated  8
+ * JSON_TIME      data/snapshots/window/stress/realistic_scenarios/urban_realistic_dynamic_calibrated  8
  * </pre>
  *
  * <p>JSON_SEQUENCE è la modalità consigliata per i test offline. Legge tutti
@@ -48,7 +50,7 @@ public final class AdaptiveWindowSourceMain {
 
     private static final String DEFAULT_MODE = "JSON_SEQUENCE";
     private static final String DEFAULT_SNAPSHOT_FOLDER =
-            "data/snapshots/window/stress/realistic_scenarios/urban_realistic_dynamic_calibrated";
+            SnapshotPaths.TEMPORAL_WINDOW_URBAN_CALIBRATED_FOLDER;
     private static final double START_TIME_SECONDS = 0.0;
 
     private AdaptiveWindowSourceMain() {
@@ -167,6 +169,10 @@ public final class AdaptiveWindowSourceMain {
         AdaptiveWindowDiagnosticPrinter adaptivePrinter =
                 new AdaptiveWindowDiagnosticPrinter();
         adaptivePrinter.print(result);
+
+        TemporalTimingDiagnosticPrinter timingPrinter =
+                new TemporalTimingDiagnosticPrinter();
+        timingPrinter.print(result);
 
         SystemStateSourceDiagnosticPrinter sourcePrinter =
                 new SystemStateSourceDiagnosticPrinter();

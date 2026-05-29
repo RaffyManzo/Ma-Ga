@@ -1,4 +1,4 @@
-package test;
+package app;
 
 import config.MaGaConfig;
 import config.ga.GaParameterScalingMode;

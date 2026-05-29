@@ -29,16 +29,23 @@ public final class SystemStateSourceDiagnosticPrinter {
         out.println("------------------------------------------------------------");
         out.println("SYSTEM STATE SOURCE SUMMARY");
         out.println("------------------------------------------------------------");
-        out.println("idx | snapshot | mode | seq | requestedTime | actualTime | shifted | exactMatch | source");
+        out.println(
+                "idx | snapshot | mode | seq | managerTime | sourceTime | shift | exactMatch | source"
+        );
 
         for (TemporalStepResult step : result.getSteps()) {
             if (step.getSystemStateObservation().isEmpty()) {
                 out.println(
                         step.getWindowIndex()
                                 + " | " + step.getSnapshot().getSnapshotId()
-                                + " | UNKNOWN | - | - | "
-                                + formatSeconds(step.getObservationTimeSeconds())
-                                + " | false | true | legacy"
+                                + " | LEGACY | - | "
+                                + formatSeconds(step.getLogicalObservationTimeSeconds())
+                                + " | " + formatSeconds(step.getSourceObservationTimeSeconds())
+                                + " | " + formatSeconds(
+                                step.getSourceObservationTimeSeconds()
+                                        - step.getLogicalObservationTimeSeconds()
+                        )
+                                + " | - | legacy"
                 );
                 continue;
             }
@@ -52,9 +59,13 @@ public final class SystemStateSourceDiagnosticPrinter {
                             + " | " + step.getSnapshot().getSnapshotId()
                             + " | " + observation.getSourceMode()
                             + " | " + observation.getSequenceIndex()
-                            + " | " + formatSeconds(observation.getRequestedObservationTimeSeconds())
-                            + " | " + formatSeconds(observation.getActualObservationTimeSeconds())
-                            + " | " + observation.isTimeShifted()
+                            + " | " + formatSeconds(
+                            observation.getRequestedObservationTimeSeconds()
+                    )
+                            + " | " + formatSeconds(
+                            observation.getSourceObservationTimeSeconds()
+                    )
+                            + " | " + formatSeconds(observation.getTimeShiftSeconds())
                             + " | " + observation.isExactTimeMatch()
                             + " | " + observation.getSourceDescription()
             );

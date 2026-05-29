@@ -1,5 +1,7 @@
 package app;
 
+import io.snapshot.SnapshotPaths;
+
 /**
  * Alias compatibile con il main usato nei test della finestra adattiva.
  */
@@ -14,7 +16,7 @@ public final class AdaptiveWindowMain {
         if (args.length == 0) {
             normalizedArgs = new String[]{
                     "JSON_SEQUENCE",
-                    "data/realistic_scenarios/urban_realistic_dynamic_calibrated",
+                    SnapshotPaths.TEMPORAL_WINDOW_URBAN_CALIBRATED_FOLDER,
                     "8"
             };
         } else if (args.length == 1) {
