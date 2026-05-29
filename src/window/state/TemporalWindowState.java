@@ -3,6 +3,7 @@ package window.state;
 import ga.core.MaGaResult;
 import model.genetic.Chromosome;
 import model.snapshot.SystemSnapshot;
+import window.timing.TemporalOperationalMetrics;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -10,45 +11,37 @@ import java.util.List;
 
 /**
  * Stato interno del gestore temporale.
- *
- * Conserva le informazioni necessarie per passare da una finestra alla
- * successiva: ultimo snapshot, ultimo risultato e popolazione finale.
  */
 public final class TemporalWindowState {
 
     private final int windowIndex;
     private final double currentTimeSeconds;
     private final double nextScheduledTimeSeconds;
-
+    private final double currentWindowDurationSeconds;
     private final SystemSnapshot lastSnapshot;
     private final MaGaResult lastResult;
+    private final TemporalOperationalMetrics lastOperationalMetrics;
     private final List<Chromosome> lastFinalPopulation;
 
-    /**
-     * Crea uno stato temporale.
-     *
-     * @param windowIndex indice della prossima finestra
-     * @param currentTimeSeconds tempo da cui riparte il controllo temporale
-     * @param nextScheduledTimeSeconds prossima scadenza programmata
-     * @param lastSnapshot ultimo snapshot ottimizzato
-     * @param lastResult ultimo risultato MA-GA
-     * @param lastFinalPopulation popolazione finale precedente
-     */
     public TemporalWindowState(
             int windowIndex,
             double currentTimeSeconds,
             double nextScheduledTimeSeconds,
+            double currentWindowDurationSeconds,
             SystemSnapshot lastSnapshot,
             MaGaResult lastResult,
+            TemporalOperationalMetrics lastOperationalMetrics,
             List<Chromosome> lastFinalPopulation
     ) {
         if (windowIndex < 0) {
             throw new IllegalArgumentException("windowIndex must be >= 0.");
         }
-
         validateFiniteAndNonNegative("currentTimeSeconds", currentTimeSeconds);
-        validateFiniteAndNonNegative("nextScheduledTimeSeconds", nextScheduledTimeSeconds);
-
+        validateFiniteAndNonNegative(
+                "nextScheduledTimeSeconds",
+                nextScheduledTimeSeconds
+        );
+        validatePositive("currentWindowDurationSeconds", currentWindowDurationSeconds);
         if (nextScheduledTimeSeconds < currentTimeSeconds) {
             throw new IllegalArgumentException(
                     "nextScheduledTimeSeconds must be >= currentTimeSeconds."
@@ -58,9 +51,10 @@ public final class TemporalWindowState {
         this.windowIndex = windowIndex;
         this.currentTimeSeconds = currentTimeSeconds;
         this.nextScheduledTimeSeconds = nextScheduledTimeSeconds;
+        this.currentWindowDurationSeconds = currentWindowDurationSeconds;
         this.lastSnapshot = lastSnapshot;
         this.lastResult = lastResult;
-
+        this.lastOperationalMetrics = lastOperationalMetrics;
         this.lastFinalPopulation = Collections.unmodifiableList(
                 new ArrayList<>(
                         lastFinalPopulation == null
@@ -70,40 +64,60 @@ public final class TemporalWindowState {
         );
     }
 
-    /**
-     * Crea lo stato prima della prima esecuzione.
-     *
-     * @param startTimeSeconds tempo iniziale
-     * @param fixedIntervalSeconds intervallo programmato
-     * @return stato iniziale
-     */
     public static TemporalWindowState initial(
             double startTimeSeconds,
-            double fixedIntervalSeconds
+            double initialWindowSeconds,
+            TemporalOperationalMetrics initialOperationalMetrics
     ) {
         validateFiniteAndNonNegative("startTimeSeconds", startTimeSeconds);
-        validatePositive("fixedIntervalSeconds", fixedIntervalSeconds);
+        validatePositive("initialWindowSeconds", initialWindowSeconds);
 
         return new TemporalWindowState(
                 0,
                 startTimeSeconds,
-                startTimeSeconds + fixedIntervalSeconds,
+                startTimeSeconds + initialWindowSeconds,
+                initialWindowSeconds,
                 null,
                 null,
+                initialOperationalMetrics,
                 Collections.emptyList()
         );
     }
 
     /**
-     * Costruisce lo stato dopo una finestra eseguita.
-     *
-     * Il tempo corrente viene allineato allo snapshot ottimizzato, non al solo
-     * trigger. In questo modo la finestra successiva parte dallo stato realmente
-     * usato dal MA-GA.
-     *
-     * @param stepResult risultato appena prodotto
-     * @param fixedIntervalSeconds intervallo programmato
-     * @return stato successivo
+     * Metodo compatibile con la versione precedente.
+     */
+    public static TemporalWindowState initial(
+            double startTimeSeconds,
+            double fixedIntervalSeconds
+    ) {
+        return initial(startTimeSeconds, fixedIntervalSeconds, null);
+    }
+
+    public static TemporalWindowState afterStep(TemporalStepResult stepResult) {
+        if (stepResult == null) {
+            throw new IllegalArgumentException("stepResult must not be null.");
+        }
+
+        double currentTimeSeconds = stepResult.getSnapshot().getTimeSeconds();
+        double nextWindowDuration = stepResult
+                .getAdaptiveWindowDecision()
+                .getNextWindowDurationSeconds();
+
+        return new TemporalWindowState(
+                stepResult.getWindowIndex() + 1,
+                currentTimeSeconds,
+                currentTimeSeconds + nextWindowDuration,
+                nextWindowDuration,
+                stepResult.getSnapshot(),
+                stepResult.getMaGaResult(),
+                stepResult.getOperationalMetrics(),
+                stepResult.getMaGaResult().getFinalPopulation()
+        );
+    }
+
+    /**
+     * Metodo compatibile con la versione precedente.
      */
     public static TemporalWindowState afterStep(
             TemporalStepResult stepResult,
@@ -113,16 +127,16 @@ public final class TemporalWindowState {
             throw new IllegalArgumentException("stepResult must not be null.");
         }
 
-        validatePositive("fixedIntervalSeconds", fixedIntervalSeconds);
-
         double currentTimeSeconds = stepResult.getSnapshot().getTimeSeconds();
 
         return new TemporalWindowState(
                 stepResult.getWindowIndex() + 1,
                 currentTimeSeconds,
                 currentTimeSeconds + fixedIntervalSeconds,
+                fixedIntervalSeconds,
                 stepResult.getSnapshot(),
                 stepResult.getMaGaResult(),
+                stepResult.getOperationalMetrics(),
                 stepResult.getMaGaResult().getFinalPopulation()
         );
     }
@@ -139,12 +153,20 @@ public final class TemporalWindowState {
         return nextScheduledTimeSeconds;
     }
 
+    public double getCurrentWindowDurationSeconds() {
+        return currentWindowDurationSeconds;
+    }
+
     public SystemSnapshot getLastSnapshot() {
         return lastSnapshot;
     }
 
     public MaGaResult getLastResult() {
         return lastResult;
+    }
+
+    public TemporalOperationalMetrics getLastOperationalMetrics() {
+        return lastOperationalMetrics;
     }
 
     public List<Chromosome> getLastFinalPopulation() {
@@ -159,11 +181,13 @@ public final class TemporalWindowState {
         return !lastFinalPopulation.isEmpty();
     }
 
-    private static void validateFiniteAndNonNegative(String fieldName, double value) {
+    private static void validateFiniteAndNonNegative(
+            String fieldName,
+            double value
+    ) {
         if (!Double.isFinite(value)) {
             throw new IllegalArgumentException(fieldName + " must be finite.");
         }
-
         if (value < 0.0) {
             throw new IllegalArgumentException(fieldName + " must be >= 0.");
         }
@@ -173,7 +197,6 @@ public final class TemporalWindowState {
         if (!Double.isFinite(value)) {
             throw new IllegalArgumentException(fieldName + " must be finite.");
         }
-
         if (value <= 0.0) {
             throw new IllegalArgumentException(fieldName + " must be > 0.");
         }
@@ -181,13 +204,14 @@ public final class TemporalWindowState {
 
     @Override
     public String toString() {
-        return "TemporalWindowState{"
-                + "windowIndex=" + windowIndex
-                + ", currentTimeSeconds=" + currentTimeSeconds
-                + ", nextScheduledTimeSeconds=" + nextScheduledTimeSeconds
-                + ", lastSnapshot="
-                + (lastSnapshot == null ? null : lastSnapshot.getSnapshotId())
-                + ", lastFinalPopulationSize=" + lastFinalPopulation.size()
-                + '}';
+        return "TemporalWindowState{" +
+                "windowIndex=" + windowIndex +
+                ", currentTimeSeconds=" + currentTimeSeconds +
+                ", nextScheduledTimeSeconds=" + nextScheduledTimeSeconds +
+                ", currentWindowDurationSeconds=" + currentWindowDurationSeconds +
+                ", lastSnapshot=" +
+                (lastSnapshot == null ? null : lastSnapshot.getSnapshotId()) +
+                ", lastFinalPopulationSize=" + lastFinalPopulation.size() +
+                '}';
     }
 }

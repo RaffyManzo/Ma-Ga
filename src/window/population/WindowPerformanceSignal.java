@@ -1,23 +1,51 @@
 package window.population;
 
+import ga.core.MaGaResult;
+import ga.fitness.breakdown.EvaluationBreakdown;
+
 /**
- * Sintesi qualitativa della qualità della soluzione prodotta nella finestra precedente.
- *
- * <p>Questa informazione non appartiene al GA core: viene usata dal gestore temporale
- * per capire se la popolazione precedente merita di essere riutilizzata quasi per intero,
- * parzialmente o ignorata.</p>
+ * Segnale sintetico sulla qualità della finestra precedente.
  */
 public enum WindowPerformanceSignal {
-
-    /** Nessuna finestra precedente disponibile. */
     UNKNOWN,
-
-    /** La finestra precedente ha rispettato bene deadline, copertura e vincoli duri. */
     GOOD,
-
-    /** La finestra precedente ha mostrato qualche criticità ma non un fallimento grave. */
     WARNING,
+    BAD;
 
-    /** La finestra precedente ha mostrato criticità forti: molte deadline violate o vincoli duri. */
-    BAD
+    public static WindowPerformanceSignal from(MaGaResult result) {
+        if (result == null || result.getBestEvaluation() == null) {
+            return UNKNOWN;
+        }
+
+        EvaluationBreakdown evaluation = result.getBestEvaluation();
+
+        double resourcePenalty = safe(evaluation.getResourcePenalty());
+        double mobilityPenalty = safe(evaluation.getMobilityPenalty());
+        double fitness = safe(result.getFinalBestFitness());
+
+        if (resourcePenalty >= 100.0 || mobilityPenalty >= 10.0 || fitness >= 50.0) {
+            return BAD;
+        }
+
+        if (resourcePenalty >= 5.0 || mobilityPenalty >= 1.0 || fitness >= 5.0) {
+            return WARNING;
+        }
+
+        return GOOD;
+    }
+
+    public boolean isGood() {
+        return this == GOOD;
+    }
+
+    public boolean isBadOrWarning() {
+        return this == WARNING || this == BAD;
+    }
+
+    private static double safe(double value) {
+        if (!Double.isFinite(value)) {
+            return Double.POSITIVE_INFINITY;
+        }
+        return value;
+    }
 }

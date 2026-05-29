@@ -6,23 +6,15 @@ import window.dynamicity.DynamicityBreakdown;
 import window.population.PopulationReuseDecision;
 import window.population.PopulationReuseMode;
 import window.population.WindowPerformanceSignal;
+import window.timing.AdaptiveWindowDecision;
+import window.timing.TemporalOperationalMetrics;
+import window.timing.TemporalWindowBounds;
 import window.trigger.ReoptimizationTrigger;
 
 import java.util.Objects;
 
 /**
  * Risultato di una singola finestra temporale.
- *
- * <p>Conserva trigger, tempo di osservazione, snapshot usato, modalità di riuso
- * e risultato MA-GA.</p>
- *
- * <p>Da questa versione il risultato conserva anche la decisione completa di
- * riuso della popolazione, distinguendo tra:</p>
- *
- * <pre>
- * suggestedReuseMode = decisione di base derivata dalla dinamicità
- * reuseMode          = decisione effettivamente applicata
- * </pre>
  */
 public final class TemporalStepResult {
 
@@ -32,17 +24,87 @@ public final class TemporalStepResult {
     private final double observationTimeSeconds;
     private final SystemSnapshot snapshot;
     private final DynamicityBreakdown dynamicityBreakdown;
+    private final PopulationReuseDecision populationReuseDecision;
     private final PopulationReuseMode reuseMode;
-    private final PopulationReuseDecision reuseDecision;
+    private final AdaptiveWindowDecision adaptiveWindowDecision;
+    private final TemporalOperationalMetrics operationalMetrics;
     private final int initialPopulationSize;
     private final int finalPopulationSize;
     private final MaGaResult maGaResult;
 
+    public TemporalStepResult(
+            int windowIndex,
+            ReoptimizationTrigger trigger,
+            double dataCollectionDelaySeconds,
+            double observationTimeSeconds,
+            SystemSnapshot snapshot,
+            DynamicityBreakdown dynamicityBreakdown,
+            PopulationReuseDecision populationReuseDecision,
+            AdaptiveWindowDecision adaptiveWindowDecision,
+            TemporalOperationalMetrics operationalMetrics,
+            int initialPopulationSize,
+            int finalPopulationSize,
+            MaGaResult maGaResult
+    ) {
+        if (windowIndex < 0) {
+            throw new IllegalArgumentException("windowIndex must be >= 0.");
+        }
+        validateFiniteAndNonNegative(
+                "dataCollectionDelaySeconds",
+                dataCollectionDelaySeconds
+        );
+        validateFiniteAndNonNegative(
+                "observationTimeSeconds",
+                observationTimeSeconds
+        );
+        if (initialPopulationSize < 0) {
+            throw new IllegalArgumentException(
+                    "initialPopulationSize must be >= 0."
+            );
+        }
+        if (finalPopulationSize < 0) {
+            throw new IllegalArgumentException(
+                    "finalPopulationSize must be >= 0."
+            );
+        }
+
+        this.windowIndex = windowIndex;
+        this.trigger = Objects.requireNonNull(trigger, "trigger must not be null.");
+        this.dataCollectionDelaySeconds = dataCollectionDelaySeconds;
+        this.observationTimeSeconds = observationTimeSeconds;
+        this.snapshot = Objects.requireNonNull(snapshot, "snapshot must not be null.");
+        this.dynamicityBreakdown = Objects.requireNonNull(
+                dynamicityBreakdown,
+                "dynamicityBreakdown must not be null."
+        );
+        this.populationReuseDecision = Objects.requireNonNull(
+                populationReuseDecision,
+                "populationReuseDecision must not be null."
+        );
+        this.reuseMode = populationReuseDecision.getAppliedMode();
+        this.adaptiveWindowDecision = Objects.requireNonNull(
+                adaptiveWindowDecision,
+                "adaptiveWindowDecision must not be null."
+        );
+        this.operationalMetrics = Objects.requireNonNull(
+                operationalMetrics,
+                "operationalMetrics must not be null."
+        );
+        this.maGaResult = Objects.requireNonNull(maGaResult, "maGaResult must not be null.");
+        this.initialPopulationSize = initialPopulationSize;
+        this.finalPopulationSize = finalPopulationSize;
+
+        validateObservationConsistency(
+                trigger,
+                observationTimeSeconds,
+                dataCollectionDelaySeconds
+        );
+        validateSnapshotConsistency(snapshot, maGaResult);
+        validateSnapshotObservationTime(snapshot, observationTimeSeconds);
+    }
+
     /**
      * Costruttore compatibile con la versione precedente.
-     *
-     * <p>In assenza di una decisione esplicita, la modalità applicata coincide
-     * con quella suggerita dalla dinamicità.</p>
      */
     public TemporalStepResult(
             int windowIndex,
@@ -63,101 +125,30 @@ public final class TemporalStepResult {
                 observationTimeSeconds,
                 snapshot,
                 dynamicityBreakdown,
-                reuseMode,
-                initialPopulationSize,
-                finalPopulationSize,
-                maGaResult,
                 new PopulationReuseDecision(
                         dynamicityBreakdown.getSuggestedReuseMode(),
                         reuseMode,
                         WindowPerformanceSignal.UNKNOWN,
                         false,
-                        "Legacy constructor: no explicit reuse decision was provided."
-                )
+                        false,
+                        "Legacy constructor."
+                ),
+                AdaptiveWindowDecision.fixed(
+                        Math.max(1.0, trigger.getTriggerTimeSeconds()),
+                        new TemporalWindowBounds(1.0, Math.max(1.0, trigger.getTriggerTimeSeconds()), 0.0, false),
+                        dynamicityBreakdown.getDynamicityLevel(),
+                        "Legacy constructor."
+                ),
+                TemporalOperationalMetrics.estimated(
+                        dataCollectionDelaySeconds,
+                        0.1,
+                        0.0,
+                        1.0E-6
+                ),
+                initialPopulationSize,
+                finalPopulationSize,
+                maGaResult
         );
-    }
-
-    /**
-     * Crea il risultato di una finestra temporale.
-     *
-     * @param windowIndex indice della finestra
-     * @param trigger causa della riesecuzione
-     * @param dataCollectionDelaySeconds ritardo di raccolta dati
-     * @param observationTimeSeconds tempo richiesto per lo snapshot
-     * @param snapshot snapshot ottimizzato
-     * @param dynamicityBreakdown dinamicità calcolata
-     * @param reuseMode modalità di riuso applicata
-     * @param initialPopulationSize dimensione popolazione iniziale
-     * @param finalPopulationSize dimensione popolazione finale
-     * @param maGaResult risultato MA-GA
-     * @param reuseDecision decisione completa di riuso
-     */
-    public TemporalStepResult(
-            int windowIndex,
-            ReoptimizationTrigger trigger,
-            double dataCollectionDelaySeconds,
-            double observationTimeSeconds,
-            SystemSnapshot snapshot,
-            DynamicityBreakdown dynamicityBreakdown,
-            PopulationReuseMode reuseMode,
-            int initialPopulationSize,
-            int finalPopulationSize,
-            MaGaResult maGaResult,
-            PopulationReuseDecision reuseDecision
-    ) {
-        if (windowIndex < 0) {
-            throw new IllegalArgumentException("windowIndex must be >= 0.");
-        }
-
-        validateFiniteAndNonNegative(
-                "dataCollectionDelaySeconds",
-                dataCollectionDelaySeconds
-        );
-        validateFiniteAndNonNegative(
-                "observationTimeSeconds",
-                observationTimeSeconds
-        );
-
-        if (initialPopulationSize < 0) {
-            throw new IllegalArgumentException("initialPopulationSize must be >= 0.");
-        }
-
-        if (finalPopulationSize < 0) {
-            throw new IllegalArgumentException("finalPopulationSize must be >= 0.");
-        }
-
-        this.windowIndex = windowIndex;
-        this.trigger = Objects.requireNonNull(trigger, "trigger must not be null.");
-        this.dataCollectionDelaySeconds = dataCollectionDelaySeconds;
-        this.observationTimeSeconds = observationTimeSeconds;
-        this.snapshot = Objects.requireNonNull(snapshot, "snapshot must not be null.");
-        this.dynamicityBreakdown = Objects.requireNonNull(
-                dynamicityBreakdown,
-                "dynamicityBreakdown must not be null."
-        );
-        this.reuseMode = Objects.requireNonNull(
-                reuseMode,
-                "reuseMode must not be null."
-        );
-        this.maGaResult = Objects.requireNonNull(
-                maGaResult,
-                "maGaResult must not be null."
-        );
-        this.reuseDecision = Objects.requireNonNull(
-                reuseDecision,
-                "reuseDecision must not be null."
-        );
-        this.initialPopulationSize = initialPopulationSize;
-        this.finalPopulationSize = finalPopulationSize;
-
-        validateObservationConsistency(
-                trigger,
-                observationTimeSeconds,
-                dataCollectionDelaySeconds
-        );
-        validateSnapshotConsistency(snapshot, maGaResult);
-        validateSnapshotObservationTime(snapshot, observationTimeSeconds);
-        validateReuseDecisionConsistency(reuseDecision, reuseMode);
     }
 
     public int getWindowIndex() {
@@ -184,12 +175,20 @@ public final class TemporalStepResult {
         return dynamicityBreakdown;
     }
 
+    public PopulationReuseDecision getPopulationReuseDecision() {
+        return populationReuseDecision;
+    }
+
     public PopulationReuseMode getReuseMode() {
         return reuseMode;
     }
 
-    public PopulationReuseDecision getReuseDecision() {
-        return reuseDecision;
+    public AdaptiveWindowDecision getAdaptiveWindowDecision() {
+        return adaptiveWindowDecision;
+    }
+
+    public TemporalOperationalMetrics getOperationalMetrics() {
+        return operationalMetrics;
     }
 
     public int getInitialPopulationSize() {
@@ -221,8 +220,8 @@ public final class TemporalStepResult {
             double observationTimeSeconds,
             double dataCollectionDelaySeconds
     ) {
-        double expectedObservationTime =
-                trigger.getTriggerTimeSeconds() + dataCollectionDelaySeconds;
+        double expectedObservationTime = trigger.getTriggerTimeSeconds()
+                + dataCollectionDelaySeconds;
 
         if (Math.abs(expectedObservationTime - observationTimeSeconds) > 1.0E-6) {
             throw new IllegalArgumentException(
@@ -253,17 +252,6 @@ public final class TemporalStepResult {
         }
     }
 
-    private static void validateReuseDecisionConsistency(
-            PopulationReuseDecision reuseDecision,
-            PopulationReuseMode reuseMode
-    ) {
-        if (reuseDecision.getAppliedReuseMode() != reuseMode) {
-            throw new IllegalArgumentException(
-                    "reuseMode must match reuseDecision.appliedReuseMode."
-            );
-        }
-    }
-
     private static void validateFiniteAndNonNegative(
             String fieldName,
             double value
@@ -271,7 +259,6 @@ public final class TemporalStepResult {
         if (!Double.isFinite(value)) {
             throw new IllegalArgumentException(fieldName + " must be finite.");
         }
-
         if (value < 0.0) {
             throw new IllegalArgumentException(fieldName + " must be >= 0.");
         }
@@ -282,14 +269,11 @@ public final class TemporalStepResult {
         return "TemporalStepResult{" +
                 "windowIndex=" + windowIndex +
                 ", triggerTimeSeconds=" + getTriggerTimeSeconds() +
-                ", dataCollectionDelaySeconds=" + dataCollectionDelaySeconds +
                 ", observationTimeSeconds=" + observationTimeSeconds +
                 ", snapshotId='" + snapshot.getSnapshotId() + '\'' +
-                ", snapshotTimeSeconds=" + snapshot.getTimeSeconds() +
                 ", dynamicity=" + dynamicityBreakdown.getGlobalDynamicity() +
-                ", suggestedReuseMode=" + dynamicityBreakdown.getSuggestedReuseMode() +
-                ", appliedReuseMode=" + reuseMode +
-                ", reuseCorrected=" + reuseDecision.isCorrected() +
+                ", reuseMode=" + reuseMode +
+                ", nextWindow=" + adaptiveWindowDecision.getNextWindowSeconds() +
                 ", finalBestFitness=" + maGaResult.getFinalBestFitness() +
                 '}';
     }

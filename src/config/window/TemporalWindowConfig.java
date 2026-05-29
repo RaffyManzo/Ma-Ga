@@ -3,36 +3,33 @@ package config.window;
 /**
  * Configurazione del gestore temporale del MA-GA.
  *
- * Contiene i parametri usati dal package window per:
- * - programmare la riesecuzione periodica;
- * - modellare il ritardo di raccolta dello stato;
- * - classificare la dinamicità tra snapshot;
- * - decidere il riuso della popolazione precedente.
+ * <p>La finestra iniziale resta configurata tramite {@code fixedIntervalSeconds}
+ * per compatibilità con il codice precedente. Dopo la prima esecuzione, la
+ * durata della finestra può essere aggiornata dal controller adattivo.</p>
  */
 public final class TemporalWindowConfig {
 
+    private static final double DEFAULT_STRATEGY_APPLICATION_SECONDS = 0.05;
+    private static final double DEFAULT_GA_RUNTIME_ESTIMATE_SECONDS = 0.10;
+
     private final double fixedIntervalSeconds;
     private final double dataCollectionDelaySeconds;
-
     private final double thetaLow;
     private final double thetaHigh;
     private final double rhoKeep;
-
     private final double lambdaVehicles;
     private final double lambdaTasks;
     private final double lambdaResources;
     private final double lambdaLinks;
-
     private final double alphaT;
     private final double etaUp;
     private final double etaDown;
     private final double epsilonT;
+    private final double strategyApplicationSeconds;
+    private final double defaultGaRuntimeEstimateSeconds;
 
     /**
      * Costruttore compatibile con la versione precedente.
-     *
-     * Imposta dataCollectionDelaySeconds a 0.0, adatto alla simulazione statica
-     * basata su snapshot JSON già disponibili.
      */
     public TemporalWindowConfig(
             double fixedIntervalSeconds,
@@ -61,26 +58,14 @@ public final class TemporalWindowConfig {
                 alphaT,
                 etaUp,
                 etaDown,
-                epsilonT
+                epsilonT,
+                DEFAULT_STRATEGY_APPLICATION_SECONDS,
+                DEFAULT_GA_RUNTIME_ESTIMATE_SECONDS
         );
     }
 
     /**
      * Costruisce la configurazione temporale completa.
-     *
-     * @param fixedIntervalSeconds intervallo programmato tra due riesecuzioni
-     * @param dataCollectionDelaySeconds ritardo tra trigger e snapshot osservato
-     * @param thetaLow soglia inferiore della dinamicità
-     * @param thetaHigh soglia superiore della dinamicità
-     * @param rhoKeep quota mantenuta in partial restart
-     * @param lambdaVehicles peso variazione veicoli
-     * @param lambdaTasks peso variazione task
-     * @param lambdaResources peso variazione risorse
-     * @param lambdaLinks peso variazione link
-     * @param alphaT coefficiente per futura finestra adattiva
-     * @param etaUp fattore di incremento futuro della finestra
-     * @param etaDown fattore di riduzione futuro della finestra
-     * @param epsilonT soglia numerica per aggiornamenti trascurabili
      */
     public TemporalWindowConfig(
             double fixedIntervalSeconds,
@@ -97,64 +82,88 @@ public final class TemporalWindowConfig {
             double etaDown,
             double epsilonT
     ) {
+        this(
+                fixedIntervalSeconds,
+                dataCollectionDelaySeconds,
+                thetaLow,
+                thetaHigh,
+                rhoKeep,
+                lambdaVehicles,
+                lambdaTasks,
+                lambdaResources,
+                lambdaLinks,
+                alphaT,
+                etaUp,
+                etaDown,
+                epsilonT,
+                DEFAULT_STRATEGY_APPLICATION_SECONDS,
+                DEFAULT_GA_RUNTIME_ESTIMATE_SECONDS
+        );
+    }
+
+    /**
+     * Costruisce la configurazione temporale completa, includendo i tempi
+     * operativi usati per il limite inferiore della finestra adattiva.
+     */
+    public TemporalWindowConfig(
+            double fixedIntervalSeconds,
+            double dataCollectionDelaySeconds,
+            double thetaLow,
+            double thetaHigh,
+            double rhoKeep,
+            double lambdaVehicles,
+            double lambdaTasks,
+            double lambdaResources,
+            double lambdaLinks,
+            double alphaT,
+            double etaUp,
+            double etaDown,
+            double epsilonT,
+            double strategyApplicationSeconds,
+            double defaultGaRuntimeEstimateSeconds
+    ) {
         validatePositive("fixedIntervalSeconds", fixedIntervalSeconds);
         validateFiniteAndNonNegative("dataCollectionDelaySeconds", dataCollectionDelaySeconds);
-
         validateRate("thetaLow", thetaLow);
         validateRate("thetaHigh", thetaHigh);
-
         if (thetaLow >= thetaHigh) {
             throw new IllegalArgumentException("thetaLow must be smaller than thetaHigh.");
         }
-
         validateRate("rhoKeep", rhoKeep);
-
         validateFiniteAndNonNegative("lambdaVehicles", lambdaVehicles);
         validateFiniteAndNonNegative("lambdaTasks", lambdaTasks);
         validateFiniteAndNonNegative("lambdaResources", lambdaResources);
         validateFiniteAndNonNegative("lambdaLinks", lambdaLinks);
-
         double lambdaSum = lambdaVehicles + lambdaTasks + lambdaResources + lambdaLinks;
-
         if (lambdaSum <= 0.0) {
             throw new IllegalArgumentException("At least one dynamicity lambda must be > 0.");
         }
-
         validateRate("alphaT", alphaT);
         validatePositive("etaUp", etaUp);
         validatePositive("etaDown", etaDown);
         validateFiniteAndNonNegative("epsilonT", epsilonT);
-
-        if (etaUp < 1.0) {
-            throw new IllegalArgumentException("etaUp should be >= 1.0.");
-        }
-
-        if (etaDown > 1.0) {
-            throw new IllegalArgumentException("etaDown should be <= 1.0.");
-        }
+        validateFiniteAndNonNegative("strategyApplicationSeconds", strategyApplicationSeconds);
+        validatePositive("defaultGaRuntimeEstimateSeconds", defaultGaRuntimeEstimateSeconds);
 
         this.fixedIntervalSeconds = fixedIntervalSeconds;
         this.dataCollectionDelaySeconds = dataCollectionDelaySeconds;
-
         this.thetaLow = thetaLow;
         this.thetaHigh = thetaHigh;
         this.rhoKeep = rhoKeep;
-
         this.lambdaVehicles = lambdaVehicles;
         this.lambdaTasks = lambdaTasks;
         this.lambdaResources = lambdaResources;
         this.lambdaLinks = lambdaLinks;
-
         this.alphaT = alphaT;
         this.etaUp = etaUp;
         this.etaDown = etaDown;
         this.epsilonT = epsilonT;
+        this.strategyApplicationSeconds = strategyApplicationSeconds;
+        this.defaultGaRuntimeEstimateSeconds = defaultGaRuntimeEstimateSeconds;
     }
 
     /**
-     * Configurazione iniziale per test statici.
-     *
-     * Il ritardo di raccolta dati è 0.0 perché gli snapshot JSON sono già pronti.
+     * Configurazione iniziale per i test con snapshot JSON.
      */
     public static TemporalWindowConfig defaultConfig() {
         return new TemporalWindowConfig(
@@ -167,30 +176,19 @@ public final class TemporalWindowConfig {
                 0.25,
                 0.25,
                 0.25,
-                0.50,
-                1.20,
-                0.80,
-                1.0E-6
+                0.60,
+                1.0,
+                1.0,
+                1.0E-6,
+                DEFAULT_STRATEGY_APPLICATION_SECONDS,
+                DEFAULT_GA_RUNTIME_ESTIMATE_SECONDS
         );
     }
 
-    /**
-     * Crea una configurazione con finestra fissa e raccolta dati istantanea.
-     *
-     * @param fixedIntervalSeconds intervallo programmato
-     * @return configurazione temporale
-     */
     public static TemporalWindowConfig fixedInterval(double fixedIntervalSeconds) {
         return fixedIntervalWithCollectionDelay(fixedIntervalSeconds, 0.0);
     }
 
-    /**
-     * Crea una configurazione con finestra fissa e ritardo di raccolta esplicito.
-     *
-     * @param fixedIntervalSeconds intervallo programmato
-     * @param dataCollectionDelaySeconds ritardo di raccolta dati
-     * @return configurazione temporale
-     */
     public static TemporalWindowConfig fixedIntervalWithCollectionDelay(
             double fixedIntervalSeconds,
             double dataCollectionDelaySeconds
@@ -205,14 +203,23 @@ public final class TemporalWindowConfig {
                 0.25,
                 0.25,
                 0.25,
-                0.50,
-                1.20,
-                0.80,
-                1.0E-6
+                0.60,
+                1.0,
+                1.0,
+                1.0E-6,
+                DEFAULT_STRATEGY_APPLICATION_SECONDS,
+                DEFAULT_GA_RUNTIME_ESTIMATE_SECONDS
         );
     }
 
     public double getFixedIntervalSeconds() {
+        return fixedIntervalSeconds;
+    }
+
+    /**
+     * Nome più chiaro per la finestra iniziale.
+     */
+    public double getInitialWindowSeconds() {
         return fixedIntervalSeconds;
     }
 
@@ -248,20 +255,37 @@ public final class TemporalWindowConfig {
         return lambdaLinks;
     }
 
+    /**
+     * Coefficiente usato per DeltaT_max(k) = alphaT * T_coverage_ref(k).
+     */
     public double getAlphaT() {
         return alphaT;
     }
 
+    /**
+     * Passo additivo, in secondi, usato quando la finestra può crescere.
+     */
     public double getEtaUp() {
         return etaUp;
     }
 
+    /**
+     * Passo sottrattivo, in secondi, usato quando la finestra deve ridursi.
+     */
     public double getEtaDown() {
         return etaDown;
     }
 
     public double getEpsilonT() {
         return epsilonT;
+    }
+
+    public double getStrategyApplicationSeconds() {
+        return strategyApplicationSeconds;
+    }
+
+    public double getDefaultGaRuntimeEstimateSeconds() {
+        return defaultGaRuntimeEstimateSeconds;
     }
 
     public double getLambdaSum() {
@@ -288,7 +312,6 @@ public final class TemporalWindowConfig {
         if (!Double.isFinite(value)) {
             throw new IllegalArgumentException(fieldName + " must be finite.");
         }
-
         if (value <= 0.0) {
             throw new IllegalArgumentException(fieldName + " must be > 0.");
         }
@@ -298,7 +321,6 @@ public final class TemporalWindowConfig {
         if (!Double.isFinite(value)) {
             throw new IllegalArgumentException(fieldName + " must be finite.");
         }
-
         if (value < 0.0) {
             throw new IllegalArgumentException(fieldName + " must be >= 0.");
         }
@@ -308,7 +330,6 @@ public final class TemporalWindowConfig {
         if (!Double.isFinite(value)) {
             throw new IllegalArgumentException(fieldName + " must be finite.");
         }
-
         if (value < 0.0 || value > 1.0) {
             throw new IllegalArgumentException(fieldName + " must be in [0, 1].");
         }
@@ -316,20 +337,22 @@ public final class TemporalWindowConfig {
 
     @Override
     public String toString() {
-        return "TemporalWindowConfig{"
-                + "fixedIntervalSeconds=" + fixedIntervalSeconds
-                + ", dataCollectionDelaySeconds=" + dataCollectionDelaySeconds
-                + ", thetaLow=" + thetaLow
-                + ", thetaHigh=" + thetaHigh
-                + ", rhoKeep=" + rhoKeep
-                + ", lambdaVehicles=" + lambdaVehicles
-                + ", lambdaTasks=" + lambdaTasks
-                + ", lambdaResources=" + lambdaResources
-                + ", lambdaLinks=" + lambdaLinks
-                + ", alphaT=" + alphaT
-                + ", etaUp=" + etaUp
-                + ", etaDown=" + etaDown
-                + ", epsilonT=" + epsilonT
-                + '}';
+        return "TemporalWindowConfig{" +
+                "fixedIntervalSeconds=" + fixedIntervalSeconds +
+                ", dataCollectionDelaySeconds=" + dataCollectionDelaySeconds +
+                ", thetaLow=" + thetaLow +
+                ", thetaHigh=" + thetaHigh +
+                ", rhoKeep=" + rhoKeep +
+                ", lambdaVehicles=" + lambdaVehicles +
+                ", lambdaTasks=" + lambdaTasks +
+                ", lambdaResources=" + lambdaResources +
+                ", lambdaLinks=" + lambdaLinks +
+                ", alphaT=" + alphaT +
+                ", etaUp=" + etaUp +
+                ", etaDown=" + etaDown +
+                ", epsilonT=" + epsilonT +
+                ", strategyApplicationSeconds=" + strategyApplicationSeconds +
+                ", defaultGaRuntimeEstimateSeconds=" + defaultGaRuntimeEstimateSeconds +
+                '}';
     }
 }
