@@ -7,6 +7,7 @@ import ga.core.MaGaResult;
 import io.reporting.ResultPrinter;
 import io.reporting.StressResultPrinter;
 import io.snapshot.SnapshotLoader;
+import io.snapshot.SnapshotPaths;
 import model.snapshot.SystemSnapshot;
 import validation.snapshot.SnapshotValidator;
 
@@ -36,7 +37,7 @@ public final class Main {
     public static void main(String[] args) throws Exception {
         String snapshotPath = args.length > 0
                 ? args[0]
-                : "data/maga/snapshot_maga_stress_100v_60tasks_coherent_cpu.json";
+                : SnapshotPaths.MAGA_DEFAULT_STRESS;
 
         SnapshotLoader snapshotLoader = new SnapshotLoader();
         SystemSnapshot snapshot = snapshotLoader.load(snapshotPath);

@@ -44,7 +44,7 @@ import java.util.Random;
 public final class TemporalWindowStressTestMain {
 
     private static final String DEFAULT_SNAPSHOT_FOLDER =
-            "data/validation_scenarios/computation_heavy";
+            "data/snapshots/window/stress/realistic_scenarios/urban_realistic_dynamic_calibrated";
 
     private static final double START_TIME_SECONDS = 0.0;
 

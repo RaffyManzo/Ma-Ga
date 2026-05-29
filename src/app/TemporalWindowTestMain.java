@@ -5,6 +5,7 @@ import config.window.TemporalWindowConfig;
 import ga.core.MaGaOptimizer;
 import io.reporting.TemporalWindowPrinter;
 import io.snapshot.SnapshotLoader;
+import io.snapshot.SnapshotPaths;
 import model.snapshot.SystemSnapshot;
 import validation.snapshot.SnapshotValidator;
 import window.core.TemporalWindowManager;
@@ -99,19 +100,12 @@ public final class TemporalWindowTestMain {
      * Carica e valida gli snapshot usati dal test.
      */
     private static List<SystemSnapshot> loadAndValidateSnapshots() throws Exception {
-        List<String> paths = List.of(
-                "data/window/snapshot_window_001.json",
-                "data/window/snapshot_window_002.json",
-                "data/window/snapshot_window_003.json",
-                "data/window/snapshot_window_004.json"
-        );
-
         SnapshotLoader loader = new SnapshotLoader();
         SnapshotValidator validator = new SnapshotValidator();
 
         List<SystemSnapshot> snapshots = new ArrayList<>();
 
-        for (String path : paths) {
+        for (String path : SnapshotPaths.WINDOW_EXAMPLES) {
             SystemSnapshot snapshot = loader.load(path);
             validator.validate(snapshot);
             snapshots.add(snapshot);

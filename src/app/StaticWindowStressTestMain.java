@@ -6,6 +6,7 @@ import ga.core.MaGaOptimizer;
 import ga.core.MaGaResult;
 import io.reporting.StaticWindowStressPrinter;
 import io.snapshot.SnapshotLoader;
+import io.snapshot.SnapshotPaths;
 import model.genetic.Chromosome;
 import model.snapshot.SystemSnapshot;
 import validation.snapshot.SnapshotValidator;
@@ -28,7 +29,7 @@ import java.util.List;
 public final class StaticWindowStressTestMain {
 
     private static final String DEFAULT_FOLDER =
-            "data/window_static_stress";
+            SnapshotPaths.STATIC_WINDOW_STRESS_FOLDER;
 
     private StaticWindowStressTestMain() {
     }

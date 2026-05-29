@@ -5,14 +5,14 @@ import ga.core.MaGaOptimizer;
 import ga.core.MaGaResult;
 import io.reporting.ResultPrinter;
 import io.snapshot.SnapshotLoader;
+import io.snapshot.SnapshotPaths;
 import model.snapshot.SystemSnapshot;
 import validation.snapshot.SnapshotValidator;
 
 /**
- * Runner manuale per eseguire più snapshot di test in sequenza.
+ * Runner manuale per eseguire gli snapshot di esempio MA-GA in sequenza.
  *
- * Non usa JUnit.
- * Serve a controllare rapidamente che:
+ * Non usa JUnit. Serve a controllare rapidamente che:
  *
  * - il loader legga correttamente gli snapshot;
  * - il validator li accetti;
@@ -21,17 +21,8 @@ import validation.snapshot.SnapshotValidator;
  */
 public final class SnapshotBatchRunner {
 
-    private static final String[] SNAPSHOT_PATHS = {
-            "data/tests/snapshot_01_local_only.json",
-            "data/tests/snapshot_02_local_vs_edge.json",
-            "data/tests/snapshot_03_partial_offloading.json",
-            "data/tests/snapshot_04_deadline_pressure.json",
-            "data/tests/snapshot_05_coverage_pressure.json",
-            "data/tests/snapshot_06_source_aware_multi_vehicle.json"
-    };
-
     /**
-     * Esegue tutti gli snapshot di test.
+     * Esegue tutti gli snapshot di esempio MA-GA.
      */
     public static void main(String[] args) throws Exception {
         SnapshotLoader loader = new SnapshotLoader();
@@ -40,7 +31,7 @@ public final class SnapshotBatchRunner {
         MaGaOptimizer optimizer = new MaGaOptimizer(config);
         ResultPrinter printer = new ResultPrinter(config);
 
-        for (String path : SNAPSHOT_PATHS) {
+        for (String path : SnapshotPaths.MAGA_EXAMPLES) {
             System.out.println();
             System.out.println("############################################################");
             System.out.println("RUNNING SNAPSHOT: " + path);
@@ -55,4 +46,3 @@ public final class SnapshotBatchRunner {
         }
     }
 }
-

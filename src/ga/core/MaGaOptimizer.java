@@ -1,5 +1,7 @@
 package ga.core;
 
+import config.MaGaConfig;
+import config.ga.GeneticAlgorithmConfig;
 import ga.fitness.FitnessEvaluator;
 import ga.fitness.breakdown.EvaluationBreakdown;
 import ga.operators.CrossoverOperator;
@@ -8,9 +10,6 @@ import ga.operators.MutationOperator;
 import ga.operators.PopulationInitializer;
 import ga.operators.RepairOperator;
 import ga.operators.SelectionOperator;
-
-import config.ga.GeneticAlgorithmConfig;
-import config.MaGaConfig;
 import model.genetic.Chromosome;
 import model.snapshot.SystemSnapshot;
 
@@ -23,21 +22,18 @@ import java.util.Random;
 /**
  * Orchestratore principale del MA-GA sul singolo snapshot.
  *
- * Il MA-GA resta snapshot-based:
+ * <p>Il MA-GA resta snapshot-based:</p>
  *
- * - riceve uno SystemSnapshot;
- * - riceve eventualmente una popolazione iniziale esterna;
- * - ripara la popolazione rispetto allo snapshot corrente;
- * - evolve la popolazione;
- * - restituisce miglior cromosoma, breakdown e popolazione finale.
+ * <ul>
+ *     <li>riceve uno SystemSnapshot;</li>
+ *     <li>riceve eventualmente una popolazione iniziale esterna;</li>
+ *     <li>ripara la popolazione rispetto allo snapshot corrente;</li>
+ *     <li>evolve la popolazione;</li>
+ *     <li>restituisce miglior cromosoma, breakdown e popolazione finale.</li>
+ * </ul>
  *
- * La scelta tra COLD_START, WARM_START e PARTIAL_RESTART non appartiene
- * a questa classe. Quella decisione sarà del package window.
- *
- * Questa classe deve solo essere capace di eseguire il GA partendo da:
- *
- * - una popolazione generata da zero;
- * - oppure una popolazione iniziale fornita dall'esterno.
+ * <p>La scelta tra COLD_START, WARM_START e PARTIAL_RESTART non appartiene
+ * a questa classe. Quella decisione rimane nel package window.</p>
  */
 public final class MaGaOptimizer {
 
@@ -45,7 +41,6 @@ public final class MaGaOptimizer {
 
     private final MaGaConfig config;
     private GeneticAlgorithmConfig gaConfig;
-
     private final FitnessEvaluator fitnessEvaluator;
     private final PopulationInitializer populationInitializer;
     private final RepairOperator repairOperator;
@@ -53,20 +48,27 @@ public final class MaGaOptimizer {
     private final CrossoverOperator crossoverOperator;
     private final MutationOperator mutationOperator;
     private final ElitismOperator elitismOperator;
-
     private final Random random;
 
     public MaGaOptimizer(MaGaConfig config) {
-        this.config = Objects.requireNonNull(config, "config must not be null.");
-
+        this.config = Objects.requireNonNull(
+                config,
+                "config must not be null."
+        );
         this.gaConfig = Objects.requireNonNull(
                 config.getGeneticAlgorithmConfig(),
                 "geneticAlgorithmConfig must not be null."
         );
-
         this.random = new Random(gaConfig.getRandomSeed());
 
-        this.repairOperator = new RepairOperator();
+        /*
+         * Il repair riceve la MobilityConfig per usare lo stesso modello di
+         * copertura della fitness. In questo modo il vincolo
+         * T_i(C) <= T_i^coverage(n_i) viene controllato anche in repair,
+         * non solo penalizzato in valutazione.
+         */
+        this.repairOperator = new RepairOperator(config.getMobilityConfig());
+
         this.fitnessEvaluator = new FitnessEvaluator(config);
         this.populationInitializer = new PopulationInitializer(random, repairOperator);
         this.selectionOperator = new SelectionOperator(random, DEFAULT_TOURNAMENT_SIZE);
@@ -78,7 +80,7 @@ public final class MaGaOptimizer {
     /**
      * Esegue il MA-GA partendo da popolazione generata internamente.
      *
-     * Metodo mantenuto per compatibilità.
+     * <p>Metodo mantenuto per compatibilità.</p>
      */
     public Chromosome optimize(SystemSnapshot snapshot) {
         return optimizeDetailed(snapshot).getBestChromosome();
@@ -86,9 +88,6 @@ public final class MaGaOptimizer {
 
     /**
      * Esegue il MA-GA partendo da una popolazione iniziale esterna.
-     *
-     * Questo metodo sarà usato dal package window quando viene applicato
-     * WARM_START o PARTIAL_RESTART.
      */
     public Chromosome optimize(
             SystemSnapshot snapshot,
@@ -100,7 +99,7 @@ public final class MaGaOptimizer {
     /**
      * Esegue il MA-GA e restituisce il risultato completo.
      *
-     * Metodo mantenuto per compatibilità.
+     * <p>Metodo mantenuto per compatibilità.</p>
      */
     public MaGaResult optimizeDetailed(SystemSnapshot snapshot) {
         return optimizeDetailed(snapshot, null);
@@ -108,17 +107,6 @@ public final class MaGaOptimizer {
 
     /**
      * Esegue il MA-GA e restituisce un risultato completo.
-     *
-     * Se initialPopulation è null o vuota, il comportamento coincide con la
-     * versione precedente: la popolazione viene generata da zero.
-     *
-     * Se initialPopulation è presente, viene:
-     *
-     * 1. copiata;
-     * 2. riparata rispetto allo snapshot corrente;
-     * 3. valutata;
-     * 4. completata se troppo piccola;
-     * 5. ridotta ai migliori cromosomi se troppo grande.
      */
     public MaGaResult optimizeDetailed(
             SystemSnapshot snapshot,
@@ -127,7 +115,6 @@ public final class MaGaOptimizer {
         Objects.requireNonNull(snapshot, "snapshot must not be null.");
 
         this.gaConfig = config.resolveGeneticAlgorithmConfig(snapshot);
-
         validateSnapshot(snapshot);
 
         List<GenerationStat> generationHistory = new ArrayList<>();
@@ -135,10 +122,7 @@ public final class MaGaOptimizer {
         if (snapshot.getTasks().isEmpty()) {
             Chromosome empty = new Chromosome(new ArrayList<>());
             empty.setFitness(0.0);
-
-            EvaluationBreakdown evaluation =
-                    fitnessEvaluator.evaluateDetailed(empty, snapshot);
-
+            EvaluationBreakdown evaluation = fitnessEvaluator.evaluateDetailed(empty, snapshot);
             List<Chromosome> finalPopulation = new ArrayList<>();
             finalPopulation.add(copyChromosome(empty));
 
@@ -200,10 +184,8 @@ public final class MaGaOptimizer {
                         snapshot,
                         gaConfig.getMutationRate()
                 );
-
                 child = repairOperator.repairChromosome(child, snapshot);
                 child.setFitness(fitnessEvaluator.evaluate(child, snapshot));
-
                 nextPopulation.add(child);
             }
 
@@ -214,7 +196,6 @@ public final class MaGaOptimizer {
                     generation,
                     population
             );
-
             generationHistory.add(generationStat);
 
             Chromosome generationBest = findBest(population);
@@ -232,8 +213,10 @@ public final class MaGaOptimizer {
             }
         }
 
-        EvaluationBreakdown bestEvaluation =
-                fitnessEvaluator.evaluateDetailed(bestOverall, snapshot);
+        EvaluationBreakdown bestEvaluation = fitnessEvaluator.evaluateDetailed(
+                bestOverall,
+                snapshot
+        );
 
         List<Chromosome> finalPopulation = prepareFinalPopulationForResult(
                 population,
@@ -274,7 +257,6 @@ public final class MaGaOptimizer {
 
             Chromosome copied = copyChromosome(chromosome);
             Chromosome repaired = repairOperator.repairChromosome(copied, snapshot);
-
             repaired.setFitness(fitnessEvaluator.evaluate(repaired, snapshot));
             prepared.add(repaired);
         }
@@ -288,7 +270,6 @@ public final class MaGaOptimizer {
 
         if (prepared.size() > gaConfig.getPopulationSize()) {
             prepared.sort(Comparator.comparingDouble(Chromosome::getFitness));
-
             List<Chromosome> reduced = new ArrayList<>();
 
             for (int i = 0; i < gaConfig.getPopulationSize(); i++) {
@@ -300,10 +281,10 @@ public final class MaGaOptimizer {
 
         if (prepared.size() < gaConfig.getPopulationSize()) {
             int missing = gaConfig.getPopulationSize() - prepared.size();
-
-            List<Chromosome> randomChromosomes =
-                    populationInitializer.createInitialPopulation(snapshot, missing);
-
+            List<Chromosome> randomChromosomes = populationInitializer.createInitialPopulation(
+                    snapshot,
+                    missing
+            );
             evaluatePopulation(randomChromosomes, snapshot);
             prepared.addAll(randomChromosomes);
         }
@@ -313,11 +294,6 @@ public final class MaGaOptimizer {
 
     /**
      * Prepara la popolazione finale da conservare in MaGaResult.
-     *
-     * Aggiunge anche bestOverall alla lista prima del taglio finale. In questo modo
-     * il gestore temporale riceve una popolazione finale che contiene sicuramente
-     * la migliore soluzione osservata durante l'esecuzione, anche nel caso in cui
-     * una configurazione futura disattivasse l'elitismo.
      */
     private List<Chromosome> prepareFinalPopulationForResult(
             List<Chromosome> population,
@@ -332,7 +308,6 @@ public final class MaGaOptimizer {
         }
 
         result.add(copyChromosome(bestOverall));
-
         result.sort(Comparator.comparingDouble(Chromosome::getFitness));
 
         while (result.size() > gaConfig.getPopulationSize()) {
@@ -385,13 +360,14 @@ public final class MaGaOptimizer {
 
         for (Chromosome chromosome : population) {
             double fitness = chromosome.getFitness();
-
             best = Math.min(best, fitness);
             worst = Math.max(worst, fitness);
             sum += fitness;
         }
 
-        double average = population.isEmpty() ? 0.0 : sum / population.size();
+        double average = population.isEmpty()
+                ? 0.0
+                : sum / population.size();
 
         return new GenerationStat(
                 generationIndex,
@@ -410,7 +386,8 @@ public final class MaGaOptimizer {
             throw new IllegalArgumentException("snapshot.tasks must not be null.");
         }
 
-        if (snapshot.getCandidateNodes() == null || snapshot.getCandidateNodes().isEmpty()) {
+        if (snapshot.getCandidateNodes() == null
+                || snapshot.getCandidateNodes().isEmpty()) {
             throw new IllegalArgumentException(
                     "snapshot.candidateNodes must contain at least one node."
             );
@@ -421,5 +398,3 @@ public final class MaGaOptimizer {
         }
     }
 }
-
-
