@@ -11,6 +11,7 @@ public final class TemporalWindowConfig {
 
     private static final double DEFAULT_STRATEGY_APPLICATION_SECONDS = 0.05;
     private static final double DEFAULT_GA_RUNTIME_ESTIMATE_SECONDS = 0.10;
+    private static final double DEFAULT_CONFIGURED_MAX_WINDOW_SECONDS = 8.0;
 
     private final double fixedIntervalSeconds;
     private final double dataCollectionDelaySeconds;
@@ -27,6 +28,9 @@ public final class TemporalWindowConfig {
     private final double epsilonT;
     private final double strategyApplicationSeconds;
     private final double defaultGaRuntimeEstimateSeconds;
+    private final double configuredMaxWindowSeconds;
+    private final TemporalMinimumBoundMode minimumBoundMode;
+    private final TemporalMaximumBoundMode maximumBoundMode;
 
     /**
      * Costruttore compatibile con la versione precedente.
@@ -60,12 +64,15 @@ public final class TemporalWindowConfig {
                 etaDown,
                 epsilonT,
                 DEFAULT_STRATEGY_APPLICATION_SECONDS,
-                DEFAULT_GA_RUNTIME_ESTIMATE_SECONDS
+                DEFAULT_GA_RUNTIME_ESTIMATE_SECONDS,
+                DEFAULT_CONFIGURED_MAX_WINDOW_SECONDS,
+                TemporalMinimumBoundMode.CONFIGURED_GA_ESTIMATE,
+                TemporalMaximumBoundMode.COVERAGE_ADAPTIVE
         );
     }
 
     /**
-     * Costruisce la configurazione temporale completa.
+     * Costruttore compatibile con la versione precedente.
      */
     public TemporalWindowConfig(
             double fixedIntervalSeconds,
@@ -97,13 +104,15 @@ public final class TemporalWindowConfig {
                 etaDown,
                 epsilonT,
                 DEFAULT_STRATEGY_APPLICATION_SECONDS,
-                DEFAULT_GA_RUNTIME_ESTIMATE_SECONDS
+                DEFAULT_GA_RUNTIME_ESTIMATE_SECONDS,
+                DEFAULT_CONFIGURED_MAX_WINDOW_SECONDS,
+                TemporalMinimumBoundMode.CONFIGURED_GA_ESTIMATE,
+                TemporalMaximumBoundMode.COVERAGE_ADAPTIVE
         );
     }
 
     /**
-     * Costruisce la configurazione temporale completa, includendo i tempi
-     * operativi usati per il limite inferiore della finestra adattiva.
+     * Costruttore compatibile con la versione della finestra adattiva.
      */
     public TemporalWindowConfig(
             double fixedIntervalSeconds,
@@ -121,6 +130,51 @@ public final class TemporalWindowConfig {
             double epsilonT,
             double strategyApplicationSeconds,
             double defaultGaRuntimeEstimateSeconds
+    ) {
+        this(
+                fixedIntervalSeconds,
+                dataCollectionDelaySeconds,
+                thetaLow,
+                thetaHigh,
+                rhoKeep,
+                lambdaVehicles,
+                lambdaTasks,
+                lambdaResources,
+                lambdaLinks,
+                alphaT,
+                etaUp,
+                etaDown,
+                epsilonT,
+                strategyApplicationSeconds,
+                defaultGaRuntimeEstimateSeconds,
+                DEFAULT_CONFIGURED_MAX_WINDOW_SECONDS,
+                TemporalMinimumBoundMode.CONFIGURED_GA_ESTIMATE,
+                TemporalMaximumBoundMode.COVERAGE_ADAPTIVE
+        );
+    }
+
+    /**
+     * Costruisce la configurazione temporale completa.
+     */
+    public TemporalWindowConfig(
+            double fixedIntervalSeconds,
+            double dataCollectionDelaySeconds,
+            double thetaLow,
+            double thetaHigh,
+            double rhoKeep,
+            double lambdaVehicles,
+            double lambdaTasks,
+            double lambdaResources,
+            double lambdaLinks,
+            double alphaT,
+            double etaUp,
+            double etaDown,
+            double epsilonT,
+            double strategyApplicationSeconds,
+            double defaultGaRuntimeEstimateSeconds,
+            double configuredMaxWindowSeconds,
+            TemporalMinimumBoundMode minimumBoundMode,
+            TemporalMaximumBoundMode maximumBoundMode
     ) {
         validatePositive("fixedIntervalSeconds", fixedIntervalSeconds);
         validateFiniteAndNonNegative("dataCollectionDelaySeconds", dataCollectionDelaySeconds);
@@ -144,6 +198,13 @@ public final class TemporalWindowConfig {
         validateFiniteAndNonNegative("epsilonT", epsilonT);
         validateFiniteAndNonNegative("strategyApplicationSeconds", strategyApplicationSeconds);
         validatePositive("defaultGaRuntimeEstimateSeconds", defaultGaRuntimeEstimateSeconds);
+        validatePositive("configuredMaxWindowSeconds", configuredMaxWindowSeconds);
+        if (minimumBoundMode == null) {
+            throw new IllegalArgumentException("minimumBoundMode must not be null.");
+        }
+        if (maximumBoundMode == null) {
+            throw new IllegalArgumentException("maximumBoundMode must not be null.");
+        }
 
         this.fixedIntervalSeconds = fixedIntervalSeconds;
         this.dataCollectionDelaySeconds = dataCollectionDelaySeconds;
@@ -160,10 +221,22 @@ public final class TemporalWindowConfig {
         this.epsilonT = epsilonT;
         this.strategyApplicationSeconds = strategyApplicationSeconds;
         this.defaultGaRuntimeEstimateSeconds = defaultGaRuntimeEstimateSeconds;
+        this.configuredMaxWindowSeconds = configuredMaxWindowSeconds;
+        this.minimumBoundMode = minimumBoundMode;
+        this.maximumBoundMode = maximumBoundMode;
     }
 
     /**
      * Configurazione iniziale per i test con snapshot JSON.
+     *
+     * <p>Il minimo usa una stima configurata del tempo GA. Questo evita che
+     * il wall-clock della JVM domini DeltaT_min durante i test locali.</p>
+     *
+     * <p>Il massimo resta aderente alla formalizzazione:</p>
+     *
+     * <pre>
+     * DeltaT_max(k) = alphaT * T_coverage_ref(k)
+     * </pre>
      */
     public static TemporalWindowConfig defaultConfig() {
         return new TemporalWindowConfig(
@@ -181,7 +254,67 @@ public final class TemporalWindowConfig {
                 1.0,
                 1.0E-6,
                 DEFAULT_STRATEGY_APPLICATION_SECONDS,
-                DEFAULT_GA_RUNTIME_ESTIMATE_SECONDS
+                DEFAULT_GA_RUNTIME_ESTIMATE_SECONDS,
+                DEFAULT_CONFIGURED_MAX_WINDOW_SECONDS,
+                TemporalMinimumBoundMode.CONFIGURED_GA_ESTIMATE,
+                TemporalMaximumBoundMode.COVERAGE_ADAPTIVE
+        );
+    }
+
+    /**
+     * Configurazione utile se si vuole studiare il comportamento operativo
+     * usando il tempo reale osservato del GA.
+     */
+    public static TemporalWindowConfig observedRuntimeBoundsConfig() {
+        return new TemporalWindowConfig(
+                5.0,
+                0.0,
+                0.25,
+                0.65,
+                0.40,
+                0.25,
+                0.25,
+                0.25,
+                0.25,
+                0.60,
+                1.0,
+                1.0,
+                1.0E-6,
+                DEFAULT_STRATEGY_APPLICATION_SECONDS,
+                DEFAULT_GA_RUNTIME_ESTIMATE_SECONDS,
+                DEFAULT_CONFIGURED_MAX_WINDOW_SECONDS,
+                TemporalMinimumBoundMode.OBSERVED_GA_RUNTIME,
+                TemporalMaximumBoundMode.COVERAGE_ADAPTIVE
+        );
+    }
+
+    /**
+     * Configurazione controllata. Utile solo per test sintetici.
+     */
+    public static TemporalWindowConfig configuredBoundsForReplay(
+            double initialWindowSeconds,
+            double configuredGaRuntimeEstimateSeconds,
+            double configuredMaxWindowSeconds
+    ) {
+        return new TemporalWindowConfig(
+                initialWindowSeconds,
+                0.0,
+                0.25,
+                0.65,
+                0.40,
+                0.25,
+                0.25,
+                0.25,
+                0.25,
+                0.60,
+                1.0,
+                1.0,
+                1.0E-6,
+                DEFAULT_STRATEGY_APPLICATION_SECONDS,
+                configuredGaRuntimeEstimateSeconds,
+                configuredMaxWindowSeconds,
+                TemporalMinimumBoundMode.CONFIGURED_GA_ESTIMATE,
+                TemporalMaximumBoundMode.CONFIGURED_MAX
         );
     }
 
@@ -208,7 +341,10 @@ public final class TemporalWindowConfig {
                 1.0,
                 1.0E-6,
                 DEFAULT_STRATEGY_APPLICATION_SECONDS,
-                DEFAULT_GA_RUNTIME_ESTIMATE_SECONDS
+                DEFAULT_GA_RUNTIME_ESTIMATE_SECONDS,
+                DEFAULT_CONFIGURED_MAX_WINDOW_SECONDS,
+                TemporalMinimumBoundMode.CONFIGURED_GA_ESTIMATE,
+                TemporalMaximumBoundMode.COVERAGE_ADAPTIVE
         );
     }
 
@@ -216,9 +352,6 @@ public final class TemporalWindowConfig {
         return fixedIntervalSeconds;
     }
 
-    /**
-     * Nome più chiaro per la finestra iniziale.
-     */
     public double getInitialWindowSeconds() {
         return fixedIntervalSeconds;
     }
@@ -255,23 +388,14 @@ public final class TemporalWindowConfig {
         return lambdaLinks;
     }
 
-    /**
-     * Coefficiente usato per DeltaT_max(k) = alphaT * T_coverage_ref(k).
-     */
     public double getAlphaT() {
         return alphaT;
     }
 
-    /**
-     * Passo additivo, in secondi, usato quando la finestra può crescere.
-     */
     public double getEtaUp() {
         return etaUp;
     }
 
-    /**
-     * Passo sottrattivo, in secondi, usato quando la finestra deve ridursi.
-     */
     public double getEtaDown() {
         return etaDown;
     }
@@ -286,6 +410,18 @@ public final class TemporalWindowConfig {
 
     public double getDefaultGaRuntimeEstimateSeconds() {
         return defaultGaRuntimeEstimateSeconds;
+    }
+
+    public double getConfiguredMaxWindowSeconds() {
+        return configuredMaxWindowSeconds;
+    }
+
+    public TemporalMinimumBoundMode getMinimumBoundMode() {
+        return minimumBoundMode;
+    }
+
+    public TemporalMaximumBoundMode getMaximumBoundMode() {
+        return maximumBoundMode;
     }
 
     public double getLambdaSum() {
@@ -353,6 +489,9 @@ public final class TemporalWindowConfig {
                 ", epsilonT=" + epsilonT +
                 ", strategyApplicationSeconds=" + strategyApplicationSeconds +
                 ", defaultGaRuntimeEstimateSeconds=" + defaultGaRuntimeEstimateSeconds +
+                ", configuredMaxWindowSeconds=" + configuredMaxWindowSeconds +
+                ", minimumBoundMode=" + minimumBoundMode +
+                ", maximumBoundMode=" + maximumBoundMode +
                 '}';
     }
 }

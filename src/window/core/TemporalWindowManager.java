@@ -61,7 +61,7 @@ public final class TemporalWindowManager {
                 optimizer,
                 dynamicityEvaluator,
                 populationAdapter,
-                new PopulationReuseDecisionPolicy(),
+                new PopulationReuseDecisionPolicy(windowConfig),
                 defaultAdaptiveWindowController(
                         windowConfig,
                         MobilityConfig.defaultConfig()

@@ -6,8 +6,12 @@ package window.timing;
  * <p>Formalmente:</p>
  *
  * <pre>
- * DeltaT_min(k) = T_s(k) + T_GA_est(k) + T_apply(k) + epsilonT
+ * DeltaT_min(k) = T_s(k) + T_GA_est(k) + T_apply(k) + epsilon_T
  * </pre>
+ *
+ * <p>Questa classe conserva il valore di T_GA_est usato per il calcolo.
+ * Il tempo osservato reale del GA viene mantenuto separato quando serve
+ * nella diagnostica.</p>
  */
 public final class TemporalOperationalMetrics {
 
@@ -15,12 +19,29 @@ public final class TemporalOperationalMetrics {
     private final double gaRuntimeEstimateSeconds;
     private final double strategyApplicationSeconds;
     private final double epsilonSeconds;
+    private final double observedGaRuntimeSeconds;
 
     public TemporalOperationalMetrics(
             double dataCollectionSeconds,
             double gaRuntimeEstimateSeconds,
             double strategyApplicationSeconds,
             double epsilonSeconds
+    ) {
+        this(
+                dataCollectionSeconds,
+                gaRuntimeEstimateSeconds,
+                strategyApplicationSeconds,
+                epsilonSeconds,
+                gaRuntimeEstimateSeconds
+        );
+    }
+
+    public TemporalOperationalMetrics(
+            double dataCollectionSeconds,
+            double gaRuntimeEstimateSeconds,
+            double strategyApplicationSeconds,
+            double epsilonSeconds,
+            double observedGaRuntimeSeconds
     ) {
         this.dataCollectionSeconds = validateFiniteAndNonNegative(
                 "dataCollectionSeconds",
@@ -38,6 +59,10 @@ public final class TemporalOperationalMetrics {
                 "epsilonSeconds",
                 epsilonSeconds
         );
+        this.observedGaRuntimeSeconds = validateFiniteAndNonNegative(
+                "observedGaRuntimeSeconds",
+                observedGaRuntimeSeconds
+        );
     }
 
     public static TemporalOperationalMetrics estimated(
@@ -50,7 +75,8 @@ public final class TemporalOperationalMetrics {
                 dataCollectionSeconds,
                 defaultGaRuntimeEstimateSeconds,
                 strategyApplicationSeconds,
-                epsilonSeconds
+                epsilonSeconds,
+                defaultGaRuntimeEstimateSeconds
         );
     }
 
@@ -64,7 +90,20 @@ public final class TemporalOperationalMetrics {
                 dataCollectionSeconds,
                 observedGaRuntimeSeconds,
                 strategyApplicationSeconds,
-                epsilonSeconds
+                epsilonSeconds,
+                observedGaRuntimeSeconds
+        );
+    }
+
+    public TemporalOperationalMetrics withGaRuntimeEstimateSeconds(
+            double newGaRuntimeEstimateSeconds
+    ) {
+        return new TemporalOperationalMetrics(
+                dataCollectionSeconds,
+                newGaRuntimeEstimateSeconds,
+                strategyApplicationSeconds,
+                epsilonSeconds,
+                observedGaRuntimeSeconds
         );
     }
 
@@ -82,6 +121,10 @@ public final class TemporalOperationalMetrics {
 
     public double getEpsilonSeconds() {
         return epsilonSeconds;
+    }
+
+    public double getObservedGaRuntimeSeconds() {
+        return observedGaRuntimeSeconds;
     }
 
     public double getMinimumWindowSeconds() {
@@ -109,6 +152,7 @@ public final class TemporalOperationalMetrics {
         return "TemporalOperationalMetrics{" +
                 "dataCollectionSeconds=" + dataCollectionSeconds +
                 ", gaRuntimeEstimateSeconds=" + gaRuntimeEstimateSeconds +
+                ", observedGaRuntimeSeconds=" + observedGaRuntimeSeconds +
                 ", strategyApplicationSeconds=" + strategyApplicationSeconds +
                 ", epsilonSeconds=" + epsilonSeconds +
                 ", minimumWindowSeconds=" + getMinimumWindowSeconds() +

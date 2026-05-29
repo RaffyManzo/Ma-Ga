@@ -29,7 +29,11 @@ public final class AdaptiveWindowDiagnosticPrinter {
         out.println("------------------------------------------------------------");
         out.println("ADAPTIVE WINDOW SUMMARY");
         out.println("------------------------------------------------------------");
-        out.println("idx | snapshot | currentDt | nextDt | minDt | maxDt | TcovRef | action | reason");
+        out.println(
+                "idx | snapshot | currentDt | nextDt | minDt | maxDt | "
+                        + "TcovRef | minMode | maxMode | gaUsed | gaObserved | "
+                        + "adaptiveMax | configuredMax | raisedMax | action | reason"
+        );
 
         for (TemporalStepResult step : result.getSteps()) {
             AdaptiveWindowDecision decision = step.getAdaptiveWindowDecision();
@@ -43,6 +47,13 @@ public final class AdaptiveWindowDiagnosticPrinter {
                             + " | " + formatSeconds(bounds.getMinimumWindowSeconds())
                             + " | " + formatSeconds(bounds.getMaximumWindowSeconds())
                             + " | " + formatSeconds(bounds.getCoverageReferenceSeconds())
+                            + " | " + bounds.getMinimumBoundMode()
+                            + " | " + bounds.getMaximumBoundMode()
+                            + " | " + formatSeconds(bounds.getGaRuntimeEstimateUsedSeconds())
+                            + " | " + formatSeconds(bounds.getObservedGaRuntimeSeconds())
+                            + " | " + formatSeconds(bounds.getAdaptiveMaximumWindowSeconds())
+                            + " | " + formatSeconds(bounds.getConfiguredMaximumWindowSeconds())
+                            + " | " + bounds.isMaximumRaisedToMinimum()
                             + " | " + decision.getAction()
                             + " | " + decision.getReason()
             );

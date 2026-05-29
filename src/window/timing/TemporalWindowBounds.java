@@ -1,5 +1,8 @@
 package window.timing;
 
+import config.window.TemporalMaximumBoundMode;
+import config.window.TemporalMinimumBoundMode;
+
 /**
  * Limiti della prossima finestra temporale.
  */
@@ -9,12 +12,47 @@ public final class TemporalWindowBounds {
     private final double maximumWindowSeconds;
     private final double coverageReferenceSeconds;
     private final boolean coverageReferenceAvailable;
+    private final double adaptiveMaximumWindowSeconds;
+    private final double configuredMaximumWindowSeconds;
+    private final double gaRuntimeEstimateUsedSeconds;
+    private final double observedGaRuntimeSeconds;
+    private final TemporalMinimumBoundMode minimumBoundMode;
+    private final TemporalMaximumBoundMode maximumBoundMode;
+    private final boolean maximumRaisedToMinimum;
 
     public TemporalWindowBounds(
             double minimumWindowSeconds,
             double maximumWindowSeconds,
             double coverageReferenceSeconds,
             boolean coverageReferenceAvailable
+    ) {
+        this(
+                minimumWindowSeconds,
+                maximumWindowSeconds,
+                coverageReferenceSeconds,
+                coverageReferenceAvailable,
+                maximumWindowSeconds,
+                maximumWindowSeconds,
+                0.0,
+                0.0,
+                TemporalMinimumBoundMode.CONFIGURED_GA_ESTIMATE,
+                TemporalMaximumBoundMode.COVERAGE_ADAPTIVE,
+                maximumWindowSeconds < minimumWindowSeconds
+        );
+    }
+
+    public TemporalWindowBounds(
+            double minimumWindowSeconds,
+            double maximumWindowSeconds,
+            double coverageReferenceSeconds,
+            boolean coverageReferenceAvailable,
+            double adaptiveMaximumWindowSeconds,
+            double configuredMaximumWindowSeconds,
+            double gaRuntimeEstimateUsedSeconds,
+            double observedGaRuntimeSeconds,
+            TemporalMinimumBoundMode minimumBoundMode,
+            TemporalMaximumBoundMode maximumBoundMode,
+            boolean maximumRaisedToMinimum
     ) {
         this.minimumWindowSeconds = validatePositive(
                 "minimumWindowSeconds",
@@ -29,6 +67,31 @@ public final class TemporalWindowBounds {
                 coverageReferenceSeconds
         );
         this.coverageReferenceAvailable = coverageReferenceAvailable;
+        this.adaptiveMaximumWindowSeconds = validateFiniteAndNonNegative(
+                "adaptiveMaximumWindowSeconds",
+                adaptiveMaximumWindowSeconds
+        );
+        this.configuredMaximumWindowSeconds = validatePositive(
+                "configuredMaximumWindowSeconds",
+                configuredMaximumWindowSeconds
+        );
+        this.gaRuntimeEstimateUsedSeconds = validateFiniteAndNonNegative(
+                "gaRuntimeEstimateUsedSeconds",
+                gaRuntimeEstimateUsedSeconds
+        );
+        this.observedGaRuntimeSeconds = validateFiniteAndNonNegative(
+                "observedGaRuntimeSeconds",
+                observedGaRuntimeSeconds
+        );
+        if (minimumBoundMode == null) {
+            throw new IllegalArgumentException("minimumBoundMode must not be null.");
+        }
+        if (maximumBoundMode == null) {
+            throw new IllegalArgumentException("maximumBoundMode must not be null.");
+        }
+        this.minimumBoundMode = minimumBoundMode;
+        this.maximumBoundMode = maximumBoundMode;
+        this.maximumRaisedToMinimum = maximumRaisedToMinimum;
     }
 
     public double getMinimumWindowSeconds() {
@@ -45,6 +108,34 @@ public final class TemporalWindowBounds {
 
     public boolean isCoverageReferenceAvailable() {
         return coverageReferenceAvailable;
+    }
+
+    public double getAdaptiveMaximumWindowSeconds() {
+        return adaptiveMaximumWindowSeconds;
+    }
+
+    public double getConfiguredMaximumWindowSeconds() {
+        return configuredMaximumWindowSeconds;
+    }
+
+    public double getGaRuntimeEstimateUsedSeconds() {
+        return gaRuntimeEstimateUsedSeconds;
+    }
+
+    public double getObservedGaRuntimeSeconds() {
+        return observedGaRuntimeSeconds;
+    }
+
+    public TemporalMinimumBoundMode getMinimumBoundMode() {
+        return minimumBoundMode;
+    }
+
+    public TemporalMaximumBoundMode getMaximumBoundMode() {
+        return maximumBoundMode;
+    }
+
+    public boolean isMaximumRaisedToMinimum() {
+        return maximumRaisedToMinimum;
     }
 
     public double clamp(double value) {
@@ -87,6 +178,13 @@ public final class TemporalWindowBounds {
                 ", maximumWindowSeconds=" + maximumWindowSeconds +
                 ", coverageReferenceSeconds=" + coverageReferenceSeconds +
                 ", coverageReferenceAvailable=" + coverageReferenceAvailable +
+                ", adaptiveMaximumWindowSeconds=" + adaptiveMaximumWindowSeconds +
+                ", configuredMaximumWindowSeconds=" + configuredMaximumWindowSeconds +
+                ", gaRuntimeEstimateUsedSeconds=" + gaRuntimeEstimateUsedSeconds +
+                ", observedGaRuntimeSeconds=" + observedGaRuntimeSeconds +
+                ", minimumBoundMode=" + minimumBoundMode +
+                ", maximumBoundMode=" + maximumBoundMode +
+                ", maximumRaisedToMinimum=" + maximumRaisedToMinimum +
                 '}';
     }
 }
