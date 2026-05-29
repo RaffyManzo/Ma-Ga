@@ -1,0 +1,271 @@
+"C:\Program Files\Java\jdk-21\bin\java.exe" "-javaagent:C:\Program Files\JetBrains\IntelliJ IDEA 2023.2.2\lib\idea_rt.jar=54490:C:\Program Files\JetBrains\IntelliJ IDEA 2023.2.2\bin" -Dfile.encoding=UTF-8 -Dsun.stdout.encoding=UTF-8 -Dsun.stderr.encoding=UTF-8 -classpath C:\Users\raffa\IdeaProjects\maga-core\out\production\maga-core;C:\Users\raffa\.m2\repository\com\fasterxml\jackson\core\jackson-databind\2.17.2\jackson-databind-2.17.2.jar;C:\Users\raffa\.m2\repository\com\fasterxml\jackson\core\jackson-annotations\2.17.2\jackson-annotations-2.17.2.jar;C:\Users\raffa\.m2\repository\com\fasterxml\jackson\core\jackson-core\2.17.2\jackson-core-2.17.2.jar app.TemporalWindowStressTestMain
+============================================================
+MA-GA TEMPORAL DIAGNOSTIC REPORT
+============================================================
+
+------------------------------------------------------------
+1. EXECUTIVE SUMMARY
+------------------------------------------------------------
+Executed windows: 8
+Critical-event windows: 0
+Population-reuse windows: 7
+Best final fitness: 16,777910
+
+Main diagnostic counters:
+- task evaluations: 480
+- deadline violations: 101 (21,041667%)
+- coverage insufficient: 1
+- CPU violations: 0
+- bandwidth violations: 0
+- CPU saturated >= 95,000000%: 38
+- bandwidth saturated >= 95,000000%: 40
+
+Dominant deadline causes:
+- LOCAL_EXECUTION_BOTTLENECK: 8
+- LOCAL_BRANCH_DOMINATES: 6
+- MIXED_LOCAL_REMOTE_BOTTLENECK: 49
+- UPLOAD_BOTTLENECK: 14
+- REMOTE_EXECUTION_BOTTLENECK: 23
+- COVERAGE_INSUFFICIENT: 1
+
+------------------------------------------------------------
+2. TEMPORAL / DYNAMICITY SUMMARY
+------------------------------------------------------------
+idx | trigger | obsTime | snapshot | D | Dv | Dt | Dr | Dl | level | suggested | applied | initPop | finalPop
+0 | FIRST_RUN | 0,000000 s | window_static_stress_000 | 0,000000 | 0,000000 | 0,000000 | 0,000000 | 0,000000 | UNKNOWN | FIRST_RUN | FIRST_RUN | 178 | 178
+1 | SCHEDULED | 5,000000 s | window_static_stress_001 | 0,418898 | 0,197085 | 0,632084 | 0,202579 | 0,643845 | MODERATE | PARTIAL_RESTART | PARTIAL_RESTART | 178 | 178
+2 | SCHEDULED | 10,000000 s | window_static_stress_002 | 0,413873 | 0,200640 | 0,615267 | 0,194038 | 0,645548 | MODERATE | PARTIAL_RESTART | PARTIAL_RESTART | 178 | 178
+3 | SCHEDULED | 15,000000 s | window_static_stress_003 | 0,428539 | 0,200040 | 0,627174 | 0,208176 | 0,678764 | MODERATE | PARTIAL_RESTART | PARTIAL_RESTART | 178 | 178
+4 | SCHEDULED | 20,000000 s | window_static_stress_004 | 0,437192 | 0,197457 | 0,625671 | 0,257318 | 0,668321 | MODERATE | PARTIAL_RESTART | PARTIAL_RESTART | 178 | 178
+5 | SCHEDULED | 25,000000 s | window_static_stress_005 | 0,386541 | 0,197258 | 0,543343 | 0,182971 | 0,622594 | MODERATE | PARTIAL_RESTART | PARTIAL_RESTART | 178 | 179
+6 | SCHEDULED | 30,000000 s | window_static_stress_006 | 0,409881 | 0,198601 | 0,616255 | 0,186839 | 0,637830 | MODERATE | PARTIAL_RESTART | PARTIAL_RESTART | 178 | 178
+7 | SCHEDULED | 35,000000 s | window_static_stress_007 | 0,417998 | 0,210469 | 0,603841 | 0,228020 | 0,629662 | MODERATE | PARTIAL_RESTART | PARTIAL_RESTART | 178 | 178
+
+------------------------------------------------------------
+3. GA CONVERGENCE SUMMARY
+------------------------------------------------------------
+idx | pop | maxGen | genRun | stop | initBest | finalBest | gain% | last10 | last50
+0 | 178 | 316 | 316 | MAX_GENERATIONS_REACHED | 116,398580 | 22,972500 | 80,263935% | 0,193316 | 0,462012
+1 | 178 | 315 | 315 | MAX_GENERATIONS_REACHED | 107,703350 | 17,992538 | 83,294356% | 0,113978 | 1,032049
+2 | 178 | 316 | 316 | MAX_GENERATIONS_REACHED | 109,918422 | 16,777910 | 84,736035% | 0,290483 | 0,771255
+3 | 178 | 315 | 315 | MAX_GENERATIONS_REACHED | 108,696217 | 19,707211 | 81,869460% | 0,019673 | 0,290329
+4 | 178 | 316 | 316 | MAX_GENERATIONS_REACHED | 124,783560 | 27,832269 | 77,695564% | 0,308391 | 0,917035
+5 | 179 | 317 | 317 | MAX_GENERATIONS_REACHED | 94,021133 | 19,453178 | 79,309782% | 0,000000 | 0,244431
+6 | 178 | 316 | 316 | MAX_GENERATIONS_REACHED | 130,036747 | 23,745100 | 81,739700% | 0,722778 | 2,130324
+7 | 178 | 315 | 315 | MAX_GENERATIONS_REACHED | 115,625729 | 25,584042 | 77,873401% | 0,036679 | 0,415260
+
+------------------------------------------------------------
+4. DECISION / OFFLOADING SUMMARY
+------------------------------------------------------------
+idx | LOCAL | EDGE | CLOUD | VEHICLE | localExec | partial | full | avgP | p=0 | low | midLow | midHigh | high | p=1
+0 | 27 | 10 | 9 | 14 | 27 | 32 | 1 | 0,284690 | 27 | 5 | 7 | 18 | 2 | 1
+1 | 29 | 8 | 5 | 18 | 29 | 29 | 2 | 0,291422 | 29 | 1 | 9 | 17 | 2 | 2
+2 | 28 | 13 | 8 | 11 | 28 | 31 | 1 | 0,288976 | 28 | 5 | 6 | 15 | 5 | 1
+3 | 20 | 14 | 7 | 19 | 20 | 39 | 1 | 0,318924 | 20 | 9 | 13 | 13 | 4 | 1
+4 | 28 | 13 | 8 | 11 | 28 | 32 | 0 | 0,230656 | 28 | 6 | 12 | 13 | 1 | 0
+5 | 30 | 11 | 9 | 10 | 30 | 30 | 0 | 0,265911 | 30 | 1 | 11 | 14 | 4 | 0
+6 | 24 | 14 | 7 | 15 | 24 | 36 | 0 | 0,303002 | 24 | 5 | 13 | 12 | 6 | 0
+7 | 25 | 13 | 6 | 16 | 25 | 33 | 2 | 0,268167 | 25 | 6 | 15 | 8 | 4 | 2
+
+------------------------------------------------------------
+5. DEADLINE CAUSE SUMMARY
+------------------------------------------------------------
+idx | violated | rate | local | upload | remoteExec | download | baseLat | mixedLocalRemote | mixedRemote | coverage | unknown
+0 | 15 | 25,000000% | 1 | 4 | 3 | 0 | 0 | 7 | 0 | 0 | 0
+1 | 11 | 18,333333% | 0 | 1 | 2 | 0 | 0 | 7 | 0 | 0 | 0
+2 | 14 | 23,333333% | 2 | 3 | 1 | 0 | 0 | 8 | 0 | 0 | 0
+3 | 11 | 18,333333% | 0 | 2 | 2 | 0 | 0 | 7 | 0 | 0 | 0
+4 | 13 | 21,666667% | 2 | 1 | 3 | 0 | 0 | 6 | 0 | 0 | 0
+5 | 12 | 20,000000% | 2 | 2 | 4 | 0 | 0 | 3 | 0 | 1 | 0
+6 | 14 | 23,333333% | 0 | 1 | 7 | 0 | 0 | 4 | 0 | 0 | 0
+7 | 11 | 18,333333% | 1 | 0 | 1 | 0 | 0 | 7 | 0 | 0 | 0
+
+------------------------------------------------------------
+6. TOP DEADLINE VIOLATIONS BY WINDOW
+------------------------------------------------------------
+Window 0 | snapshot=window_static_stress_000 | violated=15
+task | source | node | decision | p | completion | deadline | ratio | cause | secondary | dominant | coverage | note
+task_020 | vehicle_020 | EDGE | PARTIAL_OFFLOADING | 0,674261 | 3,121196 s | 1,261000 s | 1,475176 | MIXED_LOCAL_REMOTE_BOTTLENECK | UNKNOWN | localExecution=3,022803 s | 15,945356 s | Local and remote branches are both close to the critical path; branchBalance=0,968476.
+task_060 | vehicle_096 | EDGE | PARTIAL_OFFLOADING | 0,583208 | 3,920741 s | 1,819000 s | 1,155437 | MIXED_LOCAL_REMOTE_BOTTLENECK | UNKNOWN | localExecution=3,841081 s | 15,784572 s | Local and remote branches are both close to the critical path; branchBalance=0,979682.
+task_010 | vehicle_010 | VEHICLE | PARTIAL_OFFLOADING | 0,463068 | 3,704687 s | 1,905000 s | 0,944718 | MIXED_LOCAL_REMOTE_BOTTLENECK | UNKNOWN | localExecution=3,704687 s | 72,720531 s | Local and remote branches are both close to the critical path; branchBalance=0,916765.
+task_030 | vehicle_030 | VEHICLE | PARTIAL_OFFLOADING | 0,422156 | 3,481271 s | 1,807000 s | 0,926547 | MIXED_LOCAL_REMOTE_BOTTLENECK | UNKNOWN | localExecution=3,383310 s | 21,630453 s | Local and remote branches are both close to the critical path; branchBalance=0,971861.
+task_050 | vehicle_062 | CLOUD | PARTIAL_OFFLOADING | 0,688531 | 3,129975 s | 1,750000 s | 0,788557 | UPLOAD_BOTTLENECK | UNKNOWN | localExecution=2,642675 s | 300,000000 s | Dominant component=localExecution, localRatio=0,844312, remoteRatio=1,000000, secondary=UNKNOWN.
+task_034 | vehicle_034 | EDGE | PARTIAL_OFFLOADING | 0,611890 | 2,864744 s | 1,831000 s | 0,564579 | REMOTE_EXECUTION_BOTTLENECK | UNKNOWN | localExecution=2,594221 s | 4,126037 s | Dominant component=localExecution, localRatio=0,905568, remoteRatio=1,000000, secondary=UNKNOWN.
+task_026 | vehicle_026 | EDGE | PARTIAL_OFFLOADING | 0,801930 | 3,858990 s | 2,789000 s | 0,383646 | REMOTE_EXECUTION_BOTTLENECK | UNKNOWN | remoteExecution=2,717879 s | 7,068262 s | Dominant component=remoteExecution, localRatio=0,500365, remoteRatio=1,000000, secondary=UNKNOWN.
+task_044 | vehicle_044 | EDGE | PARTIAL_OFFLOADING | 0,600685 | 2,761497 s | 2,204000 s | 0,252948 | MIXED_LOCAL_REMOTE_BOTTLENECK | UNKNOWN | localExecution=2,696144 s | 6,229115 s | Local and remote branches are both close to the critical path; branchBalance=0,976334.
+task_040 | vehicle_040 | EDGE | PARTIAL_OFFLOADING | 0,580065 | 2,411867 s | 2,006000 s | 0,202326 | MIXED_LOCAL_REMOTE_BOTTLENECK | UNKNOWN | localExecution=2,411867 s | 12,335737 s | Local and remote branches are both close to the critical path; branchBalance=0,996798.
+task_036 | vehicle_036 | EDGE | PARTIAL_OFFLOADING | 0,639897 | 2,250485 s | 1,937000 s | 0,161841 | UPLOAD_BOTTLENECK | UNKNOWN | localExecution=1,898602 s | 12,312915 s | Dominant component=localExecution, localRatio=0,843641, remoteRatio=1,000000, secondary=UNKNOWN.
+
+Window 1 | snapshot=window_static_stress_001 | violated=11
+task | source | node | decision | p | completion | deadline | ratio | cause | secondary | dominant | coverage | note
+task_029 | vehicle_040 | CLOUD | PARTIAL_OFFLOADING | 0,579680 | 3,418414 s | 1,254000 s | 1,726008 | MIXED_LOCAL_REMOTE_BOTTLENECK | UNKNOWN | localExecution=3,377773 s | 300,000000 s | Local and remote branches are both close to the critical path; branchBalance=0,988111.
+task_009 | vehicle_019 | EDGE | PARTIAL_OFFLOADING | 0,708528 | 2,655642 s | 1,206000 s | 1,202025 | MIXED_LOCAL_REMOTE_BOTTLENECK | UNKNOWN | localExecution=2,612576 s | 94,119796 s | Local and remote branches are both close to the critical path; branchBalance=0,983783.
+task_039 | vehicle_050 | CLOUD | PARTIAL_OFFLOADING | 0,754133 | 2,329898 s | 1,201000 s | 0,939965 | UPLOAD_BOTTLENECK | UNKNOWN | localExecution=2,077337 s | 300,000000 s | Dominant component=localExecution, localRatio=0,891600, remoteRatio=1,000000, secondary=UNKNOWN.
+task_059 | vehicle_092 | EDGE | PARTIAL_OFFLOADING | 0,646688 | 2,624154 s | 1,618000 s | 0,621850 | MIXED_LOCAL_REMOTE_BOTTLENECK | UNKNOWN | localExecution=2,567553 s | 28,730717 s | Local and remote branches are both close to the critical path; branchBalance=0,978431.
+task_049 | vehicle_066 | EDGE | PARTIAL_OFFLOADING | 0,739789 | 2,470451 s | 1,818000 s | 0,358884 | MIXED_LOCAL_REMOTE_BOTTLENECK | UNKNOWN | localExecution=2,451812 s | 8,682981 s | Local and remote branches are both close to the critical path; branchBalance=0,992455.
+task_019 | vehicle_030 | CLOUD | PARTIAL_OFFLOADING | 0,545602 | 2,311507 s | 1,768000 s | 0,307414 | LOCAL_BRANCH_DOMINATES | UPLOAD_BOTTLENECK | localExecution=2,311507 s | 300,000000 s | Partial offloading is selected, but the local branch dominates the critical path.
+task_013 | vehicle_024 | VEHICLE | PARTIAL_OFFLOADING | 0,366126 | 3,081934 s | 2,934000 s | 0,050421 | MIXED_LOCAL_REMOTE_BOTTLENECK | UNKNOWN | localExecution=2,888280 s | 20,295960 s | Local and remote branches are both close to the critical path; branchBalance=0,937165.
+task_057 | vehicle_089 | VEHICLE | PARTIAL_OFFLOADING | 0,727578 | 3,731390 s | 3,631000 s | 0,027648 | REMOTE_EXECUTION_BOTTLENECK | UNKNOWN | remoteExecution=3,131052 s | 197,710154 s | Dominant component=remoteExecution, localRatio=0,205429, remoteRatio=1,000000, secondary=UNKNOWN.
+task_043 | vehicle_054 | EDGE | PARTIAL_OFFLOADING | 0,668976 | 2,465639 s | 2,402000 s | 0,026494 | REMOTE_EXECUTION_BOTTLENECK | UNKNOWN | remoteExecution=1,464557 s | 18,776098 s | Dominant component=remoteExecution, localRatio=0,505819, remoteRatio=1,000000, secondary=UNKNOWN.
+task_023 | vehicle_034 | CLOUD | PARTIAL_OFFLOADING | 0,579944 | 2,749479 s | 2,700000 s | 0,018325 | MIXED_LOCAL_REMOTE_BOTTLENECK | UNKNOWN | localExecution=2,749479 s | 300,000000 s | Local and remote branches are both close to the critical path; branchBalance=0,949852.
+
+Window 2 | snapshot=window_static_stress_002 | violated=14
+task | source | node | decision | p | completion | deadline | ratio | cause | secondary | dominant | coverage | note
+task_018 | vehicle_034 | CLOUD | PARTIAL_OFFLOADING | 0,549545 | 3,226656 s | 1,562000 s | 1,065721 | MIXED_LOCAL_REMOTE_BOTTLENECK | UNKNOWN | localExecution=3,177863 s | 300,000000 s | Local and remote branches are both close to the critical path; branchBalance=0,984878.
+task_048 | vehicle_070 | LOCAL | LOCAL_EXECUTION | 0,000000 | 4,048915 s | 2,016000 s | 1,008390 | LOCAL_EXECUTION_BOTTLENECK | UNKNOWN | localExecution=4,048915 s | 300,000000 s | Pure local execution is slower than the task deadline.
+task_058 | vehicle_090 | EDGE | PARTIAL_OFFLOADING | 0,544613 | 2,750415 s | 1,672000 s | 0,644985 | MIXED_LOCAL_REMOTE_BOTTLENECK | UNKNOWN | localExecution=2,707727 s | 17,574285 s | Local and remote branches are both close to the critical path; branchBalance=0,984480.
+task_002 | vehicle_013 | CLOUD | PARTIAL_OFFLOADING | 0,760754 | 2,911039 s | 1,903000 s | 0,529711 | MIXED_LOCAL_REMOTE_BOTTLENECK | UNKNOWN | localExecution=2,911039 s | 300,000000 s | Local and remote branches are both close to the critical path; branchBalance=0,946431.
+task_038 | vehicle_060 | EDGE | PARTIAL_OFFLOADING | 0,589013 | 2,874915 s | 2,053000 s | 0,400348 | MIXED_LOCAL_REMOTE_BOTTLENECK | UNKNOWN | localExecution=2,874915 s | 12,285357 s | Local and remote branches are both close to the critical path; branchBalance=0,943901.
+task_008 | vehicle_020 | EDGE | PARTIAL_OFFLOADING | 0,710161 | 2,510897 s | 1,803000 s | 0,392622 | MIXED_LOCAL_REMOTE_BOTTLENECK | UNKNOWN | localExecution=2,347904 s | 6,013768 s | Local and remote branches are both close to the critical path; branchBalance=0,935086.
+task_028 | vehicle_050 | EDGE | PARTIAL_OFFLOADING | 0,650971 | 2,885770 s | 2,074000 s | 0,391403 | MIXED_LOCAL_REMOTE_BOTTLENECK | UNKNOWN | localExecution=2,838970 s | 13,617501 s | Local and remote branches are both close to the critical path; branchBalance=0,983783.
+task_012 | vehicle_026 | CLOUD | PARTIAL_OFFLOADING | 0,810927 | 2,880837 s | 2,468000 s | 0,167276 | REMOTE_EXECUTION_BOTTLENECK | UNKNOWN | localExecution=2,311817 s | 300,000000 s | Dominant component=localExecution, localRatio=0,802481, remoteRatio=1,000000, secondary=UNKNOWN.
+task_034 | vehicle_056 | LOCAL | LOCAL_EXECUTION | 0,000000 | 2,144002 s | 1,853000 s | 0,157043 | LOCAL_EXECUTION_BOTTLENECK | UNKNOWN | localExecution=2,144002 s | 300,000000 s | Pure local execution is slower than the task deadline.
+task_014 | vehicle_029 | CLOUD | PARTIAL_OFFLOADING | 0,349625 | 2,799962 s | 2,618000 s | 0,069504 | MIXED_LOCAL_REMOTE_BOTTLENECK | UNKNOWN | localExecution=2,573974 s | 300,000000 s | Local and remote branches are both close to the critical path; branchBalance=0,919289.
+
+Window 3 | snapshot=window_static_stress_003 | violated=11
+task | source | node | decision | p | completion | deadline | ratio | cause | secondary | dominant | coverage | note
+task_007 | vehicle_012 | CLOUD | PARTIAL_OFFLOADING | 0,545490 | 3,479908 s | 1,272000 s | 1,735776 | MIXED_LOCAL_REMOTE_BOTTLENECK | UNKNOWN | localExecution=3,479908 s | 300,000000 s | Local and remote branches are both close to the critical path; branchBalance=0,999960.
+task_017 | vehicle_023 | CLOUD | PARTIAL_OFFLOADING | 0,727329 | 2,660531 s | 1,311000 s | 1,029391 | UPLOAD_BOTTLENECK | UNKNOWN | localExecution=2,369829 s | 300,000000 s | Dominant component=localExecution, localRatio=0,890735, remoteRatio=1,000000, secondary=UNKNOWN.
+task_037 | vehicle_070 | VEHICLE | PARTIAL_OFFLOADING | 0,349924 | 3,127372 s | 1,585000 s | 0,973105 | REMOTE_EXECUTION_BOTTLENECK | UNKNOWN | localExecution=2,761411 s | 170,596770 s | Dominant component=localExecution, localRatio=0,882981, remoteRatio=1,000000, secondary=UNKNOWN.
+task_027 | vehicle_044 | EDGE | PARTIAL_OFFLOADING | 0,755569 | 3,151742 s | 1,735000 s | 0,816566 | MIXED_LOCAL_REMOTE_BOTTLENECK | UNKNOWN | localExecution=2,989849 s | 8,971374 s | Local and remote branches are both close to the critical path; branchBalance=0,948634.
+task_013 | vehicle_019 | VEHICLE | PARTIAL_OFFLOADING | 0,531269 | 2,777851 s | 1,801000 s | 0,542393 | MIXED_LOCAL_REMOTE_BOTTLENECK | UNKNOWN | localExecution=2,777851 s | 19,205051 s | Local and remote branches are both close to the critical path; branchBalance=0,973934.
+task_047 | vehicle_080 | EDGE | PARTIAL_OFFLOADING | 0,491654 | 2,981103 s | 1,949000 s | 0,529555 | MIXED_LOCAL_REMOTE_BOTTLENECK | UNKNOWN | localExecution=2,830214 s | 20,262850 s | Local and remote branches are both close to the critical path; branchBalance=0,949385.
+task_057 | vehicle_090 | CLOUD | PARTIAL_OFFLOADING | 0,625616 | 2,256442 s | 2,015000 s | 0,119823 | UPLOAD_BOTTLENECK | UNKNOWN | localExecution=1,975486 s | 300,000000 s | Dominant component=localExecution, localRatio=0,875487, remoteRatio=1,000000, secondary=UNKNOWN.
+task_023 | vehicle_036 | EDGE | PARTIAL_OFFLOADING | 0,479959 | 2,625381 s | 2,524000 s | 0,040167 | MIXED_LOCAL_REMOTE_BOTTLENECK | UNKNOWN | localExecution=2,625381 s | 12,483747 s | Local and remote branches are both close to the critical path; branchBalance=0,986863.
+task_021 | vehicle_034 | EDGE | PARTIAL_OFFLOADING | 0,611467 | 2,902661 s | 2,814000 s | 0,031507 | REMOTE_EXECUTION_BOTTLENECK | UNKNOWN | localExecution=2,093722 s | 19,475953 s | Dominant component=localExecution, localRatio=0,721311, remoteRatio=1,000000, secondary=UNKNOWN.
+task_029 | vehicle_048 | VEHICLE | PARTIAL_OFFLOADING | 0,050000 | 2,704140 s | 2,683000 s | 0,007879 | MIXED_LOCAL_REMOTE_BOTTLENECK | UNKNOWN | localExecution=2,642335 s | 65,201074 s | Local and remote branches are both close to the critical path; branchBalance=0,977144.
+
+Window 4 | snapshot=window_static_stress_004 | violated=13
+task | source | node | decision | p | completion | deadline | ratio | cause | secondary | dominant | coverage | note
+task_056 | vehicle_096 | CLOUD | PARTIAL_OFFLOADING | 0,551406 | 4,187065 s | 1,397000 s | 1,997183 | MIXED_LOCAL_REMOTE_BOTTLENECK | UNKNOWN | localExecution=4,020806 s | 300,000000 s | Local and remote branches are both close to the critical path; branchBalance=0,960292.
+task_016 | vehicle_017 | EDGE | PARTIAL_OFFLOADING | 0,437097 | 3,429815 s | 1,435000 s | 1,390115 | MIXED_LOCAL_REMOTE_BOTTLENECK | UNKNOWN | localExecution=3,429815 s | 10,963041 s | Local and remote branches are both close to the critical path; branchBalance=0,990864.
+task_046 | vehicle_086 | VEHICLE | PARTIAL_OFFLOADING | 0,661492 | 3,956548 s | 1,729000 s | 1,288345 | REMOTE_EXECUTION_BOTTLENECK | UNKNOWN | localExecution=3,429556 s | 18,037507 s | Dominant component=localExecution, localRatio=0,866805, remoteRatio=1,000000, secondary=UNKNOWN.
+task_026 | vehicle_033 | EDGE | PARTIAL_OFFLOADING | 0,688597 | 3,659763 s | 1,978000 s | 0,850234 | MIXED_LOCAL_REMOTE_BOTTLENECK | UNKNOWN | localExecution=3,439611 s | 11,149716 s | Local and remote branches are both close to the critical path; branchBalance=0,939845.
+task_002 | vehicle_002 | EDGE | PARTIAL_OFFLOADING | 0,499545 | 3,246677 s | 1,844000 s | 0,760671 | MIXED_LOCAL_REMOTE_BOTTLENECK | UNKNOWN | localExecution=3,231957 s | 16,804922 s | Local and remote branches are both close to the critical path; branchBalance=0,995466.
+task_006 | vehicle_006 | EDGE | PARTIAL_OFFLOADING | 0,582334 | 3,546997 s | 2,064000 s | 0,718506 | REMOTE_EXECUTION_BOTTLENECK | UNKNOWN | localExecution=3,027998 s | 11,355978 s | Dominant component=localExecution, localRatio=0,853679, remoteRatio=1,000000, secondary=UNKNOWN.
+task_020 | vehicle_023 | EDGE | PARTIAL_OFFLOADING | 0,430408 | 3,158431 s | 2,070000 s | 0,525812 | MIXED_LOCAL_REMOTE_BOTTLENECK | UNKNOWN | localExecution=2,938068 s | 13,585073 s | Local and remote branches are both close to the critical path; branchBalance=0,930230.
+task_036 | vehicle_052 | EDGE | PARTIAL_OFFLOADING | 0,859539 | 2,596013 s | 1,921000 s | 0,351386 | UPLOAD_BOTTLENECK | UNKNOWN | localExecution=2,065980 s | 15,610824 s | Dominant component=localExecution, localRatio=0,795828, remoteRatio=1,000000, secondary=UNKNOWN.
+task_032 | vehicle_040 | CLOUD | PARTIAL_OFFLOADING | 0,573580 | 2,543823 s | 1,981000 s | 0,284110 | REMOTE_EXECUTION_BOTTLENECK | UNKNOWN | localExecution=1,938453 s | 300,000000 s | Dominant component=localExecution, localRatio=0,762024, remoteRatio=1,000000, secondary=UNKNOWN.
+task_050 | vehicle_090 | LOCAL | LOCAL_EXECUTION | 0,000000 | 3,579817 s | 2,819000 s | 0,269889 | LOCAL_EXECUTION_BOTTLENECK | UNKNOWN | localExecution=3,579817 s | 300,000000 s | Pure local execution is slower than the task deadline.
+
+Window 5 | snapshot=window_static_stress_005 | violated=12
+task | source | node | decision | p | completion | deadline | ratio | cause | secondary | dominant | coverage | note
+task_025 | vehicle_025 | EDGE | PARTIAL_OFFLOADING | 0,627276 | 3,561108 s | 1,835000 s | 0,940658 | REMOTE_EXECUTION_BOTTLENECK | UNKNOWN | localExecution=2,958606 s | 22,105196 s | Dominant component=localExecution, localRatio=0,830811, remoteRatio=1,000000, secondary=UNKNOWN.
+task_041 | vehicle_041 | VEHICLE | PARTIAL_OFFLOADING | 0,529964 | 3,915330 s | 2,057000 s | 0,903418 | MIXED_LOCAL_REMOTE_BOTTLENECK | UNKNOWN | localExecution=3,915330 s | 28,207454 s | Local and remote branches are both close to the critical path; branchBalance=0,938125.
+task_035 | vehicle_035 | LOCAL | LOCAL_EXECUTION | 0,000000 | 3,648466 s | 1,924000 s | 0,896292 | LOCAL_EXECUTION_BOTTLENECK | UNKNOWN | localExecution=3,648466 s | 300,000000 s | Pure local execution is slower than the task deadline.
+task_015 | vehicle_015 | CLOUD | PARTIAL_OFFLOADING | 0,600310 | 2,356271 s | 1,252000 s | 0,882006 | MIXED_LOCAL_REMOTE_BOTTLENECK | UNKNOWN | localExecution=2,356271 s | 300,000000 s | Local and remote branches are both close to the critical path; branchBalance=0,992530.
+task_005 | vehicle_005 | CLOUD | PARTIAL_OFFLOADING | 0,483346 | 3,530498 s | 1,879000 s | 0,878924 | UPLOAD_BOTTLENECK | UNKNOWN | localExecution=2,937726 s | 300,000000 s | Dominant component=localExecution, localRatio=0,832100, remoteRatio=1,000000, secondary=UNKNOWN.
+task_055 | vehicle_095 | EDGE | PARTIAL_OFFLOADING | 0,695465 | 2,336568 s | 1,736000 s | 0,345949 | MIXED_LOCAL_REMOTE_BOTTLENECK | UNKNOWN | localExecution=2,336568 s | 82,196470 s | Local and remote branches are both close to the critical path; branchBalance=0,985545.
+task_045 | vehicle_050 | EDGE | PARTIAL_OFFLOADING | 0,726265 | 2,283252 s | 1,779000 s | 0,283447 | REMOTE_EXECUTION_BOTTLENECK | UNKNOWN | localExecution=1,672563 s | 28,622837 s | Dominant component=localExecution, localRatio=0,732535, remoteRatio=1,000000, secondary=UNKNOWN.
+task_039 | vehicle_039 | EDGE | PARTIAL_OFFLOADING | 0,797600 | 3,661423 s | 3,029000 s | 0,208790 | REMOTE_EXECUTION_BOTTLENECK | UNKNOWN | localExecution=2,634962 s | 12,828061 s | Dominant component=localExecution, localRatio=0,719655, remoteRatio=1,000000, secondary=UNKNOWN.
+task_011 | vehicle_011 | CLOUD | PARTIAL_OFFLOADING | 0,677040 | 2,383417 s | 2,010000 s | 0,185780 | UPLOAD_BOTTLENECK | UNKNOWN | localExecution=2,057743 s | 300,000000 s | Dominant component=localExecution, localRatio=0,863358, remoteRatio=1,000000, secondary=UNKNOWN.
+task_009 | vehicle_009 | EDGE | PARTIAL_OFFLOADING | 0,552791 | 2,561499 s | 2,190000 s | 0,169634 | COVERAGE_INSUFFICIENT | UPLOAD_BOTTLENECK | localExecution=2,561499 s | 2,483115 s | Remote candidate has insufficient coverage; prefilter or mobility-aware repair should remove it.
+
+Window 6 | snapshot=window_static_stress_006 | violated=14
+task | source | node | decision | p | completion | deadline | ratio | cause | secondary | dominant | coverage | note
+task_044 | vehicle_052 | EDGE | PARTIAL_OFFLOADING | 0,753252 | 3,665386 s | 1,315000 s | 1,787366 | MIXED_LOCAL_REMOTE_BOTTLENECK | UNKNOWN | localExecution=3,665386 s | 6,503680 s | Local and remote branches are both close to the critical path; branchBalance=0,996334.
+task_024 | vehicle_032 | EDGE | PARTIAL_OFFLOADING | 0,627168 | 2,828977 s | 1,257000 s | 1,250578 | MIXED_LOCAL_REMOTE_BOTTLENECK | UNKNOWN | localExecution=2,648581 s | 12,924428 s | Local and remote branches are both close to the critical path; branchBalance=0,936233.
+task_014 | vehicle_021 | VEHICLE | PARTIAL_OFFLOADING | 0,313926 | 2,897587 s | 1,480000 s | 0,957829 | REMOTE_EXECUTION_BOTTLENECK | UNKNOWN | localExecution=2,467574 s | 59,634540 s | Dominant component=localExecution, localRatio=0,851596, remoteRatio=1,000000, secondary=UNKNOWN.
+task_054 | vehicle_089 | CLOUD | PARTIAL_OFFLOADING | 0,585924 | 3,092542 s | 1,811000 s | 0,707643 | REMOTE_EXECUTION_BOTTLENECK | UNKNOWN | localExecution=2,723839 s | 300,000000 s | Dominant component=localExecution, localRatio=0,880777, remoteRatio=1,000000, secondary=UNKNOWN.
+task_034 | vehicle_042 | VEHICLE | PARTIAL_OFFLOADING | 0,266536 | 2,638491 s | 1,569000 s | 0,681639 | LOCAL_BRANCH_DOMINATES | REMOTE_EXECUTION_BOTTLENECK | localExecution=2,638491 s | 19,298765 s | Partial offloading is selected, but the local branch dominates the critical path.
+task_028 | vehicle_036 | EDGE | PARTIAL_OFFLOADING | 0,566870 | 2,983614 s | 1,825000 s | 0,634857 | REMOTE_EXECUTION_BOTTLENECK | UNKNOWN | localExecution=2,603274 s | 6,833698 s | Dominant component=localExecution, localRatio=0,872524, remoteRatio=1,000000, secondary=UNKNOWN.
+task_004 | vehicle_005 | EDGE | PARTIAL_OFFLOADING | 0,656695 | 2,961185 s | 2,031000 s | 0,457993 | REMOTE_EXECUTION_BOTTLENECK | UNKNOWN | localExecution=2,003732 s | 12,591670 s | Dominant component=localExecution, localRatio=0,676666, remoteRatio=1,000000, secondary=UNKNOWN.
+task_008 | vehicle_013 | CLOUD | PARTIAL_OFFLOADING | 0,846702 | 2,842572 s | 2,050000 s | 0,386621 | UPLOAD_BOTTLENECK | UNKNOWN | localExecution=1,650066 s | 300,000000 s | Dominant component=localExecution, localRatio=0,580484, remoteRatio=1,000000, secondary=UNKNOWN.
+task_050 | vehicle_058 | CLOUD | PARTIAL_OFFLOADING | 0,669751 | 2,211835 s | 2,030000 s | 0,089574 | REMOTE_EXECUTION_BOTTLENECK | UNKNOWN | localExecution=1,957068 s | 300,000000 s | Dominant component=localExecution, localRatio=0,884817, remoteRatio=1,000000, secondary=UNKNOWN.
+task_040 | vehicle_048 | CLOUD | PARTIAL_OFFLOADING | 0,496724 | 2,528862 s | 2,360000 s | 0,071551 | MIXED_LOCAL_REMOTE_BOTTLENECK | UNKNOWN | localExecution=2,528862 s | 300,000000 s | Local and remote branches are both close to the critical path; branchBalance=0,942352.
+
+Window 7 | snapshot=window_static_stress_007 | violated=11
+task | source | node | decision | p | completion | deadline | ratio | cause | secondary | dominant | coverage | note
+task_023 | vehicle_029 | VEHICLE | PARTIAL_OFFLOADING | 0,506166 | 3,892657 s | 1,420000 s | 1,741308 | MIXED_LOCAL_REMOTE_BOTTLENECK | UNKNOWN | localExecution=3,892657 s | 52,401687 s | Local and remote branches are both close to the critical path; branchBalance=0,919890.
+task_033 | vehicle_052 | CLOUD | PARTIAL_OFFLOADING | 0,802318 | 3,194622 s | 1,238000 s | 1,580470 | MIXED_LOCAL_REMOTE_BOTTLENECK | UNKNOWN | localExecution=3,001309 s | 300,000000 s | Local and remote branches are both close to the critical path; branchBalance=0,939488.
+task_003 | vehicle_004 | EDGE | PARTIAL_OFFLOADING | 0,553021 | 3,075502 s | 1,295000 s | 1,374905 | MIXED_LOCAL_REMOTE_BOTTLENECK | UNKNOWN | localExecution=3,063375 s | 23,776422 s | Local and remote branches are both close to the critical path; branchBalance=0,996057.
+task_053 | vehicle_085 | EDGE | PARTIAL_OFFLOADING | 0,785374 | 2,741920 s | 1,430000 s | 0,917426 | REMOTE_EXECUTION_BOTTLENECK | UNKNOWN | localExecution=2,003900 s | 14,353115 s | Dominant component=localExecution, localRatio=0,730838, remoteRatio=1,000000, secondary=UNKNOWN.
+task_039 | vehicle_058 | CLOUD | PARTIAL_OFFLOADING | 0,270051 | 3,544963 s | 2,159000 s | 0,641947 | MIXED_LOCAL_REMOTE_BOTTLENECK | UNKNOWN | localExecution=3,340559 s | 300,000000 s | Local and remote branches are both close to the critical path; branchBalance=0,942340.
+task_013 | vehicle_016 | CLOUD | PARTIAL_OFFLOADING | 0,556560 | 2,053836 s | 1,398000 s | 0,469125 | MIXED_LOCAL_REMOTE_BOTTLENECK | UNKNOWN | localExecution=1,986749 s | 300,000000 s | Local and remote branches are both close to the critical path; branchBalance=0,967336.
+task_043 | vehicle_062 | EDGE | PARTIAL_OFFLOADING | 0,540945 | 2,802888 s | 2,061000 s | 0,359965 | MIXED_LOCAL_REMOTE_BOTTLENECK | UNKNOWN | localExecution=2,802888 s | 5,771151 s | Local and remote branches are both close to the critical path; branchBalance=0,985487.
+task_019 | vehicle_025 | VEHICLE | PARTIAL_OFFLOADING | 0,304698 | 4,011817 s | 2,964000 s | 0,353515 | LOCAL_BRANCH_DOMINATES | REMOTE_EXECUTION_BOTTLENECK | localExecution=4,011817 s | 21,424253 s | Partial offloading is selected, but the local branch dominates the critical path.
+task_009 | vehicle_012 | VEHICLE | PARTIAL_OFFLOADING | 0,294711 | 3,491094 s | 2,748000 s | 0,270413 | MIXED_LOCAL_REMOTE_BOTTLENECK | UNKNOWN | localExecution=3,491094 s | 17,212473 s | Local and remote branches are both close to the critical path; branchBalance=0,999743.
+task_037 | vehicle_056 | LOCAL | LOCAL_EXECUTION | 0,000000 | 1,983513 s | 1,905000 s | 0,041214 | LOCAL_EXECUTION_BOTTLENECK | UNKNOWN | localExecution=1,983513 s | 300,000000 s | Pure local execution is slower than the task deadline.
+
+------------------------------------------------------------
+7. COVERAGE PROBLEM SUMMARY
+------------------------------------------------------------
+idx | insufficient | worstTask | node | completion | coverage | cause
+0 | 0 | none | - | - | - | -
+1 | 0 | none | - | - | - | -
+2 | 0 | none | - | - | - | -
+3 | 0 | none | - | - | - | -
+4 | 0 | none | - | - | - | -
+5 | 1 | task_009 | EDGE | 2,561499 s | 2,483115 s | COVERAGE_INSUFFICIENT
+6 | 0 | none | - | - | - | -
+7 | 0 | none | - | - | - | -
+
+------------------------------------------------------------
+8. RESOURCE PRESSURE SUMMARY
+------------------------------------------------------------
+idx | CPUviol | CPUsat | worstCpuNode | worstCpu% | BWviol | BWsat | worstBwLink | worstBw%
+0 | 0 | 3 | edge_center_1 | 100,000000% | 0 | 7 | vehicle_090_v2v_r2_for_vehicle_030 | 100,000000%
+1 | 0 | 3 | edge_center_1 | 100,000000% | 0 | 4 | cloud_001_for_vehicle_030 | 100,000000%
+2 | 0 | 5 | edge_east_2 | 100,000000% | 0 | 4 | edge_west_r2_for_vehicle_020 | 100,000000%
+3 | 0 | 5 | vehicle_049 | 100,000000% | 0 | 2 | cloud_001_for_vehicle_090 | 100,000000%
+4 | 0 | 6 | edge_center_2 | 100,000000% | 0 | 3 | vehicle_077_v2v_r2_for_vehicle_086 | 100,000000%
+5 | 0 | 4 | edge_east_1 | 100,000000% | 0 | 4 | edge_center_1_r1_for_vehicle_087 | 100,000000%
+6 | 0 | 7 | edge_center_1 | 100,000000% | 0 | 10 | edge_east_2_r1_for_vehicle_036 | 100,000000%
+7 | 0 | 5 | vehicle_038 | 100,000000% | 0 | 6 | vehicle_085_v2v_r1_for_vehicle_027 | 100,000000%
+
+------------------------------------------------------------
+9. WORST WINDOWS
+------------------------------------------------------------
+Worst by final fitness:
+- idx=4 J=27,832269 Pres=170,731228 violated=13 coverage=0 reuse=PARTIAL_RESTART
+- idx=7 J=25,584042 Pres=155,144883 violated=11 coverage=0 reuse=PARTIAL_RESTART
+- idx=6 J=23,745100 Pres=142,567710 violated=14 coverage=0 reuse=PARTIAL_RESTART
+- idx=0 J=22,972500 Pres=138,219013 violated=15 coverage=0 reuse=FIRST_RUN
+- idx=3 J=19,707211 Pres=116,557954 violated=11 coverage=0 reuse=PARTIAL_RESTART
+- idx=5 J=19,453178 Pres=115,707288 violated=12 coverage=1 reuse=PARTIAL_RESTART
+- idx=1 J=17,992538 Pres=105,635911 violated=11 coverage=0 reuse=PARTIAL_RESTART
+- idx=2 J=16,777910 Pres=97,640815 violated=14 coverage=0 reuse=PARTIAL_RESTART
+Worst by deadline violations:
+- idx=0 violated=15 rate=25,000000% J=22,972500 mainCause=MIXED_LOCAL_REMOTE_BOTTLENECK
+- idx=2 violated=14 rate=23,333333% J=16,777910 mainCause=MIXED_LOCAL_REMOTE_BOTTLENECK
+- idx=6 violated=14 rate=23,333333% J=23,745100 mainCause=REMOTE_EXECUTION_BOTTLENECK
+- idx=4 violated=13 rate=21,666667% J=27,832269 mainCause=MIXED_LOCAL_REMOTE_BOTTLENECK
+- idx=5 violated=12 rate=20,000000% J=19,453178 mainCause=REMOTE_EXECUTION_BOTTLENECK
+- idx=1 violated=11 rate=18,333333% J=17,992538 mainCause=MIXED_LOCAL_REMOTE_BOTTLENECK
+- idx=3 violated=11 rate=18,333333% J=19,707211 mainCause=MIXED_LOCAL_REMOTE_BOTTLENECK
+- idx=7 violated=11 rate=18,333333% J=25,584042 mainCause=MIXED_LOCAL_REMOTE_BOTTLENECK
+Worst by coverage problems:
+- idx=5 coverageInsufficient=1 violated=12 J=19,453178
+- idx=0 coverageInsufficient=0 violated=15 J=22,972500
+- idx=1 coverageInsufficient=0 violated=11 J=17,992538
+- idx=2 coverageInsufficient=0 violated=14 J=16,777910
+- idx=3 coverageInsufficient=0 violated=11 J=19,707211
+- idx=4 coverageInsufficient=0 violated=13 J=27,832269
+- idx=6 coverageInsufficient=0 violated=14 J=23,745100
+- idx=7 coverageInsufficient=0 violated=11 J=25,584042
+
+------------------------------------------------------------
+10. DIAGNOSIS
+------------------------------------------------------------
+- CPU aggregate repair appears effective: no CPU violations were observed.
+- Bandwidth repair can remain OpenIssue for now: no bandwidth violations were observed.
+- Deadline violations remain the main problem.
+- Use sections 5 and 6 to identify whether the dominant cause is local execution, upload, remote execution, latency, mixed execution, or coverage.
+- Some deadline violations are primarily caused by insufficient coverage.
+- This supports introducing a candidate prefilter/repair for remote candidates with bad coverage.
+
+------------------------------------------------------------
+CANDIDATE PREFILTER SUMMARY
+------------------------------------------------------------
+idx | snapshot | original | filtered | removed | reasons
+0 | window_static_stress_000 | 598 | 357 | 241 | KEPT=357, NO_TASK_FOR_SOURCE=198, INSUFFICIENT_COVERAGE=37, DEADLINE_LOWER_BOUND_TOO_HIGH=6
+1 | window_static_stress_001 | 598 | 347 | 251 | KEPT=347, NO_TASK_FOR_SOURCE=198, INSUFFICIENT_COVERAGE=44, DEADLINE_LOWER_BOUND_TOO_HIGH=9
+2 | window_static_stress_002 | 597 | 357 | 240 | KEPT=357, NO_TASK_FOR_SOURCE=197, INSUFFICIENT_COVERAGE=40, DEADLINE_LOWER_BOUND_TOO_HIGH=3
+3 | window_static_stress_003 | 600 | 346 | 254 | KEPT=346, NO_TASK_FOR_SOURCE=200, INSUFFICIENT_COVERAGE=48, DEADLINE_LOWER_BOUND_TOO_HIGH=6
+4 | window_static_stress_004 | 600 | 353 | 247 | KEPT=353, NO_TASK_FOR_SOURCE=200, INSUFFICIENT_COVERAGE=41, DEADLINE_LOWER_BOUND_TOO_HIGH=6
+5 | window_static_stress_005 | 600 | 361 | 239 | KEPT=361, NO_TASK_FOR_SOURCE=200, INSUFFICIENT_COVERAGE=35, DEADLINE_LOWER_BOUND_TOO_HIGH=4
+6 | window_static_stress_006 | 599 | 359 | 240 | KEPT=359, NO_TASK_FOR_SOURCE=199, INSUFFICIENT_COVERAGE=36, DEADLINE_LOWER_BOUND_TOO_HIGH=5
+7 | window_static_stress_007 | 600 | 341 | 259 | KEPT=341, NO_TASK_FOR_SOURCE=200, INSUFFICIENT_COVERAGE=52, DEADLINE_LOWER_BOUND_TOO_HIGH=7
+
+
+Process finished with exit code 0

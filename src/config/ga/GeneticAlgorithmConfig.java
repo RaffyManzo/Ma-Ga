@@ -93,7 +93,7 @@ public final class GeneticAlgorithmConfig {
                 2,        // elitismCount
                 15,       // stallGenerations
                 1.0E-6,   // fitnessImprovementEpsilon
-                73827L       // randomSeed
+                5L       // randomSeed
         );
     }
 
