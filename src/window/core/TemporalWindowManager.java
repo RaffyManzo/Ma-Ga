@@ -9,6 +9,8 @@ import window.dynamicity.DynamicityBreakdown;
 import window.dynamicity.DynamicityEvaluator;
 import window.event.CriticalEventDetector;
 import window.population.PopulationAdapter;
+import window.population.PopulationReuseDecision;
+import window.population.PopulationReuseDecisionPolicy;
 import window.population.PopulationReuseMode;
 import window.provider.SystemStateProvider;
 import window.state.TemporalStepResult;
@@ -22,20 +24,23 @@ import java.util.Objects;
 /**
  * Orchestratore del ciclo temporale del MA-GA.
  *
- * Coordina trigger, raccolta snapshot, dinamicità, riuso popolazione ed
- * esecuzione del MA-GA.
+ * <p>Coordina trigger, raccolta snapshot, dinamicità, riuso popolazione ed
+ * esecuzione del MA-GA.</p>
+ *
+ * <p>Nota metodologica: la dinamicità resta calcolata da
+ * {@link DynamicityEvaluator}. La modalità finale di riuso viene però filtrata
+ * da {@link PopulationReuseDecisionPolicy}, così il sistema non resta bloccato
+ * su {@code PARTIAL_RESTART} quando i report suggeriscono warm/cold start.</p>
  */
 public final class TemporalWindowManager {
 
     private final TemporalWindowConfig windowConfig;
     private final MaGaOptimizer optimizer;
-
     private final DynamicityEvaluator dynamicityEvaluator;
     private final PopulationAdapter populationAdapter;
-
+    private final PopulationReuseDecisionPolicy reuseDecisionPolicy;
     private final CriticalEventDetector criticalEventDetector;
     private final SystemStateProvider systemStateProvider;
-
     private final int targetPopulationSize;
 
     /**
@@ -62,27 +67,22 @@ public final class TemporalWindowManager {
                 windowConfig,
                 "windowConfig must not be null."
         );
-
         this.optimizer = Objects.requireNonNull(
                 optimizer,
                 "optimizer must not be null."
         );
-
         this.dynamicityEvaluator = Objects.requireNonNull(
                 dynamicityEvaluator,
                 "dynamicityEvaluator must not be null."
         );
-
         this.populationAdapter = Objects.requireNonNull(
                 populationAdapter,
                 "populationAdapter must not be null."
         );
-
         this.criticalEventDetector = Objects.requireNonNull(
                 criticalEventDetector,
                 "criticalEventDetector must not be null."
         );
-
         this.systemStateProvider = Objects.requireNonNull(
                 systemStateProvider,
                 "systemStateProvider must not be null."
@@ -93,6 +93,7 @@ public final class TemporalWindowManager {
         }
 
         this.targetPopulationSize = targetPopulationSize;
+        this.reuseDecisionPolicy = new PopulationReuseDecisionPolicy(this.windowConfig);
     }
 
     /**
@@ -143,13 +144,10 @@ public final class TemporalWindowManager {
      * @param state stato corrente del gestore
      * @return risultato dello step, oppure null se non esiste snapshot osservabile
      */
-    public TemporalStepResult executeNextStepOrNull(
-            TemporalWindowState state
-    ) {
+    public TemporalStepResult executeNextStepOrNull(TemporalWindowState state) {
         Objects.requireNonNull(state, "state must not be null.");
 
         ReoptimizationTrigger trigger = resolveTrigger(state);
-
         double observationTimeSeconds = computeObservationTime(trigger);
 
         SystemSnapshot currentSnapshot = systemStateProvider
@@ -160,28 +158,31 @@ public final class TemporalWindowManager {
             return null;
         }
 
-        DynamicityBreakdown dynamicityBreakdown =
-                dynamicityEvaluator.evaluate(
-                        state.getLastSnapshot(),
-                        currentSnapshot
-                );
+        DynamicityBreakdown dynamicityBreakdown = dynamicityEvaluator.evaluate(
+                state.getLastSnapshot(),
+                currentSnapshot
+        );
 
-        PopulationReuseMode reuseMode =
-                dynamicityBreakdown.getSuggestedReuseMode();
+        PopulationReuseDecision reuseDecision = reuseDecisionPolicy.decide(
+                dynamicityBreakdown,
+                state.getLastResult(),
+                state.hasReusablePopulation(),
+                trigger.isCriticalEventTrigger()
+        );
 
-        List<Chromosome> initialPopulation =
-                populationAdapter.adaptPopulation(
-                        state.getLastFinalPopulation(),
-                        currentSnapshot,
-                        reuseMode,
-                        targetPopulationSize
-                );
+        PopulationReuseMode reuseMode = reuseDecision.getAppliedReuseMode();
 
-        MaGaResult maGaResult =
-                optimizer.optimizeDetailed(
-                        currentSnapshot,
-                        initialPopulation
-                );
+        List<Chromosome> initialPopulation = populationAdapter.adaptPopulation(
+                state.getLastFinalPopulation(),
+                currentSnapshot,
+                reuseMode,
+                targetPopulationSize
+        );
+
+        MaGaResult maGaResult = optimizer.optimizeDetailed(
+                currentSnapshot,
+                initialPopulation
+        );
 
         return new TemporalStepResult(
                 state.getWindowIndex(),
@@ -193,16 +194,15 @@ public final class TemporalWindowManager {
                 reuseMode,
                 initialPopulation.size(),
                 maGaResult.getFinalPopulation().size(),
-                maGaResult
+                maGaResult,
+                reuseDecision
         );
     }
 
     /**
      * Determina il trigger della prossima riesecuzione.
      */
-    private ReoptimizationTrigger resolveTrigger(
-            TemporalWindowState state
-    ) {
+    private ReoptimizationTrigger resolveTrigger(TemporalWindowState state) {
         if (!state.hasPreviousExecution()) {
             return ReoptimizationTrigger.firstRun(
                     state.getCurrentTimeSeconds()
@@ -213,15 +213,10 @@ public final class TemporalWindowManager {
         double scheduledTimeSeconds = state.getNextScheduledTimeSeconds();
 
         return criticalEventDetector
-                .findNextCriticalEvent(
-                        currentTimeSeconds,
-                        scheduledTimeSeconds
-                )
+                .findNextCriticalEvent(currentTimeSeconds, scheduledTimeSeconds)
                 .map(ReoptimizationTrigger::criticalEvent)
                 .orElseGet(
-                        () -> ReoptimizationTrigger.scheduledExpiration(
-                                scheduledTimeSeconds
-                        )
+                        () -> ReoptimizationTrigger.scheduledExpiration(scheduledTimeSeconds)
                 );
     }
 
