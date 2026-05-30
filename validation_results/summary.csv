@@ -1,6 +1,0 @@
-scenario,seed,file,deadline_violations,deadline_violation_rate_percent,best_final_fitness,task_evaluations,coverage_insufficient,cpu_violations,bandwidth_violations,cpu_saturated,bandwidth_saturated,cause_coverage_insufficient,cause_local_branch_dominates,cause_local_execution_bottleneck,cause_mixed_local_remote_bottleneck,cause_remote_branch_dominates,cause_remote_execution_bottleneck,cause_upload_bottleneck,critical_event_windows,executed_windows,population_reuse_windows
-baseline,001,baseline\seed_001.txt,101,21.041667,16.77791,480,1,0,0,38,40,1,6,8,49,0,23,14,0,8,7
-baseline,002,baseline\seed_002.txt,103,21.458333,14.174066,480,1,0,0,42,52,1,4,11,49,0,20,18,0,8,7
-baseline,003,baseline\seed_003.txt,108,22.5,18.197022,480,2,0,0,36,45,1,5,13,43,0,19,27,0,8,7
-baseline,004,baseline\seed_004.txt,95,19.791667,14.902949,480,0,0,0,42,51,0,7,7,44,0,21,16,0,8,7
-baseline,005,baseline\seed_005.txt,104,21.666667,14.603267,480,2,0,0,40,52,1,7,7,44,0,25,20,0,8,7
