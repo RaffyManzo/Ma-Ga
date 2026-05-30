@@ -3,7 +3,11 @@ package app;
 import io.snapshot.SnapshotPaths;
 
 /**
- * Alias compatibile con il main usato nei test della finestra adattiva.
+ * Entry point compatibile per l'esecuzione della finestra adattiva.
+ *
+ * <p>Normalizza gli argomenti storici e delega a
+ * {@link AdaptiveWindowSourceMain}, che contiene la configurazione completa
+ * della sorgente dati e dei printer diagnostici.</p>
  */
 public final class AdaptiveWindowMain {
 

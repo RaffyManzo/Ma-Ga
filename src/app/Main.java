@@ -14,25 +14,22 @@ import validation.snapshot.SnapshotValidator;
 /**
  * Punto di ingresso del prototipo Java standalone del MA-GA.
  *
- * Questa versione integra SnapshotValidator.
+ * <p>Flusso di esecuzione:</p>
  *
- * Flusso:
- *
- * 1. carica lo snapshot JSON;
- * 2. valida lo snapshot;
- * 3. crea la configurazione MA-GA;
- * 4. esegue optimizeDetailed();
- * 5. stampa il report tecnico.
+ * <ol>
+ *     <li>carica uno snapshot JSON;</li>
+ *     <li>valida lo scenario;</li>
+ *     <li>costruisce la configurazione MA-GA;</li>
+ *     <li>esegue l'ottimizzazione dettagliata;</li>
+ *     <li>stampa il report diagnostico di stress.</li>
+ * </ol>
  */
 public final class Main {
 
     /**
      * Avvia il prototipo.
      *
-     * Parametri in ingresso:
-     * - args[0], opzionale: percorso dello snapshot da eseguire.
-     *
-     * Se args[0] non viene fornito, usa uno snapshot di test di default.
+     * @param args opzionalmente, in posizione 0, il percorso dello snapshot
      */
     public static void main(String[] args) throws Exception {
         String snapshotPath = args.length > 0
@@ -50,12 +47,6 @@ public final class Main {
         );
         MaGaOptimizer optimizer = new MaGaOptimizer(config);
         MaGaResult result = optimizer.optimizeDetailed(snapshot);
-
-        //  resultPrinter = new ResultPrinter(config);
-        // resultPrinter.printOptimizationResult(snapshot, result);
-
-
-
 
         StressResultPrinter resultPrinter = new StressResultPrinter(config);
         resultPrinter.printStressReport(snapshot, result);

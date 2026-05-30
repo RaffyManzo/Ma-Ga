@@ -24,8 +24,8 @@ import java.util.Objects;
 /**
  * Stampa un report tecnico leggibile del risultato prodotto dal MA-GA.
  *
- * Questa classe non ricalcola la fitness.
- * Legge solo i dati già calcolati da FitnessEvaluator e raccolti in MaGaResult.
+ * <p>La classe non ricalcola la fitness: legge i dati già prodotti da
+ * {@link FitnessEvaluator} e raccolti in {@link MaGaResult}.</p>
  */
 public final class ResultPrinter {
 
@@ -37,11 +37,7 @@ public final class ResultPrinter {
     /**
      * Costruisce il printer usando System.out.
      *
-     * Parametri in ingresso:
-     * - config: configurazione usata dal MA-GA.
-     *
-     * Output:
-     * - nuovo ResultPrinter.
+     * @param config configurazione usata dal MA-GA
      */
     public ResultPrinter(MaGaConfig config) {
         this(config, System.out);
@@ -50,12 +46,8 @@ public final class ResultPrinter {
     /**
      * Costruisce il printer usando uno stream personalizzato.
      *
-     * Parametri in ingresso:
-     * - config: configurazione usata dal MA-GA;
-     * - out: stream di stampa.
-     *
-     * Output:
-     * - nuovo ResultPrinter.
+     * @param config configurazione usata dal MA-GA
+     * @param out stream di stampa
      */
     public ResultPrinter(MaGaConfig config, PrintStream out) {
         this.config = Objects.requireNonNull(config, "config must not be null.");
@@ -65,13 +57,8 @@ public final class ResultPrinter {
     /**
      * Stampa il report completo.
      *
-     * Parametri in ingresso:
-     * - snapshot: snapshot usato come input;
-     * - result: risultato completo prodotto da MaGaOptimizer.
-     *
-     * Output:
-     * - nessun valore restituito;
-     * - stampa il report.
+     * @param snapshot snapshot usato come input
+     * @param result risultato completo prodotto da MaGaOptimizer
      */
     public void printOptimizationResult(SystemSnapshot snapshot, MaGaResult result) {
         Objects.requireNonNull(snapshot, "snapshot must not be null.");
@@ -492,5 +479,4 @@ public final class ResultPrinter {
         return format(value) + " s";
     }
 }
-
 

@@ -1,5 +1,11 @@
 package model.snapshot;
 
+/**
+ * Task computazionale generato da un veicolo sorgente.
+ *
+ * <p>Il task descrive il carico da decidere nel cromosoma: dati da trasferire,
+ * cicli CPU richiesti e deadline massima ammessa.</p>
+ */
 public class TaskInstance {
 
     private String taskId;
@@ -12,6 +18,16 @@ public class TaskInstance {
     public TaskInstance() {
     }
 
+    /**
+     * Crea un task computazionale.
+     *
+     * @param taskId identificativo del task
+     * @param sourceVehicleId veicolo che genera il task
+     * @param inputSizeBits dimensione dell'input da trasferire
+     * @param outputSizeBits dimensione dell'output prodotto
+     * @param cpuCycles cicli CPU richiesti
+     * @param deadlineSeconds deadline massima in secondi
+     */
     public TaskInstance(
             String taskId,
             String sourceVehicleId,

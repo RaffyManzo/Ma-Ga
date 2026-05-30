@@ -1,5 +1,11 @@
 package model.snapshot;
 
+/**
+ * Stato sintetico di un veicolo nello snapshot.
+ *
+ * <p>La posizione e la velocità alimentano le stime di copertura, mentre
+ * {@code localCpu} rappresenta la capacità disponibile per esecuzione locale.</p>
+ */
 public class VehicleSnapshot {
 
     private String vehicleId;
@@ -11,6 +17,15 @@ public class VehicleSnapshot {
     public VehicleSnapshot() {
     }
 
+    /**
+     * Crea lo stato di un veicolo.
+     *
+     * @param vehicleId identificativo del veicolo
+     * @param x coordinata X
+     * @param y coordinata Y
+     * @param speed velocità scalare
+     * @param localCpu CPU locale disponibile
+     */
     public VehicleSnapshot(
             String vehicleId,
             double x,

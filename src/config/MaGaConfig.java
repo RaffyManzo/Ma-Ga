@@ -15,17 +15,10 @@ import java.util.Objects;
 /**
  * Configurazione complessiva del Mobility-Aware Genetic Algorithm.
  *
- * Aggrega:
- * - pesi della fitness;
- * - penalità;
- * - normalizzazione;
- * - configurazione GA di base;
- * - configurazione di mobilità;
- * - modalità di scaling dei parametri GA.
- *
- * Il main deve scegliere solo la modalità di scaling.
- * Il calcolo della GeneticAlgorithmConfig effettiva viene risolto
- * internamente quando è disponibile lo snapshot.
+ * <p>Aggrega pesi della fitness, penalità, normalizzazione, configurazione GA,
+ * parametri di mobilità e modalità di scaling. I main normalmente scelgono solo
+ * la modalità di scaling; la configurazione GA effettiva viene risolta quando
+ * è disponibile lo snapshot.</p>
  */
 public final class MaGaConfig {
 
@@ -39,9 +32,7 @@ public final class MaGaConfig {
     private final GaParameterScaler gaParameterScaler;
 
     /**
-     * Costruttore compatibile con la versione precedente.
-     *
-     * Usa modalità STATIC.
+     * Overload storico in modalità {@link GaParameterScalingMode#STATIC}.
      */
     public MaGaConfig(
             FitnessWeights fitnessWeights,
@@ -60,9 +51,8 @@ public final class MaGaConfig {
     }
 
     /**
-     * Costruttore con configurazione di mobilità.
-     *
-     * Usa modalità STATIC.
+     * Overload con configurazione di mobilità esplicita in modalità
+     * {@link GaParameterScalingMode#STATIC}.
      */
     public MaGaConfig(
             FitnessWeights fitnessWeights,

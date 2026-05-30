@@ -157,7 +157,8 @@ public final class TemporalStepResult {
     }
 
     /**
-     * Costruttore compatibile con la versione precedente.
+     * Costruttore semplificato per chiamanti che non producono ancora decisioni
+     * adattive complete.
      */
     public TemporalStepResult(
             int windowIndex,
