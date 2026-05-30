@@ -34,17 +34,21 @@ import java.util.Random;
 /**
  * Main dedicato alla finestra adattiva con sorgente dati astratta.
  *
- * <p>Modalità supportate per ora:</p>
+ * <p>Questo entry point compone il ciclo temporale completo: caricamento degli
+ * snapshot, prefiltraggio candidati, costruzione del manager temporale,
+ * esecuzione e stampa dei report diagnostici.</p>
+ *
+ * <p>Modalità supportate:</p>
  *
  * <pre>
  * JSON_SEQUENCE  data/realistic_scenarios/urban_realistic_dynamic_calibrated  8
  * JSON_TIME      data/realistic_scenarios/urban_realistic_dynamic_calibrated  8
  * </pre>
  *
- * <p>JSON_SEQUENCE è la modalità consigliata per i test offline. Legge tutti
+ * <p>{@code JSON_SEQUENCE} è la modalità consigliata per i test offline. Legge tutti
  * gli snapshot in ordine e calcola comunque la decisione della finestra
- * adattiva. JSON_TIME usa invece il tempo richiesto dal manager e può saltare
- * snapshot se la durata adattiva non coincide con i tempi dei file.</p>
+ * adattiva. {@code JSON_TIME} usa invece il tempo richiesto dal manager e può
+ * saltare snapshot se la durata adattiva non coincide con i tempi dei file.</p>
  */
 public final class AdaptiveWindowSourceMain {
 
@@ -60,11 +64,13 @@ public final class AdaptiveWindowSourceMain {
         String mode = args.length > 0 ? args[0] : DEFAULT_MODE;
         String folderPath = args.length > 1 ? args[1] : DEFAULT_SNAPSHOT_FOLDER;
 
+        // Input offline: gli snapshot sono caricati tutti prima di comporre la sorgente.
         List<SystemSnapshot> snapshots = new JsonSnapshotFolderLoader().load(folderPath);
         int maxSteps = args.length > 2
                 ? Integer.parseInt(args[2])
                 : snapshots.size();
 
+        // Configurazione di algoritmo, finestra temporale e prefilter.
         MaGaConfig maGaConfig = MaGaConfig.defaultConfig(
                 GaParameterScalingMode.ADAPTIVE
         );
@@ -79,6 +85,7 @@ public final class AdaptiveWindowSourceMain {
                 prefilter
         );
 
+        // La popolazione target dipende dalla configurazione GA effettiva sul primo snapshot filtrato.
         SystemSnapshot firstFilteredSnapshot = prefilter
                 .filter(snapshots.get(0))
                 .getFilteredSnapshot();
@@ -97,12 +104,14 @@ public final class AdaptiveWindowSourceMain {
         AdaptiveWindowController adaptiveWindowController =
                 new AdaptiveWindowController(windowConfig, boundsCalculator);
 
+        // Il manager orchestra trigger, riuso popolazione, finestra adattiva e ottimizzazione.
         TemporalWindowManager manager = new TemporalWindowManager(
                 windowConfig,
                 new MaGaOptimizer(maGaConfig),
                 new DynamicityEvaluator(windowConfig),
                 new PopulationAdapter(
                         windowConfig,
+                        maGaConfig,
                         new Random(
                                 maGaConfig
                                         .getGeneticAlgorithmConfig()
@@ -131,6 +140,7 @@ public final class AdaptiveWindowSourceMain {
     ) throws Exception {
         String normalizedMode = SystemStateSourceFactory.normalizeMode(mode);
 
+        // Replay sequenziale: utile quando ogni file rappresenta uno step da eseguire.
         if ("JSON_SEQUENCE".equals(normalizedMode)
                 || "JSON_SEQUENTIAL".equals(normalizedMode)
                 || "SEQUENTIAL".equals(normalizedMode)) {
@@ -140,12 +150,14 @@ public final class AdaptiveWindowSourceMain {
             );
         }
 
+        // Replay indicizzato: usa il tempo richiesto dal manager e può saltare snapshot intermedi.
         if ("JSON_TIME".equals(normalizedMode)
                 || "JSON_TIME_INDEXED".equals(normalizedMode)
                 || "TIME_INDEXED".equals(normalizedMode)) {
             return SystemStateSourceFactory.fromJsonFolder(mode, folderPath);
         }
 
+        // Il bridge MOSAIC è dichiarato nell'architettura, ma non viene inizializzato da questo main.
         if ("MOSAIC".equals(normalizedMode)
                 || "MOSAIC_LIVE".equals(normalizedMode)) {
             throw new UnsupportedOperationException(
@@ -162,6 +174,7 @@ public final class AdaptiveWindowSourceMain {
             TemporalWindowResult result,
             FilteringSystemStateSource filteredSource
     ) {
+        // I printer sono separati per mantenere leggibili diagnosi temporali, GA e sorgente dati.
         DeepTemporalWindowDiagnosticPrinter diagnosticPrinter =
                 new DeepTemporalWindowDiagnosticPrinter(maGaConfig);
         diagnosticPrinter.print(result);

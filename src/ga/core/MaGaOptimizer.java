@@ -2,6 +2,7 @@ package ga.core;
 
 import config.MaGaConfig;
 import config.ga.GeneticAlgorithmConfig;
+import config.mobility.MobilityConfig;
 import ga.fitness.FitnessEvaluator;
 import ga.fitness.breakdown.EvaluationBreakdown;
 import ga.operators.CrossoverOperator;
@@ -22,18 +23,14 @@ import java.util.Random;
 /**
  * Orchestratore principale del MA-GA sul singolo snapshot.
  *
- * <p>Il MA-GA resta snapshot-based:</p>
+ * <p>Il MA-GA resta snapshot-based: ogni esecuzione riceve uno
+ * {@link SystemSnapshot}, prepara una popolazione coerente con quello snapshot,
+ * evolve i cromosomi e restituisce sia la soluzione migliore sia il breakdown
+ * diagnostico della popolazione finale.</p>
  *
- * <ul>
- *     <li>riceve uno SystemSnapshot;</li>
- *     <li>riceve eventualmente una popolazione iniziale esterna;</li>
- *     <li>ripara la popolazione rispetto allo snapshot corrente;</li>
- *     <li>evolve la popolazione;</li>
- *     <li>restituisce miglior cromosoma, breakdown e popolazione finale.</li>
- * </ul>
- *
- * <p>La scelta tra COLD_START, WARM_START e PARTIAL_RESTART non appartiene
- * a questa classe. Quella decisione rimane nel package window.</p>
+ * <p>La scelta tra cold start, warm start e partial restart non appartiene a
+ * questa classe. Il package {@code window} decide la strategia temporale e passa
+ * qui l'eventuale popolazione iniziale.</p>
  */
 public final class MaGaOptimizer {
 
@@ -62,10 +59,9 @@ public final class MaGaOptimizer {
         this.random = new Random(gaConfig.getRandomSeed());
 
         /*
-         * Il repair riceve la MobilityConfig per usare lo stesso modello di
-         * copertura della fitness. In questo modo il vincolo
-         * T_i(C) <= T_i^coverage(n_i) viene controllato anche in repair,
-         * non solo penalizzato in valutazione.
+         * Repair e fitness condividono la stessa MobilityConfig, così il vincolo
+         * di copertura viene interpretato nello stesso modo durante correzione
+         * e valutazione.
          */
         this.repairOperator = new RepairOperator(config.getMobilityConfig());
 
@@ -80,10 +76,18 @@ public final class MaGaOptimizer {
     /**
      * Esegue il MA-GA partendo da popolazione generata internamente.
      *
-     * <p>Metodo mantenuto per compatibilità.</p>
+     * <p>API di compatibilità per i chiamanti che richiedono solo il miglior
+     * cromosoma. Internamente usa il percorso dettagliato.</p>
      */
     public Chromosome optimize(SystemSnapshot snapshot) {
         return optimizeDetailed(snapshot).getBestChromosome();
+    }
+
+    /**
+     * Restituisce la configurazione di mobilita usata da repair e fitness.
+     */
+    public MobilityConfig getMobilityConfig() {
+        return config.getMobilityConfig();
     }
 
     /**
@@ -99,7 +103,8 @@ public final class MaGaOptimizer {
     /**
      * Esegue il MA-GA e restituisce il risultato completo.
      *
-     * <p>Metodo mantenuto per compatibilità.</p>
+     * <p>API di compatibilità per esecuzioni senza popolazione iniziale
+     * esterna.</p>
      */
     public MaGaResult optimizeDetailed(SystemSnapshot snapshot) {
         return optimizeDetailed(snapshot, null);
@@ -107,6 +112,17 @@ public final class MaGaOptimizer {
 
     /**
      * Esegue il MA-GA e restituisce un risultato completo.
+     *
+     * <p>Fasi principali:</p>
+     *
+     * <ol>
+     *     <li>risolve la configurazione GA effettiva per lo snapshot;</li>
+     *     <li>prepara o ripara la popolazione iniziale;</li>
+     *     <li>evolve la popolazione con elitismo, selezione, crossover,
+     *     mutazione e repair;</li>
+     *     <li>valuta il miglior cromosoma e conserva una popolazione finale
+     *     riutilizzabile dalle finestre temporali successive.</li>
+     * </ol>
      */
     public MaGaResult optimizeDetailed(
             SystemSnapshot snapshot,
@@ -294,6 +310,10 @@ public final class MaGaOptimizer {
 
     /**
      * Prepara la popolazione finale da conservare in MaGaResult.
+     *
+     * <p>Il miglior cromosoma globale viene reinserito esplicitamente prima del
+     * taglio alla dimensione target, perché potrebbe essere stato trovato in una
+     * generazione precedente e non appartenere più alla popolazione corrente.</p>
      */
     private List<Chromosome> prepareFinalPopulationForResult(
             List<Chromosome> population,

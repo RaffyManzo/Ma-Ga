@@ -3,6 +3,7 @@ package test.runner;
 import test.runner.core.ManualTestExecutor;
 import test.runner.suite.FitnessEvaluatorTestSuite;
 import test.runner.suite.OperatorTestSuite;
+import test.runner.suite.PopulationAdapterTestSuite;
 import test.runner.suite.SnapshotValidatorTestSuite;
 
 import java.util.List;
@@ -20,7 +21,8 @@ public final class TestRunner {
                 List.of(
                         new SnapshotValidatorTestSuite(),
                         new FitnessEvaluatorTestSuite(),
-                        new OperatorTestSuite()
+                        new OperatorTestSuite(),
+                        new PopulationAdapterTestSuite()
                 )
         );
     }

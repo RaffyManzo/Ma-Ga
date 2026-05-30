@@ -1,6 +1,8 @@
 package window.population;
 
+import config.MaGaConfig;
 import config.window.TemporalWindowConfig;
+import ga.fitness.FitnessEvaluator;
 import ga.operators.PopulationInitializer;
 import ga.operators.RepairOperator;
 import model.genetic.Chromosome;
@@ -17,102 +19,63 @@ import java.util.Random;
  * Adatta la popolazione genetica finale di una finestra temporale precedente
  * allo snapshot corrente.
  *
- * <p>Questa classe è il collegamento operativo tra il gestore temporale e il
- * MA-GA snapshot-based. Il gestore temporale decide una
- * {@link PopulationReuseMode}; l'adattatore traduce quella decisione in una
- * popolazione iniziale concreta per la nuova esecuzione.</p>
- *
- * <p>Formalmente, se la finestra precedente ha prodotto:</p>
- *
- * <pre>
- * P_final(k-1)
- * </pre>
- *
- * <p>all'arrivo della finestra {@code k}, o di un evento critico che anticipa
- * la riesecuzione, questa classe costruisce:</p>
- *
- * <pre>
- * P_init(k)
- * </pre>
- *
- * <p>Responsabilità escluse: {@code PopulationAdapter} non esegue il Genetic
- * Algorithm, non calcola crossover, non calcola mutazione e non calcola
- * fitness. Il suo compito è solo preparare una popolazione iniziale coerente
- * con lo snapshot corrente. L'evoluzione vera e propria rimane responsabilità
- * di {@code MaGaOptimizer}.</p>
- *
- * <p>La classe è separata dal package {@code ga} perché la popolazione
- * precedente potrebbe essere parzialmente incompatibile con il nuovo snapshot.
- * Per esempio:</p>
+ * <p>È il ponte tra il ciclo temporale e l'ottimizzatore snapshot-based: il
+ * gestore temporale sceglie una {@link PopulationReuseMode}, mentre questo
+ * adattatore costruisce la popolazione iniziale {@code P_init(k)} per la nuova
+ * finestra.</p>
  *
  * <ul>
- *     <li>alcuni task della finestra precedente potrebbero non esistere più;</li>
- *     <li>potrebbero essere comparsi nuovi task;</li>
- *     <li>un candidato scelto in un gene potrebbe non essere più disponibile;</li>
- *     <li>un link potrebbe essere peggiorato;</li>
- *     <li>un nodo potrebbe avere meno risorse;</li>
- *     <li>un veicolo potrebbe essere uscito dallo scenario.</li>
+ *     <li>{@code FIRST_RUN} e {@code COLD_START}: genera una popolazione nuova;</li>
+ *     <li>{@code WARM_START}: prova a riusare tutta la popolazione precedente;</li>
+ *     <li>{@code PARTIAL_RESTART}: conserva una quota dei migliori cromosomi e
+ *     rigenera il resto.</li>
  * </ul>
  *
- * <p>Per questo motivo ogni cromosoma riutilizzato viene copiato e riparato
- * rispetto allo snapshot corrente prima di essere inserito nella nuova
- * popolazione iniziale.</p>
+ * <p>Ogni cromosoma riusato viene copiato, riparato e rivalutato rispetto allo
+ * snapshot corrente. La fitness storica non decide quali cromosomi conservare
+ * nella nuova finestra.</p>
  */
 public final class PopulationAdapter {
 
     /**
-     * Configurazione del gestore temporale.
-     *
-     * <p>Da qui viene letto soprattutto {@code rhoKeep}, cioè la quota della
-     * popolazione precedente da conservare in caso di
-     * {@link PopulationReuseMode#PARTIAL_RESTART}.</p>
+     * Configurazione temporale; in questa classe viene usata soprattutto
+     * {@code rhoKeep} per calcolare la quota conservata in partial restart.
      */
     private final TemporalWindowConfig config;
 
     /**
-     * Operatore di riparazione già usato dal package ga.
-     *
-     * <p>Viene riutilizzato qui per non duplicare le regole di validità
-     * source-aware dei cromosomi rispetto allo snapshot corrente.</p>
+     * Operatore usato per rendere i cromosomi storici compatibili con lo
+     * snapshot corrente prima del riuso.
      */
     private final RepairOperator repairOperator;
 
     /**
-     * Generatore della popolazione iniziale casuale già usato dal package ga.
-     *
-     * <p>Serve quando:</p>
-     *
-     * <ul>
-     *     <li>siamo in {@link PopulationReuseMode#FIRST_RUN};</li>
-     *     <li>siamo in {@link PopulationReuseMode#COLD_START};</li>
-     *     <li>siamo in {@link PopulationReuseMode#PARTIAL_RESTART} e bisogna rigenerare la parte mancante;</li>
-     *     <li>la popolazione precedente è vuota o non recuperabile.</li>
-     * </ul>
+     * Valuta i cromosomi adattati usando lo snapshot corrente.
+     */
+    private final FitnessEvaluator fitnessEvaluator;
+
+    /**
+     * Generatore usato per creare cromosomi freschi quando il riuso non è
+     * possibile o quando una popolazione parziale va completata.
      */
     private final PopulationInitializer populationInitializer;
 
     /**
-     * Generatore pseudo-casuale condiviso dagli operatori di inizializzazione.
-     *
-     * <p>Qui viene conservato solo per poter costruire
-     * {@link PopulationInitializer} e mantenere coerenza con il resto degli
-     * operatori che dipendono dalla casualità.</p>
+     * Generatore pseudo-casuale condiviso con l'inizializzatore.
      */
     private final Random random;
-
-    // ---------------------------------------------------------------------
-    // Costruzione
-    // ---------------------------------------------------------------------
 
     /**
      * Costruisce un adattatore di popolazione.
      *
      * @param config configurazione temporale contenente, tra gli altri, {@code rhoKeep}
+     * @param maGaConfig configurazione usata da repair e fitness
      * @param random generatore pseudo-casuale condiviso con l'inizializzatore
-     * @throws NullPointerException se {@code config} o {@code random} sono {@code null}
+     * @throws NullPointerException se un parametro richiesto e' {@code null}
      */
     public PopulationAdapter(
             TemporalWindowConfig config,
+            MaGaConfig maGaConfig,
             Random random
     ) {
         this.config = Objects.requireNonNull(
@@ -120,56 +83,33 @@ public final class PopulationAdapter {
                 "config must not be null."
         );
 
+        MaGaConfig safeMaGaConfig = Objects.requireNonNull(
+                maGaConfig,
+                "maGaConfig must not be null."
+        );
+
         this.random = Objects.requireNonNull(
                 random,
                 "random must not be null."
         );
 
-        this.repairOperator = new RepairOperator();
+        this.repairOperator = new RepairOperator(
+                safeMaGaConfig.getMobilityConfig()
+        );
+        this.fitnessEvaluator = new FitnessEvaluator(safeMaGaConfig);
         this.populationInitializer = new PopulationInitializer(
                 this.random,
                 this.repairOperator
         );
     }
 
-    // ---------------------------------------------------------------------
-    // API pubblica
-    // ---------------------------------------------------------------------
-
     /**
      * Costruisce la popolazione iniziale da passare al MA-GA nella finestra
      * corrente.
      *
-     * <p>Questo metodo è il punto principale della classe.</p>
-     *
-     * <p>Input concettuali:</p>
-     *
-     * <ul>
-     *     <li>{@code previousFinalPopulation = P_final(k-1)};</li>
-     *     <li>{@code currentSnapshot = S_k};</li>
-     *     <li>{@code reuseMode}: decisione temporale presa dal gestore;</li>
-     *     <li>{@code targetPopulationSize}: dimensione desiderata della popolazione.</li>
-     * </ul>
-     *
-     * <p>Output:</p>
-     *
-     * <pre>
-     * P_init(k)
-     * </pre>
-     *
-     * <p>Regole:</p>
-     *
-     * <ul>
-     *     <li>{@code FIRST_RUN}: non esiste una popolazione precedente; si genera tutto da zero;</li>
-     *     <li>{@code COLD_START}: lo scenario è cambiato troppo; si ignora la popolazione precedente;</li>
-     *     <li>{@code WARM_START}: si prova a riutilizzare tutta la popolazione precedente riparata;</li>
-     *     <li>{@code PARTIAL_RESTART}: si conserva una quota dei migliori cromosomi e si rigenera il resto.</li>
-     * </ul>
-     *
-     * <p>Anche se {@code MaGaOptimizer} fosse capace di ricevere una lista vuota
-     * e generare internamente la popolazione, qui viene restituita sempre una
-     * popolazione concreta. Questo rende il comportamento del package
-     * {@code window} più esplicito e più facile da verificare nei test.</p>
+     * <p>Il metodo restituisce sempre una popolazione concreta, così il package
+     * {@code window} rende esplicita la strategia scelta prima di invocare
+     * {@code MaGaOptimizer}.</p>
      *
      * @param previousFinalPopulation popolazione finale della finestra precedente
      * @param currentSnapshot snapshot su cui preparare la nuova popolazione
@@ -199,12 +139,12 @@ public final class PopulationAdapter {
             );
         }
 
-        // Caso 1: prima esecuzione. Non esiste memoria genetica precedente.
+        // Prima esecuzione: non esiste memoria genetica precedente.
         if (reuseMode == PopulationReuseMode.FIRST_RUN) {
             return createFreshPopulation(currentSnapshot, targetPopulationSize);
         }
 
-        // Caso 2: cold start. Lo scenario è troppo diverso per riusare P_final(k-1).
+        // Cold start: lo scenario è troppo diverso per riusare P_final(k-1).
         if (reuseMode == PopulationReuseMode.COLD_START) {
             return createFreshPopulation(currentSnapshot, targetPopulationSize);
         }
@@ -216,7 +156,8 @@ public final class PopulationAdapter {
          * - vengono rimossi elementi null;
          * - ogni cromosoma viene copiato;
          * - ogni cromosoma viene riparato rispetto allo snapshot corrente;
-         * - la popolazione viene ordinata per fitness crescente.
+         * - ogni cromosoma viene rivalutato sullo snapshot corrente;
+         * - la popolazione viene ordinata per fitness corrente crescente.
          *
          * Nota:
          * in questo progetto la fitness è da minimizzare, quindi fitness più bassa
@@ -239,7 +180,7 @@ public final class PopulationAdapter {
             return createFreshPopulation(currentSnapshot, targetPopulationSize);
         }
 
-        // Caso 3: warm start. Conserva più informazione genetica possibile.
+        // Warm start: conserva più informazione genetica possibile.
         if (reuseMode == PopulationReuseMode.WARM_START) {
             return buildWarmStartPopulation(
                     repairedPreviousPopulation,
@@ -248,7 +189,7 @@ public final class PopulationAdapter {
                 );
         }
 
-        // Caso 4: partial restart. Mantiene solo una quota dei migliori cromosomi.
+        // Partial restart: mantiene solo una quota dei migliori cromosomi.
         if (reuseMode == PopulationReuseMode.PARTIAL_RESTART) {
             return buildPartialRestartPopulation(
                     repairedPreviousPopulation,
@@ -264,20 +205,8 @@ public final class PopulationAdapter {
         return createFreshPopulation(currentSnapshot, targetPopulationSize);
     }
 
-    // ---------------------------------------------------------------------
-    // Strategie di costruzione della popolazione
-    // ---------------------------------------------------------------------
-
     /**
      * Crea una popolazione nuova da zero.
-     *
-     * <p>Questo metodo viene usato nei casi:</p>
-     *
-     * <ul>
-     *     <li>{@link PopulationReuseMode#FIRST_RUN};</li>
-     *     <li>{@link PopulationReuseMode#COLD_START};</li>
-     *     <li>fallback quando la popolazione precedente non è recuperabile.</li>
-     * </ul>
      *
      * @param snapshot snapshot corrente
      * @param targetPopulationSize dimensione desiderata
@@ -287,30 +216,30 @@ public final class PopulationAdapter {
             SystemSnapshot snapshot,
             int targetPopulationSize
     ) {
-        return populationInitializer.createInitialPopulation(
-                snapshot,
-                targetPopulationSize
-        );
+        List<Chromosome> freshPopulation =
+                populationInitializer.createInitialPopulation(
+                        snapshot,
+                        targetPopulationSize
+                );
+
+        evaluatePopulation(freshPopulation, snapshot);
+        return freshPopulation;
     }
 
     /**
      * Prepara la popolazione precedente al riuso.
      *
-     * <p>Questa è una delle sezioni più importanti della classe. La popolazione
-     * finale della finestra precedente non può essere riutilizzata direttamente,
-     * perché lo snapshot corrente potrebbe essere cambiato.</p>
-     *
-     * <p>Per questo motivo ogni cromosoma viene:</p>
+     * <p>Ogni cromosoma storico viene:</p>
      *
      * <ol>
      *     <li>copiato;</li>
      *     <li>riparato rispetto allo snapshot corrente;</li>
-     *     <li>inserito in una nuova lista;</li>
-     *     <li>ordinato per fitness crescente.</li>
+     *     <li>rivalutato sullo snapshot corrente;</li>
+     *     <li>ordinato per fitness corrente crescente.</li>
      * </ol>
      *
-     * <p>La copia evita effetti collaterali: il package {@code window} non deve
-     * modificare oggetti già conservati in vecchi risultati.</p>
+     * <p>La copia evita effetti collaterali sui risultati delle finestre già
+     * completate.</p>
      *
      * @param previousFinalPopulation popolazione prodotta nella finestra precedente
      * @param currentSnapshot snapshot corrente usato per riparare i cromosomi
@@ -336,6 +265,13 @@ public final class PopulationAdapter {
             Chromosome repairedChromosome =
                     repairOperator.repairChromosome(copied, currentSnapshot);
 
+            repairedChromosome.setFitness(
+                    fitnessEvaluator.evaluate(
+                            repairedChromosome,
+                            currentSnapshot
+                    )
+            );
+
             repaired.add(repairedChromosome);
         }
 
@@ -346,17 +282,8 @@ public final class PopulationAdapter {
     /**
      * Costruisce la popolazione per WARM_START.
      *
-     * <p>Logica:</p>
-     *
-     * <ul>
-     *     <li>si conservano i migliori cromosomi riparati;</li>
-     *     <li>se sono meno della dimensione richiesta, si genera la parte mancante;</li>
-     *     <li>se sono più della dimensione richiesta, si tagliano i peggiori.</li>
-     * </ul>
-     *
-     * <p>In questo modo il warm start prova a mantenere continuità genetica tra
-     * finestre consecutive, ma resta compatibile con la dimensione di
-     * popolazione richiesta dal GA.</p>
+     * <p>Conserva i migliori cromosomi riparati e genera eventuali cromosomi
+     * mancanti, mantenendo la dimensione target richiesta dal GA.</p>
      */
     private List<Chromosome> buildWarmStartPopulation(
             List<Chromosome> repairedPreviousPopulation,
@@ -386,30 +313,8 @@ public final class PopulationAdapter {
     /**
      * Costruisce la popolazione per PARTIAL_RESTART.
      *
-     * <p>Logica:</p>
-     *
-     * <ul>
-     *     <li>si calcola quanti cromosomi conservare usando {@code rhoKeep};</li>
-     *     <li>si prendono i migliori cromosomi della popolazione precedente riparata;</li>
-     *     <li>il resto viene generato da zero sullo snapshot corrente.</li>
-     * </ul>
-     *
-     * <p>Esempio:</p>
-     *
-     * <pre>
-     * targetPopulationSize = 40
-     * rhoKeep = 0.40
-     *
-     * allora:
-     *
-     * keepCount = 16
-     * freshCount = 24
-     *
-     * Quindi P_init(k) sarà composta da:
-     *
-     * - 16 cromosomi riusati;
-     * - 24 cromosomi nuovi.
-     * </pre>
+     * <p>Conserva {@code rhoKeep * targetPopulationSize} cromosomi riparati e
+     * genera da zero il resto della popolazione.</p>
      */
     private List<Chromosome> buildPartialRestartPopulation(
             List<Chromosome> repairedPreviousPopulation,
@@ -439,13 +344,8 @@ public final class PopulationAdapter {
     /**
      * Calcola quanti cromosomi mantenere in partial restart.
      *
-     * <p>La formula base è:</p>
-     *
-     * <pre>
-     * keepCount = round(rhoKeep * targetPopulationSize)
-     * </pre>
-     *
-     * <p>Il valore viene poi limitato in modo da:</p>
+     * <p>La formula base è {@code round(rhoKeep * targetPopulationSize)}. Il
+     * risultato viene poi limitato per:</p>
      *
      * <ul>
      *     <li>non superare la popolazione precedente disponibile;</li>
@@ -476,12 +376,28 @@ public final class PopulationAdapter {
     }
 
     /**
+     * Rivaluta una popolazione rispetto allo snapshot corrente.
+     */
+    private void evaluatePopulation(
+            List<Chromosome> population,
+            SystemSnapshot snapshot
+    ) {
+        for (Chromosome chromosome : population) {
+            if (chromosome == null || chromosome.getGenes() == null) {
+                continue;
+            }
+
+            chromosome.setFitness(
+                    fitnessEvaluator.evaluate(chromosome, snapshot)
+            );
+        }
+    }
+
+    /**
      * Completa una popolazione parziale con cromosomi nuovi.
      *
-     * <p>Questo metodo viene usato sia nel warm start sia nel partial restart.
-     * Dopo aver riutilizzato una parte della popolazione precedente, può mancare
-     * ancora un certo numero di cromosomi per raggiungere la dimensione
-     * richiesta dal GA.</p>
+     * <p>È usato sia dal warm start sia dal partial restart quando la porzione
+     * riusata non raggiunge ancora la dimensione target.</p>
      */
     private void fillWithFreshChromosomes(
             List<Chromosome> result,
@@ -496,7 +412,7 @@ public final class PopulationAdapter {
         }
 
         List<Chromosome> freshChromosomes =
-                populationInitializer.createInitialPopulation(
+                createFreshPopulation(
                         currentSnapshot,
                         missing
                 );
@@ -508,10 +424,8 @@ public final class PopulationAdapter {
     /**
      * Taglia la popolazione alla dimensione richiesta.
      *
-     * <p>Se per qualche errore o cambiamento futuro la lista diventasse più
-     * grande del necessario, vengono rimossi gli ultimi cromosomi.</p>
-     *
-     * <p>Prima del taglio la lista viene ordinata per fitness crescente.</p>
+     * <p>Prima del taglio ordina per fitness crescente, così vengono rimossi i
+     * cromosomi peggiori.</p>
      */
     private void trimToTargetSize(
             List<Chromosome> chromosomes,
@@ -527,12 +441,8 @@ public final class PopulationAdapter {
     /**
      * Crea una copia superficiale di un cromosoma.
      *
-     * <p>I {@link Gene} sono immutabili nel modello attuale, quindi è
-     * sufficiente copiare la lista dei geni senza ricostruire ogni singolo
-     * gene.</p>
-     *
-     * <p>Se in futuro {@code Gene} diventasse mutabile, questo metodo andrebbe
-     * aggiornato per creare una copia profonda dei geni.</p>
+     * <p>La copia è superficiale perché {@link Gene} è immutabile nel modello
+     * attuale.</p>
      */
     private Chromosome copyChromosome(Chromosome source) {
         List<Gene> copiedGenes = new ArrayList<>(source.getGenes());

@@ -65,6 +65,7 @@ public final class TemporalWindowTestMain {
         PopulationAdapter populationAdapter =
                 new PopulationAdapter(
                         windowConfig,
+                        maGaConfig,
                         new Random(maGaConfig.getGeneticAlgorithmConfig().getRandomSeed())
                 );
 

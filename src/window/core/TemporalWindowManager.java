@@ -33,7 +33,12 @@ import java.util.Objects;
  * Orchestratore del ciclo temporale del MA-GA.
  *
  * <p>Il manager non conosce la sorgente concreta degli snapshot. Riceve una
- * SystemStateSource, che può essere basata su JSON, MOSAIC o altri adapter.</p>
+ * {@link SystemStateSource}, che può essere basata su JSON, MOSAIC o altri
+ * adapter.</p>
+ *
+ * <p>Ogni step risolve un trigger, osserva lo stato del sistema, valuta la
+ * dinamicità, decide il riuso della popolazione, calcola la prossima finestra
+ * e invoca il MA-GA sullo snapshot corrente.</p>
  */
 public final class TemporalWindowManager {
 
@@ -64,7 +69,7 @@ public final class TemporalWindowManager {
                 new PopulationReuseDecisionPolicy(windowConfig),
                 defaultAdaptiveWindowController(
                         windowConfig,
-                        MobilityConfig.defaultConfig()
+                        optimizerMobilityConfig(optimizer)
                 ),
                 criticalEventDetector,
                 systemStateSource,
@@ -135,6 +140,13 @@ public final class TemporalWindowManager {
         return new AdaptiveWindowController(config, boundsCalculator);
     }
 
+    private static MobilityConfig optimizerMobilityConfig(MaGaOptimizer optimizer) {
+        return Objects.requireNonNull(
+                optimizer,
+                "optimizer must not be null."
+        ).getMobilityConfig();
+    }
+
     public TemporalWindowResult run(
             double startTimeSeconds,
             int maxSteps
@@ -153,6 +165,7 @@ public final class TemporalWindowManager {
 
         TemporalWindowResult result = TemporalWindowResult.empty();
 
+        // Il ciclo termina quando la sorgente dati non produce più osservazioni.
         for (int i = 0; i < maxSteps; i++) {
             TemporalStepResult stepResult = executeNextStepOrNull(state);
 
@@ -170,6 +183,7 @@ public final class TemporalWindowManager {
     public TemporalStepResult executeNextStepOrNull(TemporalWindowState state) {
         Objects.requireNonNull(state, "state must not be null.");
 
+        // Trigger e osservazione definiscono il punto temporale della finestra corrente.
         ReoptimizationTrigger plannedTrigger = resolveTrigger(state);
         double requestedObservationTimeSeconds = computeObservationTime(plannedTrigger);
 
@@ -194,6 +208,7 @@ public final class TemporalWindowManager {
 
         double observationTimeSeconds = request.getRequestedObservationTimeSeconds();
 
+        // La dinamicità guida sia il riuso della popolazione sia la durata della prossima finestra.
         DynamicityBreakdown dynamicityBreakdown = dynamicityEvaluator.evaluate(
                 state.getLastSnapshot(),
                 currentSnapshot
@@ -218,6 +233,7 @@ public final class TemporalWindowManager {
 
         PopulationReuseMode reuseMode = reuseDecision.getAppliedMode();
 
+        // La popolazione iniziale incapsula cold start, warm start e partial restart.
         List<Chromosome> initialPopulation = populationAdapter.adaptPopulation(
                 state.getLastFinalPopulation(),
                 currentSnapshot,
@@ -232,6 +248,7 @@ public final class TemporalWindowManager {
         );
         long elapsedNs = System.nanoTime() - startNs;
 
+        // Il tempo osservato del GA può alimentare le decisioni delle finestre successive.
         TemporalOperationalMetrics observedMetrics = observedOperationalMetrics(
                 elapsedNs
         );
