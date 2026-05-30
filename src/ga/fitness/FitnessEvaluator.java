@@ -14,6 +14,8 @@ import model.genetic.Gene;
 import model.mobility.CoverageEstimator;
 import model.node.NodeCandidate;
 import model.node.NodeType;
+import model.offloading.OffloadingTimeBreakdown;
+import model.offloading.OffloadingTimeModel;
 import model.snapshot.SystemSnapshot;
 import model.snapshot.TaskInstance;
 import model.snapshot.VehicleSnapshot;
@@ -27,8 +29,18 @@ import java.util.Objects;
 /**
  * Valuta un cromosoma MA-GA rispetto a uno snapshot del sistema.
  *
- * Usa CoverageEstimator per stimare il tempo di copertura. Il tempo di
- * copertura non viene più letto direttamente da NodeCandidate.
+ * <p>La valutazione combina quattro famiglie di costo:</p>
+ *
+ * <ul>
+ *     <li>tempo massimo di completamento dei task;</li>
+ *     <li>latenza media di comunicazione;</li>
+ *     <li>rischio mobility-aware legato alla copertura;</li>
+ *     <li>penalità di vincolo e sovrauso risorse.</li>
+ * </ul>
+ *
+ * <p>Il tempo di copertura viene calcolato tramite {@link CoverageEstimator},
+ * così il modello non dipende da un valore precomputato dentro
+ * {@code NodeCandidate}.</p>
  */
 public final class FitnessEvaluator {
 
@@ -37,6 +49,7 @@ public final class FitnessEvaluator {
 
     private final MaGaConfig config;
     private final CoverageEstimator coverageEstimator;
+    private final OffloadingTimeModel offloadingTimeModel;
 
     /**
      * Costruisce il valutatore usando la configurazione MA-GA.
@@ -72,6 +85,7 @@ public final class FitnessEvaluator {
                 coverageEstimator,
                 "coverageEstimator must not be null."
         );
+        this.offloadingTimeModel = new OffloadingTimeModel();
     }
 
     /**
@@ -90,6 +104,10 @@ public final class FitnessEvaluator {
 
     /**
      * Calcola la valutazione dettagliata di un cromosoma.
+     *
+     * <p>Il breakdown restituito è usato dai report diagnostici, dal riuso
+     * della popolazione e dai test manuali per capire quali vincoli hanno
+     * pesato sulla soluzione.</p>
      *
      * @param chromosome cromosoma da valutare
      * @param snapshot snapshot corrente
@@ -122,14 +140,17 @@ public final class FitnessEvaluator {
                 "chromosome.genes"
         );
 
+        // Indici di lookup: la fitness lavora task-per-task e deve risolvere rapidamente riferimenti.
         Map<String, TaskInstance> taskById = indexTasks(tasks);
         Map<String, VehicleSnapshot> vehicleById = indexVehicles(vehicles);
         Map<String, NodeCandidate> candidateById = indexCandidates(candidates);
         Map<String, Gene> geneByTaskId = indexGenes(genes);
 
+        // Penalità strutturali: cromosomi con cardinalità errata o task sconosciuti restano confrontabili.
         double invalidPenalty = computeCardinalityPenalty(tasks, genes);
         invalidPenalty += computeUnknownGeneTaskPenalty(geneByTaskId, taskById);
 
+        // Accumulatori di risorse per vincoli aggregati su nodi fisici e link.
         Map<String, ExecutionNodeResourceUsageBreakdown> cpuUsageByExecutionNode =
                 initializeExecutionNodeCpuUsage(candidates);
 
@@ -146,6 +167,7 @@ public final class FitnessEvaluator {
         double mobilityPenalty = 0.0;
         double constraintPenalty = 0.0;
 
+        // Valutazione task-level: ogni gene contribuisce a tempi, latenza e pressione risorse.
         for (TaskInstance task : tasks) {
             Gene gene = geneByTaskId.get(task.getTaskId());
 
@@ -219,6 +241,7 @@ public final class FitnessEvaluator {
         double totalResourceAndConstraintPenalty =
                 resourcePenalty + constraintPenalty + invalidPenalty;
 
+        // Normalizzazione finale: tutte le componenti vengono portate sulle scale configurate.
         FitnessWeights weights = config.getFitnessWeights();
         NormalizationConfig normalization = config.getNormalizationConfig();
 
@@ -259,6 +282,10 @@ public final class FitnessEvaluator {
 
     /**
      * Valuta un singolo gene rispetto al task associato.
+     *
+     * <p>Per candidati locali la quota remota deve essere zero. Per candidati
+     * remoti il completion time è il massimo tra ramo locale e ramo remoto,
+     * tranne nel full offloading, dove conta solo il ramo remoto.</p>
      */
     private GeneEvaluationBreakdown evaluateGene(
             SystemSnapshot snapshot,
@@ -292,15 +319,15 @@ public final class FitnessEvaluator {
                 );
 
         if (candidate.getType() == NodeType.LOCAL) {
-            double localCpuCycles = task.getCpuCycles();
-            double localExecutionTime = safeDivide(localCpuCycles, localCpu);
+            OffloadingTimeBreakdown timeBreakdown =
+                    offloadingTimeModel.evaluateLocal(task, localCpu);
 
             if (Math.abs(p) > EPSILON) {
                 constraintPenalty += Math.abs(p) * INVALID_SOLUTION_PENALTY;
             }
 
             double deadlinePenalty = computeDeadlinePenalty(
-                    localExecutionTime,
+                    timeBreakdown.getCompletionTimeSeconds(),
                     task.getDeadlineSeconds(),
                     penalties
             );
@@ -315,20 +342,20 @@ public final class FitnessEvaluator {
                     0.0,
                     localCpu,
                     0.0,
-                    localCpuCycles,
-                    localExecutionTime,
+                    timeBreakdown.getLocalCpuCycles(),
+                    timeBreakdown.getLocalExecutionTimeSeconds(),
                     0.0,
                     0.0,
                     0.0,
                     0.0,
                     0.0,
-                    localExecutionTime,
+                    timeBreakdown.getCompletionTimeSeconds(),
                     0.0,
                     0.0,
                     constraintPenalty + deadlinePenalty,
                     task.getDeadlineSeconds(),
                     isDeadlineRespected(
-                            localExecutionTime,
+                            timeBreakdown.getCompletionTimeSeconds(),
                             task.getDeadlineSeconds()
                     ),
                     coverageTimeSeconds,
@@ -354,46 +381,25 @@ public final class FitnessEvaluator {
             allocatedBandwidth = EPSILON;
         }
 
-        double localCpuCycles = (1.0 - p) * task.getCpuCycles();
-        double localExecutionTime = safeDivide(localCpuCycles, localCpu);
-
-        double uploadTime = safeDivide(
-                p * task.getInputSizeBits(),
-                allocatedBandwidth
-        );
-
-        double remoteExecutionTime = safeDivide(
-                p * task.getCpuCycles(),
-                allocatedCpu
-        );
-
-        double downloadTime = safeDivide(
-                task.getOutputSizeBits(),
-                allocatedBandwidth
-        );
-
-        double baseLatency = Math.max(0.0, candidate.getBaseLatencySeconds());
-
-        double remotePartTime =
-                uploadTime + remoteExecutionTime + downloadTime + baseLatency;
-
-        double communicationLatency =
-                uploadTime + downloadTime + baseLatency;
-
-        double completionTime =
-                p >= 1.0 - EPSILON
-                        ? remotePartTime
-                        : Math.max(localExecutionTime, remotePartTime);
+        OffloadingTimeBreakdown timeBreakdown =
+                offloadingTimeModel.evaluateRemote(
+                        task,
+                        candidate,
+                        localCpu,
+                        p,
+                        allocatedCpu,
+                        allocatedBandwidth
+                );
 
         double mobilityPenalty = computeMobilityPenalty(
                 candidate,
                 coverageTimeSeconds,
-                completionTime,
+                timeBreakdown.getCompletionTimeSeconds(),
                 penalties
         );
 
         double deadlinePenalty = computeDeadlinePenalty(
-                completionTime,
+                timeBreakdown.getCompletionTimeSeconds(),
                 task.getDeadlineSeconds(),
                 penalties
         );
@@ -405,7 +411,7 @@ public final class FitnessEvaluator {
 
         boolean coverageSufficient =
                 coverageTimeSeconds > 0.0
-                        && coverageTimeSeconds >= completionTime;
+                        && coverageTimeSeconds >= timeBreakdown.getCompletionTimeSeconds();
 
         return new GeneEvaluationBreakdown(
                 task.getTaskId(),
@@ -417,19 +423,22 @@ public final class FitnessEvaluator {
                 p,
                 allocatedCpu,
                 allocatedBandwidth,
-                localCpuCycles,
-                localExecutionTime,
-                uploadTime,
-                remoteExecutionTime,
-                downloadTime,
-                baseLatency,
-                remotePartTime,
-                completionTime,
-                communicationLatency,
+                timeBreakdown.getLocalCpuCycles(),
+                timeBreakdown.getLocalExecutionTimeSeconds(),
+                timeBreakdown.getUploadTimeSeconds(),
+                timeBreakdown.getRemoteExecutionTimeSeconds(),
+                timeBreakdown.getDownloadTimeSeconds(),
+                timeBreakdown.getBaseLatencySeconds(),
+                timeBreakdown.getRemotePartTimeSeconds(),
+                timeBreakdown.getCompletionTimeSeconds(),
+                timeBreakdown.getCommunicationLatencySeconds(),
                 mobilityPenalty,
                 constraintPenalty + deadlinePenalty,
                 task.getDeadlineSeconds(),
-                isDeadlineRespected(completionTime, task.getDeadlineSeconds()),
+                isDeadlineRespected(
+                        timeBreakdown.getCompletionTimeSeconds(),
+                        task.getDeadlineSeconds()
+                ),
                 coverageTimeSeconds,
                 coverageSufficient
         );

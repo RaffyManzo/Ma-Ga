@@ -6,6 +6,7 @@ import model.genetic.Gene;
 import model.mobility.CoverageEstimator;
 import model.node.NodeCandidate;
 import model.node.NodeType;
+import model.offloading.OffloadingTimeModel;
 import model.snapshot.SystemSnapshot;
 import model.snapshot.TaskInstance;
 import model.snapshot.VehicleSnapshot;
@@ -56,6 +57,7 @@ public final class RepairOperator {
 
     private final CpuAggregateRepairOperator cpuAggregateRepairOperator;
     private final CoverageEstimator coverageEstimator;
+    private final OffloadingTimeModel offloadingTimeModel;
 
     /**
      * Costruttore compatibile con il codice precedente.
@@ -74,6 +76,7 @@ public final class RepairOperator {
         this.coverageEstimator = new CoverageEstimator(
                 Objects.requireNonNull(mobilityConfig, "mobilityConfig must not be null.")
         );
+        this.offloadingTimeModel = new OffloadingTimeModel();
     }
 
     /**
@@ -453,7 +456,10 @@ public final class RepairOperator {
         }
 
         if (candidate.getType() == NodeType.LOCAL) {
-            return safeDivide(task.getCpuCycles(), localCpu);
+            return offloadingTimeModel.evaluateLocal(
+                    task,
+                    localCpu
+            ).getCompletionTimeSeconds();
         }
 
         if (!isStrictlyPositive(allocatedCpu)
@@ -467,34 +473,14 @@ public final class RepairOperator {
                 1.0
         );
 
-        double localCpuCycles = (1.0 - p) * task.getCpuCycles();
-        double localExecutionTime = safeDivide(localCpuCycles, localCpu);
-
-        double uploadTime = safeDivide(
-                p * task.getInputSizeBits(),
+        return offloadingTimeModel.evaluateRemote(
+                task,
+                candidate,
+                localCpu,
+                p,
+                allocatedCpu,
                 allocatedBandwidth
-        );
-
-        double remoteExecutionTime = safeDivide(
-                p * task.getCpuCycles(),
-                allocatedCpu
-        );
-
-        double downloadTime = safeDivide(
-                task.getOutputSizeBits(),
-                allocatedBandwidth
-        );
-
-        double remotePartTime = uploadTime
-                + remoteExecutionTime
-                + downloadTime
-                + Math.max(0.0, candidate.getBaseLatencySeconds());
-
-        if (p >= 1.0 - EPSILON) {
-            return remotePartTime;
-        }
-
-        return Math.max(localExecutionTime, remotePartTime);
+        ).getCompletionTimeSeconds();
     }
 
     private Gene createLocalGene(
@@ -611,18 +597,6 @@ public final class RepairOperator {
 
     private boolean isStrictlyPositive(double value) {
         return Double.isFinite(value) && value > EPSILON;
-    }
-
-    private double safeDivide(
-            double numerator,
-            double denominator
-    ) {
-        if (!Double.isFinite(numerator)
-                || !isStrictlyPositive(denominator)) {
-            return Double.POSITIVE_INFINITY;
-        }
-
-        return numerator / denominator;
     }
 
     /**

@@ -4,6 +4,7 @@ import model.genetic.Chromosome;
 import model.genetic.Gene;
 import model.node.NodeCandidate;
 import model.node.NodeType;
+import model.offloading.OffloadingTimeModel;
 import model.snapshot.SystemSnapshot;
 import model.snapshot.TaskInstance;
 import model.snapshot.VehicleSnapshot;
@@ -36,8 +37,9 @@ public final class PopulationInitializer {
     private final Random random;
     private final RepairOperator repairOperator;
     private final OffloadingRatioPolicy offloadingRatioPolicy;
-
     private final ResourceAllocationPolicy resourceAllocationPolicy;
+    private final OffloadingTimeModel offloadingTimeModel;
+
     /**
      * Costruisce l'inizializzatore.
      *
@@ -60,6 +62,7 @@ public final class PopulationInitializer {
 
         this.offloadingRatioPolicy = new OffloadingRatioPolicy();
         this.resourceAllocationPolicy = new ResourceAllocationPolicy();
+        this.offloadingTimeModel = new OffloadingTimeModel();
     }
 
     /**
@@ -508,12 +511,10 @@ public final class PopulationInitializer {
             TaskInstance task,
             VehicleSnapshot sourceVehicle
     ) {
-        if (sourceVehicle == null || sourceVehicle.getLocalCpu() <= 0.0) {
-            return Double.POSITIVE_INFINITY;
-        }
-
-        return Math.max(0.0, task.getCpuCycles())
-                / sourceVehicle.getLocalCpu();
+        return offloadingTimeModel.estimateLocalOnlyTime(
+                task,
+                sourceVehicle
+        );
     }
 
     /**
@@ -523,24 +524,10 @@ public final class PopulationInitializer {
             TaskInstance task,
             NodeCandidate candidate
     ) {
-        if (candidate.getAvailableBandwidth() <= 0.0
-                || candidate.getAvailableCpu() <= 0.0) {
-            return Double.POSITIVE_INFINITY;
-        }
-
-        double upload =
-                Math.max(0.0, task.getInputSizeBits())
-                        / candidate.getAvailableBandwidth();
-
-        double remoteExecution =
-                Math.max(0.0, task.getCpuCycles())
-                        / candidate.getAvailableCpu();
-
-        double download =
-                Math.max(0.0, task.getOutputSizeBits())
-                        / candidate.getAvailableBandwidth();
-
-        return upload + remoteExecution + download;
+        return offloadingTimeModel.estimateRemoteLinearTime(
+                task,
+                candidate
+        );
     }
 
     /**

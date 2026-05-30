@@ -148,13 +148,25 @@ public final class FitnessEvaluatorTestSuite implements ManualTestSuite {
         );
 
         TestAssertions.assertAlmostEquals(
-                1.3,
+                1.2,
                 geneBreakdown.getRemotePartTimeSeconds(),
-                "Remote part should take 1.3 seconds."
+                "Remote part should scale upload, execution and download by p_i."
         );
 
         TestAssertions.assertAlmostEquals(
-                1.3,
+                0.1,
+                geneBreakdown.getDownloadTimeSeconds(),
+                "Partial offloading should download only the remote output share."
+        );
+
+        TestAssertions.assertAlmostEquals(
+                0.7,
+                geneBreakdown.getCommunicationLatencySeconds(),
+                "Communication latency should scale transferred data by p_i."
+        );
+
+        TestAssertions.assertAlmostEquals(
+                1.2,
                 geneBreakdown.getCompletionTimeSeconds(),
                 "Completion time should be max(local, remote)."
         );
