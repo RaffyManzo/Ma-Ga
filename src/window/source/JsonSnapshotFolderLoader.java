@@ -21,7 +21,11 @@ public final class JsonSnapshotFolderLoader {
     private final SnapshotValidator snapshotValidator;
 
     public JsonSnapshotFolderLoader() {
-        this(new SnapshotLoader(), new SnapshotValidator());
+        this(new SnapshotValidator());
+    }
+
+    public JsonSnapshotFolderLoader(SnapshotValidator snapshotValidator) {
+        this(new SnapshotLoader(snapshotValidator), snapshotValidator);
     }
 
     public JsonSnapshotFolderLoader(

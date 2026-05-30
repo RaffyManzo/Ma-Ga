@@ -86,10 +86,6 @@ public final class NodeCandidate {
                 "coverageRadiusMeters",
                 coverageRadiusMeters
         );
-
-        validateLocalCandidate();
-        validateVehicleCandidate();
-        validateInfrastructureCandidate();
     }
 
     public String getCandidateId() {
@@ -194,39 +190,6 @@ public final class NodeCandidate {
      */
     public boolean isValidForSourceVehicle(String vehicleId) {
         return sourceVehicleId.equals(vehicleId);
-    }
-
-    /**
-     * Verifica la regola dei candidati locali.
-     */
-    private void validateLocalCandidate() {
-        if (type == NodeType.LOCAL && !sourceVehicleId.equals(executionNodeId)) {
-            throw new IllegalArgumentException(
-                    "LOCAL candidate must have sourceVehicleId == executionNodeId."
-            );
-        }
-    }
-
-    /**
-     * Verifica la regola dei candidati V2V.
-     */
-    private void validateVehicleCandidate() {
-        if (type == NodeType.VEHICLE && sourceVehicleId.equals(executionNodeId)) {
-            throw new IllegalArgumentException(
-                    "VEHICLE candidate must have sourceVehicleId != executionNodeId."
-            );
-        }
-    }
-
-    /**
-     * Verifica che i candidati infrastrutturali abbiano dati geometrici.
-     */
-    private void validateInfrastructureCandidate() {
-        if (type == NodeType.EDGE && !hasCoverageGeometry()) {
-            throw new IllegalArgumentException(
-                    "EDGE candidate must define nodeX, nodeY and coverageRadiusMeters."
-            );
-        }
     }
 
     private static String requireText(String value, String fieldName) {

@@ -1,11 +1,16 @@
 package io.snapshot;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.snapshot.dto.NodeCandidateInputDto;
+import io.snapshot.dto.SnapshotInputDto;
+import io.snapshot.dto.TaskInputDto;
+import io.snapshot.dto.VehicleInputDto;
 import model.node.NodeCandidate;
 import model.node.NodeType;
 import model.snapshot.SystemSnapshot;
 import model.snapshot.TaskInstance;
 import model.snapshot.VehicleSnapshot;
+import validation.snapshot.SnapshotValidator;
 
 import java.io.File;
 import java.io.IOException;
@@ -15,19 +20,34 @@ import java.util.List;
 /**
  * Carica uno snapshot statico del sistema da file JSON.
  *
- * Il loader converte il formato JSON in oggetti del modello interno.
- * Non valida la correttezza dello scenario: la validazione è responsabilità
- * di SnapshotValidator.
+ * <p>Il loader separa tre passaggi: lettura del JSON in DTO grezzi,
+ * validazione centralizzata in {@link SnapshotValidator} e mapping verso il
+ * modello interno.</p>
  */
 public final class SnapshotLoader {
 
     private final ObjectMapper objectMapper;
+    private final SnapshotValidator snapshotValidator;
 
     /**
-     * Costruisce un loader basato su Jackson.
+     * Costruisce un loader basato su Jackson e sul validator standard.
      */
     public SnapshotLoader() {
+        this(new SnapshotValidator());
+    }
+
+    /**
+     * Costruisce un loader con validator esplicito.
+     *
+     * @param snapshotValidator validator da usare prima del mapping
+     */
+    public SnapshotLoader(SnapshotValidator snapshotValidator) {
+        if (snapshotValidator == null) {
+            throw new IllegalArgumentException("snapshotValidator must not be null.");
+        }
+
         this.objectMapper = new ObjectMapper();
+        this.snapshotValidator = snapshotValidator;
     }
 
     /**
@@ -35,25 +55,26 @@ public final class SnapshotLoader {
      *
      * @param filePath percorso del file JSON
      * @return snapshot convertito nel modello interno
-     * @throws IOException se il file non è leggibile o il JSON non è valido
+     * @throws IOException se il file non e' leggibile o il JSON non e' valido
      */
     public SystemSnapshot load(String filePath) throws IOException {
         if (filePath == null || filePath.isBlank()) {
             throw new IllegalArgumentException("filePath must not be null or blank.");
         }
 
-        SnapshotDto snapshotDto = objectMapper.readValue(
+        SnapshotInputDto snapshotDto = objectMapper.readValue(
                 new File(filePath),
-                SnapshotDto.class
+                SnapshotInputDto.class
         );
 
+        snapshotValidator.validate(snapshotDto);
         return toSystemSnapshot(snapshotDto);
     }
 
     /**
-     * Converte il DTO principale in SystemSnapshot.
+     * Converte il DTO principale in {@link SystemSnapshot}.
      */
-    private SystemSnapshot toSystemSnapshot(SnapshotDto dto) {
+    private SystemSnapshot toSystemSnapshot(SnapshotInputDto dto) {
         if (dto == null) {
             throw new IllegalArgumentException("snapshot JSON is empty or invalid.");
         }
@@ -68,16 +89,18 @@ public final class SnapshotLoader {
     }
 
     /**
-     * Converte i veicoli JSON in VehicleSnapshot.
+     * Converte i veicoli JSON in {@link VehicleSnapshot}.
      */
-    private List<VehicleSnapshot> toVehicles(List<VehicleDto> vehicleDtos) {
+    private List<VehicleSnapshot> toVehicles(
+            List<VehicleInputDto> vehicleDtos
+    ) {
         List<VehicleSnapshot> vehicles = new ArrayList<>();
 
         if (vehicleDtos == null) {
             return vehicles;
         }
 
-        for (VehicleDto dto : vehicleDtos) {
+        for (VehicleInputDto dto : vehicleDtos) {
             vehicles.add(
                     new VehicleSnapshot(
                             dto.vehicleId,
@@ -93,16 +116,16 @@ public final class SnapshotLoader {
     }
 
     /**
-     * Converte i task JSON in TaskInstance.
+     * Converte i task JSON in {@link TaskInstance}.
      */
-    private List<TaskInstance> toTasks(List<TaskDto> taskDtos) {
+    private List<TaskInstance> toTasks(List<TaskInputDto> taskDtos) {
         List<TaskInstance> tasks = new ArrayList<>();
 
         if (taskDtos == null) {
             return tasks;
         }
 
-        for (TaskDto dto : taskDtos) {
+        for (TaskInputDto dto : taskDtos) {
             tasks.add(
                     new TaskInstance(
                             dto.taskId,
@@ -119,20 +142,18 @@ public final class SnapshotLoader {
     }
 
     /**
-     * Converte i candidati JSON in NodeCandidate source-aware.
-     *
-     * Il JSON non contiene più coverageTimeSeconds.
-     * Per EDGE/RSU deve contenere nodeX, nodeY e coverageRadiusMeters.
-     * Per LOCAL, CLOUD e VEHICLE questi campi possono essere assenti.
+     * Converte i candidati JSON in {@link NodeCandidate}.
      */
-    private List<NodeCandidate> toCandidateNodes(List<NodeDto> nodeDtos) {
+    private List<NodeCandidate> toCandidateNodes(
+            List<NodeCandidateInputDto> nodeDtos
+    ) {
         List<NodeCandidate> candidateNodes = new ArrayList<>();
 
         if (nodeDtos == null) {
             return candidateNodes;
         }
 
-        for (NodeDto dto : nodeDtos) {
+        for (NodeCandidateInputDto dto : nodeDtos) {
             candidateNodes.add(
                     new NodeCandidate(
                             dto.candidateId,
@@ -156,50 +177,6 @@ public final class SnapshotLoader {
      * Converte il tipo del nodo da stringa JSON a enum.
      */
     private NodeType parseNodeType(String value) {
-        if (value == null || value.isBlank()) {
-            throw new IllegalArgumentException("candidate type must not be null or blank.");
-        }
-
         return NodeType.valueOf(value.trim().toUpperCase());
-    }
-
-    private static final class SnapshotDto {
-        public String snapshotId;
-        public double timeSeconds;
-        public List<VehicleDto> vehicles;
-        public List<TaskDto> tasks;
-        public List<NodeDto> candidateNodes;
-    }
-
-    private static final class VehicleDto {
-        public String vehicleId;
-        public double x;
-        public double y;
-        public double speed;
-        public double localCpu;
-    }
-
-    private static final class TaskDto {
-        public String taskId;
-        public String sourceVehicleId;
-        public double inputSizeBits;
-        public double outputSizeBits;
-        public double cpuCycles;
-        public double deadlineSeconds;
-    }
-
-    private static final class NodeDto {
-        public String candidateId;
-        public String sourceVehicleId;
-        public String executionNodeId;
-        public String type;
-
-        public double availableCpu;
-        public double availableBandwidth;
-        public double baseLatencySeconds;
-
-        public Double nodeX;
-        public Double nodeY;
-        public Double coverageRadiusMeters;
     }
 }
