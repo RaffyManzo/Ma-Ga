@@ -22,13 +22,13 @@ import java.util.Objects;
  * nella fase 6A:</p>
  *
  * <pre>
- * L_i = p * input / b + output / b + L_base   per p > 0
+ * L_i = p * input / b + output / b + tau_n   per p > 0
  * L(C) = sum_i L_i
  * </pre>
  *
- * <p>{@code L_base} resta una estensione operativa provvisoria associata al
- * nodo remoto. La sua relazione con {@code tau_n} deve essere chiarita nella
- * formalizzazione prima di un ulteriore refactor.</p>
+ * <p>{@code tau_n} è interpretato come ritardo end-to-end aggregato del
+ * percorso remoto. Il valore è indipendente da {@code p} e viene conteggiato
+ * una sola volta per ogni scelta remota.</p>
  */
 public final class LatencyDiagnosticPrinter {
 
@@ -71,13 +71,13 @@ public final class LatencyDiagnosticPrinter {
         out.println("Aggregation rule: L(C) = sum_i L_i(C)");
         out.println("Partial upload rule: p * input / bandwidth");
         out.println("Partial download rule: output / bandwidth for every remote choice p > 0");
-        out.println("Base latency rule: included once as provisional operational extension");
+        out.println("Propagation delay rule: tau_n is included once as aggregated end-to-end delay");
         out.println();
     }
 
     private void printSummaryByWindow(TemporalWindowResult result) {
         printSectionTitle("COMMUNICATION LATENCY SUMMARY BY WINDOW");
-        out.println("idx | snapshot | tasks | remote | partial | full | L(C) | Lref | normalizedL | avgPerTask | avgPerRemote | uploadSum | downloadSum | baseLatencySum | componentDelta");
+        out.println("idx | snapshot | tasks | remote | partial | full | L(C) | Lref | normalizedL | avgPerTask | avgPerRemote | uploadSum | downloadSum | tauSum | componentDelta");
 
         for (TemporalStepResult step : result.getSteps()) {
             EvaluationBreakdown evaluation = step.getMaGaResult().getBestEvaluation();
@@ -88,7 +88,7 @@ public final class LatencyDiagnosticPrinter {
             int full = 0;
             double uploadSum = 0.0;
             double downloadSum = 0.0;
-            double baseLatencySum = 0.0;
+            double tauSum = 0.0;
 
             for (GeneEvaluationBreakdown gene : remoteGenes) {
                 if (gene.getOffloadingRatio() >= 1.0 - EPSILON) {
@@ -98,11 +98,11 @@ public final class LatencyDiagnosticPrinter {
                 }
                 uploadSum += gene.getUploadTimeSeconds();
                 downloadSum += gene.getDownloadTimeSeconds();
-                baseLatencySum += gene.getBaseLatencySeconds();
+                tauSum += gene.getPropagationDelaySeconds();
             }
 
             double totalLatency = evaluation.getCommunicationLatencySeconds();
-            double components = uploadSum + downloadSum + baseLatencySum;
+            double components = uploadSum + downloadSum + tauSum;
             double delta = totalLatency - components;
             double avgPerTask = genes.isEmpty() ? 0.0 : totalLatency / genes.size();
             double avgPerRemote = remoteGenes.isEmpty() ? 0.0 : totalLatency / remoteGenes.size();
@@ -122,7 +122,7 @@ public final class LatencyDiagnosticPrinter {
                     avgPerRemote,
                     uploadSum,
                     downloadSum,
-                    baseLatencySum,
+                    tauSum,
                     delta
             );
         }
@@ -155,7 +155,7 @@ public final class LatencyDiagnosticPrinter {
                 continue;
             }
 
-            out.println("task | source | candidate | type | p | upload | download | baseLatency | L_i | remoteExec | remotePart | completion");
+            out.println("task | source | candidate | type | p | upload | download | tau_n | L_i | remoteExec | remotePart | completion");
 
             for (int index = 0; index < Math.min(topLimit, ranked.size()); index++) {
                 GeneEvaluationBreakdown gene = ranked.get(index);
@@ -168,7 +168,7 @@ public final class LatencyDiagnosticPrinter {
                         gene.getOffloadingRatio(),
                         gene.getUploadTimeSeconds(),
                         gene.getDownloadTimeSeconds(),
-                        gene.getBaseLatencySeconds(),
+                        gene.getPropagationDelaySeconds(),
                         gene.getCommunicationLatencySeconds(),
                         gene.getRemoteExecutionTimeSeconds(),
                         gene.getRemotePartTimeSeconds(),
@@ -185,8 +185,8 @@ public final class LatencyDiagnosticPrinter {
         out.println("- For every remote choice p > 0, upload scales with p.");
         out.println("- For every remote choice p > 0, download uses the integral remote output.");
         out.println("- L(C) is the sum of the task communication latencies, not their average.");
-        out.println("- baseLatencySeconds is included once as a provisional operational extension.");
-        out.println("- The relationship between baseLatencySeconds and the formal parameter tau_n remains an Open Issue.");
+        out.println("- tau_n is included once as aggregated end-to-end propagation delay.");
+        out.println("- tau_n is independent of p and excludes bandwidth-dependent transfer times.");
         out.println();
     }
 

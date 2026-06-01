@@ -15,7 +15,7 @@ import java.util.Objects;
  *
  * <pre>
  * T_local(p)  = (1 - p) * cycles / f_local
- * T_remote(p) = p * input / b + p * cycles / f + output / b + L_base
+ * T_remote(p) = p * input / b + p * cycles / f + output / b + tau_n
  * T_i         = max(T_local, T_remote)  se 0 < p < 1
  * T_i         = T_remote                se p = 1
  * </pre>
@@ -23,11 +23,10 @@ import java.util.Objects;
  * <p>Per i geni locali vale {@code p = 0}, la banda è nulla e il tempo è
  * {@code cycles / f_local}.</p>
  *
- * <p>{@code L_base} viene mantenuta provvisoriamente come estensione operativa
- * associata al nodo remoto. La formalizzazione introduce il parametro
- * {@code tau_n}, ma deve ancora chiarire in modo univoco se e come includerlo
- * nelle formule operative. Questa scelta resta quindi esplicita e separata
- * dalla correzione certa sul download integrale.</p>
+ * <p>{@code tau_n} è interpretato come ritardo end-to-end aggregato del
+ * percorso remoto. Il valore esclude i tempi di trasferimento dipendenti dalla
+ * banda, viene conteggiato una sola volta per ogni scelta remota e non scala
+ * con {@code p_i}.</p>
  */
 public final class OffloadingTimeModel {
 
@@ -110,17 +109,19 @@ public final class OffloadingTimeModel {
                 safeNonNegative(task.getOutputSizeBits()),
                 allocatedBandwidth
         );
-        double baseLatency = safeNonNegative(candidate.getBaseLatencySeconds());
+        double propagationDelay = safeNonNegative(
+                candidate.getPropagationDelaySeconds()
+        );
 
         double remotePartTime =
                 uploadTime
                         + remoteExecutionTime
                         + downloadTime
-                        + baseLatency;
+                        + propagationDelay;
         double communicationLatency =
                 uploadTime
                         + downloadTime
-                        + baseLatency;
+                        + propagationDelay;
         double completionTime = p >= 1.0 - EPSILON
                 ? remotePartTime
                 : Math.max(localExecutionTime, remotePartTime);
@@ -132,7 +133,7 @@ public final class OffloadingTimeModel {
                 uploadTime,
                 remoteExecutionTime,
                 downloadTime,
-                baseLatency,
+                propagationDelay,
                 remotePartTime,
                 communicationLatency,
                 completionTime
@@ -199,7 +200,7 @@ public final class OffloadingTimeModel {
 
     /**
      * Stima la componente fissa del ramo remoto per ogni {@code p > 0}:
-     * download integrale dell'output e latenza base provvisoria.
+     * download integrale dell'output e ritardo di propagazione aggregato.
      */
     public double estimateRemoteFixedTime(
             TaskInstance task,
@@ -212,15 +213,17 @@ public final class OffloadingTimeModel {
                 safeNonNegative(task.getOutputSizeBits()),
                 candidate.getAvailableBandwidth()
         );
-        double baseLatency = safeNonNegative(candidate.getBaseLatencySeconds());
-        return downloadTime + baseLatency;
+        double propagationDelay = safeNonNegative(
+                candidate.getPropagationDelaySeconds()
+        );
+        return downloadTime + propagationDelay;
     }
 
     /**
      * Mantiene compatibilità con chiamanti precedenti.
      *
      * <p>Restituisce il costo remoto completo per {@code p = 1}, senza
-     * latenza base. Non deve essere moltiplicato nuovamente per {@code p}
+     * ritardo di propagazione. Non deve essere moltiplicato nuovamente per {@code p}
      * nelle euristiche del partial offloading.</p>
      */
     @Deprecated

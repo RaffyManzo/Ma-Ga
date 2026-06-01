@@ -27,7 +27,7 @@ public final class GeneEvaluationBreakdown {
     private final double uploadTimeSeconds;
     private final double remoteExecutionTimeSeconds;
     private final double downloadTimeSeconds;
-    private final double baseLatencySeconds;
+    private final double propagationDelaySeconds;
     private final double remotePartTimeSeconds;
     private final double completionTimeSeconds;
     private final double communicationLatencySeconds;
@@ -57,7 +57,7 @@ public final class GeneEvaluationBreakdown {
             double uploadTimeSeconds,
             double remoteExecutionTimeSeconds,
             double downloadTimeSeconds,
-            double baseLatencySeconds,
+            double propagationDelaySeconds,
             double remotePartTimeSeconds,
             double completionTimeSeconds,
             double communicationLatencySeconds,
@@ -83,7 +83,7 @@ public final class GeneEvaluationBreakdown {
                 uploadTimeSeconds,
                 remoteExecutionTimeSeconds,
                 downloadTimeSeconds,
-                baseLatencySeconds,
+                propagationDelaySeconds,
                 remotePartTimeSeconds,
                 completionTimeSeconds,
                 communicationLatencySeconds,
@@ -116,7 +116,7 @@ public final class GeneEvaluationBreakdown {
             double uploadTimeSeconds,
             double remoteExecutionTimeSeconds,
             double downloadTimeSeconds,
-            double baseLatencySeconds,
+            double propagationDelaySeconds,
             double remotePartTimeSeconds,
             double completionTimeSeconds,
             double communicationLatencySeconds,
@@ -142,7 +142,7 @@ public final class GeneEvaluationBreakdown {
         this.uploadTimeSeconds = uploadTimeSeconds;
         this.remoteExecutionTimeSeconds = remoteExecutionTimeSeconds;
         this.downloadTimeSeconds = downloadTimeSeconds;
-        this.baseLatencySeconds = baseLatencySeconds;
+        this.propagationDelaySeconds = propagationDelaySeconds;
         this.remotePartTimeSeconds = remotePartTimeSeconds;
         this.completionTimeSeconds = completionTimeSeconds;
         this.communicationLatencySeconds = communicationLatencySeconds;
@@ -172,7 +172,16 @@ public final class GeneEvaluationBreakdown {
     public double getUploadTimeSeconds() { return uploadTimeSeconds; }
     public double getRemoteExecutionTimeSeconds() { return remoteExecutionTimeSeconds; }
     public double getDownloadTimeSeconds() { return downloadTimeSeconds; }
-    public double getBaseLatencySeconds() { return baseLatencySeconds; }
+    /** Restituisce tau_n: il ritardo end-to-end aggregato del percorso remoto. */
+    public double getPropagationDelaySeconds() { return propagationDelaySeconds; }
+
+    /**
+     * Alias mantenuto per compatibilità con printer e chiamanti precedenti.
+     *
+     * @deprecated usare {@link #getPropagationDelaySeconds()}
+     */
+    @Deprecated
+    public double getBaseLatencySeconds() { return getPropagationDelaySeconds(); }
     public double getRemotePartTimeSeconds() { return remotePartTimeSeconds; }
     public double getCompletionTimeSeconds() { return completionTimeSeconds; }
     public double getCommunicationLatencySeconds() { return communicationLatencySeconds; }

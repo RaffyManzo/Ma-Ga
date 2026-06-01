@@ -367,7 +367,7 @@ public final class FitnessEvaluator {
                 timeBreakdown.getUploadTimeSeconds(),
                 timeBreakdown.getRemoteExecutionTimeSeconds(),
                 timeBreakdown.getDownloadTimeSeconds(),
-                timeBreakdown.getBaseLatencySeconds(),
+                timeBreakdown.getPropagationDelaySeconds(),
                 timeBreakdown.getRemotePartTimeSeconds(),
                 timeBreakdown.getCompletionTimeSeconds(),
                 timeBreakdown.getCommunicationLatencySeconds(),
