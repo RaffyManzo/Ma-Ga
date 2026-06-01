@@ -10,6 +10,7 @@ import model.node.NodeType;
 import model.snapshot.SystemSnapshot;
 import model.snapshot.TaskInstance;
 import model.snapshot.VehicleSnapshot;
+import validation.snapshot.LocalCandidateInvariantValidator;
 import validation.snapshot.SnapshotValidator;
 
 import java.io.File;
@@ -20,34 +21,53 @@ import java.util.List;
 /**
  * Carica uno snapshot statico del sistema da file JSON.
  *
- * <p>Il loader separa tre passaggi: lettura del JSON in DTO grezzi,
- * validazione centralizzata in {@link SnapshotValidator} e mapping verso il
- * modello interno.</p>
+ * <p>Il loader separa quattro passaggi: lettura del JSON in DTO grezzi,
+ * validazione centralizzata in {@link SnapshotValidator}, mapping verso il
+ * modello interno e verifica dell'invariante locale necessario al repair.</p>
  */
 public final class SnapshotLoader {
-
     private final ObjectMapper objectMapper;
     private final SnapshotValidator snapshotValidator;
+    private final LocalCandidateInvariantValidator localCandidateInvariantValidator;
 
     /**
-     * Costruisce un loader basato su Jackson e sul validator standard.
+     * Costruisce un loader basato su Jackson e sui validator standard.
      */
     public SnapshotLoader() {
-        this(new SnapshotValidator());
+        this(new SnapshotValidator(), new LocalCandidateInvariantValidator());
     }
 
     /**
-     * Costruisce un loader con validator esplicito.
+     * Costruisce un loader mantenendo compatibilità con i chiamanti esistenti.
      *
      * @param snapshotValidator validator da usare prima del mapping
      */
     public SnapshotLoader(SnapshotValidator snapshotValidator) {
+        this(snapshotValidator, new LocalCandidateInvariantValidator());
+    }
+
+    /**
+     * Costruisce un loader con validator espliciti.
+     *
+     * @param snapshotValidator              validator dei DTO grezzi
+     * @param localCandidateInvariantValidator validator del fallback locale
+     */
+    public SnapshotLoader(
+            SnapshotValidator snapshotValidator,
+            LocalCandidateInvariantValidator localCandidateInvariantValidator
+    ) {
         if (snapshotValidator == null) {
             throw new IllegalArgumentException("snapshotValidator must not be null.");
+        }
+        if (localCandidateInvariantValidator == null) {
+            throw new IllegalArgumentException(
+                    "localCandidateInvariantValidator must not be null."
+            );
         }
 
         this.objectMapper = new ObjectMapper();
         this.snapshotValidator = snapshotValidator;
+        this.localCandidateInvariantValidator = localCandidateInvariantValidator;
     }
 
     /**
@@ -68,7 +88,9 @@ public final class SnapshotLoader {
         );
 
         snapshotValidator.validate(snapshotDto);
-        return toSystemSnapshot(snapshotDto);
+        SystemSnapshot snapshot = toSystemSnapshot(snapshotDto);
+        localCandidateInvariantValidator.validate(snapshot);
+        return snapshot;
     }
 
     /**
@@ -91,11 +113,8 @@ public final class SnapshotLoader {
     /**
      * Converte i veicoli JSON in {@link VehicleSnapshot}.
      */
-    private List<VehicleSnapshot> toVehicles(
-            List<VehicleInputDto> vehicleDtos
-    ) {
+    private List<VehicleSnapshot> toVehicles(List<VehicleInputDto> vehicleDtos) {
         List<VehicleSnapshot> vehicles = new ArrayList<>();
-
         if (vehicleDtos == null) {
             return vehicles;
         }
@@ -111,7 +130,6 @@ public final class SnapshotLoader {
                     )
             );
         }
-
         return vehicles;
     }
 
@@ -120,7 +138,6 @@ public final class SnapshotLoader {
      */
     private List<TaskInstance> toTasks(List<TaskInputDto> taskDtos) {
         List<TaskInstance> tasks = new ArrayList<>();
-
         if (taskDtos == null) {
             return tasks;
         }
@@ -137,18 +154,14 @@ public final class SnapshotLoader {
                     )
             );
         }
-
         return tasks;
     }
 
     /**
      * Converte i candidati JSON in {@link NodeCandidate}.
      */
-    private List<NodeCandidate> toCandidateNodes(
-            List<NodeCandidateInputDto> nodeDtos
-    ) {
+    private List<NodeCandidate> toCandidateNodes(List<NodeCandidateInputDto> nodeDtos) {
         List<NodeCandidate> candidateNodes = new ArrayList<>();
-
         if (nodeDtos == null) {
             return candidateNodes;
         }
@@ -169,7 +182,6 @@ public final class SnapshotLoader {
                     )
             );
         }
-
         return candidateNodes;
     }
 
