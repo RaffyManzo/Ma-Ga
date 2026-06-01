@@ -9,9 +9,11 @@ import ga.fitness.breakdown.ExecutionNodeResourceUsageBreakdown;
 import ga.fitness.breakdown.GeneEvaluationBreakdown;
 import ga.fitness.breakdown.LinkBandwidthUsageBreakdown;
 import ga.fitness.breakdown.LocalResourceUsageBreakdown;
+import ga.fitness.breakdown.MobilityPenaltyBreakdown;
 import model.genetic.Chromosome;
 import model.genetic.Gene;
 import model.mobility.CoverageEstimator;
+import model.mobility.MobilityLinkMetrics;
 import model.node.NodeCandidate;
 import model.node.NodeType;
 import model.offloading.OffloadingTimeBreakdown;
@@ -247,11 +249,12 @@ public final class FitnessEvaluator {
             localCpu = EPSILON;
         }
 
-        double coverageTimeSeconds = coverageEstimator.estimateCoverageTimeSeconds(
+        MobilityLinkMetrics mobilityLinkMetrics = coverageEstimator.estimateLinkMetrics(
                 snapshot,
                 task,
                 candidate
         );
+        double coverageTimeSeconds = mobilityLinkMetrics.getCoverageTimeSeconds();
 
         if (candidate.getType() == NodeType.LOCAL) {
             OffloadingTimeBreakdown timeBreakdown =
@@ -294,7 +297,8 @@ public final class FitnessEvaluator {
                             task.getDeadlineSeconds()
                     ),
                     coverageTimeSeconds,
-                    true
+                    true,
+                    MobilityPenaltyBreakdown.zero(mobilityLinkMetrics)
             );
         }
 
@@ -325,19 +329,13 @@ public final class FitnessEvaluator {
                 allocatedBandwidth
         );
 
-        double linkInstability = coverageEstimator.estimateLinkInstability(
-                snapshot,
-                task,
-                candidate
-        );
-
-        double mobilityPenalty = computeMobilityPenalty(
+        MobilityPenaltyBreakdown mobilityBreakdown = computeMobilityPenaltyBreakdown(
                 candidate,
-                coverageTimeSeconds,
+                mobilityLinkMetrics,
                 timeBreakdown.getCompletionTimeSeconds(),
-                linkInstability,
                 penalties
         );
+        double mobilityPenalty = mobilityBreakdown.getTotalMobilityPenalty();
 
         double deadlinePenalty = computeDeadlinePenalty(
                 timeBreakdown.getCompletionTimeSeconds(),
@@ -379,7 +377,8 @@ public final class FitnessEvaluator {
                         task.getDeadlineSeconds()
                 ),
                 coverageTimeSeconds,
-                coverageSufficient
+                coverageSufficient,
+                mobilityBreakdown
         );
     }
 
@@ -469,42 +468,50 @@ public final class FitnessEvaluator {
     }
 
     /**
-     * Calcola la penalità mobility-aware usando copertura stimata e phi_link.
+     * Calcola la penalità mobility-aware e conserva il breakdown diagnostico.
      */
-    private double computeMobilityPenalty(
+    private MobilityPenaltyBreakdown computeMobilityPenaltyBreakdown(
             NodeCandidate candidate,
-            double coverageTimeSeconds,
+            MobilityLinkMetrics linkMetrics,
             double completionTimeSeconds,
-            double linkInstability,
             PenaltyConfig penalties
     ) {
         if (candidate.getType() == NodeType.LOCAL) {
-            return 0.0;
+            return MobilityPenaltyBreakdown.zero(linkMetrics);
         }
 
         if (!isStrictlyPositive(completionTimeSeconds)) {
-            return 0.0;
+            return MobilityPenaltyBreakdown.zero(linkMetrics);
         }
+
+        double coverageTimeSeconds = linkMetrics.getCoverageTimeSeconds();
+        double linkInstability = linkMetrics.getLinkInstability();
+        double coverageRisk;
+        double handoverRisk;
 
         if (!isStrictlyPositive(coverageTimeSeconds)) {
-            return penalties.getCoverageRiskWeight()
-                    + penalties.getLinkInstabilityWeight() * linkInstability
-                    + penalties.getHandoverRiskWeight();
+            coverageRisk = 1.0;
+            handoverRisk = 1.0;
+        } else {
+            coverageRisk = Math.max(
+                    0.0,
+                    1.0 - coverageTimeSeconds / completionTimeSeconds
+            );
+            handoverRisk = Math.min(
+                    1.0,
+                    completionTimeSeconds / coverageTimeSeconds
+            );
         }
 
-        double coverageRisk = Math.max(
-                0.0,
-                1.0 - coverageTimeSeconds / completionTimeSeconds
+        return new MobilityPenaltyBreakdown(
+                linkMetrics,
+                coverageRisk,
+                linkInstability,
+                handoverRisk,
+                penalties.getCoverageRiskWeight() * coverageRisk,
+                penalties.getLinkInstabilityWeight() * linkInstability,
+                penalties.getHandoverRiskWeight() * handoverRisk
         );
-
-        double handoverRisk = Math.min(
-                1.0,
-                completionTimeSeconds / coverageTimeSeconds
-        );
-
-        return penalties.getCoverageRiskWeight() * coverageRisk
-                + penalties.getLinkInstabilityWeight() * linkInstability
-                + penalties.getHandoverRiskWeight() * handoverRisk;
     }
 
     private double computeDeadlinePenalty(
