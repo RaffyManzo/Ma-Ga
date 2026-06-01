@@ -11,11 +11,12 @@ import java.util.Objects;
 /**
  * Punto unico di composizione del report temporale della finestra adattiva.
  *
- * <p>Il main non conosce più i singoli printer specialistici. Questo oggetto mantiene
- * insieme il report diagnostico generale, i bounds adattivi, il timing, il riuso della
- * popolazione, la sorgente dati e il prefilter.</p>
+ * <p>Il main non conosce più i singoli printer specialistici. Questo oggetto
+ * mantiene insieme il report diagnostico generale, i bounds adattivi, il
+ * timing, il riuso della popolazione, la sorgente dati e il prefilter.</p>
  */
 public final class AdaptiveWindowReportPrinter {
+
     private final MaGaConfig config;
     private final PrintStream out;
 
@@ -64,6 +65,7 @@ public final class AdaptiveWindowReportPrinter {
 
         printExecutionMetadata(requestedSourceMode, runtimeProfile, snapshotFolder);
         new DeepTemporalWindowDiagnosticPrinter(config, out, 10).print(result);
+        new DeadlineBestEffortDiagnosticPrinter(out, 10).print(result);
         new MobilityDiagnosticPrinter(config, out, 10).print(result);
         new LatencyDiagnosticPrinter(config, out, 10).print(result);
         new AdaptiveWindowDiagnosticPrinter(out).print(result);
@@ -86,11 +88,13 @@ public final class AdaptiveWindowReportPrinter {
         out.println("Snapshot folder: " + snapshotFolder);
         out.println();
         out.println("Source mode interpretation:");
-        out.println("- JSON_TIME: time-driven replay. The manager requests a logical time and the source must not expose future snapshots.");
+        out.println("- JSON_TIME: time-driven replay.\n"
+                + "  The manager requests a logical time and the source must not expose future snapshots.");
         out.println("- JSON_SEQUENCE: ordinal diagnostic replay. All files are consumed in sequence; a positive time shift can be expected after adaptive window changes.");
         out.println();
         out.println("Runtime profile interpretation:");
-        out.println("- OBSERVED_RUNTIME: operational verification. DeltaT_min uses the GA runtime observed in the previous window after the initial estimate.");
+        out.println("- OBSERVED_RUNTIME: operational verification.\n"
+                + "  DeltaT_min uses the GA runtime observed in the previous window after the initial estimate.");
         out.println("- CONFIGURED_RUNTIME: abstract replay. DeltaT_min uses the configured GA estimate to keep offline experiments reproducible.");
         out.println();
     }

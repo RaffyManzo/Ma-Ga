@@ -14,9 +14,11 @@ import java.util.List;
 import java.util.Objects;
 
 /**
- * Report aggregato per il confronto di più esecuzioni statiche e indipendenti del MA-GA.
+ * Report aggregato per il confronto di più esecuzioni statiche e indipendenti
+ * del MA-GA.
  */
 public final class GaBatchReportPrinter {
+
     private final MaGaConfig config;
     private final PrintStream out;
 
@@ -53,6 +55,7 @@ public final class GaBatchReportPrinter {
         out.println("Snapshot folder: " + snapshotFolder);
         out.println("Independent GA runs: " + runCount);
         out.println("Population reuse: disabled");
+        out.println("Deadline residuals: labelled as DEGRADED_BEST_EFFORT");
         out.println();
     }
 
@@ -60,7 +63,8 @@ public final class GaBatchReportPrinter {
         printSection("1. SNAPSHOT COMPARISON");
         out.println(
                 "idx | snapshot | time | vehicles | tasks | candidates | gen | stop | "
-                        + "initBest | finalBest | gain% | deadlineViol | cpuViol | bwViol | runtime"
+                        + "initBest | finalBest | gain% | deadlineViol | degradedBestEffort | "
+                        + "maxLateness | cpuViol | bwViol | runtime"
         );
 
         for (SnapshotRun run : runs) {
@@ -78,6 +82,8 @@ public final class GaBatchReportPrinter {
                             + format(run.result().getFinalBestFitness()) + " | "
                             + formatPercent(improvementRatio(run.result())) + " | "
                             + countDeadlineViolations(evaluation) + " | "
+                            + countDegradedBestEffort(evaluation) + " | "
+                            + formatSeconds(computeMaxLateness(evaluation)) + " | "
                             + countCpuViolations(evaluation) + " | "
                             + countBandwidthViolations(evaluation) + " | "
                             + run.runtimeMillis() + " ms"
@@ -88,6 +94,7 @@ public final class GaBatchReportPrinter {
 
     private void printWorstSnapshots(List<SnapshotRun> runs) {
         printSection("2. WORST SNAPSHOTS");
+
         if (runs.isEmpty()) {
             out.println("No snapshot run available.");
             out.println();
@@ -104,26 +111,38 @@ public final class GaBatchReportPrinter {
                         "- idx=" + run.index()
                                 + " snapshot=" + run.snapshot().getSnapshotId()
                                 + " J=" + format(run.result().getFinalBestFitness())
-                                + " deadlineViol=" + countDeadlineViolations(
+                                + " degradedBestEffort=" + countDegradedBestEffort(
                                 run.result().getBestEvaluation()
                         )
+                                + " maxLateness=" + formatSeconds(computeMaxLateness(
+                                run.result().getBestEvaluation()
+                        ))
                 ));
-
         out.println();
-        out.println("Worst by deadline violations:");
+
+        out.println("Worst by degraded best-effort decisions:");
         runs.stream()
-                .sorted(Comparator.comparingLong(
-                        (SnapshotRun run) -> countDeadlineViolations(
-                                run.result().getBestEvaluation()
+                .sorted(
+                        Comparator.comparingLong(
+                                (SnapshotRun run) -> countDegradedBestEffort(
+                                        run.result().getBestEvaluation()
+                                )
                         )
-                ).reversed())
+                                .thenComparingDouble(run -> computeMaxLateness(
+                                        run.result().getBestEvaluation()
+                                ))
+                                .reversed()
+                )
                 .limit(5)
                 .forEach(run -> out.println(
                         "- idx=" + run.index()
                                 + " snapshot=" + run.snapshot().getSnapshotId()
-                                + " deadlineViol=" + countDeadlineViolations(
+                                + " degradedBestEffort=" + countDegradedBestEffort(
                                 run.result().getBestEvaluation()
                         )
+                                + " maxLateness=" + formatSeconds(computeMaxLateness(
+                                run.result().getBestEvaluation()
+                        ))
                                 + " J=" + format(run.result().getFinalBestFitness())
                 ));
         out.println();
@@ -132,10 +151,10 @@ public final class GaBatchReportPrinter {
     private void printDetailedReports(List<SnapshotRun> runs) {
         printSection("3. DETAILED SNAPSHOT REPORTS");
         StressResultPrinter detailPrinter = new StressResultPrinter(config, out);
+
         for (SnapshotRun run : runs) {
             out.println("############################################################");
-            out.println("DETAIL idx=" + run.index()
-                    + " snapshot=" + run.snapshot().getSnapshotId());
+            out.println("DETAIL idx=" + run.index() + " snapshot=" + run.snapshot().getSnapshotId());
             out.println("############################################################");
             detailPrinter.printStressReport(run.snapshot(), run.result());
         }
@@ -146,6 +165,28 @@ public final class GaBatchReportPrinter {
                 .stream()
                 .filter(gene -> !gene.isDeadlineRespected())
                 .count();
+    }
+
+    private long countDegradedBestEffort(EvaluationBreakdown evaluation) {
+        return countDeadlineViolations(evaluation);
+    }
+
+    private double computeMaxLateness(EvaluationBreakdown evaluation) {
+        return evaluation.getGeneBreakdowns()
+                .stream()
+                .mapToDouble(this::latenessSeconds)
+                .max()
+                .orElse(0.0);
+    }
+
+    private double latenessSeconds(GeneEvaluationBreakdown gene) {
+        if (gene.isDeadlineRespected()) {
+            return 0.0;
+        }
+        return Math.max(
+                0.0,
+                gene.getCompletionTimeSeconds() - gene.getDeadlineSeconds()
+        );
     }
 
     private long countCpuViolations(EvaluationBreakdown evaluation) {
