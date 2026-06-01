@@ -1,0 +1,179 @@
+{
+  "snapshotId": "phase_11_bandwidth_pressure",
+  "timeSeconds": 55.0,
+  "vehicles": [
+    {
+      "vehicleId": "vehicle_a",
+      "x": 100.0,
+      "y": 0.0,
+      "speed": 10.0,
+      "localCpu": 300.0
+    },
+    {
+      "vehicleId": "vehicle_b",
+      "x": 200.0,
+      "y": 0.0,
+      "speed": 10.0,
+      "localCpu": 350.0
+    },
+    {
+      "vehicleId": "vehicle_peer",
+      "x": 150.0,
+      "y": 0.0,
+      "speed": 10.2,
+      "localCpu": 1400.0
+    },
+    {
+      "vehicleId": "vehicle_bw_a",
+      "x": 60.0,
+      "y": 0.0,
+      "speed": 10.0,
+      "localCpu": 100.0
+    },
+    {
+      "vehicleId": "vehicle_bw_b",
+      "x": 70.0,
+      "y": 0.0,
+      "speed": 10.0,
+      "localCpu": 100.0
+    }
+  ],
+  "tasks": [
+    {
+      "taskId": "task_a_base",
+      "sourceVehicleId": "vehicle_a",
+      "inputSizeBits": 150.0,
+      "outputSizeBits": 15.0,
+      "cpuCycles": 1000.0,
+      "deadlineSeconds": 4.0
+    },
+    {
+      "taskId": "task_b_base",
+      "sourceVehicleId": "vehicle_b",
+      "inputSizeBits": 180.0,
+      "outputSizeBits": 15.0,
+      "cpuCycles": 1200.0,
+      "deadlineSeconds": 4.0
+    },
+    {
+      "taskId": "task_bw_a",
+      "sourceVehicleId": "vehicle_bw_a",
+      "inputSizeBits": 1500.0,
+      "outputSizeBits": 150.0,
+      "cpuCycles": 900.0,
+      "deadlineSeconds": 3.0
+    },
+    {
+      "taskId": "task_bw_b",
+      "sourceVehicleId": "vehicle_bw_b",
+      "inputSizeBits": 1500.0,
+      "outputSizeBits": 150.0,
+      "cpuCycles": 900.0,
+      "deadlineSeconds": 3.0
+    }
+  ],
+  "candidateNodes": [
+    {
+      "candidateId": "local_vehicle_a",
+      "sourceVehicleId": "vehicle_a",
+      "executionNodeId": "vehicle_a",
+      "type": "LOCAL",
+      "availableCpu": 300.0,
+      "availableBandwidth": 0.0,
+      "baseLatencySeconds": 0.0
+    },
+    {
+      "candidateId": "edge_center_for_vehicle_a",
+      "sourceVehicleId": "vehicle_a",
+      "executionNodeId": "edge_center",
+      "type": "EDGE",
+      "availableCpu": 4500.0,
+      "availableBandwidth": 450.0,
+      "baseLatencySeconds": 0.02,
+      "nodeX": 0.0,
+      "nodeY": 0.0,
+      "coverageRadiusMeters": 500.0
+    },
+    {
+      "candidateId": "cloud_001_for_vehicle_a",
+      "sourceVehicleId": "vehicle_a",
+      "executionNodeId": "cloud_001",
+      "type": "CLOUD",
+      "availableCpu": 12000.0,
+      "availableBandwidth": 700.0,
+      "baseLatencySeconds": 0.18
+    },
+    {
+      "candidateId": "local_vehicle_b",
+      "sourceVehicleId": "vehicle_b",
+      "executionNodeId": "vehicle_b",
+      "type": "LOCAL",
+      "availableCpu": 350.0,
+      "availableBandwidth": 0.0,
+      "baseLatencySeconds": 0.0
+    },
+    {
+      "candidateId": "edge_center_for_vehicle_b",
+      "sourceVehicleId": "vehicle_b",
+      "executionNodeId": "edge_center",
+      "type": "EDGE",
+      "availableCpu": 4500.0,
+      "availableBandwidth": 450.0,
+      "baseLatencySeconds": 0.02,
+      "nodeX": 0.0,
+      "nodeY": 0.0,
+      "coverageRadiusMeters": 500.0
+    },
+    {
+      "candidateId": "cloud_001_for_vehicle_b",
+      "sourceVehicleId": "vehicle_b",
+      "executionNodeId": "cloud_001",
+      "type": "CLOUD",
+      "availableCpu": 12000.0,
+      "availableBandwidth": 700.0,
+      "baseLatencySeconds": 0.18
+    },
+    {
+      "candidateId": "local_vehicle_bw_a",
+      "sourceVehicleId": "vehicle_bw_a",
+      "executionNodeId": "vehicle_bw_a",
+      "type": "LOCAL",
+      "availableCpu": 100.0,
+      "availableBandwidth": 0.0,
+      "baseLatencySeconds": 0.0
+    },
+    {
+      "candidateId": "edge_shared_bw_for_vehicle_bw_a",
+      "sourceVehicleId": "vehicle_bw_a",
+      "executionNodeId": "edge_shared_bw",
+      "type": "EDGE",
+      "availableCpu": 8000.0,
+      "availableBandwidth": 40.0,
+      "baseLatencySeconds": 0.01,
+      "nodeX": 0.0,
+      "nodeY": 0.0,
+      "coverageRadiusMeters": 500.0
+    },
+    {
+      "candidateId": "local_vehicle_bw_b",
+      "sourceVehicleId": "vehicle_bw_b",
+      "executionNodeId": "vehicle_bw_b",
+      "type": "LOCAL",
+      "availableCpu": 100.0,
+      "availableBandwidth": 0.0,
+      "baseLatencySeconds": 0.0
+    },
+    {
+      "candidateId": "edge_shared_bw_for_vehicle_bw_b",
+      "sourceVehicleId": "vehicle_bw_b",
+      "executionNodeId": "edge_shared_bw",
+      "type": "EDGE",
+      "availableCpu": 8000.0,
+      "availableBandwidth": 40.0,
+      "baseLatencySeconds": 0.01,
+      "nodeX": 0.0,
+      "nodeY": 0.0,
+      "coverageRadiusMeters": 500.0
+    }
+  ]
+}

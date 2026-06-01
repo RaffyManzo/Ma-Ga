@@ -1,0 +1,245 @@
+[
+  {
+    "idx": "000",
+    "timestamp": "0.0",
+    "snapshotId": "phase_00_baseline",
+    "phase": "00 - baseline",
+    "focus": "LOCAL / EDGE / CLOUD disponibili in uno scenario leggero.",
+    "expected": "Snapshot valido; nessuna violazione CPU o banda; TcovRef atteso = 35 s.",
+    "note": ""
+  },
+  {
+    "idx": "001",
+    "timestamp": "5.0",
+    "snapshotId": "phase_01_stable_repeat",
+    "phase": "01 - stabilità",
+    "focus": "Snapshot fisicamente identico.",
+    "expected": "D=0; riuso della popolazione favorito; TcovRef invariato.",
+    "note": ""
+  },
+  {
+    "idx": "002",
+    "timestamp": "10.0",
+    "snapshotId": "phase_02_extra_candidates_same_access",
+    "phase": "02 - regressione TcovRef",
+    "focus": "Aggiunta di candidati EDGE inferiori e di un candidato V2V.",
+    "expected": "TcovRef deve restare 35 s: ogni veicolo pesa una sola volta e i candidati V2V non entrano nella media.",
+    "note": "Test diretto della patch minima su CoverageReferenceCalculator."
+  },
+  {
+    "idx": "003",
+    "timestamp": "15.0",
+    "snapshotId": "phase_03_prefilter_structural",
+    "phase": "03 - prefilter strutturale",
+    "focus": "EDGE vicino al limite, EDGE fuori copertura e candidato associato a sorgente senza task.",
+    "expected": "edge_fragile_valid mantenuto; edge_outside rimosso; edge_idle rimosso per NO_TASK_FOR_SOURCE.",
+    "note": ""
+  },
+  {
+    "idx": "004",
+    "timestamp": "20.0",
+    "snapshotId": "phase_04_v2v_out_of_range",
+    "phase": "04 - V2V fuori raggio",
+    "focus": "Il target V2V supera il raggio di comunicazione.",
+    "expected": "Il candidato VEHICLE per vehicle_a viene filtrato per copertura insufficiente; Dl aumenta.",
+    "note": ""
+  },
+  {
+    "idx": "005",
+    "timestamp": "25.0",
+    "snapshotId": "phase_05_v2v_equal_speed",
+    "phase": "05 - V2V velocità uguali",
+    "focus": "Il target V2V torna vicino con velocità scalare uguale alla sorgente.",
+    "expected": "Candidato V2V nuovamente valido; tempo di copertura clampato al massimo convenzionale tramite epsilonSpeed.",
+    "note": ""
+  },
+  {
+    "idx": "006",
+    "timestamp": "30.0",
+    "snapshotId": "phase_06_deadline_repairable",
+    "phase": "06 - deadline riparabile",
+    "focus": "Task impossibile in locale ma facilmente eseguibile su EDGE.",
+    "expected": "degradedBestEffort=0; il repair deve trovare una configurazione remota ammissibile.",
+    "note": ""
+  },
+  {
+    "idx": "007",
+    "timestamp": "35.0",
+    "snapshotId": "phase_07_degraded_best_effort",
+    "phase": "07 - DEGRADED_BEST_EFFORT",
+    "focus": "Task oltre deadline per tutte le alternative valutabili.",
+    "expected": "Il report deve mostrare DEGRADED_BEST_EFFORT e lateness positiva; CLOUD non va privilegiato per regola fissa.",
+    "note": ""
+  },
+  {
+    "idx": "008",
+    "timestamp": "40.0",
+    "snapshotId": "phase_08_full_offloading_diagnostic",
+    "phase": "08 - full offloading",
+    "focus": "Scenario costruito per favorire una quota p prossima o uguale a 1.",
+    "expected": "Verificare se p=1 compare. Se resta assente, investigare initializer, mutation e repair prima della fitness.",
+    "note": "Test diagnostico: la natura stocastica del GA non garantisce un output identico a ogni run."
+  },
+  {
+    "idx": "009",
+    "timestamp": "45.0",
+    "snapshotId": "phase_09_tau_tradeoff",
+    "phase": "09 - semantica tau_n",
+    "focus": "Due EDGE equivalenti tranne per tau_n.",
+    "expected": "edge_low_tau deve essere più competitivo; tau_n va conteggiato una sola volta per scelta remota.",
+    "note": ""
+  },
+  {
+    "idx": "010",
+    "timestamp": "50.0",
+    "snapshotId": "phase_10_remote_cpu_contention",
+    "phase": "10 - repair CPU aggregato",
+    "focus": "Due task competono per lo stesso executionNodeId remoto.",
+    "expected": "Il report finale non deve mostrare CPU violations; il repair aggregato deve ridimensionare o riallocare.",
+    "note": ""
+  },
+  {
+    "idx": "011",
+    "timestamp": "55.0",
+    "snapshotId": "phase_11_bandwidth_pressure",
+    "phase": "11 - pressione banda",
+    "focus": "Due task remoti con trasferimenti elevati verso lo stesso EDGE.",
+    "expected": "Osservare saturazione e scelte del repair. Il modello gerarchico dei pool radio resta open issue.",
+    "note": "Scenario esplorativo: non certifica una semantica di banda non ancora formalizzata nel codice."
+  },
+  {
+    "idx": "012",
+    "timestamp": "60.0",
+    "snapshotId": "phase_12_vehicle_entry",
+    "phase": "12 - ingresso veicolo",
+    "focus": "Ingresso di un nuovo veicolo con un task attivo.",
+    "expected": "Dv e Dt devono aumentare; il riuso della popolazione deve adattarsi al nuovo task.",
+    "note": ""
+  },
+  {
+    "idx": "013",
+    "timestamp": "65.0",
+    "snapshotId": "phase_13_vehicle_exit",
+    "phase": "13 - uscita veicolo",
+    "focus": "Il veicolo introdotto nella finestra precedente scompare.",
+    "expected": "Dv e Dt devono aumentare nuovamente.",
+    "note": ""
+  },
+  {
+    "idx": "014",
+    "timestamp": "70.0",
+    "snapshotId": "phase_14_task_spike",
+    "phase": "14 - spike task",
+    "focus": "Aumento improvviso del numero di task attivi.",
+    "expected": "Dt elevato; possibile riduzione della finestra e riuso più prudente.",
+    "note": ""
+  },
+  {
+    "idx": "015",
+    "timestamp": "75.0",
+    "snapshotId": "phase_15_resource_degradation",
+    "phase": "15 - degrado risorse",
+    "focus": "Caduta della CPU disponibile su edge_center durante lo spike.",
+    "expected": "Dr elevato; maggiore pressione sul repair e possibile cold start.",
+    "note": ""
+  },
+  {
+    "idx": "016",
+    "timestamp": "80.0",
+    "snapshotId": "phase_16_resource_recovery",
+    "phase": "16 - recupero risorse",
+    "focus": "Ritorno allo scenario leggero.",
+    "expected": "Dr e Dt riflettono il recupero; nessuna violazione aggregata residua.",
+    "note": ""
+  },
+  {
+    "idx": "017",
+    "timestamp": "85.0",
+    "snapshotId": "phase_17_link_degradation_reachable",
+    "phase": "17 - degrado link",
+    "focus": "I veicoli si avvicinano al bordo della copertura EDGE senza superarlo.",
+    "expected": "EDGE mantenuti dal prefilter; Dl aumenta; TcovRef si riduce; phi_link elevato ma < 1.",
+    "note": ""
+  },
+  {
+    "idx": "018",
+    "timestamp": "90.0",
+    "snapshotId": "phase_18_link_loss_outside",
+    "phase": "18 - perdita copertura EDGE",
+    "focus": "I veicoli superano il raggio di edge_center.",
+    "expected": "Candidati EDGE filtrati per INSUFFICIENT_COVERAGE; LOCAL e CLOUD restano disponibili.",
+    "note": ""
+  },
+  {
+    "idx": "019",
+    "timestamp": "95.0",
+    "snapshotId": "phase_19_severe_combined_spike",
+    "phase": "19 - spike severo combinato",
+    "focus": "Spike task, link fragili e degrado risorse nello stesso istante.",
+    "expected": "Dt, Dl e Dr elevati; COLD_START atteso se le soglie correnti rilevano il picco severo.",
+    "note": ""
+  },
+  {
+    "idx": "020",
+    "timestamp": "100.0",
+    "snapshotId": "phase_20_recovery_after_spike",
+    "phase": "20 - recupero",
+    "focus": "Ritorno alla baseline dopo lo spike severo.",
+    "expected": "Il manager osserva una forte variazione inversa e ristabilisce gradualmente il riuso.",
+    "note": ""
+  },
+  {
+    "idx": "021",
+    "timestamp": "105.0",
+    "snapshotId": "phase_21_raw_filtered_idle_source",
+    "phase": "21 - raw vs filtered, sorgente inattiva",
+    "focus": "Veicolo e candidati presenti nello snapshot grezzo, ma nessun task attivo per la sorgente.",
+    "expected": "I candidati di vehicle_idle_2 sono esclusi dalla vista ottimizzabile per NO_TASK_FOR_SOURCE.",
+    "note": ""
+  },
+  {
+    "idx": "022",
+    "timestamp": "110.0",
+    "snapshotId": "phase_22_raw_filtered_task_activation",
+    "phase": "22 - raw vs filtered, attivazione task",
+    "focus": "Il task attiva candidati già presenti nello snapshot grezzo.",
+    "expected": "Dt aumenta; Dr e Dl non devono simulare l'apparizione fisica di nuovi nodi.",
+    "note": ""
+  },
+  {
+    "idx": "023",
+    "timestamp": "115.0",
+    "snapshotId": "phase_23_raw_filtered_task_deactivation",
+    "phase": "23 - raw vs filtered, disattivazione task",
+    "focus": "Il task viene rimosso, ma veicolo e candidati restano osservati fisicamente.",
+    "expected": "Dt aumenta; Dr e Dl non devono simulare la scomparsa fisica dei candidati.",
+    "note": ""
+  },
+  {
+    "idx": "024",
+    "timestamp": "120.0",
+    "snapshotId": "phase_24_cloud_placeholder",
+    "phase": "24 - placeholder cloud",
+    "focus": "Task con CLOUD come unica alternativa remota.",
+    "expected": "Il report mobility rende visibile CLOUD_STABLE_PLACEHOLDER e phi_link CLOUD=0.",
+    "note": "Scenario esplorativo collegato alla open issue sul gateway radio esplicito."
+  },
+  {
+    "idx": "025",
+    "timestamp": "125.0",
+    "snapshotId": "phase_25_local_cpu_sharing_open_issue",
+    "phase": "25 - CPU locale condivisa",
+    "focus": "Due task locali sullo stesso veicolo.",
+    "expected": "Scenario esplorativo: osservare l'ipotesi corrente; la contesa locale aggregata resta open issue.",
+    "note": ""
+  },
+  {
+    "idx": "026",
+    "timestamp": "130.0",
+    "snapshotId": "phase_26_final_stable_repeat",
+    "phase": "26 - stabilità finale",
+    "focus": "Ripetizione esatta della finestra precedente.",
+    "expected": "D=0; warm start favorito salvo correzioni prestazionali.",
+    "note": ""
+  }
+]

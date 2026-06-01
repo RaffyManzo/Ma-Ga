@@ -1,0 +1,144 @@
+{
+  "scenario": "comprehensive_dynamic_validation",
+  "snapshotCount": 27,
+  "firstTimestamp": 0.0,
+  "lastTimestamp": 130.0,
+  "structuralValidation": "PASS",
+  "files": [
+    {
+      "idx": 0,
+      "file": "000_phase_00_baseline.json",
+      "errors": []
+    },
+    {
+      "idx": 1,
+      "file": "001_phase_01_stable_repeat.json",
+      "errors": []
+    },
+    {
+      "idx": 2,
+      "file": "002_phase_02_extra_candidates_same_access.json",
+      "errors": []
+    },
+    {
+      "idx": 3,
+      "file": "003_phase_03_prefilter_structural.json",
+      "errors": []
+    },
+    {
+      "idx": 4,
+      "file": "004_phase_04_v2v_out_of_range.json",
+      "errors": []
+    },
+    {
+      "idx": 5,
+      "file": "005_phase_05_v2v_equal_speed.json",
+      "errors": []
+    },
+    {
+      "idx": 6,
+      "file": "006_phase_06_deadline_repairable.json",
+      "errors": []
+    },
+    {
+      "idx": 7,
+      "file": "007_phase_07_degraded_best_effort.json",
+      "errors": []
+    },
+    {
+      "idx": 8,
+      "file": "008_phase_08_full_offloading_diagnostic.json",
+      "errors": []
+    },
+    {
+      "idx": 9,
+      "file": "009_phase_09_tau_tradeoff.json",
+      "errors": []
+    },
+    {
+      "idx": 10,
+      "file": "010_phase_10_remote_cpu_contention.json",
+      "errors": []
+    },
+    {
+      "idx": 11,
+      "file": "011_phase_11_bandwidth_pressure.json",
+      "errors": []
+    },
+    {
+      "idx": 12,
+      "file": "012_phase_12_vehicle_entry.json",
+      "errors": []
+    },
+    {
+      "idx": 13,
+      "file": "013_phase_13_vehicle_exit.json",
+      "errors": []
+    },
+    {
+      "idx": 14,
+      "file": "014_phase_14_task_spike.json",
+      "errors": []
+    },
+    {
+      "idx": 15,
+      "file": "015_phase_15_resource_degradation.json",
+      "errors": []
+    },
+    {
+      "idx": 16,
+      "file": "016_phase_16_resource_recovery.json",
+      "errors": []
+    },
+    {
+      "idx": 17,
+      "file": "017_phase_17_link_degradation_reachable.json",
+      "errors": []
+    },
+    {
+      "idx": 18,
+      "file": "018_phase_18_link_loss_outside.json",
+      "errors": []
+    },
+    {
+      "idx": 19,
+      "file": "019_phase_19_severe_combined_spike.json",
+      "errors": []
+    },
+    {
+      "idx": 20,
+      "file": "020_phase_20_recovery_after_spike.json",
+      "errors": []
+    },
+    {
+      "idx": 21,
+      "file": "021_phase_21_raw_filtered_idle_source.json",
+      "errors": []
+    },
+    {
+      "idx": 22,
+      "file": "022_phase_22_raw_filtered_task_activation.json",
+      "errors": []
+    },
+    {
+      "idx": 23,
+      "file": "023_phase_23_raw_filtered_task_deactivation.json",
+      "errors": []
+    },
+    {
+      "idx": 24,
+      "file": "024_phase_24_cloud_placeholder.json",
+      "errors": []
+    },
+    {
+      "idx": 25,
+      "file": "025_phase_25_local_cpu_sharing_open_issue.json",
+      "errors": []
+    },
+    {
+      "idx": 26,
+      "file": "026_phase_26_final_stable_repeat.json",
+      "errors": []
+    }
+  ]
+}
