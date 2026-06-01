@@ -18,6 +18,8 @@ import model.snapshot.VehicleSnapshot;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -84,14 +86,70 @@ public final class RepairOperator {
         );
     }
 
-    /** Ripara un cromosoma rispetto allo snapshot corrente. */
+    /**
+     * Ripara integralmente un cromosoma rispetto allo snapshot corrente.
+     *
+     * <p>Questo percorso resta obbligatorio per popolazioni appena create,
+     * cromosomi provenienti da una finestra precedente e chiamanti esterni che
+     * non dispongono dell'elenco dei geni modificati.</p>
+     */
     public Chromosome repairChromosome(Chromosome chromosome, SystemSnapshot snapshot) {
+        return repairChromosomeInternal(chromosome, snapshot, null);
+    }
+
+    /**
+     * Ripara incrementalmente un figlio prodotto durante l'evoluzione nello
+     * stesso snapshot.
+     *
+     * <p>I genitori della generazione corrente sono già stati riparati. Un gene
+     * ereditato senza modifiche resta quindi individualmente valido. Il metodo
+     * rivaluta soltanto i task indicati come dirty, ma esegue sempre il repair
+     * CPU aggregato sull'intero cromosoma: il crossover può infatti combinare
+     * geni validi singolarmente e creare una nuova contesa collettiva.</p>
+     *
+     * <p>Se la struttura del cromosoma non rispetta l'insieme dei task dello
+     * snapshot, il metodo effettua automaticamente un repair completo.</p>
+     *
+     * @param chromosome figlio da riparare
+     * @param snapshot snapshot corrente
+     * @param dirtyTaskIds task realmente modificati dalla mutazione
+     * @return cromosoma riparato
+     */
+    public Chromosome repairChromosomeIncremental(
+            Chromosome chromosome,
+            SystemSnapshot snapshot,
+            Set<String> dirtyTaskIds
+    ) {
+        Objects.requireNonNull(snapshot, "snapshot must not be null.");
+        SnapshotRepairContext context = contextFor(snapshot);
+        if (!hasCompleteTaskCoverage(chromosome, context)) {
+            return repairChromosomeInternal(chromosome, snapshot, null);
+        }
+        return repairChromosomeInternal(
+                chromosome,
+                snapshot,
+                normalizeDirtyTaskIds(dirtyTaskIds, context)
+        );
+    }
+
+    /**
+     * Implementazione condivisa dai percorsi completo e incrementale.
+     *
+     * <p>{@code initialTargetedTaskIds == null} indica il repair completo del
+     * primo passaggio. Un insieme vuoto indica invece che nessun gene necessita
+     * di repair individuale prima del controllo CPU aggregato globale.</p>
+     */
+    private Chromosome repairChromosomeInternal(
+            Chromosome chromosome,
+            SystemSnapshot snapshot,
+            Set<String> initialTargetedTaskIds
+    ) {
         Objects.requireNonNull(snapshot, "snapshot must not be null.");
         SnapshotRepairContext context = contextFor(snapshot);
         DeadlineRepairCatalog catalog = catalogFor(context);
 
         Chromosome current = chromosome;
-        Set<String> targetedTaskIds = null;
+        Set<String> targetedTaskIds = initialTargetedTaskIds;
         for (int pass = 0; pass < MAX_REPAIR_PASSES; pass++) {
             current = repairGenes(
                     current,
@@ -738,6 +796,55 @@ public final class RepairOperator {
         for (Gene gene : chromosome.getGenes()) {
             if (gene != null && gene.getTaskId() != null) {
                 result.put(gene.getTaskId(), gene);
+            }
+        }
+        return result;
+    }
+
+
+    /** Verifica che il figlio contenga esattamente un gene per task attivo. */
+    private boolean hasCompleteTaskCoverage(
+            Chromosome chromosome,
+            SnapshotRepairContext context
+    ) {
+        if (chromosome == null || chromosome.getGenes() == null) {
+            return false;
+        }
+        if (chromosome.getGenes().size() != context.getTasks().size()) {
+            return false;
+        }
+        Set<String> knownTaskIds = new HashSet<>();
+        for (TaskInstance task : context.getTasks()) {
+            knownTaskIds.add(task.getTaskId());
+        }
+        Set<String> observedTaskIds = new HashSet<>();
+        for (Gene gene : chromosome.getGenes()) {
+            if (gene == null
+                    || gene.getTaskId() == null
+                    || !knownTaskIds.contains(gene.getTaskId())
+                    || !observedTaskIds.add(gene.getTaskId())) {
+                return false;
+            }
+        }
+        return observedTaskIds.size() == knownTaskIds.size();
+    }
+
+    /** Mantiene solo identificativi dirty appartenenti allo snapshot corrente. */
+    private Set<String> normalizeDirtyTaskIds(
+            Set<String> dirtyTaskIds,
+            SnapshotRepairContext context
+    ) {
+        Set<String> knownTaskIds = new HashSet<>();
+        for (TaskInstance task : context.getTasks()) {
+            knownTaskIds.add(task.getTaskId());
+        }
+        Set<String> result = new LinkedHashSet<>();
+        if (dirtyTaskIds == null) {
+            return result;
+        }
+        for (String taskId : dirtyTaskIds) {
+            if (taskId != null && knownTaskIds.contains(taskId)) {
+                result.add(taskId);
             }
         }
         return result;

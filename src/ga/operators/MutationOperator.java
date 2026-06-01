@@ -11,43 +11,39 @@ import model.snapshot.VehicleSnapshot;
 
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Random;
+import java.util.Set;
 
 /**
  * Operatore di mutazione del MA-GA.
  *
- * La mutazione mantiene la componente casuale dell'algoritmo genetico,
- * ma non agisce più solo con piccole variazioni locali.
+ * <p>La mutazione mantiene la componente casuale dell'algoritmo genetico, ma
+ * non agisce più solo con piccole variazioni locali.</p>
  *
- * Per la quota di offloading p_i usa più modalità:
+ * <p>Per la quota di offloading {@code p_i} usa più modalità:</p>
+ * <ul>
+ *   <li>piccola perturbazione locale;</li>
+ *   <li>reset casuale;</li>
+ *   <li>salto verso {@code p = 1};</li>
+ *   <li>salto verso una quota bilanciata tra ramo locale e ramo remoto.</li>
+ * </ul>
  *
- * - piccola perturbazione locale;
- * - reset casuale;
- * - salto verso p = 1;
- * - salto verso p bilanciato tra ramo locale e ramo remoto.
- *
- * Inoltre, quando muta il candidato, sceglie solo candidati validi
- * per il veicolo sorgente del task.
+ * <p>Inoltre, quando muta il candidato, sceglie solo candidati validi per il
+ * veicolo sorgente del task.</p>
  */
 public final class MutationOperator {
-
-    private static final double MIN_RESOURCE_FRACTION = 0.05;
-
-    /**
-     * Probabilità interna di cambiare candidato quando un gene muta.
-     */
+    /** Probabilità interna di cambiare candidato quando un gene muta. */
     private static final double CANDIDATE_MUTATION_PROBABILITY = 0.25;
 
-    /**
-     * Probabilità di preferire candidati remoti quando viene cambiato candidato.
-     */
+    /** Probabilità di preferire candidati remoti quando cambia candidato. */
     private static final double REMOTE_CANDIDATE_PREFERENCE = 0.60;
 
     /**
-     * Probabilità di scegliere il candidato remoto con migliore stima euristica
-     * invece di un remoto casuale.
+     * Probabilità di scegliere il candidato remoto con migliore stima
+     * euristica invece di un remoto casuale.
      */
     private static final double BEST_REMOTE_CANDIDATE_PROBABILITY = 0.55;
 
@@ -56,31 +52,20 @@ public final class MutationOperator {
     private final ResourceAllocationPolicy resourceAllocationPolicy;
     private final OffloadingTimeModel offloadingTimeModel;
 
-    /**
-     * Costruisce l'operatore di mutazione.
-     *
-     * @param random generatore casuale condiviso dal GA
-     */
+    /** Costruisce l'operatore di mutazione. */
     public MutationOperator(Random random) {
         this.random = Objects.requireNonNull(
                 random,
                 "random must not be null."
         );
-
         this.offloadingRatioPolicy = new OffloadingRatioPolicy();
         this.resourceAllocationPolicy = new ResourceAllocationPolicy();
         this.offloadingTimeModel = new OffloadingTimeModel();
     }
 
     /**
-     * Applica la mutazione a un cromosoma.
+     * Adapter compatibile con i chiamanti precedenti.
      *
-     * Ogni gene viene mutato con probabilità mutationRate.
-     * I geni non mutati vengono copiati senza modifiche.
-     *
-     * @param chromosome cromosoma da mutare
-     * @param snapshot snapshot corrente
-     * @param mutationRate probabilità di mutazione per gene
      * @return cromosoma mutato
      */
     public Chromosome mutate(
@@ -88,48 +73,48 @@ public final class MutationOperator {
             SystemSnapshot snapshot,
             double mutationRate
     ) {
+        return mutateDetailed(chromosome, snapshot, mutationRate).getChromosome();
+    }
+
+    /**
+     * Applica la mutazione e conserva gli identificativi dei task modificati.
+     *
+     * <p>Ogni gene viene selezionato con probabilità {@code mutationRate}. Un
+     * task viene marcato dirty soltanto se la decisione risultante differisce
+     * realmente da quella precedente. Il tracking non cambia la probabilità
+     * o la logica della mutazione: espone soltanto informazione già disponibile
+     * per evitare repair ridondanti.</p>
+     */
+    public MutationResult mutateDetailed(
+            Chromosome chromosome,
+            SystemSnapshot snapshot,
+            double mutationRate
+    ) {
+        Objects.requireNonNull(chromosome, "chromosome must not be null.");
+        Objects.requireNonNull(snapshot, "snapshot must not be null.");
         validateRate(mutationRate);
 
         List<Gene> mutatedGenes = new ArrayList<>();
-
+        Set<String> mutatedTaskIds = new LinkedHashSet<>();
         for (Gene gene : chromosome.getGenes()) {
+            Gene resultingGene = gene;
             if (random.nextDouble() < mutationRate) {
-                mutatedGenes.add(
-                        mutateGene(
-                                gene,
-                                snapshot
-                        )
-                );
-            } else {
-                mutatedGenes.add(gene);
+                resultingGene = mutateGene(gene, snapshot);
+            }
+            mutatedGenes.add(resultingGene);
+            if (!sameDecision(gene, resultingGene)) {
+                mutatedTaskIds.add(resultingGene.getTaskId());
             }
         }
 
         Chromosome mutated = new Chromosome(mutatedGenes);
         mutated.setFitness(chromosome.getFitness());
-
-        return mutated;
+        return new MutationResult(mutated, mutatedTaskIds);
     }
 
-    /**
-     * Muta un singolo gene.
-     *
-     * La mutazione può:
-     *
-     * - mantenere il candidato e cambiare solo p_i/risorse;
-     * - cambiare candidato e ricalcolare p_i in modo coerente;
-     * - trasformare una decisione locale in una remota;
-     * - trasformare una decisione remota in locale, se il candidato locale viene scelto.
-     */
-    private Gene mutateGene(
-            Gene gene,
-            SystemSnapshot snapshot
-    ) {
-        TaskInstance task = findTask(
-                snapshot,
-                gene.getTaskId()
-        );
-
+    /** Muta un singolo gene. */
+    private Gene mutateGene(Gene gene, SystemSnapshot snapshot) {
+        TaskInstance task = findTask(snapshot, gene.getTaskId());
         if (task == null) {
             return gene;
         }
@@ -138,13 +123,7 @@ public final class MutationOperator {
                 snapshot,
                 task.getSourceVehicleId()
         );
-
-        List<NodeCandidate> validCandidates =
-                findCandidatesForTask(
-                        task,
-                        snapshot
-                );
-
+        List<NodeCandidate> validCandidates = findCandidatesForTask(task, snapshot);
         if (validCandidates.isEmpty()) {
             return gene;
         }
@@ -153,29 +132,18 @@ public final class MutationOperator {
                 snapshot,
                 gene.getSelectedCandidateId()
         );
-
-        boolean candidateChanged =
-                currentCandidate == null
-                        || !currentCandidate.isValidForSourceVehicle(
+        boolean candidateChanged = currentCandidate == null
+                || !currentCandidate.isValidForSourceVehicle(
                         task.getSourceVehicleId()
                 )
-                        || random.nextDouble()
-                        < CANDIDATE_MUTATION_PROBABILITY;
+                || random.nextDouble() < CANDIDATE_MUTATION_PROBABILITY;
 
         NodeCandidate selectedCandidate = candidateChanged
-                ? selectCandidateForMutation(
-                task,
-                validCandidates,
-                sourceVehicle
-        )
+                ? selectCandidateForMutation(task, validCandidates, sourceVehicle)
                 : currentCandidate;
 
         if (selectedCandidate.getType() == NodeType.LOCAL) {
-            return createLocalGene(
-                    task,
-                    selectedCandidate,
-                    sourceVehicle
-            );
+            return createLocalGene(task, selectedCandidate, sourceVehicle);
         }
 
         double offloadingRatio = mutateOffloadingRatio(
@@ -185,18 +153,15 @@ public final class MutationOperator {
                 sourceVehicle,
                 candidateChanged
         );
-
-        ResourceAllocationDecision allocation =
-                resourceAllocationPolicy.mutate(
-                        gene,
-                        task,
-                        selectedCandidate,
-                        sourceVehicle,
-                        offloadingRatio,
-                        candidateChanged,
-                        random
-                );
-
+        ResourceAllocationDecision allocation = resourceAllocationPolicy.mutate(
+                gene,
+                task,
+                selectedCandidate,
+                sourceVehicle,
+                offloadingRatio,
+                candidateChanged,
+                random
+        );
         return new Gene(
                 task.getTaskId(),
                 selectedCandidate.getCandidateId(),
@@ -206,23 +171,14 @@ public final class MutationOperator {
         );
     }
 
-    /**
-     * Sceglie un candidato valido per la mutazione.
-     *
-     * Preferisce candidati remoti perché il problema osservato nei report
-     * è un uso troppo conservativo del locale. Non elimina però il locale:
-     * mantiene una quota di casualità e quindi di diversità.
-     */
+    /** Sceglie un candidato valido per la mutazione. */
     private NodeCandidate selectCandidateForMutation(
             TaskInstance task,
             List<NodeCandidate> validCandidates,
             VehicleSnapshot sourceVehicle
     ) {
-        List<NodeCandidate> remoteCandidates =
-                findRemoteCandidates(validCandidates);
-
-        NodeCandidate localCandidate =
-                findLocalCandidate(validCandidates);
+        List<NodeCandidate> remoteCandidates = findRemoteCandidates(validCandidates);
+        NodeCandidate localCandidate = findLocalCandidate(validCandidates);
 
         if (!remoteCandidates.isEmpty()
                 && random.nextDouble() < REMOTE_CANDIDATE_PREFERENCE) {
@@ -233,28 +189,16 @@ public final class MutationOperator {
                         sourceVehicle
                 );
             }
-
-            return remoteCandidates.get(
-                    random.nextInt(remoteCandidates.size())
-            );
+            return remoteCandidates.get(random.nextInt(remoteCandidates.size()));
         }
 
         if (localCandidate != null && random.nextDouble() < 0.50) {
             return localCandidate;
         }
-
-        return validCandidates.get(
-                random.nextInt(validCandidates.size())
-        );
+        return validCandidates.get(random.nextInt(validCandidates.size()));
     }
 
-    /**
-     * Muta la quota di offloading p_i.
-     *
-     * La mutazione resta genetica e casuale, ma quando serve una quota
-     * "ragionata" usa una stima deadline-aware invece del solo bilanciamento
-     * locale/remoto.
-     */
+    /** Muta la quota di offloading {@code p_i}. */
     private double mutateOffloadingRatio(
             Gene gene,
             TaskInstance task,
@@ -267,7 +211,6 @@ public final class MutationOperator {
         }
 
         double roll = random.nextDouble();
-
         if (candidateChanged) {
             if (roll < 0.50) {
                 return offloadingRatioPolicy.deadlineAwareRatio(
@@ -277,15 +220,12 @@ public final class MutationOperator {
                         random
                 );
             }
-
             if (roll < 0.62) {
                 return offloadingRatioPolicy.mutateToFullOffloading();
             }
-
             if (roll < 0.85) {
                 return offloadingRatioPolicy.mutateByRandomReset(random);
             }
-
             return offloadingRatioPolicy.mutateBySmallStep(
                     gene.getOffloadingRatio(),
                     random
@@ -298,7 +238,6 @@ public final class MutationOperator {
                     random
             );
         }
-
         if (roll < 0.78) {
             return offloadingRatioPolicy.deadlineAwareRatio(
                     task,
@@ -307,17 +246,13 @@ public final class MutationOperator {
                     random
             );
         }
-
         if (roll < 0.88) {
             return offloadingRatioPolicy.mutateToFullOffloading();
         }
-
         return offloadingRatioPolicy.mutateByRandomReset(random);
     }
 
-    /**
-     * Crea un gene locale coerente.
-     */
+    /** Crea un gene locale coerente. */
     private Gene createLocalGene(
             TaskInstance task,
             NodeCandidate candidate,
@@ -326,7 +261,6 @@ public final class MutationOperator {
         double localCpu = sourceVehicle == null
                 ? candidate.getAvailableCpu()
                 : Math.max(0.0, sourceVehicle.getLocalCpu());
-
         return new Gene(
                 task.getTaskId(),
                 candidate.getCandidateId(),
@@ -336,12 +270,7 @@ public final class MutationOperator {
         );
     }
 
-    /**
-     * Sceglie il candidato remoto con migliore stima euristica.
-     *
-     * La stima non sostituisce la fitness.
-     * Serve solo a non sprecare mutazioni su candidati palesemente peggiori.
-     */
+    /** Sceglie il candidato remoto con migliore stima euristica. */
     private NodeCandidate selectBestEstimatedRemoteCandidate(
             TaskInstance task,
             List<NodeCandidate> remoteCandidates,
@@ -351,12 +280,11 @@ public final class MutationOperator {
                 .stream()
                 .min(
                         Comparator.comparingDouble(
-                                candidate ->
-                                        estimateBestCompletion(
-                                                task,
-                                                candidate,
-                                                sourceVehicle
-                                        )
+                                candidate -> estimateBestCompletion(
+                                        task,
+                                        candidate,
+                                        sourceVehicle
+                                )
                         )
                 )
                 .orElse(
@@ -366,181 +294,134 @@ public final class MutationOperator {
                 );
     }
 
-    /**
-     * Stima euristica del miglior completion ottenibile con un candidato remoto.
-     *
-     * Usa lo stesso modello usato dalla policy di p:
-     *
-     * local(p)  = (1 - p) * A
-     * remote(p) = L + p * B
-     */
+    /** Stima euristica del miglior completion ottenibile da un remoto. */
     private double estimateBestCompletion(
             TaskInstance task,
             NodeCandidate candidate,
             VehicleSnapshot sourceVehicle
     ) {
-        double localOnlyTime =
-                estimateLocalOnlyTime(task, sourceVehicle);
-
-        double remoteLinearTime =
-                estimateRemoteLinearTime(task, candidate);
-
-        double baseLatency =
-                Math.max(0.0, candidate.getBaseLatencySeconds());
+        double localOnlyTime = estimateLocalOnlyTime(task, sourceVehicle);
+        double remoteLinearTime = estimateRemoteLinearTime(task, candidate);
+        double baseLatency = Math.max(0.0, candidate.getBaseLatencySeconds());
 
         if (!Double.isFinite(localOnlyTime)) {
             return baseLatency + remoteLinearTime;
         }
-
         if (!Double.isFinite(remoteLinearTime)) {
             return localOnlyTime;
         }
 
-        double p =
-                offloadingRatioPolicy.balancedRemoteRatio(
-                        task,
-                        candidate,
-                        sourceVehicle
-                );
-
-        double localBranch =
-                (1.0 - p) * localOnlyTime;
-
-        double remoteBranch =
-                baseLatency + p * remoteLinearTime;
-
+        double p = offloadingRatioPolicy.balancedRemoteRatio(
+                task,
+                candidate,
+                sourceVehicle
+        );
+        double localBranch = (1.0 - p) * localOnlyTime;
+        double remoteBranch = baseLatency + p * remoteLinearTime;
         return Math.max(localBranch, remoteBranch);
     }
 
-    /**
-     * Stima il tempo locale puro.
-     */
     private double estimateLocalOnlyTime(
             TaskInstance task,
             VehicleSnapshot sourceVehicle
     ) {
-        return offloadingTimeModel.estimateLocalOnlyTime(
-                task,
-                sourceVehicle
-        );
+        return offloadingTimeModel.estimateLocalOnlyTime(task, sourceVehicle);
     }
 
-    /**
-     * Stima upload + esecuzione remota + download per p = 1.
-     */
     private double estimateRemoteLinearTime(
             TaskInstance task,
             NodeCandidate candidate
     ) {
-        return offloadingTimeModel.estimateRemoteLinearTime(
-                task,
-                candidate
-        );
+        return offloadingTimeModel.estimateRemoteLinearTime(task, candidate);
     }
 
-    /**
-     * Trova i candidati validi per il veicolo sorgente del task.
-     */
+    /** Trova i candidati validi per il veicolo sorgente del task. */
     private List<NodeCandidate> findCandidatesForTask(
             TaskInstance task,
             SystemSnapshot snapshot
     ) {
         List<NodeCandidate> result = new ArrayList<>();
-
         for (NodeCandidate candidate : snapshot.getCandidateNodes()) {
-            if (candidate.isValidForSourceVehicle(
-                    task.getSourceVehicleId()
-            )) {
+            if (candidate.isValidForSourceVehicle(task.getSourceVehicleId())) {
                 result.add(candidate);
             }
         }
-
         return result;
     }
 
-    /**
-     * Estrae i candidati remoti.
-     */
-    private List<NodeCandidate> findRemoteCandidates(
-            List<NodeCandidate> candidates
-    ) {
+    private List<NodeCandidate> findRemoteCandidates(List<NodeCandidate> candidates) {
         List<NodeCandidate> result = new ArrayList<>();
-
         for (NodeCandidate candidate : candidates) {
             if (candidate.getType() != NodeType.LOCAL) {
                 result.add(candidate);
             }
         }
-
         return result;
     }
 
-    /**
-     * Trova il candidato locale, se presente.
-     */
-    private NodeCandidate findLocalCandidate(
-            List<NodeCandidate> candidates
-    ) {
+    private NodeCandidate findLocalCandidate(List<NodeCandidate> candidates) {
         for (NodeCandidate candidate : candidates) {
             if (candidate.getType() == NodeType.LOCAL) {
                 return candidate;
             }
         }
-
         return null;
     }
 
-    /**
-     * Cerca un candidato tramite candidateId.
-     */
-    private NodeCandidate findCandidate(
-            SystemSnapshot snapshot,
-            String candidateId
-    ) {
+    private NodeCandidate findCandidate(SystemSnapshot snapshot, String candidateId) {
         for (NodeCandidate candidate : snapshot.getCandidateNodes()) {
             if (candidate.getCandidateId().equals(candidateId)) {
                 return candidate;
             }
         }
-
         return null;
     }
 
-    /**
-     * Cerca il veicolo sorgente.
-     */
-    private VehicleSnapshot findVehicle(
-            SystemSnapshot snapshot,
-            String vehicleId
-    ) {
+    private VehicleSnapshot findVehicle(SystemSnapshot snapshot, String vehicleId) {
         for (VehicleSnapshot vehicle : snapshot.getVehicles()) {
             if (vehicle.getVehicleId().equals(vehicleId)) {
                 return vehicle;
             }
         }
-
         return null;
     }
 
-    /**
-     * Cerca il task associato al gene.
-     */
-    private TaskInstance findTask(
-            SystemSnapshot snapshot,
-            String taskId
-    ) {
+    private TaskInstance findTask(SystemSnapshot snapshot, String taskId) {
         for (TaskInstance task : snapshot.getTasks()) {
             if (task.getTaskId().equals(taskId)) {
                 return task;
             }
         }
-
         return null;
     }
 
-    /**
-     * Valida una probabilità.
-     */
+    /** Confronta semanticamente due geni immutabili. */
+    private boolean sameDecision(Gene first, Gene second) {
+        if (first == second) {
+            return true;
+        }
+        if (first == null || second == null) {
+            return false;
+        }
+        return Objects.equals(first.getTaskId(), second.getTaskId())
+                && Objects.equals(
+                        first.getSelectedCandidateId(),
+                        second.getSelectedCandidateId()
+                )
+                && Double.compare(
+                        first.getOffloadingRatio(),
+                        second.getOffloadingRatio()
+                ) == 0
+                && Double.compare(
+                        first.getAllocatedCpu(),
+                        second.getAllocatedCpu()
+                ) == 0
+                && Double.compare(
+                        first.getAllocatedBandwidth(),
+                        second.getAllocatedBandwidth()
+                ) == 0;
+    }
+
     private void validateRate(double value) {
         if (!Double.isFinite(value) || value < 0.0 || value > 1.0) {
             throw new IllegalArgumentException(
@@ -548,5 +429,4 @@ public final class MutationOperator {
             );
         }
     }
-
 }
