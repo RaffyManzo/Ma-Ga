@@ -38,11 +38,22 @@ La formalizzazione usa questi concetti:
 Il flusso principale e' questo:
 
 ```text
-JSON/MOSAIC -> SystemStateSource -> CandidatePrefilter -> TemporalWindowManager
-TemporalWindowManager -> DynamicityEvaluator -> PopulationAdapter -> MaGaOptimizer
+JSON/MOSAIC ->
+SystemStateSource ->
+CandidatePrefilter ->
+TemporalWindowManager
+
+TemporalWindowManager ->
+DynamicityEvaluator ->
+PopulationAdapter ->
+MaGaOptimizer
+
 MaGaOptimizer -> PopulationInitializer/Selection/Crossover/MutationResult/Repair/Fitness
-RepairOperator -> SnapshotRepairContext/DeadlineRepairCatalog/CpuAggregateRepairOperator
-FitnessEvaluator -> EvaluationBreakdown -> Report/Diagnostics
+RepairOperator ->
+SnapshotRepairContext/DeadlineRepairCatalog/CpuAggregateRepairOperator
+FitnessEvaluator ->
+EvaluationBreakdown ->
+Report/Diagnostics
 ```
 
 Le classi `model` rappresentano dati e formule. Le classi `ga` cercano una buona soluzione su uno snapshot. Le classi `ga.constraints` aiutano il repair a trattare deadline e copertura. Le classi `window` decidono quando rieseguire il GA e come riusare la popolazione precedente. Le classi `io` leggono o stampano dati. Le classi `config` evitano di nascondere costanti dentro l'algoritmo.
