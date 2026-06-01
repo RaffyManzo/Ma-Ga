@@ -3,7 +3,6 @@ package test.runner;
 import config.MaGaConfig;
 import ga.core.MaGaOptimizer;
 import ga.core.MaGaResult;
-import io.reporting.ResultPrinter;
 import io.snapshot.SnapshotLoader;
 import io.snapshot.SnapshotPaths;
 import model.snapshot.SystemSnapshot;
