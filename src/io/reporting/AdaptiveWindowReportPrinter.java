@@ -64,6 +64,7 @@ public final class AdaptiveWindowReportPrinter {
 
         printExecutionMetadata(requestedSourceMode, runtimeProfile, snapshotFolder);
         new DeepTemporalWindowDiagnosticPrinter(config, out, 10).print(result);
+        new MobilityDiagnosticPrinter(config, out, 10).print(result);
         new AdaptiveWindowDiagnosticPrinter(out).print(result);
         new TemporalTimingDiagnosticPrinter(out).print(result);
         new PopulationReuseDecisionDiagnosticPrinter(out).print(result);
