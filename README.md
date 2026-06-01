@@ -1,108 +1,188 @@
-## Struttura del Codice
+# MA-GA Core
 
-Il repository è organizzato in package con responsabilità distinte: modello del
-problema, algoritmo genetico, gestione temporale, configurazione, I/O,
-validazione e test manuali.
+Questo repository contiene il core Java del **Mobility-Aware Genetic Algorithm
+(MA-GA)** per il computation offloading nel continuum veicolo, edge e cloud.
 
-### Package `model`
+L'obiettivo del progetto e' scegliere, per ogni task generato da un veicolo,
+dove eseguirlo e con quali risorse:
 
-Il package `model` contiene gli oggetti che rappresentano il problema di
-offloading:
+- esecuzione locale sul veicolo sorgente;
+- offloading verso un altro veicolo;
+- offloading verso edge;
+- offloading verso cloud.
 
-- `SystemSnapshot`: fotografia dello scenario in un istante simulato, con
-  veicoli, task attivi e candidati di esecuzione.
-- `VehicleSnapshot`: stato di un veicolo, inclusi posizione, velocità e CPU
-  locale disponibile.
-- `TaskInstance`: task computazionale generato da un veicolo, con input,
-  output, cicli CPU e deadline.
-- `NodeCandidate`: destinazione possibile per un task, locale o remota
-  (`VEHICLE`, `EDGE`, `CLOUD`).
-- `Gene`: decisione di offloading per un singolo task.
-- `Chromosome`: strategia completa di offloading per tutti i task attivi.
+Il codice lavora su snapshot JSON dello scenario e puo' eseguire sia ottimizzazioni
+statiche indipendenti, sia una sequenza temporale con finestra adattiva.
 
-`Gene` e `Chromosome` sono le classi più vicine alla formalizzazione del GA. Il
-gene contiene candidato scelto, quota di offloading, CPU e banda allocate; il
-cromosoma raccoglie un gene per ogni task.
+## Cosa fa il progetto
 
-### Package `ga`
+MA-GA rappresenta una soluzione come un cromosoma. Ogni gene descrive la scelta
+per un singolo task:
 
-Il package `ga` contiene il cuore dell'algoritmo genetico.
+- candidato selezionato;
+- quota di offloading `p`;
+- CPU assegnata;
+- banda assegnata.
 
-`MaGaOptimizer` coordina il ciclo evolutivo:
+La fitness valuta la soluzione combinando:
 
-1. prepara la popolazione iniziale;
-2. valuta i cromosomi;
-3. applica elitismo, selezione, crossover e mutazione;
-4. ripara cromosomi incoerenti;
-5. produce la soluzione migliore e la popolazione finale.
+- tempo di completamento;
+- latenza comunicativa complessiva;
+- penalita' mobility-aware;
+- uso di CPU e banda;
+- violazioni residue di deadline.
 
-`FitnessEvaluator` traduce la funzione obiettivo in codice, combinando tempo di
-completamento, latenza di comunicazione, rischio di mobilità/copertura e uso
-delle risorse.
+La versione corrente include anche un repair piu' esplicito per deadline,
+copertura e CPU aggregata. Se il repair non trova una scelta ammissibile per un
+task, il codice puo' usare una modalita' best-effort degradata, segnalata nei
+report.
 
-Gli operatori genetici generano e modificano le soluzioni. Alcune policy
-aggiuntive, come `OffloadingRatioPolicy` e `ResourceAllocationPolicy`, guidano
-la generazione di quote e risorse per evitare combinazioni formalmente valide
-ma poco plausibili rispetto a deadline, banda e CPU disponibili.
+## Funzionalita' principali
 
-### Package `window`
+- GA snapshot-based con inizializzazione, selezione, crossover, mutazione,
+  elitismo, repair e fitness dettagliata.
+- Gestione temporale con `TemporalWindowManager`, riuso della popolazione e
+  finestra adattiva.
+- Replay JSON in due modalita':
+  - `JSON_TIME`, coerente con il tempo logico del manager;
+  - `JSON_SEQUENCE`, replay ordinale utile per diagnosi.
+- Profilo runtime della finestra:
+  - `OBSERVED_RUNTIME`, usa il runtime GA osservato dalla finestra precedente;
+  - `CONFIGURED_RUNTIME`, usa una stima configurata e riproducibile.
+- Diagnostiche dedicate per deadline, latenza, mobilita', sorgente temporale,
+  risorse, prefilter e riuso della popolazione.
 
-Il package `window` gestisce l'esecuzione del MA-GA su finestre temporali
-successive.
+## Stato del modello
 
-La classe centrale è `TemporalWindowManager`, che:
+Il codice e' allineato alla formalizzazione nelle parti centrali:
 
-1. richiede uno snapshot alla sorgente dati;
-2. valuta la dinamicità rispetto allo snapshot precedente;
-3. decide quanto riutilizzare della popolazione precedente;
-4. esegue il GA sullo snapshot corrente;
-5. calcola la durata della finestra successiva.
+- gene e cromosoma rappresentano le variabili decisionali;
+- `OffloadingTimeModel` calcola i tempi locale/remoto/parziale;
+- `FitnessEvaluator` calcola la funzione obiettivo;
+- `DynamicityEvaluator` misura la dinamicita' tra finestre;
+- `window.timing` calcola i bound temporali della finestra.
 
-Le sottosezioni principali sono:
+Restano alcune scelte di prototipo da tenere presenti:
 
-- `dynamicity`: misura le variazioni di veicoli, task, risorse e link.
-- `population`: decide e costruisce il riuso della popolazione precedente.
-- `prefilter`: elimina candidati chiaramente non competitivi prima del GA.
-- `source`: astrae la sorgente dati, oggi basata su replay JSON e predisposta
-  per un bridge MOSAIC/SUMO.
-- `timing`: calcola i limiti e la durata della finestra adattiva.
+- la banda e' ancora modellata per link/candidato, non come unico `Bmax`
+  globale aggregato;
+- esiste un repair aggregato CPU, ma non ancora un repair aggregato banda;
+- la copertura cloud e' un placeholder stabile;
+- la copertura V2V usa velocita' relativa scalare;
+- l'integrazione MOSAIC/SUMO e' predisposta tramite interfacce, ma non contiene
+  ancora un bridge concreto nel repository.
 
-### Finestra Adattiva
+## Struttura rapida
 
-La finestra adattiva evita una durata fissa per tutte le esecuzioni. La durata
-viene aggiornata in base alla dinamicità dello scenario, ai tempi operativi del
-sistema e ai vincoli di copertura.
+```text
+src/
+  app/                 entry point eseguibili
+  config/              pesi, soglie, parametri GA, mobilita' e finestra
+  ga/                  algoritmo genetico, fitness, vincoli e operatori
+  io/                  loader JSON e report diagnostici
+  model/               snapshot, nodi, geni, tempi e mobilita'
+  validation/          validazione degli snapshot e invarianti richiesti
+  window/              sorgenti temporali, dinamicita', riuso e timing
 
-### Package `config`
+data/
+  snapshots/           dataset JSON inclusi
+  docs/                documentazione tecnica estesa
+```
 
-Il package `config` raccoglie i parametri del sistema:
+## Esecuzione rapida
 
-- pesi della fitness;
-- penalità;
-- parametri del GA;
-- parametri di mobilità;
-- parametri della finestra temporale;
-- regole di scaling dei parametri GA.
+Il progetto e' un modulo Java per IntelliJ IDEA. Richiede un JDK compatibile
+con Java 21 e la libreria Jackson Databind configurata nel progetto.
 
-### Package `io`, `validation` e `test`
+In IntelliJ e' sufficiente creare una Run Configuration con la main class
+desiderata e inserire gli eventuali program arguments.
 
-`io` contiene loader e printer diagnostici. I loader trasformano snapshot JSON
-in oggetti di dominio; i printer producono report tecnici per analizzare GA,
-finestra temporale, riuso popolazione, sorgente dati e prefilter.
+### Finestra adattiva
 
-`validation` contiene `SnapshotValidator`, che controlla struttura e coerenza
-degli snapshot prima dell'esecuzione.
+Esegue il ciclo temporale completo sullo scenario predefinito.
 
-`test` contiene runner manuali e suite sintetiche usate per verificare il
-prototipo senza dipendere da un framework di test esterno.
+```text
+Main class:
+app.AdaptiveWindowMain
 
-### Stato Attuale
+Program arguments:
+```
 
-Il core del GA è stabile nei casi principali, ma alcuni scenari con carichi
-computazionali elevati richiedono ancora calibrazione di fitness, repair e
-policy di allocazione.
+Esempio con sorgente temporale, profilo runtime, cartella snapshot e numero di
+finestre:
 
-Il prossimo passo architetturale è collegare MOSAIC/SUMO alla generazione di
-`SystemSnapshot`. Il simulatore dovrebbe fornire veicoli, posizioni, velocità,
-task, nodi disponibili, banda, latenza ed eventuali eventi critici; da questi
-dati si costruisce lo snapshot da passare a `TemporalWindowManager`.
+```text
+Main class:
+app.AdaptiveWindowMain
+
+Program arguments:
+JSON_TIME OBSERVED_RUNTIME data/snapshots/temporal/scenarios/urban_realistic_dynamic_calibrated 8
+```
+
+Per un replay ordinale diagnostico:
+
+```text
+Main class:
+app.AdaptiveWindowMain
+
+Program arguments:
+JSON_SEQUENCE CONFIGURED_RUNTIME data/snapshots/temporal/scenarios/urban_realistic_dynamic_calibrated 8
+```
+
+### Batch statico GA
+
+Esegue il GA su tutti gli snapshot di una cartella, trattandoli come scenari
+indipendenti.
+
+```text
+Main class:
+app.GaBatchMain
+
+Program arguments:
+```
+
+Con cartella esplicita e dettagli:
+
+```text
+Main class:
+app.GaBatchMain
+
+Program arguments:
+data/snapshots/ga/scenarios/static_baseline --details
+```
+
+## Dataset inclusi
+
+Gli snapshot sono divisi in due gruppi principali:
+
+- `data/snapshots/ga`: scenari statici per confrontare il GA;
+- `data/snapshots/temporal`: sequenze temporali per la finestra adattiva.
+
+La cartella temporale usata di default e':
+
+```text
+data/snapshots/temporal/scenarios/urban_realistic_dynamic_calibrated
+```
+
+## Documentazione completa
+
+Il README e' solo una preview del progetto. La spiegazione completa del codice,
+classe per classe e metodo per metodo, si trova in:
+
+```text
+data/docs/documentazione_completa_codice_maga.md
+```
+
+Quella documentazione include anche il confronto con la formalizzazione e le
+problematiche aperte associate alle classi coinvolte.
+
+## Lettura consigliata
+
+Per orientarsi nel codice senza perdersi:
+
+1. partire da `model.snapshot`, `model.node` e `model.genetic`;
+2. leggere `model.offloading` e `model.mobility`;
+3. guardare `ga.constraints` e `ga.operators.RepairOperator`;
+4. leggere `ga.fitness.FitnessEvaluator`;
+5. seguire il ciclo in `ga.core.MaGaOptimizer`;
+6. chiudere con `window.core.TemporalWindowManager` e i report in `io.reporting`.
