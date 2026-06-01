@@ -57,22 +57,38 @@ public final class DeadlineConstraintEvaluator {
     }
 
     /**
-     * Valuta un gene rispetto al task e allo snapshot corrente.
-     *
-     * <p>Per i candidati remoti la scelta è considerata mobility-aware soltanto
-     * se il completion time stimato non supera il tempo di copertura.</p>
+     * Adapter compatibile con i chiamanti precedenti.
      */
     public DeadlineEvaluation evaluate(
             Gene gene,
             TaskInstance task,
             SystemSnapshot snapshot
     ) {
+        Objects.requireNonNull(snapshot, "snapshot must not be null.");
+        return evaluate(gene, task, new SnapshotRepairContext(snapshot));
+    }
+
+    /**
+     * Valuta un gene usando gli indici e la cache di copertura dello snapshot.
+     *
+     * <p>Questo overload evita scansioni lineari ripetute durante il ciclo
+     * evolutivo. La semantica del vincolo resta invariata.</p>
+     */
+    public DeadlineEvaluation evaluate(
+            Gene gene,
+            TaskInstance task,
+            SnapshotRepairContext context
+    ) {
         Objects.requireNonNull(gene, "gene must not be null.");
         Objects.requireNonNull(task, "task must not be null.");
-        Objects.requireNonNull(snapshot, "snapshot must not be null.");
+        Objects.requireNonNull(context, "context must not be null.");
 
-        NodeCandidate candidate = findCandidate(snapshot, gene.getSelectedCandidateId());
-        VehicleSnapshot sourceVehicle = findVehicle(snapshot, task.getSourceVehicleId());
+        NodeCandidate candidate = context.getCandidateById(
+                gene.getSelectedCandidateId()
+        );
+        VehicleSnapshot sourceVehicle = context.getVehicleById(
+                task.getSourceVehicleId()
+        );
         double deadline = task.getDeadlineSeconds();
 
         if (candidate == null
@@ -115,7 +131,7 @@ public final class DeadlineConstraintEvaluator {
         boolean deadlineRespected = deadline <= 0.0
                 || completion <= deadline + EPSILON;
         boolean mobilitySustainable = candidate.getType() == NodeType.LOCAL
-                || isRemoteCoverageSufficient(snapshot, task, candidate, completion);
+                || isRemoteCoverageSufficient(context, task, candidate, completion);
 
         return DeadlineEvaluation.valid(
                 completion,
@@ -126,44 +142,18 @@ public final class DeadlineConstraintEvaluator {
     }
 
     private boolean isRemoteCoverageSufficient(
-            SystemSnapshot snapshot,
+            SnapshotRepairContext context,
             TaskInstance task,
             NodeCandidate candidate,
             double completionTimeSeconds
     ) {
-        double coverageTimeSeconds;
-        try {
-            coverageTimeSeconds = coverageEstimator.estimateCoverageTimeSeconds(
-                    snapshot,
-                    task,
-                    candidate
-            );
-        } catch (IllegalArgumentException ex) {
-            return false;
-        }
+        double coverageTimeSeconds = context.estimateCoverageTimeSeconds(
+                task,
+                candidate,
+                coverageEstimator
+        );
         return isStrictlyPositive(coverageTimeSeconds)
                 && completionTimeSeconds <= coverageTimeSeconds + EPSILON;
-    }
-
-    private NodeCandidate findCandidate(SystemSnapshot snapshot, String candidateId) {
-        if (candidateId == null) {
-            return null;
-        }
-        for (NodeCandidate candidate : snapshot.getCandidateNodes()) {
-            if (candidate.getCandidateId().equals(candidateId)) {
-                return candidate;
-            }
-        }
-        return null;
-    }
-
-    private VehicleSnapshot findVehicle(SystemSnapshot snapshot, String vehicleId) {
-        for (VehicleSnapshot vehicle : snapshot.getVehicles()) {
-            if (vehicle.getVehicleId().equals(vehicleId)) {
-                return vehicle;
-            }
-        }
-        return null;
     }
 
     private boolean isStrictlyPositive(double value) {

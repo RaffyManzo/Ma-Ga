@@ -3,6 +3,9 @@ package ga.operators;
 import config.mobility.MobilityConfig;
 import ga.constraints.DeadlineConstraintEvaluator;
 import ga.constraints.DeadlineEvaluation;
+import ga.constraints.DeadlineRepairCatalog;
+import ga.constraints.DeadlineRepairCatalog.DeadlineRepairProfile;
+import ga.constraints.SnapshotRepairContext;
 import model.genetic.Chromosome;
 import model.genetic.Gene;
 import model.mobility.CoverageEstimator;
@@ -14,8 +17,9 @@ import model.snapshot.TaskInstance;
 import model.snapshot.VehicleSnapshot;
 
 import java.util.ArrayList;
-import java.util.LinkedHashSet;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 
@@ -34,30 +38,22 @@ import java.util.Set;
  *   <li>livello cromosoma: ridimensiona la CPU aggregata sui nodi fisici remoti.</li>
  * </ol>
  *
- * <p>La riparazione mobility-aware implementa direttamente il vincolo:</p>
- *
- * <pre>
- * T_i(C) &lt;= T_i^coverage(n_i)
- * </pre>
- *
- * <p>La riparazione deadline-aware non sostituisce il GA con un secondo
- * ottimizzatore. Esplora un insieme limitato di alternative coerenti con la
- * formalizzazione e conserva una strategia degradata best-effort soltanto
- * quando nessuna alternativa valutata rispetta la deadline.</p>
+ * <p>Gli indici e il catalogo lazy sono ottimizzazioni implementative. Non
+ * introducono nuove variabili decisionali e non sostituiscono selezione,
+ * crossover, mutazione o fitness del Genetic Algorithm.</p>
  */
 public final class RepairOperator {
     private static final double EPSILON = 1.0E-9;
     private static final double MIN_REMOTE_OFFLOADING_RATIO = 0.05;
     private static final double MIN_RESOURCE_FRACTION = 0.05;
-    private static final int RESOURCE_SCALE_BINARY_SEARCH_STEPS = 24;
 
     /**
      * Numero massimo di passaggi repair gene + repair CPU aggregata.
      *
-     * <p>Serve perché il repair CPU aggregato può ridurre la CPU assegnata e
-     * rendere nuovamente insufficiente la copertura o la deadline. Due passaggi
-     * sono una scelta prudente: correggono l'effetto più comune senza
-     * introdurre un ciclo di ottimizzazione locale che snaturerebbe il GA.</p>
+     * <p>Due passaggi restano una scelta prudente: il ridimensionamento CPU
+     * aggregato può rendere nuovamente insufficiente una configurazione. Il
+     * secondo passaggio viene però limitato ai soli task effettivamente
+     * ridimensionati.</p>
      */
     private static final int MAX_REPAIR_PASSES = 2;
 
@@ -67,19 +63,15 @@ public final class RepairOperator {
     private final OffloadingRatioPolicy offloadingRatioPolicy;
     private final DeadlineConstraintEvaluator deadlineConstraintEvaluator;
 
-    /**
-     * Costruttore compatibile con il codice precedente.
-     */
+    private SnapshotRepairContext cachedContext;
+    private DeadlineRepairCatalog cachedDeadlineRepairCatalog;
+
+    /** Costruttore compatibile con il codice precedente. */
     public RepairOperator() {
         this(MobilityConfig.defaultConfig());
     }
 
-    /**
-     * Costruisce il repair operator principale con configurazione di mobilità
-     * esplicita.
-     *
-     * @param mobilityConfig configurazione usata da {@link CoverageEstimator}
-     */
+    /** Costruisce il repair operator con configurazione di mobilità esplicita. */
     public RepairOperator(MobilityConfig mobilityConfig) {
         Objects.requireNonNull(mobilityConfig, "mobilityConfig must not be null.");
         this.cpuAggregateRepairOperator = new CpuAggregateRepairOperator();
@@ -92,31 +84,69 @@ public final class RepairOperator {
         );
     }
 
-    /**
-     * Ripara un cromosoma rispetto allo snapshot corrente.
-     *
-     * @param chromosome cromosoma da riparare
-     * @param snapshot snapshot corrente
-     * @return cromosoma riparato
-     */
+    /** Ripara un cromosoma rispetto allo snapshot corrente. */
     public Chromosome repairChromosome(Chromosome chromosome, SystemSnapshot snapshot) {
         Objects.requireNonNull(snapshot, "snapshot must not be null.");
+        SnapshotRepairContext context = contextFor(snapshot);
+        DeadlineRepairCatalog catalog = catalogFor(context);
+
         Chromosome current = chromosome;
+        Set<String> targetedTaskIds = null;
         for (int pass = 0; pass < MAX_REPAIR_PASSES; pass++) {
-            current = repairGenes(current, snapshot);
-            current = cpuAggregateRepairOperator.repairChromosome(current, snapshot);
+            current = repairGenes(
+                    current,
+                    snapshot,
+                    context,
+                    catalog,
+                    targetedTaskIds
+            );
+            CpuAggregateRepairResult aggregateResult =
+                    cpuAggregateRepairOperator.repairChromosomeDetailed(
+                            current,
+                            snapshot,
+                            context
+                    );
+
+            if (!aggregateResult.isChanged()) {
+                return current;
+            }
+
+            current = aggregateResult.getChromosome();
+            targetedTaskIds = aggregateResult.getAffectedTaskIds();
+            if (targetedTaskIds.isEmpty()) {
+                return current;
+            }
         }
         return current;
     }
 
-    private Chromosome repairGenes(Chromosome chromosome, SystemSnapshot snapshot) {
+    /**
+     * Ripara tutti i geni nel primo passaggio e soltanto i geni indicati nei
+     * passaggi successivi. I geni non coinvolti dal ridimensionamento CPU
+     * aggregato vengono conservati senza una rivalutazione ridondante.
+     */
+    private Chromosome repairGenes(
+            Chromosome chromosome,
+            SystemSnapshot snapshot,
+            SnapshotRepairContext context,
+            DeadlineRepairCatalog catalog,
+            Set<String> targetedTaskIds
+    ) {
+        Map<String, Gene> geneByTaskId = indexGenes(chromosome);
         List<Gene> repairedGenes = new ArrayList<>();
-        for (TaskInstance task : snapshot.getTasks()) {
-            Gene gene = findGene(chromosome, task.getTaskId());
+        for (TaskInstance task : context.getTasks()) {
+            Gene gene = geneByTaskId.get(task.getTaskId());
+            boolean mustRepair = targetedTaskIds == null
+                    || targetedTaskIds.contains(task.getTaskId())
+                    || gene == null;
             if (gene == null) {
-                gene = createFallbackGene(task, snapshot);
+                gene = createFallbackGene(task, context);
             }
-            repairedGenes.add(repairGene(gene, task, snapshot));
+            repairedGenes.add(
+                    mustRepair
+                            ? repairGene(gene, task, snapshot, context, catalog)
+                            : gene
+            );
         }
         Chromosome repaired = new Chromosome(repairedGenes);
         if (chromosome != null) {
@@ -125,27 +155,36 @@ public final class RepairOperator {
         return repaired;
     }
 
-    /**
-     * Ripara un gene rispetto al task e allo snapshot corrente.
-     *
-     * @param gene gene da riparare
-     * @param task task associato al gene
-     * @param snapshot snapshot corrente
-     * @return gene coerente con il task
-     */
+    /** Adapter compatibile con i chiamanti precedenti. */
     public Gene repairGene(Gene gene, TaskInstance task, SystemSnapshot snapshot) {
+        Objects.requireNonNull(snapshot, "snapshot must not be null.");
+        SnapshotRepairContext context = contextFor(snapshot);
+        return repairGene(gene, task, snapshot, context, catalogFor(context));
+    }
+
+    /** Ripara un gene usando indici e catalogo dello snapshot corrente. */
+    private Gene repairGene(
+            Gene gene,
+            TaskInstance task,
+            SystemSnapshot snapshot,
+            SnapshotRepairContext context,
+            DeadlineRepairCatalog catalog
+    ) {
         Objects.requireNonNull(gene, "gene must not be null.");
         Objects.requireNonNull(task, "task must not be null.");
-        Objects.requireNonNull(snapshot, "snapshot must not be null.");
 
-        NodeCandidate localCandidate = requireLocalCandidate(task, snapshot);
-        NodeCandidate candidate = findCandidate(snapshot, gene.getSelectedCandidateId());
+        NodeCandidate localCandidate = context.requireLocalCandidateForTask(task);
+        NodeCandidate candidate = context.getCandidateById(
+                gene.getSelectedCandidateId()
+        );
         if (candidate == null
                 || !candidate.isValidForSourceVehicle(task.getSourceVehicleId())) {
             candidate = localCandidate;
         }
 
-        VehicleSnapshot sourceVehicle = findVehicle(snapshot, task.getSourceVehicleId());
+        VehicleSnapshot sourceVehicle = context.getVehicleById(
+                task.getSourceVehicleId()
+        );
         double offloadingRatio = clamp(gene.getOffloadingRatio(), 0.0, 1.0);
         double allocatedCpu = Math.max(0.0, gene.getAllocatedCpu());
         double allocatedBandwidth = Math.max(0.0, gene.getAllocatedBandwidth());
@@ -164,22 +203,22 @@ public final class RepairOperator {
             );
 
             if (!isCoverageSufficient(
-                    snapshot,
                     task,
                     candidate,
                     sourceVehicle,
                     offloadingRatio,
                     allocatedCpu,
-                    allocatedBandwidth
+                    allocatedBandwidth,
+                    context
             )) {
                 NodeCandidate replacement = findCoverageSustainableRemoteCandidate(
-                        snapshot,
                         task,
                         sourceVehicle,
                         offloadingRatio,
                         allocatedCpu,
                         allocatedBandwidth,
-                        candidate.getCandidateId()
+                        candidate.getCandidateId(),
+                        context
                 );
                 if (replacement == null) {
                     mobilityCoherentGene = createLocalGene(
@@ -219,7 +258,8 @@ public final class RepairOperator {
         return repairDeadlineIfNeeded(
                 mobilityCoherentGene,
                 task,
-                snapshot,
+                context,
+                catalog,
                 sourceVehicle,
                 localCandidate
         );
@@ -228,8 +268,6 @@ public final class RepairOperator {
     /**
      * Applica la policy deadline-aware soltanto quando il gene corrente non
      * rispetta la deadline.
-     *
-     * <p>L'ordine resta volutamente limitato:</p>
      *
      * <ol>
      *   <li>prova quote alternative mantenendo il nodo remoto corrente;</li>
@@ -241,33 +279,33 @@ public final class RepairOperator {
     private Gene repairDeadlineIfNeeded(
             Gene currentGene,
             TaskInstance task,
-            SystemSnapshot snapshot,
+            SnapshotRepairContext context,
+            DeadlineRepairCatalog catalog,
             VehicleSnapshot sourceVehicle,
             NodeCandidate localCandidate
     ) {
         DeadlineEvaluation currentEvaluation = deadlineConstraintEvaluator.evaluate(
                 currentGene,
                 task,
-                snapshot
+                context
         );
         if (currentEvaluation.isDeadlineRespected()) {
             return currentGene;
         }
 
-        NodeCandidate currentCandidate = findCandidate(
-                snapshot,
+        NodeCandidate currentCandidate = context.getCandidateById(
                 currentGene.getSelectedCandidateId()
         );
-
         if (currentCandidate != null && currentCandidate.getType() != NodeType.LOCAL) {
             Gene repairedOnCurrentCandidate = findDeadlineFeasibleGeneForCandidate(
                     task,
-                    snapshot,
                     sourceVehicle,
                     currentCandidate,
                     currentGene.getOffloadingRatio(),
                     currentGene.getAllocatedCpu(),
-                    currentGene.getAllocatedBandwidth()
+                    currentGene.getAllocatedBandwidth(),
+                    context,
+                    catalog
             );
             if (repairedOnCurrentCandidate != null) {
                 return repairedOnCurrentCandidate;
@@ -276,40 +314,43 @@ public final class RepairOperator {
 
         Gene repairedOnAlternativeRemote = findDeadlineFeasibleRemoteAlternative(
                 task,
-                snapshot,
                 sourceVehicle,
                 currentCandidate == null ? null : currentCandidate.getCandidateId(),
-                currentGene
+                currentGene,
+                context,
+                catalog
         );
         if (repairedOnAlternativeRemote != null) {
             return repairedOnAlternativeRemote;
         }
 
         Gene localGene = createLocalGene(task, localCandidate, sourceVehicle);
-        if (deadlineConstraintEvaluator.evaluate(localGene, task, snapshot).isAdmissible()) {
+        if (deadlineConstraintEvaluator.evaluate(localGene, task, context).isAdmissible()) {
             return localGene;
         }
 
         return selectDegradedBestEffortGene(
                 task,
-                snapshot,
                 sourceVehicle,
                 localGene,
-                currentGene
+                currentGene,
+                context,
+                catalog
         );
     }
 
     private Gene findDeadlineFeasibleRemoteAlternative(
             TaskInstance task,
-            SystemSnapshot snapshot,
             VehicleSnapshot sourceVehicle,
             String excludedCandidateId,
-            Gene currentGene
+            Gene currentGene,
+            SnapshotRepairContext context,
+            DeadlineRepairCatalog catalog
     ) {
         Gene bestGene = null;
         DeadlineEvaluation bestEvaluation = null;
 
-        for (NodeCandidate candidate : findCandidatesForTask(task, snapshot)) {
+        for (NodeCandidate candidate : context.getCandidatesForTask(task)) {
             if (candidate.getType() == NodeType.LOCAL) {
                 continue;
             }
@@ -319,12 +360,13 @@ public final class RepairOperator {
 
             Gene candidateGene = findDeadlineFeasibleGeneForCandidate(
                     task,
-                    snapshot,
                     sourceVehicle,
                     candidate,
                     currentGene.getOffloadingRatio(),
                     currentGene.getAllocatedCpu(),
-                    currentGene.getAllocatedBandwidth()
+                    currentGene.getAllocatedBandwidth(),
+                    context,
+                    catalog
             );
             if (candidateGene == null) {
                 continue;
@@ -333,7 +375,7 @@ public final class RepairOperator {
             DeadlineEvaluation evaluation = deadlineConstraintEvaluator.evaluate(
                     candidateGene,
                     task,
-                    snapshot
+                    context
             );
             if (bestGene == null
                     || evaluation.getCompletionTimeSeconds()
@@ -347,18 +389,19 @@ public final class RepairOperator {
 
     private Gene findDeadlineFeasibleGeneForCandidate(
             TaskInstance task,
-            SystemSnapshot snapshot,
             VehicleSnapshot sourceVehicle,
             NodeCandidate candidate,
             double preferredRatio,
             double preferredCpu,
-            double preferredBandwidth
+            double preferredBandwidth,
+            SnapshotRepairContext context,
+            DeadlineRepairCatalog catalog
     ) {
         Gene bestGene = null;
         double bestPressure = Double.POSITIVE_INFINITY;
         double bestCompletion = Double.POSITIVE_INFINITY;
 
-        for (double ratio : buildRatioCandidates(
+        for (double ratio : catalog.buildRatioCandidates(
                 task,
                 candidate,
                 sourceVehicle,
@@ -374,26 +417,23 @@ public final class RepairOperator {
                             candidate.getAvailableBandwidth()
                     )
             );
-            Gene feasibleGene = null;
+            Gene feasibleGene;
             DeadlineEvaluation evaluation = deadlineConstraintEvaluator.evaluate(
                     preservedResourcesGene,
                     task,
-                    snapshot
+                    context
             );
             if (evaluation.isAdmissible()) {
                 feasibleGene = preservedResourcesGene;
             } else {
-                feasibleGene = findMinimalFeasibleResourceScale(
-                        task,
-                        snapshot,
-                        candidate,
-                        ratio
-                );
+                feasibleGene = catalog
+                        .getProfile(task, candidate, sourceVehicle, ratio)
+                        .getMinimalFeasibleGene();
                 if (feasibleGene != null) {
                     evaluation = deadlineConstraintEvaluator.evaluate(
                             feasibleGene,
                             task,
-                            snapshot
+                            context
                     );
                 }
             }
@@ -414,63 +454,6 @@ public final class RepairOperator {
         return bestGene;
     }
 
-    /**
-     * Cerca la minima scala comune di CPU e banda che rende ammissibile la
-     * scelta remota per una quota data.
-     *
-     * <p>La ricerca binaria non è una nuova variabile del cromosoma. È una
-     * correzione interna e limitata delle due risorse già formalizzate.</p>
-     */
-    private Gene findMinimalFeasibleResourceScale(
-            TaskInstance task,
-            SystemSnapshot snapshot,
-            NodeCandidate candidate,
-            double ratio
-    ) {
-        if (!isStrictlyPositive(candidate.getAvailableCpu())
-                || !isStrictlyPositive(candidate.getAvailableBandwidth())) {
-            return null;
-        }
-
-        Gene maxCapacityGene = createScaledRemoteGene(task, candidate, ratio, 1.0);
-        if (!deadlineConstraintEvaluator
-                .evaluate(maxCapacityGene, task, snapshot)
-                .isAdmissible()) {
-            return null;
-        }
-
-        double low = MIN_RESOURCE_FRACTION;
-        double high = 1.0;
-        for (int step = 0; step < RESOURCE_SCALE_BINARY_SEARCH_STEPS; step++) {
-            double middle = (low + high) / 2.0;
-            Gene middleGene = createScaledRemoteGene(task, candidate, ratio, middle);
-            if (deadlineConstraintEvaluator
-                    .evaluate(middleGene, task, snapshot)
-                    .isAdmissible()) {
-                high = middle;
-            } else {
-                low = middle;
-            }
-        }
-        return createScaledRemoteGene(task, candidate, ratio, high);
-    }
-
-    private Gene createScaledRemoteGene(
-            TaskInstance task,
-            NodeCandidate candidate,
-            double ratio,
-            double resourceScale
-    ) {
-        double scale = clamp(resourceScale, MIN_RESOURCE_FRACTION, 1.0);
-        return new Gene(
-                task.getTaskId(),
-                candidate.getCandidateId(),
-                clamp(ratio, MIN_REMOTE_OFFLOADING_RATIO, 1.0),
-                candidate.getAvailableCpu() * scale,
-                candidate.getAvailableBandwidth() * scale
-        );
-    }
-
     /*
      * Quando nessuna configurazione valutata dal repair riesce a rispettare
      * la deadline, il task entra in modalità DEGRADED_BEST_EFFORT. La scelta
@@ -486,35 +469,38 @@ public final class RepairOperator {
      */
     private Gene selectDegradedBestEffortGene(
             TaskInstance task,
-            SystemSnapshot snapshot,
             VehicleSnapshot sourceVehicle,
             Gene localGene,
-            Gene currentGene
+            Gene currentGene,
+            SnapshotRepairContext context,
+            DeadlineRepairCatalog catalog
     ) {
         Gene bestGene = localGene;
         DeadlineEvaluation bestEvaluation = deadlineConstraintEvaluator.evaluate(
                 localGene,
                 task,
-                snapshot
+                context
         );
 
-        for (NodeCandidate candidate : findCandidatesForTask(task, snapshot)) {
+        for (NodeCandidate candidate : context.getCandidatesForTask(task)) {
             if (candidate.getType() == NodeType.LOCAL) {
                 continue;
             }
 
-            for (double ratio : buildRatioCandidates(
+            for (double ratio : catalog.buildRatioCandidates(
                     task,
                     candidate,
                     sourceVehicle,
                     currentGene.getOffloadingRatio()
             )) {
-                Gene remoteGene = createScaledRemoteGene(task, candidate, ratio, 1.0);
-                DeadlineEvaluation evaluation = deadlineConstraintEvaluator.evaluate(
-                        remoteGene,
+                DeadlineRepairProfile profile = catalog.getProfile(
                         task,
-                        snapshot
+                        candidate,
+                        sourceVehicle,
+                        ratio
                 );
+                Gene remoteGene = profile.getMaxCapacityGene();
+                DeadlineEvaluation evaluation = profile.getMaxCapacityEvaluation();
                 if (!evaluation.isValid() || !evaluation.isMobilitySustainable()) {
                     continue;
                 }
@@ -523,7 +509,7 @@ public final class RepairOperator {
                         evaluation,
                         bestGene,
                         bestEvaluation,
-                        snapshot
+                        context
                 )) {
                     bestGene = remoteGene;
                     bestEvaluation = evaluation;
@@ -538,7 +524,7 @@ public final class RepairOperator {
             DeadlineEvaluation candidateEvaluation,
             Gene currentBestGene,
             DeadlineEvaluation currentBestEvaluation,
-            SystemSnapshot snapshot
+            SnapshotRepairContext context
     ) {
         if (candidateEvaluation.getLatenessSeconds()
                 < currentBestEvaluation.getLatenessSeconds() - EPSILON) {
@@ -561,43 +547,16 @@ public final class RepairOperator {
             return false;
         }
 
-        NodeCandidate candidate = findCandidate(
-                snapshot,
+        NodeCandidate candidate = context.getCandidateById(
                 candidateGene.getSelectedCandidateId()
         );
-        NodeCandidate currentBest = findCandidate(
-                snapshot,
+        NodeCandidate currentBest = context.getCandidateById(
                 currentBestGene.getSelectedCandidateId()
         );
         return candidate != null
                 && currentBest != null
                 && candidate.getType() == NodeType.LOCAL
                 && currentBest.getType() != NodeType.LOCAL;
-    }
-
-    private List<Double> buildRatioCandidates(
-            TaskInstance task,
-            NodeCandidate candidate,
-            VehicleSnapshot sourceVehicle,
-            double preferredRatio
-    ) {
-        Set<Double> ratios = new LinkedHashSet<>();
-        ratios.add(clamp(preferredRatio, MIN_REMOTE_OFFLOADING_RATIO, 1.0));
-        ratios.add(
-                clamp(
-                        offloadingRatioPolicy.balancedRemoteRatio(
-                                task,
-                                candidate,
-                                sourceVehicle
-                        ),
-                        MIN_REMOTE_OFFLOADING_RATIO,
-                        1.0
-                )
-        );
-        for (int step = 1; step <= 20; step++) {
-            ratios.add(step * 0.05);
-        }
-        return new ArrayList<>(ratios);
     }
 
     private double computeResourcePressure(Gene gene, NodeCandidate candidate) {
@@ -608,69 +567,32 @@ public final class RepairOperator {
                 );
     }
 
-    /**
-     * Crea un gene locale di fallback quando il cromosoma non contiene il task.
-     */
-    private Gene createFallbackGene(TaskInstance task, SystemSnapshot snapshot) {
-        NodeCandidate localCandidate = requireLocalCandidate(task, snapshot);
-        VehicleSnapshot sourceVehicle = findVehicle(snapshot, task.getSourceVehicleId());
+    /** Crea un gene locale di fallback quando il cromosoma non contiene il task. */
+    private Gene createFallbackGene(
+            TaskInstance task,
+            SnapshotRepairContext context
+    ) {
+        NodeCandidate localCandidate = context.requireLocalCandidateForTask(task);
+        VehicleSnapshot sourceVehicle = context.getVehicleById(
+                task.getSourceVehicleId()
+        );
         return createLocalGene(task, localCandidate, sourceVehicle);
     }
 
-    /**
-     * Recupera il candidato locale obbligatorio del veicolo sorgente.
-     *
-     * <p>Il fallback locale non può riutilizzare un candidato remoto. Se manca
-     * il nodo locale, lo snapshot viola un'invariante del modello e deve essere
-     * rifiutato invece di generare un gene semanticamente incoerente.</p>
-     */
-    private NodeCandidate requireLocalCandidate(
-            TaskInstance task,
-            SystemSnapshot snapshot
-    ) {
-        NodeCandidate localCandidate = findLocalCandidate(task, snapshot);
-        if (localCandidate == null) {
-            throw new IllegalArgumentException(
-                    "No LOCAL candidate found for task "
-                            + task.getTaskId()
-                            + " and source vehicle "
-                            + task.getSourceVehicleId()
-            );
-        }
-        return localCandidate;
-    }
-
-    private NodeCandidate findLocalCandidate(TaskInstance task, SystemSnapshot snapshot) {
-        for (NodeCandidate candidate : snapshot.getCandidateNodes()) {
-            if (candidate.isValidForSourceVehicle(task.getSourceVehicleId())
-                    && candidate.getType() == NodeType.LOCAL) {
-                return candidate;
-            }
-        }
-        return null;
-    }
-
-    /**
-     * Cerca un candidato remoto alternativo che soddisfi la copertura.
-     *
-     * <p>La scelta resta prudente: non si cerca il candidato con fitness
-     * migliore, ma il candidato remoto con completion time stimato più basso
-     * tra quelli che rispettano la copertura. Questo è repair di vincolo, non
-     * una seconda ottimizzazione locale.</p>
-     */
+    /** Cerca un candidato remoto alternativo che soddisfi la copertura. */
     private NodeCandidate findCoverageSustainableRemoteCandidate(
-            SystemSnapshot snapshot,
             TaskInstance task,
             VehicleSnapshot sourceVehicle,
             double offloadingRatio,
             double allocatedCpu,
             double allocatedBandwidth,
-            String excludedCandidateId
+            String excludedCandidateId,
+            SnapshotRepairContext context
     ) {
         NodeCandidate bestCandidate = null;
         double bestCompletionTime = Double.POSITIVE_INFINITY;
 
-        for (NodeCandidate candidate : findCandidatesForTask(task, snapshot)) {
+        for (NodeCandidate candidate : context.getCandidatesForTask(task)) {
             if (candidate.getType() == NodeType.LOCAL) {
                 continue;
             }
@@ -695,9 +617,9 @@ public final class RepairOperator {
                     candidateBandwidth
             );
             double coverageTime = estimateCoverageTimeSeconds(
-                    snapshot,
                     task,
-                    candidate
+                    candidate,
+                    context
             );
             if (isStrictlyPositive(coverageTime)
                     && completionTime <= coverageTime
@@ -710,13 +632,13 @@ public final class RepairOperator {
     }
 
     private boolean isCoverageSufficient(
-            SystemSnapshot snapshot,
             TaskInstance task,
             NodeCandidate candidate,
             VehicleSnapshot sourceVehicle,
             double offloadingRatio,
             double allocatedCpu,
-            double allocatedBandwidth
+            double allocatedBandwidth,
+            SnapshotRepairContext context
     ) {
         if (candidate.getType() == NodeType.LOCAL) {
             return true;
@@ -729,29 +651,23 @@ public final class RepairOperator {
                 allocatedCpu,
                 allocatedBandwidth
         );
-        double coverageTime = estimateCoverageTimeSeconds(snapshot, task, candidate);
+        double coverageTime = estimateCoverageTimeSeconds(task, candidate, context);
         return isStrictlyPositive(coverageTime) && completionTime <= coverageTime;
     }
 
     private double estimateCoverageTimeSeconds(
-            SystemSnapshot snapshot,
             TaskInstance task,
-            NodeCandidate candidate
+            NodeCandidate candidate,
+            SnapshotRepairContext context
     ) {
-        try {
-            return coverageEstimator.estimateCoverageTimeSeconds(
-                    snapshot,
-                    task,
-                    candidate
-            );
-        } catch (IllegalArgumentException ex) {
-            return 0.0;
-        }
+        return context.estimateCoverageTimeSeconds(
+                task,
+                candidate,
+                coverageEstimator
+        );
     }
 
-    /**
-     * Stima il completion time usando la stessa struttura della fitness.
-     */
+    /** Stima il completion time usando la stessa struttura della fitness. */
     private double estimateCompletionTimeSeconds(
             TaskInstance task,
             NodeCandidate candidate,
@@ -814,67 +730,20 @@ public final class RepairOperator {
         );
     }
 
-    /**
-     * Trova candidati validi per un task.
-     */
-    private List<NodeCandidate> findCandidatesForTask(
-            TaskInstance task,
-            SystemSnapshot snapshot
-    ) {
-        List<NodeCandidate> result = new ArrayList<>();
-        for (NodeCandidate candidate : snapshot.getCandidateNodes()) {
-            if (candidate.isValidForSourceVehicle(task.getSourceVehicleId())) {
-                result.add(candidate);
+    private Map<String, Gene> indexGenes(Chromosome chromosome) {
+        Map<String, Gene> result = new HashMap<>();
+        if (chromosome == null || chromosome.getGenes() == null) {
+            return result;
+        }
+        for (Gene gene : chromosome.getGenes()) {
+            if (gene != null && gene.getTaskId() != null) {
+                result.put(gene.getTaskId(), gene);
             }
         }
         return result;
     }
 
-    /**
-     * Cerca un gene per taskId.
-     */
-    private Gene findGene(Chromosome chromosome, String taskId) {
-        if (chromosome == null || chromosome.getGenes() == null) {
-            return null;
-        }
-        for (Gene gene : chromosome.getGenes()) {
-            if (gene.getTaskId().equals(taskId)) {
-                return gene;
-            }
-        }
-        return null;
-    }
-
-    /**
-     * Cerca un candidato per candidateId.
-     */
-    private NodeCandidate findCandidate(SystemSnapshot snapshot, String candidateId) {
-        if (candidateId == null) {
-            return null;
-        }
-        for (NodeCandidate candidate : snapshot.getCandidateNodes()) {
-            if (candidate.getCandidateId().equals(candidateId)) {
-                return candidate;
-            }
-        }
-        return null;
-    }
-
-    /**
-     * Cerca un veicolo.
-     */
-    private VehicleSnapshot findVehicle(SystemSnapshot snapshot, String vehicleId) {
-        for (VehicleSnapshot vehicle : snapshot.getVehicles()) {
-            if (vehicle.getVehicleId().equals(vehicleId)) {
-                return vehicle;
-            }
-        }
-        return null;
-    }
-
-    /**
-     * Limita una risorsa al range ammesso dal singolo candidato.
-     */
+    /** Limita una risorsa al range ammesso dal singolo candidato. */
     private double clampResource(double value, double maxAvailable) {
         if (!Double.isFinite(maxAvailable) || maxAvailable <= 0.0) {
             return 0.0;
@@ -884,6 +753,28 @@ public final class RepairOperator {
             return min;
         }
         return clamp(value, min, maxAvailable);
+    }
+
+    private SnapshotRepairContext contextFor(SystemSnapshot snapshot) {
+        if (cachedContext == null || !cachedContext.isFor(snapshot)) {
+            cachedContext = new SnapshotRepairContext(snapshot);
+            cachedDeadlineRepairCatalog = null;
+        }
+        return cachedContext;
+    }
+
+    private DeadlineRepairCatalog catalogFor(SnapshotRepairContext context) {
+        if (cachedDeadlineRepairCatalog == null
+                || cachedDeadlineRepairCatalog.getContext() != context) {
+            cachedDeadlineRepairCatalog = new DeadlineRepairCatalog(
+                    context,
+                    coverageEstimator,
+                    offloadingTimeModel,
+                    offloadingRatioPolicy,
+                    deadlineConstraintEvaluator
+            );
+        }
+        return cachedDeadlineRepairCatalog;
     }
 
     private double safeDivide(double numerator, double denominator) {
@@ -899,9 +790,6 @@ public final class RepairOperator {
         return Double.isFinite(value) && value > EPSILON;
     }
 
-    /**
-     * Limita un valore dentro un intervallo.
-     */
     private double clamp(double value, double min, double max) {
         if (!Double.isFinite(value)) {
             return min;
