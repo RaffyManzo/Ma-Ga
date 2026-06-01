@@ -2,6 +2,7 @@ package ga.operators;
 
 import model.node.NodeCandidate;
 import model.node.NodeType;
+import model.offloading.OffloadingTimeModel;
 import model.snapshot.TaskInstance;
 import model.snapshot.VehicleSnapshot;
 
@@ -44,6 +45,9 @@ import java.util.Random;
  * </ul>
  */
 public final class OffloadingRatioPolicy {
+
+    private final OffloadingTimeModel offloadingTimeModel =
+            new OffloadingTimeModel();
 
     private static final double EPSILON = 1.0E-9;
 
@@ -451,19 +455,10 @@ public final class OffloadingRatioPolicy {
             TaskInstance task,
             VehicleSnapshot sourceVehicle
     ) {
-        if (sourceVehicle == null) {
-            return Double.POSITIVE_INFINITY;
-        }
-
-        double localCpu = safeNonNegative(
-                sourceVehicle.getLocalCpu()
+        return offloadingTimeModel.estimateLocalOnlyTime(
+                task,
+                sourceVehicle
         );
-
-        if (localCpu <= EPSILON) {
-            return Double.POSITIVE_INFINITY;
-        }
-
-        return safeNonNegative(task.getCpuCycles()) / localCpu;
     }
 
     /**
@@ -476,28 +471,10 @@ public final class OffloadingRatioPolicy {
             TaskInstance task,
             NodeCandidate candidate
     ) {
-        double bandwidth = safeNonNegative(
-                candidate.getAvailableBandwidth()
+        return offloadingTimeModel.estimateRemoteLinearTime(
+                task,
+                candidate
         );
-
-        double remoteCpu = safeNonNegative(
-                candidate.getAvailableCpu()
-        );
-
-        if (bandwidth <= EPSILON || remoteCpu <= EPSILON) {
-            return Double.POSITIVE_INFINITY;
-        }
-
-        double uploadTime = safeNonNegative(task.getInputSizeBits())
-                / bandwidth;
-
-        double remoteExecutionTime = safeNonNegative(task.getCpuCycles())
-                / remoteCpu;
-
-        double downloadTime = safeNonNegative(task.getOutputSizeBits())
-                / bandwidth;
-
-        return uploadTime + remoteExecutionTime + downloadTime;
     }
 
     /**

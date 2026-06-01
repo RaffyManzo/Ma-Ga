@@ -4,6 +4,13 @@ import model.node.NodeCandidate;
 
 import java.util.List;
 
+/**
+ * Fotografia dello stato del sistema in un istante simulato.
+ *
+ * <p>Contiene veicoli, task attivi e candidati di esecuzione disponibili per
+ * quello specifico tempo. La classe resta mutabile per supportare la
+ * deserializzazione e la composizione degli snapshot filtrati.</p>
+ */
 public class SystemSnapshot {
 
     private String snapshotId;
@@ -15,6 +22,15 @@ public class SystemSnapshot {
     public SystemSnapshot() {
     }
 
+    /**
+     * Crea uno snapshot completo.
+     *
+     * @param snapshotId identificativo dello snapshot
+     * @param timeSeconds tempo simulato associato allo snapshot
+     * @param vehicles veicoli presenti nello scenario
+     * @param tasks task attivi nello scenario
+     * @param candidateNodes candidati di esecuzione disponibili
+     */
     public SystemSnapshot(
             String snapshotId,
             double timeSeconds,

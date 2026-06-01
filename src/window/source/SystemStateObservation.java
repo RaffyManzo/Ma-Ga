@@ -88,10 +88,10 @@ public final class SystemStateObservation {
     }
 
     /**
-     * Alias compatibile con la versione precedente.
+     * Alias storico per il tempo osservato dalla sorgente.
      *
-     * <p>Il nome "actual" resta per non rompere codice già scritto. Il valore
-     * però indica il tempo della sorgente, non il tempo logico del manager.</p>
+     * <p>Il nome "actual" indica il tempo della sorgente, non il tempo logico
+     * richiesto dal manager.</p>
      */
     public double getActualObservationTimeSeconds() {
         return sourceObservationTimeSeconds;

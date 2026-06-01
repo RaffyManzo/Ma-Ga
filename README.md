@@ -1,129 +1,108 @@
-## Spiegazione della struttura del codice
+## Struttura del Codice
+
+Il repository è organizzato in package con responsabilità distinte: modello del
+problema, algoritmo genetico, gestione temporale, configurazione, I/O,
+validazione e test manuali.
 
 ### Package `model`
 
-La repo è organizzata in diversi package, ognuno con un ruolo abbastanza preciso.
+Il package `model` contiene gli oggetti che rappresentano il problema di
+offloading:
 
-Il package `model` contiene le classi che rappresentano il problema. 
-Qui ci sono gli oggetti che corrispondono alla formalizzazione: 
-- lo snapshot del sistema,
-- i veicoli, i task,
-- i nodi candidati,
-- i geni 
-- i cromosomi
+- `SystemSnapshot`: fotografia dello scenario in un istante simulato, con
+  veicoli, task attivi e candidati di esecuzione.
+- `VehicleSnapshot`: stato di un veicolo, inclusi posizione, velocità e CPU
+  locale disponibile.
+- `TaskInstance`: task computazionale generato da un veicolo, con input,
+  output, cicli CPU e deadline.
+- `NodeCandidate`: destinazione possibile per un task, locale o remota
+  (`VEHICLE`, `EDGE`, `CLOUD`).
+- `Gene`: decisione di offloading per un singolo task.
+- `Chromosome`: strategia completa di offloading per tutti i task attivi.
 
-In particolare, `SystemSnapshot` rappresenta lo stato osservato in una finestra temporale, quindi l’insieme di veicoli, task e nodi disponibili.
-`TaskInstance` rappresenta il singolo task computazionale, con dati come veicolo sorgente, dimensione dell’input, output, cicli CPU e deadline.
-`VehicleSnapshot` rappresenta invece lo stato del veicolo in quel momento, quindi posizione, velocità e risorse locali.
-`NodeCandidate` rappresenta le possibili destinazioni di esecuzione, quindi locale, veicolo, edge o cloud.
+`Gene` e `Chromosome` sono le classi più vicine alla formalizzazione del GA. Il
+gene contiene candidato scelto, quota di offloading, CPU e banda allocate; il
+cromosoma raccoglie un gene per ogni task.
 
-Le classi `Gene` e `Chromosome` sono quelle più direttamente collegate alla formalizzazione dell’algoritmo genetico. 
-Il gene rispecchia la tupla formalizzata come decisione per un task: quota di offloading, CPU allocata, banda allocata e nodo scelto. 
-Il cromosoma è quindi l’insieme dei geni, cioè una strategia completa di offloading per tutti i task attivi nella finestra.
+### Package `ga`
 
+Il package `ga` contiene il cuore dell'algoritmo genetico.
 
-Il package `ga` contiene invece il cuore dell’algoritmo genetico. 
-Qui sono presenti:
-- il ciclo evolutivo,
-- la fitness 
-- gli operatori genetici.
+`MaGaOptimizer` coordina il ciclo evolutivo:
 
-`MaGaOptimizer` coordina:
-- inizializzazione della popolazione,
-- valutazione,
-- selezione,
-- crossover,
-- mutazione,
-- repair,
-- elitismo 
-- criterio di arresto.
+1. prepara la popolazione iniziale;
+2. valuta i cromosomi;
+3. applica elitismo, selezione, crossover e mutazione;
+4. ripara cromosomi incoerenti;
+5. produce la soluzione migliore e la popolazione finale.
 
+`FitnessEvaluator` traduce la funzione obiettivo in codice, combinando tempo di
+completamento, latenza di comunicazione, rischio di mobilità/copertura e uso
+delle risorse.
 
-`FitnessEvaluator` traduce la funzione obiettivo formalizzata, considerando tempo, latenza, mobilità e uso delle risorse. 
-Gli operatori, invece, servono a generare e modificare le soluzioni.
-
-### Problematiche emerse durante i test nelle varie fasi dell'implementazione
-
-Durante i test sono emersi alcuni problemi che hanno richiesto l’introduzione di policy più guidate. 
-
-All’inizio alcune decisioni generate dal GA erano formalmente possibili, ma poco sensate rispetto ai vincoli reali del problema. 
-Per esempio, potevano comparire quote di offloading non coerenti con il tipo di nodo scelto, oppure allocazioni di CPU e banda troppo deboli rispetto alla deadline del task. 
-Per questo sono state aggiunte policy come `OffloadingRatioPolicy` e `ResourceAllocationPolicy`. 
-
-Un’altra correzione importante riguarda il repair. 
-Nei report è emerso che rispettare i vincoli del singolo gene non bastava sempre, perché più task potevano finire sullo stesso nodo fisico e superare la CPU complessiva disponibile. 
-Per questo ho implementato un repair aggregato sulla CPU, così da riportare le soluzioni dentro i limiti delle risorse. 
-Implementa in modo pratico il vincolo sulla capacità computazionale dei nodi.
-
-
-Ho poi introdotto una gestione più esplicita della mobilità e della copertura. 
-Nella formalizzazione il tempo di esecuzione deve essere compatibile non solo con la deadline, ma anche con il tempo di copertura del nodo scelto. 
-Per questo è stato aggiunto un `CoverageEstimator`, usato poi nella fitness, nel prefilter e nel repair. 
-
------
+Gli operatori genetici generano e modificano le soluzioni. Alcune policy
+aggiuntive, come `OffloadingRatioPolicy` e `ResourceAllocationPolicy`, guidano
+la generazione di quote e risorse per evitare combinazioni formalmente valide
+ma poco plausibili rispetto a deadline, banda e CPU disponibili.
 
 ### Package `window`
 
+Il package `window` gestisce l'esecuzione del MA-GA su finestre temporali
+successive.
 
-Il package `window` è quello che prepara la parte più vicina al simulatore. 
-Gestisce l'esecuzione del GA in finestre temporali successive.
-La classe centrale è `TemporalWindowManager`, che gestisce il ciclo:
-1. riceve uno snapshot,
-2. valuta quanto è cambiato rispetto al precedente,
-3. decide se riutilizzare parte della popolazione,
-4. esegue il GA 
-5. prepara la finestra successiva. 
+La classe centrale è `TemporalWindowManager`, che:
 
-Dentro `window` ci sono anche componenti più specifici. 
-La parte `dynamicity` valuta quanto cambiano veicoli, task, risorse e link tra due finestre. 
-La parte `population` gestisce il riuso della popolazione precedente: 
-- se lo scenario è stabile può avere senso riutilizzarla,
-- se ci sono cambiamenti forti conviene ripartire più da zero
+1. richiede uno snapshot alla sorgente dati;
+2. valuta la dinamicità rispetto allo snapshot precedente;
+3. decide quanto riutilizzare della popolazione precedente;
+4. esegue il GA sullo snapshot corrente;
+5. calcola la durata della finestra successiva.
 
-La parte `prefilter` serve invece a ridurre i candidati prima di passarli al GA. 
-Questo è stato utile perché alcuni candidati erano già chiaramente non utilizzabili: per esempio perché non compatibili con il veicolo sorgente, perché fuori copertura o perché anche nel caso migliore non avrebbero rispettato la deadline. 
+Le sottosezioni principali sono:
 
-#### Finestra adattiva
+- `dynamicity`: misura le variazioni di veicoli, task, risorse e link.
+- `population`: decide e costruisce il riuso della popolazione precedente.
+- `prefilter`: elimina candidati chiaramente non competitivi prima del GA.
+- `source`: astrae la sorgente dati, oggi basata su replay JSON e predisposta
+  per un bridge MOSAIC/SUMO.
+- `timing`: calcola i limiti e la durata della finestra adattiva.
 
-La parte `timing` riguarda la finestra temporale adattiva. 
-L’obiettivo è non usare una durata fissa per tutte le finestre, ma adattarla alla dinamicità dello scenario e ai tempi operativi del sistema. 
+### Finestra Adattiva
 
------
+La finestra adattiva evita una durata fissa per tutte le esecuzioni. La durata
+viene aggiornata in base alla dinamicità dello scenario, ai tempi operativi del
+sistema e ai vincoli di copertura.
 
 ### Package `config`
 
-Il package `config` raccoglie i parametri dell’algoritmo: 
-- pesi della fitness,
-- penalità,
-- parametri del GA,
-- parametri di mobilità
-- parametri della finestra temporale.
+Il package `config` raccoglie i parametri del sistema:
 
-----
+- pesi della fitness;
+- penalità;
+- parametri del GA;
+- parametri di mobilità;
+- parametri della finestra temporale;
+- regole di scaling dei parametri GA.
 
-### Package `io`, `validation` e `test` 
+### Package `io`, `validation` e `test`
 
-I package `io`, `validation` e `test` servono invece per caricare snapshot, produrre report, validare la struttura degli input ed eseguire test manuali. 
-- `io` permette di stamoare dei report che analizzano e forniscono i risultati dell'esecuzion del GA e della finestra temporale eseguiti su una serie di snapshot statici in JSON.
-- `validation` contiene uno `SnapshotValidator` che controlla la struttura del file JSON (quando verrá introdotto il simulatore verrá sostituita)
-- `test` conteneva classi che runnavano alcuni test precedenti per testare il GA su snapshot singoli.
+`io` contiene loader e printer diagnostici. I loader trasformano snapshot JSON
+in oggetti di dominio; i printer producono report tecnici per analizzare GA,
+finestra temporale, riuso popolazione, sorgente dati e prefilter.
 
------
+`validation` contiene `SnapshotValidator`, che controlla struttura e coerenza
+degli snapshot prima dell'esecuzione.
 
-### Situazione attuale
+`test` contiene runner manuali e suite sintetiche usate per verificare il
+prototipo senza dipendere da un framework di test esterno.
 
-- Il core del GA é abbastanza stabile, tolto alcuni scenari con carichi computazionali alti
-- Il prossimo passo è costruire un collegamento tra `MOSAIC/sumo` e `SystemSnapshot`.
+### Stato Attuale
 
+Il core del GA è stabile nei casi principali, ma alcuni scenari con carichi
+computazionali elevati richiedono ancora calibrazione di fitness, repair e
+policy di allocazione.
 
-In pratica, MOSAIC/SUMO dovrebbe fornire:
-- veicoli,
-- posizioni,
-- velocità,
-- task,
-- nodi disponibili,
-- banda,
-- latenza
-- eventuali eventi critici
-
-Da questi dati poi semplicemente si costruisce lo snapshot e si passa al `TemporalWindowManager` può eseguire il MA-GA.
+Il prossimo passo architetturale è collegare MOSAIC/SUMO alla generazione di
+`SystemSnapshot`. Il simulatore dovrebbe fornire veicoli, posizioni, velocità,
+task, nodi disponibili, banda, latenza ed eventuali eventi critici; da questi
+dati si costruisce lo snapshot da passare a `TemporalWindowManager`.

@@ -3,18 +3,22 @@ package model.genetic;
 /**
  * Rappresenta la decisione di offloading per un singolo task.
  *
- * Formalmente:
+ * <p>Formalmente:</p>
  *
+ * <pre>
  * g_i = (n_i, p_i, f_i, b_i)
+ * </pre>
  *
- * dove:
- * - n_i è il candidato di esecuzione scelto;
- * - p_i è la quota di offloading;
- * - f_i è la CPU assegnata;
- * - b_i è la banda assegnata.
+ * <ul>
+ *     <li>{@code n_i}: candidato di esecuzione scelto;</li>
+ *     <li>{@code p_i}: quota di offloading;</li>
+ *     <li>{@code f_i}: CPU assegnata;</li>
+ *     <li>{@code b_i}: banda assegnata.</li>
+ * </ul>
  *
- * Nel nuovo modello n_i non è più un nodo globale, ma un candidateId
- * source-aware valido per il veicolo che ha generato il task.
+ * <p>Nel modello source-aware {@code n_i} è un {@code candidateId}, non un nodo
+ * globale. Il candidato deve essere valido per il veicolo che ha generato il
+ * task.</p>
  */
 public final class Gene {
 
@@ -27,15 +31,11 @@ public final class Gene {
     /**
      * Costruisce un gene.
      *
-     * Parametri in ingresso:
-     * - taskId: task a cui il gene si riferisce;
-     * - selectedCandidateId: candidato di esecuzione scelto;
-     * - offloadingRatio: quota di offloading p_i;
-     * - allocatedCpu: CPU assegnata f_i;
-     * - allocatedBandwidth: banda assegnata b_i.
-     *
-     * Output:
-     * - nuova istanza immutabile di Gene.
+     * @param taskId task a cui il gene si riferisce
+     * @param selectedCandidateId candidato di esecuzione scelto
+     * @param offloadingRatio quota remota {@code p_i}
+     * @param allocatedCpu CPU assegnata {@code f_i}
+     * @param allocatedBandwidth banda assegnata {@code b_i}
      */
     public Gene(
             String taskId,
@@ -53,9 +53,6 @@ public final class Gene {
 
     /**
      * Restituisce il task associato al gene.
-     *
-     * Output:
-     * - taskId.
      */
     public String getTaskId() {
         return taskId;
@@ -63,9 +60,6 @@ public final class Gene {
 
     /**
      * Restituisce il candidato di esecuzione scelto.
-     *
-     * Output:
-     * - selectedCandidateId.
      */
     public String getSelectedCandidateId() {
         return selectedCandidateId;
@@ -74,11 +68,8 @@ public final class Gene {
     /**
      * Metodo di compatibilità temporanea.
      *
-     * Output:
-     * - selectedCandidateId.
-     *
-     * Nota:
-     * nel nuovo modello è preferibile usare getSelectedCandidateId().
+     * <p>Nel modello source-aware è preferibile usare
+     * {@link #getSelectedCandidateId()}.</p>
      */
     public String getSelectedNodeId() {
         return selectedCandidateId;
@@ -86,9 +77,6 @@ public final class Gene {
 
     /**
      * Restituisce la quota di offloading.
-     *
-     * Output:
-     * - p_i.
      */
     public double getOffloadingRatio() {
         return offloadingRatio;
@@ -96,9 +84,6 @@ public final class Gene {
 
     /**
      * Restituisce la CPU assegnata.
-     *
-     * Output:
-     * - f_i.
      */
     public double getAllocatedCpu() {
         return allocatedCpu;
@@ -106,9 +91,6 @@ public final class Gene {
 
     /**
      * Restituisce la banda assegnata.
-     *
-     * Output:
-     * - b_i.
      */
     public double getAllocatedBandwidth() {
         return allocatedBandwidth;

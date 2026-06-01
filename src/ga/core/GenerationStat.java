@@ -3,7 +3,8 @@ package ga.core;
 /**
  * Contiene statistiche sintetiche su una generazione del Genetic Algorithm.
  *
- * Queste informazioni servono per ricostruire l'andamento della fitness nel tempo.
+ * <p>Le statistiche sono usate dai report per ricostruire l'andamento della
+ * fitness durante l'evoluzione.</p>
  */
 public final class GenerationStat {
 
@@ -15,14 +16,10 @@ public final class GenerationStat {
     /**
      * Costruisce le statistiche di una generazione.
      *
-     * Parametri in ingresso:
-     * - generationIndex: indice della generazione;
-     * - bestFitness: migliore fitness della generazione;
-     * - averageFitness: fitness media della generazione;
-     * - worstFitness: peggiore fitness della generazione.
-     *
-     * Output:
-     * - nuova istanza immutabile di GenerationStat.
+     * @param generationIndex indice della generazione
+     * @param bestFitness migliore fitness della generazione
+     * @param averageFitness fitness media della generazione
+     * @param worstFitness peggiore fitness della generazione
      */
     public GenerationStat(
             int generationIndex,
@@ -38,9 +35,6 @@ public final class GenerationStat {
 
     /**
      * Restituisce l'indice della generazione.
-     *
-     * Output:
-     * - indice numerico della generazione.
      */
     public int getGenerationIndex() {
         return generationIndex;
@@ -48,9 +42,6 @@ public final class GenerationStat {
 
     /**
      * Restituisce la migliore fitness della generazione.
-     *
-     * Output:
-     * - fitness minima della generazione.
      */
     public double getBestFitness() {
         return bestFitness;
@@ -58,9 +49,6 @@ public final class GenerationStat {
 
     /**
      * Restituisce la fitness media della generazione.
-     *
-     * Output:
-     * - media delle fitness della popolazione.
      */
     public double getAverageFitness() {
         return averageFitness;
@@ -68,9 +56,6 @@ public final class GenerationStat {
 
     /**
      * Restituisce la peggiore fitness della generazione.
-     *
-     * Output:
-     * - fitness massima della generazione.
      */
     public double getWorstFitness() {
         return worstFitness;
@@ -78,9 +63,6 @@ public final class GenerationStat {
 
     /**
      * Restituisce una rappresentazione testuale sintetica della generazione.
-     *
-     * Output:
-     * - stringa leggibile della statistica.
      */
     @Override
     public String toString() {

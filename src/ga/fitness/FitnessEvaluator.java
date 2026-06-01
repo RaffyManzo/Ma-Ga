@@ -9,11 +9,15 @@ import ga.fitness.breakdown.ExecutionNodeResourceUsageBreakdown;
 import ga.fitness.breakdown.GeneEvaluationBreakdown;
 import ga.fitness.breakdown.LinkBandwidthUsageBreakdown;
 import ga.fitness.breakdown.LocalResourceUsageBreakdown;
+import ga.fitness.breakdown.MobilityPenaltyBreakdown;
 import model.genetic.Chromosome;
 import model.genetic.Gene;
 import model.mobility.CoverageEstimator;
+import model.mobility.MobilityLinkMetrics;
 import model.node.NodeCandidate;
 import model.node.NodeType;
+import model.offloading.OffloadingTimeBreakdown;
+import model.offloading.OffloadingTimeModel;
 import model.snapshot.SystemSnapshot;
 import model.snapshot.TaskInstance;
 import model.snapshot.VehicleSnapshot;
@@ -27,8 +31,17 @@ import java.util.Objects;
 /**
  * Valuta un cromosoma MA-GA rispetto a uno snapshot del sistema.
  *
- * Usa CoverageEstimator per stimare il tempo di copertura. Il tempo di
- * copertura non viene più letto direttamente da NodeCandidate.
+ * <p>La valutazione combina quattro famiglie di costo:</p>
+ * <ul>
+ *     <li>tempo massimo di completamento dei task;</li>
+ *     <li>latenza comunicativa complessivamente introdotta dalle decisioni remote;</li>
+ *     <li>rischio mobility-aware legato alla copertura e alla stabilità del link;</li>
+ *     <li>penalità di vincolo e sovrauso risorse.</li>
+ * </ul>
+ *
+ * <p>Il tempo di copertura e l'instabilità del collegamento vengono calcolati
+ * tramite {@link CoverageEstimator}, così il modello non dipende da valori
+ * precomputati dentro {@code NodeCandidate}.</p>
  */
 public final class FitnessEvaluator {
 
@@ -37,28 +50,20 @@ public final class FitnessEvaluator {
 
     private final MaGaConfig config;
     private final CoverageEstimator coverageEstimator;
+    private final OffloadingTimeModel offloadingTimeModel;
 
-    /**
-     * Costruisce il valutatore usando la configurazione MA-GA.
-     *
-     * @param config configurazione complessiva del MA-GA
-     */
     public FitnessEvaluator(MaGaConfig config) {
         this(
                 config,
                 new CoverageEstimator(
-                        Objects.requireNonNull(config, "config must not be null.")
-                                .getMobilityConfig()
+                        Objects.requireNonNull(
+                                config,
+                                "config must not be null."
+                        ).getMobilityConfig()
                 )
         );
     }
 
-    /**
-     * Costruisce il valutatore usando uno stimatore di copertura esplicito.
-     *
-     * @param config configurazione complessiva del MA-GA
-     * @param coverageEstimator stimatore del tempo di copertura
-     */
     public FitnessEvaluator(
             MaGaConfig config,
             CoverageEstimator coverageEstimator
@@ -67,20 +72,13 @@ public final class FitnessEvaluator {
                 config,
                 "config must not be null."
         );
-
         this.coverageEstimator = Objects.requireNonNull(
                 coverageEstimator,
                 "coverageEstimator must not be null."
         );
+        this.offloadingTimeModel = new OffloadingTimeModel();
     }
 
-    /**
-     * Calcola solo il valore scalare della fitness.
-     *
-     * @param chromosome cromosoma da valutare
-     * @param snapshot snapshot corrente
-     * @return valore finale della fitness
-     */
     public double evaluate(
             Chromosome chromosome,
             SystemSnapshot snapshot
@@ -88,13 +86,6 @@ public final class FitnessEvaluator {
         return evaluateDetailed(chromosome, snapshot).getFitness();
     }
 
-    /**
-     * Calcola la valutazione dettagliata di un cromosoma.
-     *
-     * @param chromosome cromosoma da valutare
-     * @param snapshot snapshot corrente
-     * @return breakdown completo della valutazione
-     */
     public EvaluationBreakdown evaluateDetailed(
             Chromosome chromosome,
             SystemSnapshot snapshot
@@ -102,25 +93,10 @@ public final class FitnessEvaluator {
         Objects.requireNonNull(chromosome, "chromosome must not be null.");
         Objects.requireNonNull(snapshot, "snapshot must not be null.");
 
-        List<TaskInstance> tasks = requireList(
-                snapshot.getTasks(),
-                "snapshot.tasks"
-        );
-
-        List<VehicleSnapshot> vehicles = requireList(
-                snapshot.getVehicles(),
-                "snapshot.vehicles"
-        );
-
-        List<NodeCandidate> candidates = requireList(
-                snapshot.getCandidateNodes(),
-                "snapshot.candidateNodes"
-        );
-
-        List<Gene> genes = requireList(
-                chromosome.getGenes(),
-                "chromosome.genes"
-        );
+        List<TaskInstance> tasks = requireList(snapshot.getTasks(), "snapshot.tasks");
+        List<VehicleSnapshot> vehicles = requireList(snapshot.getVehicles(), "snapshot.vehicles");
+        List<NodeCandidate> candidates = requireList(snapshot.getCandidateNodes(), "snapshot.candidateNodes");
+        List<Gene> genes = requireList(chromosome.getGenes(), "chromosome.genes");
 
         Map<String, TaskInstance> taskById = indexTasks(tasks);
         Map<String, VehicleSnapshot> vehicleById = indexVehicles(vehicles);
@@ -132,10 +108,8 @@ public final class FitnessEvaluator {
 
         Map<String, ExecutionNodeResourceUsageBreakdown> cpuUsageByExecutionNode =
                 initializeExecutionNodeCpuUsage(candidates);
-
         Map<String, LinkBandwidthUsageBreakdown> bandwidthUsageByCandidate =
                 initializeLinkBandwidthUsage(candidates);
-
         Map<String, LocalResourceUsageBreakdown> localUsageByVehicle =
                 initializeLocalUsage(vehicles);
 
@@ -148,7 +122,6 @@ public final class FitnessEvaluator {
 
         for (TaskInstance task : tasks) {
             Gene gene = geneByTaskId.get(task.getTaskId());
-
             if (gene == null) {
                 invalidPenalty += INVALID_SOLUTION_PENALTY;
                 continue;
@@ -167,8 +140,13 @@ public final class FitnessEvaluator {
                 continue;
             }
 
-            GeneEvaluationBreakdown geneBreakdown =
-                    evaluateGene(snapshot, task, gene, candidate, sourceVehicle);
+            GeneEvaluationBreakdown geneBreakdown = evaluateGene(
+                    snapshot,
+                    task,
+                    gene,
+                    candidate,
+                    sourceVehicle
+            );
 
             geneBreakdowns.add(geneBreakdown);
 
@@ -176,7 +154,6 @@ public final class FitnessEvaluator {
                     completionTime,
                     geneBreakdown.getCompletionTimeSeconds()
             );
-
             communicationLatencySum += geneBreakdown.getCommunicationLatencySeconds();
             mobilityPenalty += geneBreakdown.getMobilityPenalty();
             constraintPenalty += geneBreakdown.getConstraintPenalty();
@@ -184,14 +161,12 @@ public final class FitnessEvaluator {
             if (candidate.getType() != NodeType.LOCAL) {
                 ExecutionNodeResourceUsageBreakdown cpuUsage =
                         cpuUsageByExecutionNode.get(candidate.getExecutionNodeId());
-
                 if (cpuUsage != null) {
                     cpuUsage.addCpu(geneBreakdown.getAllocatedCpu());
                 }
 
                 LinkBandwidthUsageBreakdown bandwidthUsage =
                         bandwidthUsageByCandidate.get(candidate.getCandidateId());
-
                 if (bandwidthUsage != null) {
                     bandwidthUsage.addBandwidth(geneBreakdown.getAllocatedBandwidth());
                 }
@@ -199,7 +174,6 @@ public final class FitnessEvaluator {
 
             LocalResourceUsageBreakdown localUsage =
                     localUsageByVehicle.get(task.getSourceVehicleId());
-
             if (localUsage != null) {
                 localUsage.addLocalWorkload(
                         geneBreakdown.getLocalCpuCycles(),
@@ -208,8 +182,11 @@ public final class FitnessEvaluator {
             }
         }
 
-        double averageCommunicationLatency =
-                tasks.isEmpty() ? 0.0 : communicationLatencySum / tasks.size();
+        /*
+         * La formalizzazione definisce L(C) come somma delle latenze
+         * comunicative dei singoli task, non come media.
+         */
+        double totalCommunicationLatency = communicationLatencySum;
 
         double resourcePenalty = computeResourcePenalty(
                 cpuUsageByExecutionNode,
@@ -222,15 +199,10 @@ public final class FitnessEvaluator {
         FitnessWeights weights = config.getFitnessWeights();
         NormalizationConfig normalization = config.getNormalizationConfig();
 
-        double normalizedCompletionTime =
-                completionTime / normalization.getTRef();
-
+        double normalizedCompletionTime = completionTime / normalization.getTRef();
         double normalizedCommunicationLatency =
-                averageCommunicationLatency / normalization.getLRef();
-
-        double normalizedMobilityPenalty =
-                mobilityPenalty / normalization.getPmobRef();
-
+                totalCommunicationLatency / normalization.getLRef();
+        double normalizedMobilityPenalty = mobilityPenalty / normalization.getPmobRef();
         double normalizedResourcePenalty =
                 totalResourceAndConstraintPenalty / normalization.getPresRef();
 
@@ -243,7 +215,7 @@ public final class FitnessEvaluator {
         return new EvaluationBreakdown(
                 fitness,
                 completionTime,
-                averageCommunicationLatency,
+                totalCommunicationLatency,
                 mobilityPenalty,
                 totalResourceAndConstraintPenalty,
                 normalizedCompletionTime,
@@ -257,9 +229,6 @@ public final class FitnessEvaluator {
         );
     }
 
-    /**
-     * Valuta un singolo gene rispetto al task associato.
-     */
     private GeneEvaluationBreakdown evaluateGene(
             SystemSnapshot snapshot,
             TaskInstance task,
@@ -268,39 +237,37 @@ public final class FitnessEvaluator {
             VehicleSnapshot sourceVehicle
     ) {
         PenaltyConfig penalties = config.getPenaltyConfig();
-
         double constraintPenalty = 0.0;
-        double p = gene.getOffloadingRatio();
 
+        double p = gene.getOffloadingRatio();
         if (!Double.isFinite(p) || p < 0.0 || p > 1.0) {
             constraintPenalty += INVALID_SOLUTION_PENALTY;
             p = clamp(p, 0.0, 1.0);
         }
 
         double localCpu = sourceVehicle.getLocalCpu();
-
         if (!isStrictlyPositive(localCpu)) {
             constraintPenalty += INVALID_SOLUTION_PENALTY;
             localCpu = EPSILON;
         }
 
-        double coverageTimeSeconds =
-                coverageEstimator.estimateCoverageTimeSeconds(
-                        snapshot,
-                        task,
-                        candidate
-                );
+        MobilityLinkMetrics mobilityLinkMetrics = coverageEstimator.estimateLinkMetrics(
+                snapshot,
+                task,
+                candidate
+        );
+        double coverageTimeSeconds = mobilityLinkMetrics.getCoverageTimeSeconds();
 
         if (candidate.getType() == NodeType.LOCAL) {
-            double localCpuCycles = task.getCpuCycles();
-            double localExecutionTime = safeDivide(localCpuCycles, localCpu);
+            OffloadingTimeBreakdown timeBreakdown =
+                    offloadingTimeModel.evaluateLocal(task, localCpu);
 
             if (Math.abs(p) > EPSILON) {
                 constraintPenalty += Math.abs(p) * INVALID_SOLUTION_PENALTY;
             }
 
             double deadlinePenalty = computeDeadlinePenalty(
-                    localExecutionTime,
+                    timeBreakdown.getCompletionTimeSeconds(),
                     task.getDeadlineSeconds(),
                     penalties
             );
@@ -315,24 +282,25 @@ public final class FitnessEvaluator {
                     0.0,
                     localCpu,
                     0.0,
-                    localCpuCycles,
-                    localExecutionTime,
+                    timeBreakdown.getLocalCpuCycles(),
+                    timeBreakdown.getLocalExecutionTimeSeconds(),
                     0.0,
                     0.0,
                     0.0,
                     0.0,
                     0.0,
-                    localExecutionTime,
+                    timeBreakdown.getCompletionTimeSeconds(),
                     0.0,
                     0.0,
                     constraintPenalty + deadlinePenalty,
                     task.getDeadlineSeconds(),
                     isDeadlineRespected(
-                            localExecutionTime,
+                            timeBreakdown.getCompletionTimeSeconds(),
                             task.getDeadlineSeconds()
                     ),
                     coverageTimeSeconds,
-                    true
+                    true,
+                    MobilityPenaltyBreakdown.zero(mobilityLinkMetrics)
             );
         }
 
@@ -354,58 +322,35 @@ public final class FitnessEvaluator {
             allocatedBandwidth = EPSILON;
         }
 
-        double localCpuCycles = (1.0 - p) * task.getCpuCycles();
-        double localExecutionTime = safeDivide(localCpuCycles, localCpu);
-
-        double uploadTime = safeDivide(
-                p * task.getInputSizeBits(),
-                allocatedBandwidth
-        );
-
-        double remoteExecutionTime = safeDivide(
-                p * task.getCpuCycles(),
-                allocatedCpu
-        );
-
-        double downloadTime = safeDivide(
-                task.getOutputSizeBits(),
-                allocatedBandwidth
-        );
-
-        double baseLatency = Math.max(0.0, candidate.getBaseLatencySeconds());
-
-        double remotePartTime =
-                uploadTime + remoteExecutionTime + downloadTime + baseLatency;
-
-        double communicationLatency =
-                uploadTime + downloadTime + baseLatency;
-
-        double completionTime =
-                p >= 1.0 - EPSILON
-                        ? remotePartTime
-                        : Math.max(localExecutionTime, remotePartTime);
-
-        double mobilityPenalty = computeMobilityPenalty(
+        OffloadingTimeBreakdown timeBreakdown = offloadingTimeModel.evaluateRemote(
+                task,
                 candidate,
-                coverageTimeSeconds,
-                completionTime,
+                localCpu,
+                p,
+                allocatedCpu,
+                allocatedBandwidth
+        );
+
+        MobilityPenaltyBreakdown mobilityBreakdown = computeMobilityPenaltyBreakdown(
+                candidate,
+                mobilityLinkMetrics,
+                timeBreakdown.getCompletionTimeSeconds(),
                 penalties
         );
+        double mobilityPenalty = mobilityBreakdown.getTotalMobilityPenalty();
 
         double deadlinePenalty = computeDeadlinePenalty(
-                completionTime,
+                timeBreakdown.getCompletionTimeSeconds(),
                 task.getDeadlineSeconds(),
                 penalties
         );
 
-        DecisionType decisionType =
-                p >= 1.0 - EPSILON
-                        ? DecisionType.FULL_OFFLOADING
-                        : DecisionType.PARTIAL_OFFLOADING;
+        DecisionType decisionType = p >= 1.0 - EPSILON
+                ? DecisionType.FULL_OFFLOADING
+                : DecisionType.PARTIAL_OFFLOADING;
 
-        boolean coverageSufficient =
-                coverageTimeSeconds > 0.0
-                        && coverageTimeSeconds >= completionTime;
+        boolean coverageSufficient = coverageTimeSeconds > 0.0
+                && coverageTimeSeconds >= timeBreakdown.getCompletionTimeSeconds();
 
         return new GeneEvaluationBreakdown(
                 task.getTaskId(),
@@ -417,27 +362,28 @@ public final class FitnessEvaluator {
                 p,
                 allocatedCpu,
                 allocatedBandwidth,
-                localCpuCycles,
-                localExecutionTime,
-                uploadTime,
-                remoteExecutionTime,
-                downloadTime,
-                baseLatency,
-                remotePartTime,
-                completionTime,
-                communicationLatency,
+                timeBreakdown.getLocalCpuCycles(),
+                timeBreakdown.getLocalExecutionTimeSeconds(),
+                timeBreakdown.getUploadTimeSeconds(),
+                timeBreakdown.getRemoteExecutionTimeSeconds(),
+                timeBreakdown.getDownloadTimeSeconds(),
+                timeBreakdown.getPropagationDelaySeconds(),
+                timeBreakdown.getRemotePartTimeSeconds(),
+                timeBreakdown.getCompletionTimeSeconds(),
+                timeBreakdown.getCommunicationLatencySeconds(),
                 mobilityPenalty,
                 constraintPenalty + deadlinePenalty,
                 task.getDeadlineSeconds(),
-                isDeadlineRespected(completionTime, task.getDeadlineSeconds()),
+                isDeadlineRespected(
+                        timeBreakdown.getCompletionTimeSeconds(),
+                        task.getDeadlineSeconds()
+                ),
                 coverageTimeSeconds,
-                coverageSufficient
+                coverageSufficient,
+                mobilityBreakdown
         );
     }
 
-    /**
-     * Inizializza l'uso CPU aggregato per nodo fisico.
-     */
     private Map<String, ExecutionNodeResourceUsageBreakdown>
     initializeExecutionNodeCpuUsage(List<NodeCandidate> candidates) {
         Map<String, ExecutionNodeResourceUsageBreakdown> result = new HashMap<>();
@@ -460,9 +406,6 @@ public final class FitnessEvaluator {
         return result;
     }
 
-    /**
-     * Inizializza l'uso banda per candidato/link.
-     */
     private Map<String, LinkBandwidthUsageBreakdown>
     initializeLinkBandwidthUsage(List<NodeCandidate> candidates) {
         Map<String, LinkBandwidthUsageBreakdown> result = new HashMap<>();
@@ -487,9 +430,6 @@ public final class FitnessEvaluator {
         return result;
     }
 
-    /**
-     * Inizializza il carico locale per veicolo.
-     */
     private Map<String, LocalResourceUsageBreakdown>
     initializeLocalUsage(List<VehicleSnapshot> vehicles) {
         Map<String, LocalResourceUsageBreakdown> result = new HashMap<>();
@@ -507,9 +447,6 @@ public final class FitnessEvaluator {
         return result;
     }
 
-    /**
-     * Calcola la penalità per superamento delle risorse.
-     */
     private double computeResourcePenalty(
             Map<String, ExecutionNodeResourceUsageBreakdown> cpuUsageByExecutionNode,
             Map<String, LinkBandwidthUsageBreakdown> bandwidthUsageByCandidate
@@ -533,47 +470,52 @@ public final class FitnessEvaluator {
     }
 
     /**
-     * Calcola la penalità mobility-aware usando la copertura stimata.
+     * Calcola la penalità mobility-aware e conserva il breakdown diagnostico.
      */
-    private double computeMobilityPenalty(
+    private MobilityPenaltyBreakdown computeMobilityPenaltyBreakdown(
             NodeCandidate candidate,
-            double coverageTimeSeconds,
+            MobilityLinkMetrics linkMetrics,
             double completionTimeSeconds,
             PenaltyConfig penalties
     ) {
         if (candidate.getType() == NodeType.LOCAL) {
-            return 0.0;
+            return MobilityPenaltyBreakdown.zero(linkMetrics);
         }
 
         if (!isStrictlyPositive(completionTimeSeconds)) {
-            return 0.0;
+            return MobilityPenaltyBreakdown.zero(linkMetrics);
         }
+
+        double coverageTimeSeconds = linkMetrics.getCoverageTimeSeconds();
+        double linkInstability = linkMetrics.getLinkInstability();
+        double coverageRisk;
+        double handoverRisk;
 
         if (!isStrictlyPositive(coverageTimeSeconds)) {
-            return penalties.getCoverageRiskWeight()
-                    + penalties.getHandoverRiskWeight();
+            coverageRisk = 1.0;
+            handoverRisk = 1.0;
+        } else {
+            coverageRisk = Math.max(
+                    0.0,
+                    1.0 - coverageTimeSeconds / completionTimeSeconds
+            );
+            handoverRisk = Math.min(
+                    1.0,
+                    completionTimeSeconds / coverageTimeSeconds
+            );
         }
 
-        double coverageRisk = Math.max(
-                0.0,
-                1.0 - coverageTimeSeconds / completionTimeSeconds
+        return new MobilityPenaltyBreakdown(
+                linkMetrics,
+                coverageRisk,
+                linkInstability,
+                handoverRisk,
+                penalties.getCoverageRiskWeight() * coverageRisk,
+                penalties.getLinkInstabilityWeight() * linkInstability,
+                penalties.getHandoverRiskWeight() * handoverRisk
         );
-
-        double handoverRisk = Math.min(
-                1.0,
-                completionTimeSeconds / coverageTimeSeconds
-        );
-
-        double linkInstability = 0.0;
-
-        return penalties.getCoverageRiskWeight() * coverageRisk
-                + penalties.getLinkInstabilityWeight() * linkInstability
-                + penalties.getHandoverRiskWeight() * handoverRisk;
     }
 
-    /**
-     * Calcola la penalità di deadline.
-     */
     private double computeDeadlinePenalty(
             double completionTimeSeconds,
             double deadlineSeconds,
@@ -584,7 +526,6 @@ public final class FitnessEvaluator {
         }
 
         double violation = completionTimeSeconds - deadlineSeconds;
-
         if (violation <= 0.0) {
             return 0.0;
         }
@@ -630,11 +571,9 @@ public final class FitnessEvaluator {
 
     private Map<String, TaskInstance> indexTasks(List<TaskInstance> tasks) {
         Map<String, TaskInstance> result = new HashMap<>();
-
         for (TaskInstance task : tasks) {
             result.put(task.getTaskId(), task);
         }
-
         return result;
     }
 
@@ -642,11 +581,9 @@ public final class FitnessEvaluator {
             List<VehicleSnapshot> vehicles
     ) {
         Map<String, VehicleSnapshot> result = new HashMap<>();
-
         for (VehicleSnapshot vehicle : vehicles) {
             result.put(vehicle.getVehicleId(), vehicle);
         }
-
         return result;
     }
 
@@ -654,33 +591,25 @@ public final class FitnessEvaluator {
             List<NodeCandidate> candidates
     ) {
         Map<String, NodeCandidate> result = new HashMap<>();
-
         for (NodeCandidate candidate : candidates) {
             result.put(candidate.getCandidateId(), candidate);
         }
-
         return result;
     }
 
     private Map<String, Gene> indexGenes(List<Gene> genes) {
         Map<String, Gene> result = new HashMap<>();
-
         for (Gene gene : genes) {
             result.putIfAbsent(gene.getTaskId(), gene);
         }
-
         return result;
     }
 
     @SuppressWarnings("unchecked")
-    private <T> List<T> requireList(
-            List<?> list,
-            String name
-    ) {
+    private <T> List<T> requireList(List<?> list, String name) {
         if (list == null) {
             throw new IllegalArgumentException(name + " must not be null.");
         }
-
         return (List<T>) list;
     }
 
@@ -688,10 +617,7 @@ public final class FitnessEvaluator {
         return Double.isFinite(value) && value > EPSILON;
     }
 
-    private double safeDivide(
-            double numerator,
-            double denominator
-    ) {
+    private double safeDivide(double numerator, double denominator) {
         if (!Double.isFinite(numerator)) {
             return INVALID_SOLUTION_PENALTY;
         }
@@ -703,11 +629,7 @@ public final class FitnessEvaluator {
         return numerator / denominator;
     }
 
-    private double clamp(
-            double value,
-            double min,
-            double max
-    ) {
+    private double clamp(double value, double min, double max) {
         if (!Double.isFinite(value)) {
             return min;
         }

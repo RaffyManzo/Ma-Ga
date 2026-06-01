@@ -8,10 +8,11 @@ import java.io.PrintStream;
 import java.util.Objects;
 
 /**
- * Printer per controllare come la sorgente dati ha risposto alle richieste del
- * gestore temporale.
+ * Printer per controllare l'allineamento tra tempo logico del manager e timestamp
+ * degli snapshot restituiti dalla sorgente dati.
  */
 public final class SystemStateSourceDiagnosticPrinter {
+    private static final double EPSILON_SECONDS = 1.0E-6;
 
     private final PrintStream out;
 
@@ -30,48 +31,65 @@ public final class SystemStateSourceDiagnosticPrinter {
         out.println("SYSTEM STATE SOURCE SUMMARY");
         out.println("------------------------------------------------------------");
         out.println(
-                "idx | snapshot | mode | seq | managerTime | sourceTime | shift | exactMatch | source"
+                "idx | snapshot | mode | seq | managerTime | sourceTime | shift | "
+                        + "exactMatch | futureLookAhead | interpretation | source"
         );
 
         for (TemporalStepResult step : result.getSteps()) {
             if (step.getSystemStateObservation().isEmpty()) {
+                double shift = step.getSourceObservationTimeSeconds()
+                        - step.getLogicalObservationTimeSeconds();
                 out.println(
-                        step.getWindowIndex()
-                                + " | " + step.getSnapshot().getSnapshotId()
-                                + " | LEGACY | - | "
-                                + formatSeconds(step.getLogicalObservationTimeSeconds())
-                                + " | " + formatSeconds(step.getSourceObservationTimeSeconds())
-                                + " | " + formatSeconds(
-                                step.getSourceObservationTimeSeconds()
-                                        - step.getLogicalObservationTimeSeconds()
-                        )
-                                + " | - | legacy"
+                        step.getWindowIndex() + " | "
+                                + step.getSnapshot().getSnapshotId() + " | LEGACY | - | "
+                                + formatSeconds(step.getLogicalObservationTimeSeconds()) + " | "
+                                + formatSeconds(step.getSourceObservationTimeSeconds()) + " | "
+                                + formatSeconds(shift) + " | - | "
+                                + isFutureLookAhead(shift) + " | legacy observation | legacy"
                 );
                 continue;
             }
 
-            SystemStateObservation observation = step
-                    .getSystemStateObservation()
-                    .get();
+            SystemStateObservation observation = step.getSystemStateObservation().get();
+            double shift = observation.getTimeShiftSeconds();
+            String mode = String.valueOf(observation.getSourceMode());
 
             out.println(
-                    step.getWindowIndex()
-                            + " | " + step.getSnapshot().getSnapshotId()
-                            + " | " + observation.getSourceMode()
-                            + " | " + observation.getSequenceIndex()
-                            + " | " + formatSeconds(
-                            observation.getRequestedObservationTimeSeconds()
-                    )
-                            + " | " + formatSeconds(
-                            observation.getSourceObservationTimeSeconds()
-                    )
-                            + " | " + formatSeconds(observation.getTimeShiftSeconds())
-                            + " | " + observation.isExactTimeMatch()
-                            + " | " + observation.getSourceDescription()
+                    step.getWindowIndex() + " | "
+                            + step.getSnapshot().getSnapshotId() + " | "
+                            + mode + " | "
+                            + observation.getSequenceIndex() + " | "
+                            + formatSeconds(observation.getRequestedObservationTimeSeconds()) + " | "
+                            + formatSeconds(observation.getSourceObservationTimeSeconds()) + " | "
+                            + formatSeconds(shift) + " | "
+                            + observation.isExactTimeMatch() + " | "
+                            + isFutureLookAhead(shift) + " | "
+                            + interpret(mode, shift) + " | "
+                            + observation.getSourceDescription()
             );
         }
 
         out.println();
+        out.println("Interpretation notes:");
+        out.println("- In JSON_SEQUENCE mode, a positive shift is expected when the adaptive window duration changes because files are consumed ordinally.");
+        out.println("- In JSON_TIME mode, a futureLookAhead=true row is anomalous: it means that a snapshot newer than the manager time was exposed.");
+        out.println();
+    }
+
+    private String interpret(String mode, double shift) {
+        if (!isFutureLookAhead(shift)) {
+            return Math.abs(shift) <= EPSILON_SECONDS
+                    ? "aligned"
+                    : "past snapshot reuse";
+        }
+        if (mode.contains("SEQUENTIAL")) {
+            return "expected ordinal shift";
+        }
+        return "unexpected future snapshot";
+    }
+
+    private boolean isFutureLookAhead(double shift) {
+        return shift > EPSILON_SECONDS;
     }
 
     private String formatSeconds(double value) {

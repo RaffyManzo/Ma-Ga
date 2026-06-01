@@ -3,9 +3,13 @@ package config.window;
 /**
  * Configurazione del gestore temporale del MA-GA.
  *
- * <p>La finestra iniziale resta configurata tramite {@code fixedIntervalSeconds}
- * per compatibilità con il codice precedente. Dopo la prima esecuzione, la
- * durata della finestra può essere aggiornata dal controller adattivo.</p>
+ * <p>Contiene soglie di dinamicità, pesi delle componenti, parametri di
+ * crescita/riduzione della finestra e limiti operativi usati dal controller
+ * adattivo.</p>
+ *
+ * <p>{@code fixedIntervalSeconds} identifica la durata iniziale della finestra.
+ * Dopo la prima esecuzione, la durata può essere aggiornata dal controller
+ * adattivo.</p>
  */
 public final class TemporalWindowConfig {
 
@@ -33,7 +37,7 @@ public final class TemporalWindowConfig {
     private final TemporalMaximumBoundMode maximumBoundMode;
 
     /**
-     * Costruttore compatibile con la versione precedente.
+     * Overload storico senza ritardo di raccolta dati.
      */
     public TemporalWindowConfig(
             double fixedIntervalSeconds,
@@ -72,7 +76,7 @@ public final class TemporalWindowConfig {
     }
 
     /**
-     * Costruttore compatibile con la versione precedente.
+     * Overload storico con ritardo di raccolta dati esplicito.
      */
     public TemporalWindowConfig(
             double fixedIntervalSeconds,
@@ -112,7 +116,7 @@ public final class TemporalWindowConfig {
     }
 
     /**
-     * Costruttore compatibile con la versione della finestra adattiva.
+     * Overload con stime operative esplicite per finestra adattiva.
      */
     public TemporalWindowConfig(
             double fixedIntervalSeconds,

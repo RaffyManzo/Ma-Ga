@@ -14,9 +14,10 @@ import java.util.Objects;
 /**
  * Policy temporale per correggere la modalità di riuso della popolazione.
  *
- * <p>La dinamicità formalizzata resta il punto di partenza. La policy non
- * modifica il GA, la fitness o il cromosoma. Decide solo quanto riutilizzare
- * della popolazione precedente.</p>
+ * <p>La dinamicità formalizzata resta il punto di partenza, ma la decisione
+ * finale considera anche la qualità della finestra precedente e gli spike delle
+ * componenti più critiche per l'offloading. La policy non modifica GA, fitness
+ * o cromosomi: decide soltanto quanta popolazione precedente riutilizzare.</p>
  *
  * <p>Correzione principale: se una finestra mostra uno spike congiunto forte
  * su task e link, il sistema non resta più in PARTIAL_RESTART solo perché
@@ -41,11 +42,11 @@ public final class PopulationReuseDecisionPolicy {
     private static final double VEHICLE_SPIKE_THRESHOLD = 0.55;
 
     /**
-     * Soglia leggermente più prudente per riconoscere lo spike task+link.
+     * Soglie usate per riconoscere uno spike congiunto task-link.
      *
-     * <p>Nel report calibrato la finestra 6 aveva Dt=0.726 e Dl=0.755.
-     * Il valore aggregato D restava moderato, ma le componenti critiche
-     * indicavano un cambio forte nella natura del problema.</p>
+     * <p>Uno spike simultaneo su task e link può rendere poco rappresentativa
+     * la popolazione precedente anche quando la dinamicità aggregata resta in
+     * fascia moderata.</p>
      */
     private static final double SEVERE_TASK_SPIKE_THRESHOLD = 0.70;
     private static final double SEVERE_LINK_SPIKE_THRESHOLD = 0.74;
@@ -144,9 +145,8 @@ public final class PopulationReuseDecisionPolicy {
         }
 
         /*
-         * Caso principale: MODERATE -> PARTIAL_RESTART.
-         * Qui si evita che il valore aggregato D(k) nasconda uno spike forte
-         * nelle componenti più critiche per l'offloading: task e link.
+         * Caso moderato: il valore aggregato D(k) suggerisce partial restart,
+         * ma alcune componenti possono richiedere una scelta più conservativa.
          */
         if (criticalTaskLinkSpike) {
             return new PopulationReuseDecision(

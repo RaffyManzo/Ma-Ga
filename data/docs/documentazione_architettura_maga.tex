@@ -122,7 +122,7 @@ Questo documento spiega come il codice realizza il Mobility-Aware Genetic
 Algorithm per il computation offloading nel continuum veicolo, edge e cloud.
 Il focus e' pratico: cosa fa ogni classe, con chi comunica, quale decisione
 prende e come questa decisione si collega alla formalizzazione. Il testo tiene
-conto delle correzioni recenti, in particolare del provider filtrato e delle
+conto delle correzioni recenti, in particolare della sorgente filtrata e delle
 nuove policy per quota di offloading, CPU e banda.
 \end{abstract}
 
@@ -161,11 +161,11 @@ chi chiama chi, non ogni dettaglio interno.
 \begin{tikzpicture}[node distance=1.15cm and 1.0cm]
     \node[data] (json) {file JSON\\snapshot + eventi};
     \node[box, right=of json] (loader) {\cls{SnapshotLoader}\\\cls{SnapshotValidator}};
-    \node[box, right=of loader] (provider) {\cls{SystemStateProvider}};
-    \node[box, below=of provider] (filtered) {\cls{FilteringSystemStateProvider}};
+    \node[box, right=of loader] (source) {\cls{SystemStateSource}};
+    \node[box, below=of source] (filtered) {\cls{FilteringSystemStateSource}};
     \node[policy, left=of filtered] (prefilter) {\cls{CandidatePrefilter}};
 
-    \node[widebox, right=1.45cm of provider] (manager) {\cls{TemporalWindowManager}};
+    \node[widebox, right=1.45cm of source] (manager) {\cls{TemporalWindowManager}};
     \node[box, below=of manager] (dynamicity) {\cls{DynamicityEvaluator}};
     \node[box, below=of dynamicity] (adapter) {\cls{PopulationAdapter}};
 
@@ -174,10 +174,10 @@ chi chiama chi, non ogni dettaglio interno.
     \node[result, right=1.45cm of optimizer] (result) {\cls{MaGaResult}\\breakdown};
 
     \draw[arrow] (json) -- (loader);
-    \draw[arrow] (loader) -- (provider);
-    \draw[arrow] (provider) -- (manager);
+    \draw[arrow] (loader) -- (source);
+    \draw[arrow] (source) -- (manager);
     \draw[dashedarrow] (prefilter) -- (filtered);
-    \draw[dashedarrow] (provider) -- (filtered);
+    \draw[dashedarrow] (source) -- (filtered);
     \draw[dashedarrow] (filtered) -- (manager);
 
     \draw[arrow] (manager) -- (dynamicity);
@@ -263,7 +263,7 @@ importante: il GA e le policy devono leggere lo stato, non modificarlo.
 \end{itemize}
 
 Il GA riceve sempre uno \cls{SystemSnapshot}. Questo evita dipendenze dirette da
-JSON, file o provider temporali.
+JSON, file o sorgenti temporali.
 
 \subsection{Veicoli, task e candidati}
 
@@ -321,35 +321,33 @@ g_i = (taskId_i, candidateId_i, p_i, f_i, b_i)
 Questa struttura corrisponde alla formalizzazione: scelta del nodo,
 partizionamento del task e allocazione di risorse.
 
-\section{Caricamento e provider}
+\section{Caricamento e sorgenti}
 
 \cls{SnapshotLoader} legge gli snapshot dai file. \cls{SnapshotValidator}
 controlla che lo scenario sia coerente prima di darlo al resto del sistema.
 
-Il gestore temporale non conosce i file. Dipende solo da \cls{SystemStateProvider}.
+Il gestore temporale non conosce i file. Dipende solo da \cls{SystemStateSource}.
 Questa interfaccia espone un solo metodo:
 
 \begin{lstlisting}[language=Java]
-Optional<SystemSnapshot> findSnapshotAt(double observationTimeSeconds);
+Optional<SystemStateObservation> nextObservation(SystemStateRequest request);
 \end{lstlisting}
 
-\subsection{Correzione del provider filtrato}
+\subsection{Sorgente filtrata}
 
-\cls{FilteringSystemStateProvider} e' un decorator. Riceve un provider reale e
-un \cls{CandidatePrefilter}. Quando il manager chiede uno snapshot, il decorator:
+\cls{FilteringSystemStateSource} e' un decorator. Riceve una sorgente reale e
+un \cls{CandidatePrefilter}. Quando il manager chiede un'osservazione, il decorator:
 
 \begin{enumerate}[leftmargin=*,nosep]
-    \item chiama il provider delegato con \meth{findSnapshotAt};
-    \item applica il prefilter allo snapshot trovato;
+    \item chiama la sorgente delegata con \meth{nextObservation};
+    \item applica il prefilter allo snapshot contenuto nell'osservazione;
     \item salva il risultato diagnostico;
-    \item restituisce lo snapshot filtrato.
+    \item restituisce un'osservazione con snapshot filtrato e metadati temporali invariati.
 \end{enumerate}
 
-La correzione recente e' questa: il provider filtrato implementa solo
-\meth{findSnapshotAt(double)}. Non espone piu' un override di
-\meth{findSnapshotAtOrAfter}, perche' quel metodo non fa parte del contratto
-\cls{SystemStateProvider}. Cosi' il decorator resta allineato
-all'interfaccia e non chiede al delegato un metodo che non deve avere.
+La correzione recente e' questa: il package provider storico e'
+stato rimosso dal codice. Il contratto unico e' \cls{SystemStateSource}, che porta insieme
+snapshot, tempo richiesto, tempo sorgente e modalita' della sorgente.
 
 \section{Prefilter dei candidati}
 
@@ -557,6 +555,23 @@ T_i^{remote} =
 T_i^{upload} + T_i^{exec} + T_i^{download} + L_i^{base}
 \]
 
+Nel caso parziale, la quota remota $p_i$ scala tutte le componenti del ramo
+remoto:
+
+\[
+T_i^{upload} = \frac{p_i \cdot input_i}{b_i}
+\qquad
+T_i^{exec} = \frac{p_i \cdot cycles_i}{f_i}
+\qquad
+T_i^{download} = \frac{p_i \cdot output_i}{b_i}
+\]
+
+Il ramo locale usa la parte complementare:
+
+\[
+T_i^{local} = \frac{(1-p_i)\cdot cycles_i}{f_i^{local}}
+\]
+
 Se il task e' parziale, il codice considera anche il ramo locale. Il tempo del
 gene e' il massimo tra ramo locale e ramo remoto:
 
@@ -716,10 +731,10 @@ debugger o dentro l'IDE.
 \textbf{Percorso} & \textbf{Chiamate e motivo} \\
 \midrule
 Finestra temporale &
-\meth{run} chiama \meth{executeNextStepOrNull}. Dentro lo step compaiono \meth{resolveTrigger}, \meth{findSnapshotAt}, \meth{evaluate}, \meth{adaptPopulation} e \meth{optimizeDetailed}. Questo percorso decide quando ottimizzare e con quale popolazione partire. \\
+\meth{run} chiama \meth{executeNextStepOrNull}. Dentro lo step compaiono \meth{resolveTrigger}, \meth{nextObservation}, \meth{evaluate}, \meth{adaptPopulation} e \meth{optimizeDetailed}. Questo percorso decide quando ottimizzare e con quale popolazione partire. \\
 \addlinespace
-Provider filtrato &
-\meth{findSnapshotAt} chiama il provider delegato, poi \meth{filterSnapshot}. Il filtro usa \meth{CandidatePrefilter.filter} e restituisce \meth{getFilteredSnapshot}. Questo percorso inserisce il prefilter senza cambiare il manager. \\
+Sorgente filtrata &
+\meth{nextObservation} chiama la sorgente delegata, poi \meth{filterObservation}. Il filtro usa \meth{CandidatePrefilter.filter} e restituisce \meth{getFilteredSnapshot}. Questo percorso inserisce il prefilter senza cambiare il manager. \\
 \addlinespace
 Inizializzazione &
 \meth{PopulationInitializer} crea un gene scegliendo un profilo. Per i remoti usa \meth{deadlineAwareRatio} e \meth{allocateInitial}. Questo percorso prepara cromosomi meno casuali. \\
@@ -783,10 +798,10 @@ capire ``chi fa cosa''.
 \toprule
 \textbf{Classe} & \textbf{Decisione o responsabilita'} \\
 \midrule
-\clsb{SystemStateProvider} &
-Fornisce lo snapshot osservato a un tempo simulato. \\
-\clsb{FilteringSystemStateProvider} &
-Applica il prefilter prima di restituire lo snapshot al manager. \\
+\clsb{SystemStateSource} &
+Fornisce l'osservazione richiesta dal manager, includendo snapshot e metadati temporali. \\
+\clsb{FilteringSystemStateSource} &
+Applica il prefilter prima di restituire l'osservazione al manager. \\
 \clsb{CandidatePrefilter} &
 Rimuove candidati remoti con risorse, copertura o lower bound troppo deboli. \\
 \clsb{TemporalWindowManager} &
@@ -836,7 +851,7 @@ Intervallo temporale &
 Il manager usa un intervallo fisso. La dinamicita' influisce sul riuso della popolazione, non sulla durata della finestra. \\
 \addlinespace
 Prefilter &
-Nel codice e' gia' integrato tramite \cls{FilteringSystemStateProvider}. Riduce candidati prima del GA. \\
+Nel codice e' gia' integrato tramite \cls{FilteringSystemStateSource}. Riduce candidati prima del GA. \\
 \addlinespace
 Quote e risorse &
 \cls{OffloadingRatioPolicy} e \cls{ResourceAllocationPolicy} guidano il campionamento. La fitness resta il giudice finale. \\
@@ -875,9 +890,9 @@ soluzioni dentro i vincoli base. La fitness misura il costo. Il GA cerca il
 cromosoma migliore. Il livello temporale decide quando ripetere il processo e
 quanto riusare della popolazione precedente.
 
-Le correzioni recenti rendono il sistema piu' coerente. Il provider filtrato ora
-rispetta il contratto di \cls{SystemStateProvider}. Le nuove policy di quota e
-risorse evitano molte scelte casuali deboli senza togliere esplorazione al GA.
+Le correzioni recenti rendono il sistema piu' coerente. La sorgente filtrata ora
+rispetta il contratto unico di \cls{SystemStateSource}. Le nuove policy di quota
+e risorse evitano molte scelte casuali deboli senza togliere esplorazione al GA.
 La decisione finale resta comunque nella fitness e nella selezione genetica.
 
 \end{document}

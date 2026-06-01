@@ -3,11 +3,13 @@ package ga.fitness.breakdown;
 import ga.fitness.DecisionType;
 import model.node.NodeType;
 
+import java.util.Objects;
+
 /**
  * Dettaglio della valutazione di un singolo gene.
  *
- * Ogni istanza descrive come un task viene eseguito e quali tempi,
- * penalità e risorse derivano dalla scelta fatta dal cromosoma.
+ * <p>Ogni istanza descrive come un task viene eseguito e quali tempi,
+ * penalità e risorse derivano dalla scelta fatta dal cromosoma.</p>
  */
 public final class GeneEvaluationBreakdown {
 
@@ -17,58 +19,28 @@ public final class GeneEvaluationBreakdown {
     private final String executionNodeId;
     private final NodeType nodeType;
     private final DecisionType decisionType;
-
     private final double offloadingRatio;
     private final double allocatedCpu;
     private final double allocatedBandwidth;
-
     private final double localCpuCycles;
     private final double localExecutionTimeSeconds;
-
     private final double uploadTimeSeconds;
     private final double remoteExecutionTimeSeconds;
     private final double downloadTimeSeconds;
-    private final double baseLatencySeconds;
+    private final double propagationDelaySeconds;
     private final double remotePartTimeSeconds;
-
     private final double completionTimeSeconds;
     private final double communicationLatencySeconds;
     private final double mobilityPenalty;
     private final double constraintPenalty;
-
     private final double deadlineSeconds;
     private final boolean deadlineRespected;
-
     private final double coverageTimeSeconds;
     private final boolean coverageSufficient;
+    private final MobilityPenaltyBreakdown mobilityBreakdown;
 
     /**
-     * Crea il breakdown di valutazione di un gene.
-     *
-     * @param taskId task valutato
-     * @param sourceVehicleId veicolo sorgente del task
-     * @param selectedCandidateId candidato selezionato dal gene
-     * @param executionNodeId nodo fisico di esecuzione
-     * @param nodeType tipo del nodo selezionato
-     * @param decisionType tipo di decisione locale/remota/parziale
-     * @param offloadingRatio quota di offloading
-     * @param allocatedCpu CPU assegnata
-     * @param allocatedBandwidth banda assegnata
-     * @param localCpuCycles cicli eseguiti localmente
-     * @param localExecutionTimeSeconds tempo di esecuzione locale
-     * @param uploadTimeSeconds tempo di upload
-     * @param remoteExecutionTimeSeconds tempo di esecuzione remota
-     * @param downloadTimeSeconds tempo di download
-     * @param baseLatencySeconds latenza base del collegamento
-     * @param remotePartTimeSeconds tempo complessivo della parte remota
-     * @param completionTimeSeconds tempo finale di completamento
-     * @param communicationLatencySeconds latenza comunicativa
-     * @param mobilityPenalty penalità di mobilità
-     * @param constraintPenalty penalità di vincolo
-     * @param deadlineSeconds deadline del task
-     * @param deadlineRespected true se la deadline è rispettata
-     * @param coverageTimeSeconds tempo di copertura calcolato
-     * @param coverageSufficient true se la copertura basta per completare il task
+     * Costruttore compatibile con i chiamanti precedenti.
      */
     public GeneEvaluationBreakdown(
             String taskId,
@@ -85,7 +57,7 @@ public final class GeneEvaluationBreakdown {
             double uploadTimeSeconds,
             double remoteExecutionTimeSeconds,
             double downloadTimeSeconds,
-            double baseLatencySeconds,
+            double propagationDelaySeconds,
             double remotePartTimeSeconds,
             double completionTimeSeconds,
             double communicationLatencySeconds,
@@ -96,12 +68,72 @@ public final class GeneEvaluationBreakdown {
             double coverageTimeSeconds,
             boolean coverageSufficient
     ) {
+        this(
+                taskId,
+                sourceVehicleId,
+                selectedCandidateId,
+                executionNodeId,
+                nodeType,
+                decisionType,
+                offloadingRatio,
+                allocatedCpu,
+                allocatedBandwidth,
+                localCpuCycles,
+                localExecutionTimeSeconds,
+                uploadTimeSeconds,
+                remoteExecutionTimeSeconds,
+                downloadTimeSeconds,
+                propagationDelaySeconds,
+                remotePartTimeSeconds,
+                completionTimeSeconds,
+                communicationLatencySeconds,
+                mobilityPenalty,
+                constraintPenalty,
+                deadlineSeconds,
+                deadlineRespected,
+                coverageTimeSeconds,
+                coverageSufficient,
+                MobilityPenaltyBreakdown.legacy(
+                        nodeType,
+                        coverageTimeSeconds,
+                        mobilityPenalty
+                )
+        );
+    }
+
+    public GeneEvaluationBreakdown(
+            String taskId,
+            String sourceVehicleId,
+            String selectedCandidateId,
+            String executionNodeId,
+            NodeType nodeType,
+            DecisionType decisionType,
+            double offloadingRatio,
+            double allocatedCpu,
+            double allocatedBandwidth,
+            double localCpuCycles,
+            double localExecutionTimeSeconds,
+            double uploadTimeSeconds,
+            double remoteExecutionTimeSeconds,
+            double downloadTimeSeconds,
+            double propagationDelaySeconds,
+            double remotePartTimeSeconds,
+            double completionTimeSeconds,
+            double communicationLatencySeconds,
+            double mobilityPenalty,
+            double constraintPenalty,
+            double deadlineSeconds,
+            boolean deadlineRespected,
+            double coverageTimeSeconds,
+            boolean coverageSufficient,
+            MobilityPenaltyBreakdown mobilityBreakdown
+    ) {
         this.taskId = taskId;
         this.sourceVehicleId = sourceVehicleId;
         this.selectedCandidateId = selectedCandidateId;
         this.executionNodeId = executionNodeId;
-        this.nodeType = nodeType;
-        this.decisionType = decisionType;
+        this.nodeType = Objects.requireNonNull(nodeType, "nodeType must not be null.");
+        this.decisionType = Objects.requireNonNull(decisionType, "decisionType must not be null.");
         this.offloadingRatio = offloadingRatio;
         this.allocatedCpu = allocatedCpu;
         this.allocatedBandwidth = allocatedBandwidth;
@@ -110,7 +142,7 @@ public final class GeneEvaluationBreakdown {
         this.uploadTimeSeconds = uploadTimeSeconds;
         this.remoteExecutionTimeSeconds = remoteExecutionTimeSeconds;
         this.downloadTimeSeconds = downloadTimeSeconds;
-        this.baseLatencySeconds = baseLatencySeconds;
+        this.propagationDelaySeconds = propagationDelaySeconds;
         this.remotePartTimeSeconds = remotePartTimeSeconds;
         this.completionTimeSeconds = completionTimeSeconds;
         this.communicationLatencySeconds = communicationLatencySeconds;
@@ -120,107 +152,44 @@ public final class GeneEvaluationBreakdown {
         this.deadlineRespected = deadlineRespected;
         this.coverageTimeSeconds = coverageTimeSeconds;
         this.coverageSufficient = coverageSufficient;
+        this.mobilityBreakdown = Objects.requireNonNull(
+                mobilityBreakdown,
+                "mobilityBreakdown must not be null."
+        );
     }
 
-    public String getTaskId() {
-        return taskId;
-    }
-
-    public String getSourceVehicleId() {
-        return sourceVehicleId;
-    }
-
-    public String getSelectedCandidateId() {
-        return selectedCandidateId;
-    }
-
-    public String getExecutionNodeId() {
-        return executionNodeId;
-    }
-
-    public NodeType getNodeType() {
-        return nodeType;
-    }
-
-    public DecisionType getDecisionType() {
-        return decisionType;
-    }
-
-    public double getOffloadingRatio() {
-        return offloadingRatio;
-    }
-
-    public double getAllocatedCpu() {
-        return allocatedCpu;
-    }
-
-    public double getAllocatedBandwidth() {
-        return allocatedBandwidth;
-    }
-
-    public double getLocalCpuCycles() {
-        return localCpuCycles;
-    }
-
-    public double getLocalExecutionTimeSeconds() {
-        return localExecutionTimeSeconds;
-    }
-
-    public double getUploadTimeSeconds() {
-        return uploadTimeSeconds;
-    }
-
-    public double getRemoteExecutionTimeSeconds() {
-        return remoteExecutionTimeSeconds;
-    }
-
-    public double getDownloadTimeSeconds() {
-        return downloadTimeSeconds;
-    }
-
-    public double getBaseLatencySeconds() {
-        return baseLatencySeconds;
-    }
-
-    public double getRemotePartTimeSeconds() {
-        return remotePartTimeSeconds;
-    }
-
-    public double getCompletionTimeSeconds() {
-        return completionTimeSeconds;
-    }
-
-    public double getCommunicationLatencySeconds() {
-        return communicationLatencySeconds;
-    }
-
-    public double getMobilityPenalty() {
-        return mobilityPenalty;
-    }
-
-    public double getConstraintPenalty() {
-        return constraintPenalty;
-    }
-
-    public double getDeadlineSeconds() {
-        return deadlineSeconds;
-    }
-
-    public boolean isDeadlineRespected() {
-        return deadlineRespected;
-    }
+    public String getTaskId() { return taskId; }
+    public String getSourceVehicleId() { return sourceVehicleId; }
+    public String getSelectedCandidateId() { return selectedCandidateId; }
+    public String getExecutionNodeId() { return executionNodeId; }
+    public NodeType getNodeType() { return nodeType; }
+    public DecisionType getDecisionType() { return decisionType; }
+    public double getOffloadingRatio() { return offloadingRatio; }
+    public double getAllocatedCpu() { return allocatedCpu; }
+    public double getAllocatedBandwidth() { return allocatedBandwidth; }
+    public double getLocalCpuCycles() { return localCpuCycles; }
+    public double getLocalExecutionTimeSeconds() { return localExecutionTimeSeconds; }
+    public double getUploadTimeSeconds() { return uploadTimeSeconds; }
+    public double getRemoteExecutionTimeSeconds() { return remoteExecutionTimeSeconds; }
+    public double getDownloadTimeSeconds() { return downloadTimeSeconds; }
+    /** Restituisce tau_n: il ritardo end-to-end aggregato del percorso remoto. */
+    public double getPropagationDelaySeconds() { return propagationDelaySeconds; }
 
     /**
-     * Restituisce il tempo di copertura usato nella valutazione.
+     * Alias mantenuto per compatibilità con printer e chiamanti precedenti.
      *
-     * Questo valore deve essere calcolato tramite CoverageEstimator,
-     * non letto direttamente dal NodeCandidate.
+     * @deprecated usare {@link #getPropagationDelaySeconds()}
      */
-    public double getCoverageTimeSeconds() {
-        return coverageTimeSeconds;
-    }
-
-    public boolean isCoverageSufficient() {
-        return coverageSufficient;
-    }
+    @Deprecated
+    public double getBaseLatencySeconds() { return getPropagationDelaySeconds(); }
+    public double getRemotePartTimeSeconds() { return remotePartTimeSeconds; }
+    public double getCompletionTimeSeconds() { return completionTimeSeconds; }
+    public double getCommunicationLatencySeconds() { return communicationLatencySeconds; }
+    public double getMobilityPenalty() { return mobilityPenalty; }
+    public double getConstraintPenalty() { return constraintPenalty; }
+    public double getDeadlineSeconds() { return deadlineSeconds; }
+    public boolean isDeadlineRespected() { return deadlineRespected; }
+    public double getCoverageTimeSeconds() { return coverageTimeSeconds; }
+    public boolean isCoverageSufficient() { return coverageSufficient; }
+    public MobilityPenaltyBreakdown getMobilityBreakdown() { return mobilityBreakdown; }
 }

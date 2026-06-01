@@ -11,20 +11,16 @@ import java.util.List;
 import java.util.Objects;
 
 /**
- * Stima il tempo di copertura di un candidato rispetto a un task.
+ * Stima le grandezze mobility-aware di un candidato rispetto a un task.
  *
- * La classe usa lo snapshot corrente, il task e il candidato selezionato.
- * Il tempo di copertura non viene più letto da NodeCandidate.
+ * <p>La classe usa lo snapshot corrente, il task e il candidato selezionato.
+ * Il tempo di copertura e l'instabilità del collegamento vengono ricavati
+ * da un'unica stima, così fitness e report osservano gli stessi valori.</p>
  */
 public final class CoverageEstimator {
 
     private final MobilityConfig mobilityConfig;
 
-    /**
-     * Costruisce lo stimatore usando la configurazione di mobilità.
-     *
-     * @param mobilityConfig configurazione dei parametri di copertura
-     */
     public CoverageEstimator(MobilityConfig mobilityConfig) {
         this.mobilityConfig = Objects.requireNonNull(
                 mobilityConfig,
@@ -33,14 +29,9 @@ public final class CoverageEstimator {
     }
 
     /**
-     * Stima il tempo di copertura per una scelta task-candidato.
-     *
-     * @param snapshot stato corrente del sistema
-     * @param task task da eseguire
-     * @param candidate candidato scelto per il task
-     * @return tempo di copertura stimato in secondi
+     * Calcola tutte le metriche mobility-aware grezze del collegamento.
      */
-    public double estimateCoverageTimeSeconds(
+    public MobilityLinkMetrics estimateLinkMetrics(
             SystemSnapshot snapshot,
             TaskInstance task,
             NodeCandidate candidate
@@ -52,19 +43,25 @@ public final class CoverageEstimator {
         validateCandidateForTask(task, candidate);
 
         if (candidate.getType() == NodeType.LOCAL) {
-            return mobilityConfig.getLocalCoverageTimeSeconds();
+            return MobilityLinkMetrics.local(
+                    mobilityConfig.getLocalCoverageTimeSeconds()
+            );
         }
 
         if (candidate.getType() == NodeType.CLOUD) {
-            return mobilityConfig.getCloudCoverageTimeSeconds();
+            // Assunzione provvisoria del prototipo standalone:
+            // il gateway radio usato per raggiungere il cloud non è ancora modellato.
+            return MobilityLinkMetrics.cloud(
+                    mobilityConfig.getCloudCoverageTimeSeconds()
+            );
         }
 
         if (candidate.getType() == NodeType.EDGE) {
-            return estimateInfrastructureCoverage(snapshot, task, candidate);
+            return estimateInfrastructureMetrics(snapshot, task, candidate);
         }
 
         if (candidate.getType() == NodeType.VEHICLE) {
-            return estimateV2vCoverage(snapshot, task, candidate);
+            return estimateV2vMetrics(snapshot, task, candidate);
         }
 
         throw new IllegalArgumentException(
@@ -72,10 +69,25 @@ public final class CoverageEstimator {
         );
     }
 
-    /**
-     * Stima la copertura verso un nodo infrastrutturale, ad esempio EDGE/RSU.
-     */
-    private double estimateInfrastructureCoverage(
+    public double estimateCoverageTimeSeconds(
+            SystemSnapshot snapshot,
+            TaskInstance task,
+            NodeCandidate candidate
+    ) {
+        return estimateLinkMetrics(snapshot, task, candidate)
+                .getCoverageTimeSeconds();
+    }
+
+    public double estimateLinkInstability(
+            SystemSnapshot snapshot,
+            TaskInstance task,
+            NodeCandidate candidate
+    ) {
+        return estimateLinkMetrics(snapshot, task, candidate)
+                .getLinkInstability();
+    }
+
+    private MobilityLinkMetrics estimateInfrastructureMetrics(
             SystemSnapshot snapshot,
             TaskInstance task,
             NodeCandidate candidate
@@ -85,13 +97,7 @@ public final class CoverageEstimator {
                 task.getSourceVehicleId()
         );
 
-        if (!candidate.hasCoverageGeometry()) {
-            throw new IllegalArgumentException(
-                    "Infrastructure candidate "
-                            + candidate.getCandidateId()
-                            + " must define nodeX, nodeY and coverageRadiusMeters."
-            );
-        }
+        requireInfrastructureGeometry(candidate);
 
         double distanceMeters = distance(
                 sourceVehicle.getX(),
@@ -100,26 +106,32 @@ public final class CoverageEstimator {
                 candidate.getNodeY()
         );
 
-        double remainingDistanceMeters =
-                candidate.getCoverageRadiusMeters() - distanceMeters;
-
-        if (remainingDistanceMeters <= 0.0) {
-            return 0.0;
-        }
-
-        double speed = Math.max(
+        double radiusMeters = candidate.getCoverageRadiusMeters();
+        double remainingDistanceMeters = radiusMeters - distanceMeters;
+        double safeSpeed = Math.max(
                 sourceVehicle.getSpeed(),
                 mobilityConfig.getEpsilonSpeedMetersPerSecond()
         );
 
-        double coverageTime = remainingDistanceMeters / speed;
-        return mobilityConfig.clampCoverageTime(coverageTime);
+        double coverageTime = remainingDistanceMeters <= 0.0
+                ? 0.0
+                : mobilityConfig.clampCoverageTime(
+                        remainingDistanceMeters / safeSpeed
+                );
+
+        return new MobilityLinkMetrics(
+                candidate.getType(),
+                MobilityLinkMetrics.ModelMode.EDGE_GEOMETRIC,
+                distanceMeters,
+                radiusMeters,
+                sourceVehicle.getSpeed(),
+                Double.NaN,
+                coverageTime,
+                clamp01(distanceMeters / radiusMeters)
+        );
     }
 
-    /**
-     * Stima la copertura di un collegamento V2V.
-     */
-    private double estimateV2vCoverage(
+    private MobilityLinkMetrics estimateV2vMetrics(
             SystemSnapshot snapshot,
             TaskInstance task,
             NodeCandidate candidate
@@ -128,7 +140,6 @@ public final class CoverageEstimator {
                 snapshot,
                 task.getSourceVehicleId()
         );
-
         VehicleSnapshot targetVehicle = findVehicleById(
                 snapshot,
                 candidate.getExecutionNodeId()
@@ -141,41 +152,59 @@ public final class CoverageEstimator {
                 targetVehicle.getY()
         );
 
-        double remainingDistanceMeters =
-                mobilityConfig.getV2vCommunicationRadiusMeters() - distanceMeters;
-
-        if (remainingDistanceMeters <= 0.0) {
-            return 0.0;
-        }
-
+        double radiusMeters = mobilityConfig.getV2vCommunicationRadiusMeters();
+        double remainingDistanceMeters = radiusMeters - distanceMeters;
         double relativeSpeed = Math.abs(
                 sourceVehicle.getSpeed() - targetVehicle.getSpeed()
         );
-
         double safeRelativeSpeed = Math.max(
                 relativeSpeed,
                 mobilityConfig.getEpsilonSpeedMetersPerSecond()
         );
 
-        double coverageTime = remainingDistanceMeters / safeRelativeSpeed;
-        return mobilityConfig.clampCoverageTime(coverageTime);
+        double coverageTime = remainingDistanceMeters <= 0.0
+                ? 0.0
+                : mobilityConfig.clampCoverageTime(
+                        remainingDistanceMeters / safeRelativeSpeed
+                );
+
+        return new MobilityLinkMetrics(
+                candidate.getType(),
+                MobilityLinkMetrics.ModelMode.V2V_SCALAR_RELATIVE_SPEED,
+                distanceMeters,
+                radiusMeters,
+                sourceVehicle.getSpeed(),
+                relativeSpeed,
+                coverageTime,
+                clamp01(distanceMeters / radiusMeters)
+        );
     }
 
-    /**
-     * Recupera un veicolo dallo snapshot.
-     */
+    private void requireInfrastructureGeometry(NodeCandidate candidate) {
+        if (!candidate.hasCoverageGeometry()) {
+            throw new IllegalArgumentException(
+                    "Infrastructure candidate "
+                            + candidate.getCandidateId()
+                            + " must define nodeX, nodeY and coverageRadiusMeters."
+            );
+        }
+    }
+
     private VehicleSnapshot findVehicleById(
             SystemSnapshot snapshot,
             String vehicleId
     ) {
         if (vehicleId == null || vehicleId.isBlank()) {
-            throw new IllegalArgumentException("vehicleId must not be null or blank.");
+            throw new IllegalArgumentException(
+                    "vehicleId must not be null or blank."
+            );
         }
 
-        List vehicles = snapshot.getVehicles();
-
+        List<VehicleSnapshot> vehicles = snapshot.getVehicles();
         if (vehicles == null) {
-            throw new IllegalArgumentException("snapshot.vehicles must not be null.");
+            throw new IllegalArgumentException(
+                    "snapshot.vehicles must not be null."
+            );
         }
 
         for (Object item : vehicles) {
@@ -186,7 +215,6 @@ public final class CoverageEstimator {
             }
 
             VehicleSnapshot vehicle = (VehicleSnapshot) item;
-
             if (vehicleId.equals(vehicle.getVehicleId())) {
                 return vehicle;
             }
@@ -197,25 +225,20 @@ public final class CoverageEstimator {
         );
     }
 
-    /**
-     * Verifica che il candidato appartenga al veicolo sorgente del task.
-     */
     private void validateCandidateForTask(
             TaskInstance task,
             NodeCandidate candidate
     ) {
         if (!candidate.isValidForSourceVehicle(task.getSourceVehicleId())) {
             throw new IllegalArgumentException(
-                    "Candidate " + candidate.getCandidateId()
+                    "Candidate "
+                            + candidate.getCandidateId()
                             + " is not valid for task source vehicle "
                             + task.getSourceVehicleId()
             );
         }
     }
 
-    /**
-     * Calcola distanza euclidea tra due punti.
-     */
     private double distance(
             double x1,
             double y1,
@@ -224,7 +247,13 @@ public final class CoverageEstimator {
     ) {
         double dx = x1 - x2;
         double dy = y1 - y2;
-
         return Math.sqrt(dx * dx + dy * dy);
+    }
+
+    private double clamp01(double value) {
+        if (!Double.isFinite(value)) {
+            return 1.0;
+        }
+        return Math.max(0.0, Math.min(1.0, value));
     }
 }

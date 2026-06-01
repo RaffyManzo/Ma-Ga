@@ -1,6 +1,5 @@
-package window.source;
+package io.snapshot;
 
-import io.snapshot.SnapshotLoader;
 import model.snapshot.SystemSnapshot;
 import validation.snapshot.SnapshotValidator;
 
@@ -10,18 +9,24 @@ import java.util.Comparator;
 import java.util.List;
 
 /**
- * Loader comune per snapshot JSON usati nei test offline.
+ * Carica e valida tutti gli snapshot JSON contenuti direttamente in una cartella.
+ *
+ * <p>Il loader non impone più prefissi legati ai vecchi stress test. Una cartella
+ * rappresenta uno scenario e può quindi contenere file con nomi descrittivi differenti.
+ * I JSON vengono caricati in ordine alfabetico e restituiti in ordine temporale stabile.</p>
  */
 public final class JsonSnapshotFolderLoader {
-
-    private static final String SNAPSHOT_PREFIX = "snapshot_window_static_stress_";
     private static final String JSON_EXTENSION = ".json";
 
     private final SnapshotLoader snapshotLoader;
     private final SnapshotValidator snapshotValidator;
 
     public JsonSnapshotFolderLoader() {
-        this(new SnapshotLoader(), new SnapshotValidator());
+        this(new SnapshotValidator());
+    }
+
+    public JsonSnapshotFolderLoader(SnapshotValidator snapshotValidator) {
+        this(new SnapshotLoader(snapshotValidator), snapshotValidator);
     }
 
     public JsonSnapshotFolderLoader(
@@ -40,36 +45,35 @@ public final class JsonSnapshotFolderLoader {
 
     public List<SystemSnapshot> load(String folderPath) throws Exception {
         List<SystemSnapshot> snapshots = new ArrayList<>();
-
         for (File file : listSnapshotFiles(folderPath)) {
             SystemSnapshot snapshot = snapshotLoader.load(file.getPath());
             snapshotValidator.validate(snapshot);
             snapshots.add(snapshot);
         }
 
-        snapshots.sort(Comparator.comparingDouble(SystemSnapshot::getTimeSeconds));
+        snapshots.sort(
+                Comparator.comparingDouble(SystemSnapshot::getTimeSeconds)
+                        .thenComparing(SystemSnapshot::getSnapshotId)
+        );
         return snapshots;
     }
 
     private List<File> listSnapshotFiles(String folderPath) {
-        File folder = new File(folderPath);
-
-        if (!folder.exists() || !folder.isDirectory()) {
-            throw new IllegalArgumentException(
-                    "Snapshot folder not found: " + folderPath
-            );
+        if (folderPath == null || folderPath.isBlank()) {
+            throw new IllegalArgumentException("folderPath must not be blank.");
         }
 
-        File[] files = folder.listFiles(
-                file -> file.isFile()
-                        && file.getName().endsWith(JSON_EXTENSION)
-                        && file.getName().startsWith(SNAPSHOT_PREFIX)
-        );
+        File folder = new File(folderPath);
+        if (!folder.exists() || !folder.isDirectory()) {
+            throw new IllegalArgumentException("Snapshot folder not found: " + folderPath);
+        }
 
+        File[] files = folder.listFiles(file ->
+                file.isFile()
+                        && file.getName().toLowerCase().endsWith(JSON_EXTENSION)
+        );
         if (files == null || files.length == 0) {
-            throw new IllegalArgumentException(
-                    "No snapshot file found in: " + folderPath
-            );
+            throw new IllegalArgumentException("No JSON snapshot found in: " + folderPath);
         }
 
         List<File> result = new ArrayList<>(List.of(files));

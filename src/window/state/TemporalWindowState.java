@@ -90,7 +90,7 @@ public final class TemporalWindowState {
     }
 
     /**
-     * Metodo compatibile con la versione precedente.
+     * Factory semplificata per esecuzioni a finestra iniziale fissa.
      */
     public static TemporalWindowState initial(
             double startTimeSeconds,
@@ -122,7 +122,7 @@ public final class TemporalWindowState {
     }
 
     /**
-     * Metodo compatibile con la versione precedente.
+     * Transizione semplificata per chiamanti che mantengono una durata fissa.
      */
     public static TemporalWindowState afterStep(
             TemporalStepResult stepResult,

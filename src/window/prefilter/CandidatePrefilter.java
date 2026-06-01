@@ -2,6 +2,7 @@ package window.prefilter;
 
 import model.node.NodeCandidate;
 import model.node.NodeType;
+import model.offloading.OffloadingTimeModel;
 import model.snapshot.SystemSnapshot;
 import model.snapshot.TaskInstance;
 import model.snapshot.VehicleSnapshot;
@@ -32,6 +33,7 @@ public final class CandidatePrefilter {
     private static final double EPSILON = 1.0E-9;
 
     private final CandidatePrefilterConfig config;
+    private final OffloadingTimeModel offloadingTimeModel;
 
     public CandidatePrefilter() {
         this(CandidatePrefilterConfig.defaultConfig());
@@ -43,6 +45,7 @@ public final class CandidatePrefilter {
         }
 
         this.config = config;
+        this.offloadingTimeModel = new OffloadingTimeModel();
     }
 
     /**
@@ -323,19 +326,15 @@ public final class CandidatePrefilter {
             NodeCandidate candidate,
             VehicleSnapshot sourceVehicle
     ) {
-        double localCpu = sourceVehicle == null
-                ? 0.0
-                : sourceVehicle.getLocalCpu();
+        double localOnly = offloadingTimeModel.estimateLocalOnlyTime(
+                task,
+                sourceVehicle
+        );
 
-        double localOnly = localCpu <= EPSILON
-                ? Double.POSITIVE_INFINITY
-                : task.getCpuCycles() / localCpu;
-
-        double remoteLinear =
-                task.getInputSizeBits() / candidate.getAvailableBandwidth()
-                        + task.getCpuCycles() / candidate.getAvailableCpu()
-                        + task.getOutputSizeBits()
-                        / candidate.getAvailableBandwidth();
+        double remoteLinear = offloadingTimeModel.estimateRemoteLinearTime(
+                task,
+                candidate
+        );
 
         double latency = candidate.getBaseLatencySeconds();
 

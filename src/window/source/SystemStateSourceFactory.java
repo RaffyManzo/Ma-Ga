@@ -1,15 +1,15 @@
 package window.source;
 
+import io.snapshot.JsonSnapshotFolderLoader;
 import model.snapshot.SystemSnapshot;
 
 import java.util.List;
 import java.util.Locale;
 
 /**
- * Factory per costruire sorgenti dati a partire dagli argomenti dei main.
+ * Factory per costruire sorgenti dati temporali a partire da una cartella di snapshot JSON.
  */
 public final class SystemStateSourceFactory {
-
     private SystemStateSourceFactory() {
     }
 
@@ -44,7 +44,7 @@ public final class SystemStateSourceFactory {
 
     public static String normalizeMode(String modeName) {
         if (modeName == null || modeName.isBlank()) {
-            return "JSON_SEQUENCE";
+            return "JSON_TIME";
         }
         return modeName.trim().toUpperCase(Locale.ROOT);
     }

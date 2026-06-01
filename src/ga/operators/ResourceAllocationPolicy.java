@@ -3,6 +3,7 @@ package ga.operators;
 import model.genetic.Gene;
 import model.node.NodeCandidate;
 import model.node.NodeType;
+import model.offloading.OffloadingTimeModel;
 import model.snapshot.TaskInstance;
 import model.snapshot.VehicleSnapshot;
 
@@ -12,7 +13,9 @@ import java.util.Random;
 /**
  * Policy centralizzata per generare e mutare CPU e banda assegnate a un gene.
  *
- * <p>Questa classe NON sostituisce il Genetic Algorithm.</p>
+ * <p>Questa classe non sostituisce il Genetic Algorithm. Produce allocazioni
+ * iniziali e mutazioni plausibili, lasciando alla fitness la responsabilità di
+ * premiare o scartare le soluzioni.</p>
  *
  * <p>Il suo compito è evitare combinazioni palesemente incoerenti tra:</p>
  *
@@ -34,6 +37,9 @@ import java.util.Random;
  * </ul>
  */
 public final class ResourceAllocationPolicy {
+
+    private final OffloadingTimeModel offloadingTimeModel =
+            new OffloadingTimeModel();
 
     private enum Feasibility {
         FEASIBLE,
@@ -73,8 +79,9 @@ public final class ResourceAllocationPolicy {
     /**
      * Range per allocazioni moderate.
      *
-     * <p>Serve quando la scelta remota non sembra salvabile:
-     * in quel caso non ha senso saturare il nodo.</p>
+     * <p>Serve quando una scelta remota non sembra recuperabile neanche con una
+     * stima ottimistica: in quel caso una saturazione aggressiva consumerebbe
+     * risorse senza rendere la soluzione competitiva.</p>
      */
     private static final double MODERATE_MIN_FRACTION = 0.08;
     private static final double MODERATE_MAX_FRACTION = 0.45;
@@ -228,10 +235,7 @@ public final class ResourceAllocationPolicy {
             Random random,
             double roll
     ) {
-        /*
-         * La scelta è fattibile: ha senso usare soprattutto deadline-aware,
-         * ma lasciamo random e una piccola quota aggressive.
-         */
+        // Scelte fattibili: prevale deadline-aware, con una quota esplorativa.
         if (roll < 0.30) {
             return randomRemoteAllocation(candidate, random);
         }
@@ -258,10 +262,7 @@ public final class ResourceAllocationPolicy {
             Random random,
             double roll
     ) {
-        /*
-         * Borderline significa: anche con risorse massime siamo vicini o poco
-         * oltre la deadline. Non conviene saturare sistematicamente.
-         */
+        // Scelte borderline: aumentano le risorse, ma senza saturare sistematicamente.
         if (roll < 0.25) {
             return randomRemoteAllocation(candidate, random);
         }
@@ -287,10 +288,7 @@ public final class ResourceAllocationPolicy {
             Random random,
             double roll
     ) {
-        /*
-         * Se la scelta remota è chiaramente non salvabile, non dobbiamo
-         * sprecare CPU/banda saturando nodi e link.
-         */
+        // Scelte non salvabili: si preferiscono allocazioni moderate o casuali.
         if (roll < 0.35) {
             return randomRemoteAllocation(candidate, random);
         }
@@ -565,8 +563,8 @@ public final class ResourceAllocationPolicy {
                         : remoteCycles / Math.max(EPSILON, executionBudget);
 
         /*
-         * Floor adattivo, ma non troppo alto.
-         * La versione precedente era troppo aggressiva e tendeva a saturare.
+         * Floor adattivo: cresce con p, ma resta limitato per evitare che il
+         * campionamento deadline-aware saturi sistematicamente nodi e link.
          */
         double adaptiveMinFraction =
                 clamp(MIN_RESOURCE_FRACTION + 0.15 * p, 0.05, 0.25);
@@ -737,21 +735,11 @@ public final class ResourceAllocationPolicy {
             VehicleSnapshot sourceVehicle,
             double offloadingRatio
     ) {
-        if (sourceVehicle == null) {
-            return Double.POSITIVE_INFINITY;
-        }
-
-        double localCpu = safeNonNegative(sourceVehicle.getLocalCpu());
-
-        if (localCpu <= EPSILON) {
-            return Double.POSITIVE_INFINITY;
-        }
-
-        double localCycles =
-                (1.0 - normalizeRemoteRatio(offloadingRatio))
-                        * safeNonNegative(task.getCpuCycles());
-
-        return localCycles / localCpu;
+        return offloadingTimeModel.estimateLocalBranchTime(
+                task,
+                sourceVehicle,
+                normalizeRemoteRatio(offloadingRatio)
+        );
     }
 
     private double estimateRemoteBranchLowerBound(
@@ -759,28 +747,15 @@ public final class ResourceAllocationPolicy {
             NodeCandidate candidate,
             double offloadingRatio
     ) {
-        double maxCpu = safeNonNegative(candidate.getAvailableCpu());
-        double maxBandwidth = safeNonNegative(candidate.getAvailableBandwidth());
-
-        if (maxCpu <= EPSILON || maxBandwidth <= EPSILON) {
-            return Double.POSITIVE_INFINITY;
-        }
-
         double p = normalizeRemoteRatio(offloadingRatio);
-
-        double upload =
-                p * safeNonNegative(task.getInputSizeBits()) / maxBandwidth;
-
-        double execution =
-                p * safeNonNegative(task.getCpuCycles()) / maxCpu;
-
-        double download =
-                p * safeNonNegative(task.getOutputSizeBits()) / maxBandwidth;
-
-        return safeNonNegative(candidate.getBaseLatencySeconds())
-                + upload
-                + execution
-                + download;
+        return offloadingTimeModel.evaluateRemote(
+                task,
+                candidate,
+                1.0,
+                p,
+                candidate.getAvailableCpu(),
+                candidate.getAvailableBandwidth()
+        ).getRemotePartTimeSeconds();
     }
 
     private double mutateResourceBySmallStep(
