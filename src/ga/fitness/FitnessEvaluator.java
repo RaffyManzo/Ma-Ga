@@ -32,21 +32,27 @@ import java.util.Objects;
  * Valuta un cromosoma MA-GA rispetto a uno snapshot del sistema.
  *
  * <p>La valutazione combina quattro famiglie di costo:</p>
+ *
  * <ul>
- *     <li>tempo massimo di completamento dei task;</li>
- *     <li>latenza comunicativa complessivamente introdotta dalle decisioni remote;</li>
- *     <li>rischio mobility-aware legato alla copertura e alla stabilità del link;</li>
- *     <li>penalità di vincolo e sovrauso risorse.</li>
+ *   <li>tempo massimo di completamento dei task;</li>
+ *   <li>latenza comunicativa complessivamente introdotta dalle decisioni remote;</li>
+ *   <li>rischio mobility-aware legato alla copertura e alla stabilità del link;</li>
+ *   <li>penalità di vincolo e sovrauso risorse.</li>
  * </ul>
  *
  * <p>Il tempo di copertura e l'instabilità del collegamento vengono calcolati
  * tramite {@link CoverageEstimator}, così il modello non dipende da valori
  * precomputati dentro {@code NodeCandidate}.</p>
+ *
+ * <p>Il vincolo di deadline mantiene la penalità proporzionale già usata nel
+ * breakdown, ma introduce anche una penalità rigida indipendente dai pesi
+ * configurabili. In questo modo un cromosoma tardivo non può essere preferito
+ * a un cromosoma ammissibile soltanto perché {@code wR} è basso o nullo.</p>
  */
 public final class FitnessEvaluator {
-
     private static final double EPSILON = 1.0E-9;
     private static final double INVALID_SOLUTION_PENALTY = 1.0E9;
+    private static final double HARD_DEADLINE_VIOLATION_PENALTY = 1.0E12;
 
     private final MaGaConfig config;
     private final CoverageEstimator coverageEstimator;
@@ -68,10 +74,7 @@ public final class FitnessEvaluator {
             MaGaConfig config,
             CoverageEstimator coverageEstimator
     ) {
-        this.config = Objects.requireNonNull(
-                config,
-                "config must not be null."
-        );
+        this.config = Objects.requireNonNull(config, "config must not be null.");
         this.coverageEstimator = Objects.requireNonNull(
                 coverageEstimator,
                 "coverageEstimator must not be null."
@@ -79,10 +82,7 @@ public final class FitnessEvaluator {
         this.offloadingTimeModel = new OffloadingTimeModel();
     }
 
-    public double evaluate(
-            Chromosome chromosome,
-            SystemSnapshot snapshot
-    ) {
+    public double evaluate(Chromosome chromosome, SystemSnapshot snapshot) {
         return evaluateDetailed(chromosome, snapshot).getFitness();
     }
 
@@ -94,8 +94,14 @@ public final class FitnessEvaluator {
         Objects.requireNonNull(snapshot, "snapshot must not be null.");
 
         List<TaskInstance> tasks = requireList(snapshot.getTasks(), "snapshot.tasks");
-        List<VehicleSnapshot> vehicles = requireList(snapshot.getVehicles(), "snapshot.vehicles");
-        List<NodeCandidate> candidates = requireList(snapshot.getCandidateNodes(), "snapshot.candidateNodes");
+        List<VehicleSnapshot> vehicles = requireList(
+                snapshot.getVehicles(),
+                "snapshot.vehicles"
+        );
+        List<NodeCandidate> candidates = requireList(
+                snapshot.getCandidateNodes(),
+                "snapshot.candidateNodes"
+        );
         List<Gene> genes = requireList(chromosome.getGenes(), "chromosome.genes");
 
         Map<String, TaskInstance> taskById = indexTasks(tasks);
@@ -114,7 +120,6 @@ public final class FitnessEvaluator {
                 initializeLocalUsage(vehicles);
 
         List<GeneEvaluationBreakdown> geneBreakdowns = new ArrayList<>();
-
         double completionTime = 0.0;
         double communicationLatencySum = 0.0;
         double mobilityPenalty = 0.0;
@@ -129,12 +134,10 @@ public final class FitnessEvaluator {
 
             NodeCandidate candidate = candidateById.get(gene.getSelectedCandidateId());
             VehicleSnapshot sourceVehicle = vehicleById.get(task.getSourceVehicleId());
-
             if (candidate == null || sourceVehicle == null) {
                 invalidPenalty += INVALID_SOLUTION_PENALTY;
                 continue;
             }
-
             if (!candidate.isValidForSourceVehicle(task.getSourceVehicleId())) {
                 invalidPenalty += INVALID_SOLUTION_PENALTY;
                 continue;
@@ -147,9 +150,7 @@ public final class FitnessEvaluator {
                     candidate,
                     sourceVehicle
             );
-
             geneBreakdowns.add(geneBreakdown);
-
             completionTime = Math.max(
                     completionTime,
                     geneBreakdown.getCompletionTimeSeconds()
@@ -164,7 +165,6 @@ public final class FitnessEvaluator {
                 if (cpuUsage != null) {
                     cpuUsage.addCpu(geneBreakdown.getAllocatedCpu());
                 }
-
                 LinkBandwidthUsageBreakdown bandwidthUsage =
                         bandwidthUsageByCandidate.get(candidate.getCandidateId());
                 if (bandwidthUsage != null) {
@@ -187,30 +187,29 @@ public final class FitnessEvaluator {
          * comunicative dei singoli task, non come media.
          */
         double totalCommunicationLatency = communicationLatencySum;
-
         double resourcePenalty = computeResourcePenalty(
                 cpuUsageByExecutionNode,
                 bandwidthUsageByCandidate
         );
-
         double totalResourceAndConstraintPenalty =
                 resourcePenalty + constraintPenalty + invalidPenalty;
+        double hardDeadlinePenalty = computeHardDeadlinePenalty(geneBreakdowns);
 
         FitnessWeights weights = config.getFitnessWeights();
         NormalizationConfig normalization = config.getNormalizationConfig();
-
         double normalizedCompletionTime = completionTime / normalization.getTRef();
         double normalizedCommunicationLatency =
                 totalCommunicationLatency / normalization.getLRef();
-        double normalizedMobilityPenalty = mobilityPenalty / normalization.getPmobRef();
+        double normalizedMobilityPenalty =
+                mobilityPenalty / normalization.getPmobRef();
         double normalizedResourcePenalty =
                 totalResourceAndConstraintPenalty / normalization.getPresRef();
 
-        double fitness =
-                weights.getWT() * normalizedCompletionTime
-                        + weights.getWL() * normalizedCommunicationLatency
-                        + weights.getWM() * normalizedMobilityPenalty
-                        + weights.getWR() * normalizedResourcePenalty;
+        double fitness = hardDeadlinePenalty
+                + weights.getWT() * normalizedCompletionTime
+                + weights.getWL() * normalizedCommunicationLatency
+                + weights.getWM() * normalizedMobilityPenalty
+                + weights.getWR() * normalizedResourcePenalty;
 
         return new EvaluationBreakdown(
                 fitness,
@@ -238,7 +237,6 @@ public final class FitnessEvaluator {
     ) {
         PenaltyConfig penalties = config.getPenaltyConfig();
         double constraintPenalty = 0.0;
-
         double p = gene.getOffloadingRatio();
         if (!Double.isFinite(p) || p < 0.0 || p > 1.0) {
             constraintPenalty += INVALID_SOLUTION_PENALTY;
@@ -259,19 +257,18 @@ public final class FitnessEvaluator {
         double coverageTimeSeconds = mobilityLinkMetrics.getCoverageTimeSeconds();
 
         if (candidate.getType() == NodeType.LOCAL) {
-            OffloadingTimeBreakdown timeBreakdown =
-                    offloadingTimeModel.evaluateLocal(task, localCpu);
-
+            OffloadingTimeBreakdown timeBreakdown = offloadingTimeModel.evaluateLocal(
+                    task,
+                    localCpu
+            );
             if (Math.abs(p) > EPSILON) {
                 constraintPenalty += Math.abs(p) * INVALID_SOLUTION_PENALTY;
             }
-
             double deadlinePenalty = computeDeadlinePenalty(
                     timeBreakdown.getCompletionTimeSeconds(),
                     task.getDeadlineSeconds(),
                     penalties
             );
-
             return new GeneEvaluationBreakdown(
                     task.getTaskId(),
                     task.getSourceVehicleId(),
@@ -311,12 +308,10 @@ public final class FitnessEvaluator {
 
         double allocatedCpu = gene.getAllocatedCpu();
         double allocatedBandwidth = gene.getAllocatedBandwidth();
-
         if (!isStrictlyPositive(allocatedCpu)) {
             constraintPenalty += INVALID_SOLUTION_PENALTY;
             allocatedCpu = EPSILON;
         }
-
         if (!isStrictlyPositive(allocatedBandwidth)) {
             constraintPenalty += INVALID_SOLUTION_PENALTY;
             allocatedBandwidth = EPSILON;
@@ -330,7 +325,6 @@ public final class FitnessEvaluator {
                 allocatedCpu,
                 allocatedBandwidth
         );
-
         MobilityPenaltyBreakdown mobilityBreakdown = computeMobilityPenaltyBreakdown(
                 candidate,
                 mobilityLinkMetrics,
@@ -338,17 +332,14 @@ public final class FitnessEvaluator {
                 penalties
         );
         double mobilityPenalty = mobilityBreakdown.getTotalMobilityPenalty();
-
         double deadlinePenalty = computeDeadlinePenalty(
                 timeBreakdown.getCompletionTimeSeconds(),
                 task.getDeadlineSeconds(),
                 penalties
         );
-
         DecisionType decisionType = p >= 1.0 - EPSILON
                 ? DecisionType.FULL_OFFLOADING
                 : DecisionType.PARTIAL_OFFLOADING;
-
         boolean coverageSufficient = coverageTimeSeconds > 0.0
                 && coverageTimeSeconds >= timeBreakdown.getCompletionTimeSeconds();
 
@@ -387,12 +378,10 @@ public final class FitnessEvaluator {
     private Map<String, ExecutionNodeResourceUsageBreakdown>
     initializeExecutionNodeCpuUsage(List<NodeCandidate> candidates) {
         Map<String, ExecutionNodeResourceUsageBreakdown> result = new HashMap<>();
-
         for (NodeCandidate candidate : candidates) {
             if (candidate.getType() == NodeType.LOCAL) {
                 continue;
             }
-
             result.putIfAbsent(
                     candidate.getExecutionNodeId(),
                     new ExecutionNodeResourceUsageBreakdown(
@@ -402,19 +391,16 @@ public final class FitnessEvaluator {
                     )
             );
         }
-
         return result;
     }
 
     private Map<String, LinkBandwidthUsageBreakdown>
     initializeLinkBandwidthUsage(List<NodeCandidate> candidates) {
         Map<String, LinkBandwidthUsageBreakdown> result = new HashMap<>();
-
         for (NodeCandidate candidate : candidates) {
             if (candidate.getType() == NodeType.LOCAL) {
                 continue;
             }
-
             result.put(
                     candidate.getCandidateId(),
                     new LinkBandwidthUsageBreakdown(
@@ -426,14 +412,12 @@ public final class FitnessEvaluator {
                     )
             );
         }
-
         return result;
     }
 
     private Map<String, LocalResourceUsageBreakdown>
     initializeLocalUsage(List<VehicleSnapshot> vehicles) {
         Map<String, LocalResourceUsageBreakdown> result = new HashMap<>();
-
         for (VehicleSnapshot vehicle : vehicles) {
             result.put(
                     vehicle.getVehicleId(),
@@ -443,7 +427,6 @@ public final class FitnessEvaluator {
                     )
             );
         }
-
         return result;
     }
 
@@ -453,19 +436,16 @@ public final class FitnessEvaluator {
     ) {
         PenaltyConfig penalties = config.getPenaltyConfig();
         double totalPenalty = 0.0;
-
         for (ExecutionNodeResourceUsageBreakdown usage
                 : cpuUsageByExecutionNode.values()) {
             totalPenalty += penalties.getCpuOveruseWeight()
                     * usage.getCpuOverflowRatio();
         }
-
         for (LinkBandwidthUsageBreakdown usage
                 : bandwidthUsageByCandidate.values()) {
             totalPenalty += penalties.getBandwidthOveruseWeight()
                     * usage.getBandwidthOverflowRatio();
         }
-
         return totalPenalty;
     }
 
@@ -481,7 +461,6 @@ public final class FitnessEvaluator {
         if (candidate.getType() == NodeType.LOCAL) {
             return MobilityPenaltyBreakdown.zero(linkMetrics);
         }
-
         if (!isStrictlyPositive(completionTimeSeconds)) {
             return MobilityPenaltyBreakdown.zero(linkMetrics);
         }
@@ -490,7 +469,6 @@ public final class FitnessEvaluator {
         double linkInstability = linkMetrics.getLinkInstability();
         double coverageRisk;
         double handoverRisk;
-
         if (!isStrictlyPositive(coverageTimeSeconds)) {
             coverageRisk = 1.0;
             handoverRisk = 1.0;
@@ -504,7 +482,6 @@ public final class FitnessEvaluator {
                     completionTimeSeconds / coverageTimeSeconds
             );
         }
-
         return new MobilityPenaltyBreakdown(
                 linkMetrics,
                 coverageRisk,
@@ -524,22 +501,47 @@ public final class FitnessEvaluator {
         if (!isStrictlyPositive(deadlineSeconds)) {
             return 0.0;
         }
-
         double violation = completionTimeSeconds - deadlineSeconds;
         if (violation <= 0.0) {
             return 0.0;
         }
-
         return penalties.getDeadlineViolationWeight()
                 * safeDivide(violation, deadlineSeconds);
+    }
+
+    /**
+     * Penalità rigida applicata direttamente alla fitness.
+     *
+     * <p>La parte costante rende ogni violazione nettamente peggiore rispetto
+     * a una strategia interamente ammissibile. La parte proporzionale mantiene
+     * un ordinamento utile anche quando tutte le alternative disponibili sono
+     * degradate.</p>
+     */
+    private double computeHardDeadlinePenalty(
+            List<GeneEvaluationBreakdown> geneBreakdowns
+    ) {
+        double penalty = 0.0;
+        for (GeneEvaluationBreakdown gene : geneBreakdowns) {
+            if (gene.isDeadlineRespected()) {
+                continue;
+            }
+            double violation = Math.max(
+                    0.0,
+                    gene.getCompletionTimeSeconds() - gene.getDeadlineSeconds()
+            );
+            double violationRatio = isStrictlyPositive(gene.getDeadlineSeconds())
+                    ? safeDivide(violation, gene.getDeadlineSeconds())
+                    : 0.0;
+            penalty += HARD_DEADLINE_VIOLATION_PENALTY + violationRatio;
+        }
+        return penalty;
     }
 
     private boolean isDeadlineRespected(
             double completionTimeSeconds,
             double deadlineSeconds
     ) {
-        return deadlineSeconds <= 0.0
-                || completionTimeSeconds <= deadlineSeconds;
+        return deadlineSeconds <= 0.0 || completionTimeSeconds <= deadlineSeconds;
     }
 
     private double computeCardinalityPenalty(
@@ -549,9 +551,7 @@ public final class FitnessEvaluator {
         if (tasks.size() == genes.size()) {
             return 0.0;
         }
-
-        return INVALID_SOLUTION_PENALTY
-                * Math.abs(tasks.size() - genes.size());
+        return INVALID_SOLUTION_PENALTY * Math.abs(tasks.size() - genes.size());
     }
 
     private double computeUnknownGeneTaskPenalty(
@@ -559,13 +559,11 @@ public final class FitnessEvaluator {
             Map<String, TaskInstance> taskById
     ) {
         double penalty = 0.0;
-
         for (String geneTaskId : geneByTaskId.keySet()) {
             if (!taskById.containsKey(geneTaskId)) {
                 penalty += INVALID_SOLUTION_PENALTY;
             }
         }
-
         return penalty;
     }
 
@@ -605,12 +603,11 @@ public final class FitnessEvaluator {
         return result;
     }
 
-    @SuppressWarnings("unchecked")
-    private <T> List<T> requireList(List<?> list, String name) {
+    private <T> List<T> requireList(List<T> list, String name) {
         if (list == null) {
             throw new IllegalArgumentException(name + " must not be null.");
         }
-        return (List<T>) list;
+        return list;
     }
 
     private boolean isStrictlyPositive(double value) {
@@ -621,11 +618,9 @@ public final class FitnessEvaluator {
         if (!Double.isFinite(numerator)) {
             return INVALID_SOLUTION_PENALTY;
         }
-
         if (!isStrictlyPositive(denominator)) {
             return INVALID_SOLUTION_PENALTY;
         }
-
         return numerator / denominator;
     }
 
@@ -633,7 +628,6 @@ public final class FitnessEvaluator {
         if (!Double.isFinite(value)) {
             return min;
         }
-
         return Math.max(min, Math.min(max, value));
     }
 }
