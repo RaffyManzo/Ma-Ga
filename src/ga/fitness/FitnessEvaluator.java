@@ -34,7 +34,7 @@ import java.util.Objects;
  * <p>La valutazione combina quattro famiglie di costo:</p>
  * <ul>
  *     <li>tempo massimo di completamento dei task;</li>
- *     <li>latenza media di comunicazione;</li>
+ *     <li>latenza comunicativa complessivamente introdotta dalle decisioni remote;</li>
  *     <li>rischio mobility-aware legato alla copertura e alla stabilità del link;</li>
  *     <li>penalità di vincolo e sovrauso risorse.</li>
  * </ul>
@@ -182,9 +182,11 @@ public final class FitnessEvaluator {
             }
         }
 
-        double averageCommunicationLatency = tasks.isEmpty()
-                ? 0.0
-                : communicationLatencySum / tasks.size();
+        /*
+         * La formalizzazione definisce L(C) come somma delle latenze
+         * comunicative dei singoli task, non come media.
+         */
+        double totalCommunicationLatency = communicationLatencySum;
 
         double resourcePenalty = computeResourcePenalty(
                 cpuUsageByExecutionNode,
@@ -199,7 +201,7 @@ public final class FitnessEvaluator {
 
         double normalizedCompletionTime = completionTime / normalization.getTRef();
         double normalizedCommunicationLatency =
-                averageCommunicationLatency / normalization.getLRef();
+                totalCommunicationLatency / normalization.getLRef();
         double normalizedMobilityPenalty = mobilityPenalty / normalization.getPmobRef();
         double normalizedResourcePenalty =
                 totalResourceAndConstraintPenalty / normalization.getPresRef();
@@ -213,7 +215,7 @@ public final class FitnessEvaluator {
         return new EvaluationBreakdown(
                 fitness,
                 completionTime,
-                averageCommunicationLatency,
+                totalCommunicationLatency,
                 mobilityPenalty,
                 totalResourceAndConstraintPenalty,
                 normalizedCompletionTime,
