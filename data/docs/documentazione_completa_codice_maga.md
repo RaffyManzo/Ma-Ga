@@ -1,16 +1,16 @@
 # Documentazione completa del codice MA-GA
 
-Questa documentazione spiega il progetto `maga-core` con un linguaggio intenzionalmente semplice. L'obiettivo e' permettere anche a una persona che non ha mai toccato il codice di capire che cosa fa ogni classe, perche' esiste e come si collega alla formalizzazione del Mobility-Aware Genetic Algorithm.
+Questa documentazione descrive lo stato attuale del repository `maga-core` e sostituisce le parti superate dalla riscrittura recente. Il linguaggio e' volutamente semplice: prima spiega il progetto nel suo insieme, poi entra in ogni classe e in ogni metodo rilevato.
 
-Inventario generato dal codice sorgente: **119 file/classi top-level**, **137 tipi totali includendo tipi interni**, **1121 metodi o costruttori rilevati**.
+Inventario generato dal codice sorgente: **132 file/classi top-level**, **155 tipi totali includendo tipi interni**, **1302 metodi o costruttori rilevati**.
 
-> Nota: le sezioni 'Problematiche aperte' segnalano discrepanze o decisioni operative emerse dal confronto con la formalizzazione e dalle issue aperte. Non tutte sono bug: alcune sono scelte di prototipo da rendere esplicite.
+> Nota: le sezioni 'Problematiche aperte' segnalano discrepanze o decisioni operative emerse dal confronto con la formalizzazione e dalle issue aperte. Non tutte sono bug: alcune sono scelte di prototipo da dichiarare negli esperimenti.
 
 ## 1. Visione globale del progetto
 
-Il progetto implementa un algoritmo genetico per decidere il computation offloading in uno scenario veicolare edge-to-cloud. A ogni finestra temporale il sistema osserva uno snapshot dello scenario, costruisce possibili decisioni di offloading, le migliora con il GA e produce una strategia finale.
+Il progetto implementa un Mobility-Aware Genetic Algorithm per decidere il computation offloading in uno scenario veicolare edge-to-cloud. A ogni finestra temporale osserva uno snapshot, costruisce possibili decisioni di offloading, le corregge quando violano vincoli strutturali, le evolve con il GA e produce una strategia finale.
 
-La domanda centrale e': per ogni task generato da un veicolo, conviene eseguirlo localmente, su un altro veicolo, su edge o su cloud? E se lo eseguo in remoto, quanta parte del task devo offloadare e quante risorse devo assegnare?
+La domanda centrale e': per ogni task generato da un veicolo, conviene eseguirlo localmente, su un altro veicolo, su edge o su cloud? Se lo eseguo in remoto, quanta parte del task va offloadata e quante risorse CPU/banda devo assegnare?
 
 La formalizzazione usa questi concetti:
 - `S_k`: stato del sistema nella finestra temporale k.
@@ -23,20 +23,31 @@ La formalizzazione usa questi concetti:
 - `D(k)`: dinamicita' dello scenario tra due finestre.
 - `DeltaT_min`, `DeltaT_max`: limiti della finestra temporale.
 
-## 2. Come comunicano le classi
+## 2. Cosa e' cambiato nella versione corrente
+
+- Il vincolo di deadline e' stato rafforzato: ora ci sono `DeadlineConstraintEvaluator`, `DeadlineRepairCatalog`, `DeadlineEvaluation` e una penalita' hard in `FitnessEvaluator`.
+- Il repair e' piu' strutturato: lavora su candidati validi, copertura, deadline, CPU aggregata e usa un percorso incrementale quando conosce i task mutati.
+- La mobilita' non e' piu' solo tempo di copertura: ora `MobilityLinkMetrics` e `MobilityPenaltyBreakdown` rendono espliciti copertura, instabilita' link e handover risk.
+- La latenza comunicativa e' allineata alla formalizzazione come somma `L(C) = sum_i L_i`, non media per task.
+- `AdaptiveWindowMain` espone il profilo runtime e usa di default `OBSERVED_RUNTIME`; `CONFIGURED_RUNTIME` resta disponibile per replay astratti.
+- `TimeIndexedSnapshotReplaySource` non guarda piu' nel futuro: sceglie l'ultimo snapshot disponibile al tempo richiesto.
+- Sono stati aggiunti report specifici per latenza, mobilita' e best-effort deadline.
+
+## 3. Come comunicano le classi
 
 Il flusso principale e' questo:
 
 ```text
 JSON/MOSAIC -> SystemStateSource -> CandidatePrefilter -> TemporalWindowManager
 TemporalWindowManager -> DynamicityEvaluator -> PopulationAdapter -> MaGaOptimizer
-MaGaOptimizer -> PopulationInitializer/Selection/Crossover/Mutation/Repair/Fitness
+MaGaOptimizer -> PopulationInitializer/Selection/Crossover/MutationResult/Repair/Fitness
+RepairOperator -> SnapshotRepairContext/DeadlineRepairCatalog/CpuAggregateRepairOperator
 FitnessEvaluator -> EvaluationBreakdown -> Report/Diagnostics
 ```
 
-La separazione e' importante. Le classi `model` rappresentano dati e formule. Le classi `ga` cercano una buona soluzione su uno snapshot. Le classi `window` decidono quando rieseguire il GA e come riusare la popolazione precedente. Le classi `io` leggono o stampano dati. Le classi `config` evitano di nascondere costanti dentro l'algoritmo.
+Le classi `model` rappresentano dati e formule. Le classi `ga` cercano una buona soluzione su uno snapshot. Le classi `ga.constraints` aiutano il repair a trattare deadline e copertura. Le classi `window` decidono quando rieseguire il GA e come riusare la popolazione precedente. Le classi `io` leggono o stampano dati. Le classi `config` evitano di nascondere costanti dentro l'algoritmo.
 
-## 3. Traduzione della formalizzazione in codice
+## 4. Traduzione della formalizzazione in codice
 
 | Formalizzazione | Classe o package | Spiegazione semplice |
 |---|---|---|
@@ -47,40 +58,40 @@ La separazione e' importante. Le classi `model` rappresentano dati e formule. Le
 | Gene `g_i` | `Gene` | Decisione per un singolo task. |
 | Cromosoma `C` | `Chromosome` | Lista di geni, quindi strategia completa. |
 | Tempo `T_i(C)` | `OffloadingTimeModel` | Calcola locale, remoto e partial offloading. |
-| Copertura `T_coverage` | `CoverageEstimator` | Stima quanto resta disponibile il collegamento. |
-| Fitness `J(C)` | `FitnessEvaluator` | Combina tempo, latenza, mobilita' e risorse. |
+| Deadline `T_i <= D_i` | `ga.constraints` + `FitnessEvaluator` | Il repair prova a renderla ammissibile; la fitness penalizza duramente violazioni residue. |
+| Copertura e mobilita' | `CoverageEstimator`, `MobilityLinkMetrics` | Stimano copertura, distanza, velocita' relativa e instabilita'. |
+| Penalita' `Pmob` | `MobilityPenaltyBreakdown` | Scompone coverage risk, link instability e handover risk. |
+| Latenza `L(C)` | `OffloadingTimeModel`, `LatencyDiagnosticPrinter` | Usa la somma delle latenze comunicative. |
+| Fitness `J(C)` | `FitnessEvaluator` | Combina tempo, latenza, mobilita', risorse e penalita' hard. |
 | Dinamicita' `D(k)` | `DynamicityEvaluator` | Misura cambiamento tra snapshot. |
 | Riuso popolazione | `PopulationAdapter` | Decide quanto della popolazione precedente tenere. |
 | Finestra temporale | `window.timing` | Calcola limiti e prossima durata della finestra. |
 
-## 4. Problematiche aperte principali
+## 5. Problematiche aperte principali
 
-Queste sono le discrepanze piu' importanti da tenere a mente mentre leggi le schede:
-- **Runtime GA**: il default usa `CONFIGURED_GA_ESTIMATE = 0.1s`; il runtime osservato e' diagnostico finche' non si abilita `OBSERVED_GA_RUNTIME`.
-- **Deadline**: nella formalizzazione e' un vincolo forte, mentre nel codice finale e' soprattutto una penalita' nella fitness.
-- **Banda**: la formalizzazione parla di `Bmax` globale; il codice aggrega per `candidateId`/link source-aware.
-- **Saturazione risorse**: il 95-100% e' diagnosticato, ma non penalizzato se non supera il limite.
-- **Mobilita' `phi_link`**: il peso esiste, ma il valore e' ancora `0.0` nella fitness.
-- **Cloud coverage**: il cloud usa un tempo convenzionale; manca il legame esplicito con gateway/RSU di accesso.
-- **V2V coverage**: usa velocita' scalari, non vettori direzionali.
-- **JSON_TIME**: la sorgente time-indexed puo' restituire uno snapshot futuro rispetto al tempo richiesto.
-- **MOSAIC**: esistono interfacce e adattatori, ma il bridge concreto non e' ancora implementato.
+- **Banda globale aggregata**: il codice resta per-link/candidateId. Se la formalizzazione mantiene un unico `Bmax`, questa e' ancora una discrepanza.
+- **Repair banda**: esiste repair aggregato CPU, ma non un repair aggregato banda/gateway.
+- **Deadline**: molto migliorata rispetto alla versione precedente, ma il best-effort degradato non prova infeasibilita' globale.
+- **Runtime GA**: ora il default operativo e' osservato, ma i risultati vanno sempre letti sapendo se si usa `OBSERVED_RUNTIME` o `CONFIGURED_RUNTIME`.
+- **Mobilita' cloud/V2V**: cloud e' ancora placeholder stabile; V2V usa velocita' relativa scalare; edge non usa heading.
+- **`DeltaT_max < DeltaT_min`**: il codice rialza il massimo al minimo e lo segnala; la formalizzazione puo' richiedere una policy di fallback esplicita.
+- **MOSAIC/SUMO**: ci sono interfacce e sorgenti predisposte, ma manca un bridge concreto nel repository.
 
-Collegamento sintetico con le issue aperte viste sul branch `Refactor`: `#6 Formalizzazione` riguarda il riallineamento modello/codice, `#4 saturazione soft` riguarda il trattamento delle risorse vicine al limite, `#3 MOSAIC/SUMO` riguarda l'integrazione operativa con il simulatore.
+Collegamento sintetico con le issue aperte note: `#6 Formalizzazione` riguarda il riallineamento modello/codice, `#4 saturazione soft` riguarda risorse vicine al limite, `#3 MOSAIC/SUMO` riguarda l'integrazione operativa con il simulatore.
 
-## 5. Package del progetto
+## 6. Package del progetto
 
 ### `app`
 
-Contiene i punti di ingresso eseguibili. Qui il codice compone configurazioni, sorgenti dati, prefilter, GA e printer.
+Contiene i punti di ingresso eseguibili. Qui il codice compone configurazioni, sorgenti dati, profili runtime, prefilter, GA e printer.
 
 ### `config`
 
-Raccoglie parametri e policy di configurazione. Nella formalizzazione questi sono pesi, soglie, limiti e costanti sperimentali.
+Raccoglie parametri e policy di configurazione. Nella formalizzazione questi corrispondono a pesi, soglie, limiti e costanti sperimentali.
 
 ### `config.fitness`
 
-Configura i pesi della funzione obiettivo, le penalita' e le scale di normalizzazione.
+Configura pesi della funzione obiettivo, penalita' e scale di normalizzazione.
 
 ### `config.ga`
 
@@ -88,11 +99,15 @@ Configura e scala i parametri evolutivi del Genetic Algorithm.
 
 ### `config.mobility`
 
-Configura i parametri usati nella stima della copertura e della mobilita'.
+Configura i parametri usati nella stima della copertura e dell'instabilita' dei link.
 
 ### `config.window`
 
-Configura la finestra temporale adattiva, le soglie di dinamicita' e i limiti minimi/massimi.
+Configura la finestra temporale adattiva, inclusa la scelta tra runtime GA osservato e runtime configurato.
+
+### `ga.constraints`
+
+Contiene valutatori e cataloghi usati dal repair per trattare deadline e sostenibilita' mobility-aware in modo esplicito.
 
 ### `ga.core`
 
@@ -104,7 +119,7 @@ Calcola la funzione di fitness e classifica il tipo di decisione.
 
 ### `ga.fitness.breakdown`
 
-Conserva i dettagli diagnostici della fitness.
+Conserva dettagli diagnostici della fitness, inclusi risorse, latenza e mobilita'.
 
 ### `ga.operators`
 
@@ -112,7 +127,7 @@ Contiene inizializzazione, selezione, crossover, mutazione, repair e policy di a
 
 ### `io.reporting`
 
-Stampa report leggibili per capire cosa ha fatto il GA e il gestore temporale.
+Stampa report leggibili per capire cosa ha fatto il GA e dove nascono costi o violazioni.
 
 ### `io.reporting.diagnostics.deadline`
 
@@ -132,7 +147,7 @@ Rappresenta cromosomi e geni, cioe' la forma concreta delle soluzioni del GA.
 
 ### `model.mobility`
 
-Stima il tempo di copertura, cioe' il legame tra mobilita' e sostenibilita' dell'offloading.
+Stima metriche mobility-aware: copertura, distanza, velocita' relativa e instabilita' del link.
 
 ### `model.node`
 
@@ -148,7 +163,7 @@ Rappresenta la fotografia del sistema nella finestra corrente.
 
 ### `validation.snapshot`
 
-Valida snapshot grezzi e snapshot gia' mappati nel dominio.
+Valida snapshot grezzi e invarianti necessari al repair.
 
 ### `window.core`
 
@@ -172,7 +187,7 @@ Contiene funzioni matematiche comuni per la dinamicita'.
 
 ### `window.dynamicity.metrics`
 
-Rappresenta le metriche confrontabili tra snapshot.
+Rappresenta metriche confrontabili tra snapshot.
 
 ### `window.event`
 
@@ -188,7 +203,7 @@ Riduce lo spazio dei candidati prima del GA.
 
 ### `window.source`
 
-Astrazione della sorgente di stato: JSON sequence/time e predisposizione MOSAIC.
+Astrazione della sorgente di stato: JSON time, JSON sequence e predisposizione MOSAIC.
 
 ### `window.state`
 
@@ -202,21 +217,21 @@ Calcola limiti e decisioni della finestra adattiva.
 
 Modella il motivo temporale della riesecuzione.
 
-## 6. Schede complete di classi, enum, interfacce e record
+## 7. Schede complete di classi, enum, interfacce e record
 
 ## Package `app`
 
-Contiene i punti di ingresso eseguibili. Qui il codice compone configurazioni, sorgenti dati, prefilter, GA e printer.
+Contiene i punti di ingresso eseguibili. Qui il codice compone configurazioni, sorgenti dati, profili runtime, prefilter, GA e printer.
 
 ### `AdaptiveWindowMain`
 
-- File: `src/app/AdaptiveWindowMain.java:49`
+- File: `src/app/AdaptiveWindowMain.java:55`
 - Tipo: `class`
 - Nome completo: `app.AdaptiveWindowMain`
 
 **Cosa fa, in parole semplici**
 
-Esegue il ciclo temporale completo del MA-GA su una cartella di snapshot consecutivi. Questo è l'unico entry point applicativo per la finestra adattiva. Compone sorgente dati, prefilter, gestore temporale, riuso della popolazione, bounds adattivi e report. La modalità predefinita è `JSON_TIME`: il manager richiede lo snapshot coerente con il proprio tempo logico. `JSON_SEQUENCE` resta disponibile come replay diagnostico ordinale, utile per consumare tutti i file in sequenza anche quando la durata adattiva diverge dai timestamp salvati nei JSON. Argomenti supportati: AdaptiveWindowMain AdaptiveWindowMain data/snapshots/temporal/scenarios/urban_realistic_dynamic_calibrated AdaptiveWindowMain data/snapshots/temporal/scenarios/urban_realistic_dynamic_calibrated 8 AdaptiveWindowMain JSON_SEQUENCE data/snapshots/temporal/scenarios/urban_realistic_dynamic_calibrated 8 Compone il flusso completo: loader JSON, prefilter, sorgente, manager temporale, optimizer e printer.
+Esegue il ciclo temporale completo del MA-GA su una cartella di snapshot consecutivi. Questo è l'unico entry point applicativo per la finestra adattiva. Compone sorgente dati, prefilter, gestore temporale, riuso della popolazione, bounds adattivi e report. La modalità sorgente predefinita è `JSON_TIME`: il manager richiede lo snapshot coerente con il proprio tempo logico. `JSON_SEQUENCE` resta disponibile come replay diagnostico ordinale. Il profilo temporale predefinito è `OBSERVED_RUNTIME`: dopo la prima finestra, il bound minimo usa il runtime del GA osservato nella finestra precedente. Il profilo `CONFIGURED_RUNTIME` resta disponibile per replay algoritmici astratti e riproducibili. Argomenti supportati: AdaptiveWindowMain AdaptiveWindowMain data/snapshots/temporal/scenarios/urban_realistic_dynamic_calibrated AdaptiveWindowMain data/snapshots/temporal/scenarios/urban_realistic_dynamic_calibrated 8 AdaptiveWindowMain JSON_TIME OBSERVED_RUNTIME data/snapshots/temporal/scenarios/urban_realistic_dynamic_calibrated 8 AdaptiveWindowMain JSON_SEQUENCE CONFIGURED_RUNTIME data/snapshots/temporal/scenarios/urban_realistic_dynamic_calibrated 8 Compone il flusso completo e ora permette di scegliere anche il profilo runtime: `OBSERVED_RUNTIME` per esperimenti operativi, `CONFIGURED_RUNTIME` per replay astratti.
 
 **Relazione con la formalizzazione**
 
@@ -224,13 +239,13 @@ Supporta la traduzione pratica della formalizzazione in codice.
 
 **Con chi comunica**
 
-Comunica direttamente con: `AdaptiveWindowController`, `AdaptiveWindowReportPrinter`, `CandidatePrefilter`, `CandidatePrefilterConfig`, `CoverageReferenceCalculator`, `DynamicityEvaluator`, `FilteringSystemStateSource`, `GaParameterScalingMode`, `JsonSnapshotFolderLoader`, `MaGaConfig`, `MaGaOptimizer`, `PopulationAdapter`, `PopulationReuseDecisionPolicy`, `SequentialSnapshotReplaySource`, ... altri 9.
+Comunica direttamente con: `AdaptiveWindowController`, `AdaptiveWindowReportPrinter`, `CandidatePrefilter`, `CandidatePrefilterConfig`, `CoverageReferenceCalculator`, `DynamicityEvaluator`, `FilteringSystemStateSource`, `GaParameterScalingMode`, `JsonSnapshotFolderLoader`, `MaGaConfig`, `MaGaOptimizer`, `PopulationAdapter`, `PopulationReuseDecisionPolicy`, `SequentialSnapshotReplaySource`, `SnapshotPaths`, `StaticCriticalEventDetector`, ... altri 8.
 In pratica questa classe riceve questi oggetti, li costruisce oppure li passa allo step successivo del flusso.
 
 **Campi o valori importanti**
 
 Campi dichiarati principali:
-- `private static final String DEFAULT_MODE = "JSON_TIME"`
+- `private static final String DEFAULT_SOURCE_MODE = "JSON_TIME"`
 - `private static final double START_TIME_SECONDS = 0.0`
 
 **Metodi**
@@ -238,16 +253,17 @@ Campi dichiarati principali:
 | Metodo | Visibilita' | Spiegazione semplice |
 |---|---:|---|
 | `private AdaptiveWindowMain()` | private | Costruttore: crea l'oggetto e controlla che i dati necessari siano validi. |
-| `public static void main(String[] args) throws Exception` | public | Punto di ingresso dell'applicazione: legge gli argomenti, compone gli oggetti principali e avvia l'esecuzione. |
+| `public static void main(String[] args) throws Exception` | public | Punto di ingresso dell'applicazione: legge argomenti, compone gli oggetti principali e avvia l'esecuzione. |
 | `private static SystemStateSource buildSource( String mode, String folderPath, List<SystemSnapshot> snapshots ) throws Exception` | private | Costruisce `build source` usando le informazioni disponibili. |
+| `private static boolean isSupportedSourceMode(String value)` | private | Risponde con true/false alla domanda `is supported source mode`. |
 
 **Problematiche aperte**
 
-- Non espone ancora da CLI la scelta tra tempo GA configurato e tempo GA osservato.
+- La modalita' MOSAIC non e' avviabile dal main senza una `MosaicSnapshotBridge` concreta.
 
 ### `RunArguments` (tipo interno di `AdaptiveWindowMain`)
 
-- File: `src/app/AdaptiveWindowMain.java:148`
+- File: `src/app/AdaptiveWindowMain.java:175`
 - Tipo: `record`
 - Nome completo: `app.AdaptiveWindowMain.RunArguments`
 
@@ -261,7 +277,7 @@ Supporta la traduzione pratica della formalizzazione in codice.
 
 **Con chi comunica**
 
-Comunica direttamente con: `AdaptiveWindowController`, `AdaptiveWindowReportPrinter`, `CandidatePrefilter`, `CandidatePrefilterConfig`, `CoverageReferenceCalculator`, `DynamicityEvaluator`, `FilteringSystemStateSource`, `GaParameterScalingMode`, `JsonSnapshotFolderLoader`, `MaGaConfig`, `MaGaOptimizer`, `PopulationAdapter`, `PopulationReuseDecisionPolicy`, `SequentialSnapshotReplaySource`, ... altri 9.
+Comunica direttamente con: `AdaptiveWindowController`, `AdaptiveWindowReportPrinter`, `CandidatePrefilter`, `CandidatePrefilterConfig`, `CoverageReferenceCalculator`, `DynamicityEvaluator`, `FilteringSystemStateSource`, `GaParameterScalingMode`, `JsonSnapshotFolderLoader`, `MaGaConfig`, `MaGaOptimizer`, `PopulationAdapter`, `PopulationReuseDecisionPolicy`, `SequentialSnapshotReplaySource`, `SnapshotPaths`, `StaticCriticalEventDetector`, ... altri 8.
 In pratica questa classe riceve questi oggetti, li costruisce oppure li passa allo step successivo del flusso.
 
 **Metodi**
@@ -269,6 +285,7 @@ In pratica questa classe riceve questi oggetti, li costruisce oppure li passa al
 | Metodo | Visibilita' | Spiegazione semplice |
 |---|---:|---|
 | `private static RunArguments parse(String[] args)` | private | Interpreta input testuale o grezzo e lo trasforma in un valore usabile dal codice. |
+| `private static String usage()` | private | Metodo di supporto: realizza il passo `usage` dentro la responsabilita' della classe. |
 
 **Problematiche aperte**
 
@@ -303,7 +320,7 @@ Campi dichiarati principali:
 | Metodo | Visibilita' | Spiegazione semplice |
 |---|---:|---|
 | `private GaBatchMain()` | private | Costruttore: crea l'oggetto e controlla che i dati necessari siano validi. |
-| `public static void main(String[] args) throws Exception` | public | Punto di ingresso dell'applicazione: legge gli argomenti, compone gli oggetti principali e avvia l'esecuzione. |
+| `public static void main(String[] args) throws Exception` | public | Punto di ingresso dell'applicazione: legge argomenti, compone gli oggetti principali e avvia l'esecuzione. |
 
 **Problematiche aperte**
 
@@ -340,7 +357,7 @@ Nessuna specifica nota per questa classe.
 
 ## Package `config`
 
-Raccoglie parametri e policy di configurazione. Nella formalizzazione questi sono pesi, soglie, limiti e costanti sperimentali.
+Raccoglie parametri e policy di configurazione. Nella formalizzazione questi corrispondono a pesi, soglie, limiti e costanti sperimentali.
 
 ### `MaGaConfig`
 
@@ -390,7 +407,7 @@ Campi dichiarati principali:
 | `public GeneticAlgorithmConfig resolveGeneticAlgorithmConfig( SystemSnapshot snapshot )` | public | Risolve la configurazione GA effettiva per lo snapshot corrente. In modalità STATIC restituisce geneticAlgorithmConfig. In modalità ADAPTIVE restituisce una configurazione scalata. @param snapshot snapshot da ottimizzare @return configurazione GA effettiva |
 | `public GaParameterScalingResult resolveGaParameterScaling( SystemSnapshot snapshot )` | public | Risolve la configurazione GA effettiva e restituisce anche informazioni diagnostiche. @param snapshot snapshot da ottimizzare @return risultato dello scaling |
 | `private static GaParameterScaler createScaler( GaParameterScalingMode mode )` | private | Crea `create scaler` come nuovo oggetto o nuova struttura dati. |
-| `public String toString()` | public | Converte l'oggetto o i dati in `to string`. |
+| `public String toString()` | public | Converte l'oggetto in una stringa utile per debug e report. |
 
 **Problematiche aperte**
 
@@ -398,7 +415,7 @@ Nessuna specifica nota per questa classe.
 
 ## Package `config.fitness`
 
-Configura i pesi della funzione obiettivo, le penalita' e le scale di normalizzazione.
+Configura pesi della funzione obiettivo, penalita' e scale di normalizzazione.
 
 ### `FitnessWeights`
 
@@ -408,11 +425,11 @@ Configura i pesi della funzione obiettivo, le penalita' e le scale di normalizza
 
 **Cosa fa, in parole semplici**
 
-Rappresenta i pesi della funzione di fitness del MA-GA. Formalizzazione: J(C) = wT * T(C) + wL * L(C) + wM * Pmob(C) + wR * Pres(C) Dove: - wT pesa il tempo complessivo di completamento T(C); - wL pesa la latenza comunicativa L(C); - wM pesa la penalità di mobilità Pmob(C); - wR pesa la penalità per violazione delle risorse Pres(C). Serve solo a configurare il peso relativo dei termini che saranno usati dal FitnessEvaluator. Traduce i pesi wT, wL, wM, wR della funzione obiettivo.
+Rappresenta i pesi della funzione di fitness del MA-GA. Formalizzazione: J(C) = wT * T(C) + wL * L(C) + wM * Pmob(C) + wR * Pres(C) Dove: - wT pesa il tempo complessivo di completamento T(C); - wL pesa la latenza comunicativa L(C); - wM pesa la penalità di mobilità Pmob(C); - wR pesa la penalità per violazione delle risorse Pres(C). Serve solo a configurare il peso relativo dei termini che saranno usati dal FitnessEvaluator.
 
 **Relazione con la formalizzazione**
 
-Realizza la funzione obiettivo J(C) con pesi, normalizzazione e penalita'.
+Realizza la funzione obiettivo `J(C)` con pesi, normalizzazione e penalita'.
 
 **Con chi comunica**
 
@@ -445,7 +462,7 @@ Campi dichiarati principali:
 | `public double getWR()` | public | Restituisce il valore di `WR` senza modificarlo. |
 | `private static void validateFinite(String fieldName, double value)` | private | Controlla la correttezza di `validate finite` e solleva un'eccezione se trova dati incoerenti. |
 | `private static void validateNonNegative(String fieldName, double value)` | private | Controlla la correttezza di `validate non negative` e solleva un'eccezione se trova dati incoerenti. |
-| `public String toString()` | public | Converte l'oggetto o i dati in `to string`. |
+| `public String toString()` | public | Converte l'oggetto in una stringa utile per debug e report. |
 
 **Problematiche aperte**
 
@@ -459,11 +476,11 @@ Nessuna specifica nota per questa classe.
 
 **Cosa fa, in parole semplici**
 
-Configura i valori di riferimento usati per normalizzare i termini della fitness. La formalizzazione evidenzia che T(C), L(C), Pmob(C) e Pres(C) possono avere scale numeriche diverse. Per evitare che un termine domini gli altri solo per ordine di grandezza, il FitnessEvaluator potrà usare: T_hat(C) = T(C) / T_ref L_hat(C) = L(C) / L_ref Pmob_hat(C) = Pmob(C) / Pmob_ref Pres_hat(C) = Pres(C) / Pres_ref Questa classe NON normalizza direttamente i valori. Espone solo i riferimenti numerici. Definisce i riferimenti usati per portare tempi e penalita' su scale confrontabili.
+Configura i valori di riferimento usati per normalizzare i termini della fitness. La formalizzazione evidenzia che T(C), L(C), Pmob(C) e Pres(C) possono avere scale numeriche diverse. Per evitare che un termine domini gli altri solo per ordine di grandezza, il FitnessEvaluator potrà usare: T_hat(C) = T(C) / T_ref L_hat(C) = L(C) / L_ref Pmob_hat(C) = Pmob(C) / Pmob_ref Pres_hat(C) = Pres(C) / Pres_ref Questa classe NON normalizza direttamente i valori. Espone solo i riferimenti numerici.
 
 **Relazione con la formalizzazione**
 
-Realizza la funzione obiettivo J(C) con pesi, normalizzazione e penalita'.
+Realizza la funzione obiettivo `J(C)` con pesi, normalizzazione e penalita'.
 
 **Con chi comunica**
 
@@ -493,7 +510,7 @@ Campi dichiarati principali:
 | `public double getPmobRef()` | public | Restituisce il valore di `PmobRef` senza modificarlo. |
 | `public double getPresRef()` | public | Restituisce il valore di `PresRef` senza modificarlo. |
 | `private static void validateStrictlyPositive(String fieldName, double value)` | private | Controlla la correttezza di `validate strictly positive` e solleva un'eccezione se trova dati incoerenti. |
-| `public String toString()` | public | Converte l'oggetto o i dati in `to string`. |
+| `public String toString()` | public | Converte l'oggetto in una stringa utile per debug e report. |
 
 **Problematiche aperte**
 
@@ -507,11 +524,11 @@ Nessuna specifica nota per questa classe.
 
 **Cosa fa, in parole semplici**
 
-Configura i coefficienti usati per costruire le penalità del MA-GA. La formalizzazione distingue: - Pmob(C): penalità complessiva legata alla mobilità; - Pres(C): penalità complessiva legata alla violazione delle risorse. Questa classe NON calcola Pmob(C) o Pres(C). Serve solo a contenere i coefficienti che saranno usati dal FitnessEvaluator. Traduce i coefficienti delle penalita' di mobilita', risorse e deadline.
+Configura i coefficienti usati per costruire le penalità del MA-GA. La formalizzazione distingue: - Pmob(C): penalità complessiva legata alla mobilità; - Pres(C): penalità complessiva legata alla violazione delle risorse. Questa classe NON calcola Pmob(C) o Pres(C). Serve solo a contenere i coefficienti che saranno usati dal FitnessEvaluator.
 
 **Relazione con la formalizzazione**
 
-Realizza la funzione obiettivo J(C) con pesi, normalizzazione e penalita'.
+Realizza la funzione obiettivo `J(C)` con pesi, normalizzazione e penalita'.
 
 **Con chi comunica**
 
@@ -541,11 +558,11 @@ Campi dichiarati principali:
 | `public double getCpuOveruseWeight()` | public | Restituisce il valore di `CpuOveruseWeight` senza modificarlo. |
 | `public double getDeadlineViolationWeight()` | public | Restituisce il valore di `DeadlineViolationWeight` senza modificarlo. |
 | `private static void validateFiniteAndNonNegative(String fieldName, double value)` | private | Controlla la correttezza di `validate finite and non negative` e solleva un'eccezione se trova dati incoerenti. |
-| `public String toString()` | public | Converte l'oggetto o i dati in `to string`. |
+| `public String toString()` | public | Converte l'oggetto in una stringa utile per debug e report. |
 
 **Problematiche aperte**
 
-- Configura un peso per linkInstability, ma la misura concreta di phi_link non e' ancora implementata nella fitness.
+Nessuna specifica nota per questa classe.
 
 ## Package `config.ga`
 
@@ -559,7 +576,7 @@ Configura e scala i parametri evolutivi del Genetic Algorithm.
 
 **Cosa fa, in parole semplici**
 
-Scala i parametri evolutivi del MA-GA in base alla complessità dello snapshot osservato. La classe ha due modalità: - STATIC: restituisce la configurazione GA di base senza modificarla; - ADAPTIVE: aumenta popolazione e generazioni in base a task e candidati. Questa classe non appartiene al cromosoma e non modifica lo snapshot. Agisce prima dell'esecuzione del MaGaOptimizer. Adatta Npop e Gmax alla complessita' dello snapshot.
+Scala i parametri evolutivi del MA-GA in base alla complessità dello snapshot osservato. La classe ha due modalità: - STATIC: restituisce la configurazione GA di base senza modificarla; - ADAPTIVE: aumenta popolazione e generazioni in base a task e candidati. Questa classe non appartiene al cromosoma e non modifica lo snapshot. Agisce prima dell'esecuzione del MaGaOptimizer.
 
 **Relazione con la formalizzazione**
 
@@ -603,7 +620,7 @@ Nessuna specifica nota per questa classe.
 
 **Cosa fa, in parole semplici**
 
-Configurazione della policy che scala i parametri del Genetic Algorithm. Questa classe non sostituisce GeneticAlgorithmConfig. Definisce solo come calcolare una nuova GeneticAlgorithmConfig quando la modalità adattiva è abilitata. Parametri della legge di scaling del GA.
+Configurazione della policy che scala i parametri del Genetic Algorithm. Questa classe non sostituisce GeneticAlgorithmConfig. Definisce solo come calcolare una nuova GeneticAlgorithmConfig quando la modalità adattiva è abilitata.
 
 **Relazione con la formalizzazione**
 
@@ -699,7 +716,7 @@ Nessuna specifica nota per questa classe.
 
 **Cosa fa, in parole semplici**
 
-Risultato diagnostico del dimensionamento dei parametri GA. Serve per capire perché una certa GeneticAlgorithmConfig è stata scelta. Report della configurazione GA effettiva usata per uno snapshot.
+Risultato diagnostico del dimensionamento dei parametri GA. Serve per capire perché una certa GeneticAlgorithmConfig è stata scelta.
 
 **Relazione con la formalizzazione**
 
@@ -739,7 +756,7 @@ Campi dichiarati principali:
 | `public boolean hasChangedPopulationSize()` | public | Risponde con true/false alla domanda `has changed population size`. |
 | `public boolean hasChangedMaxGenerations()` | public | Risponde con true/false alla domanda `has changed max generations`. |
 | `public boolean hasChanged()` | public | Risponde con true/false alla domanda `has changed`. |
-| `public String toString()` | public | Converte l'oggetto o i dati in `to string`. |
+| `public String toString()` | public | Converte l'oggetto in una stringa utile per debug e report. |
 
 **Problematiche aperte**
 
@@ -753,7 +770,7 @@ Nessuna specifica nota per questa classe.
 
 **Cosa fa, in parole semplici**
 
-Configura i parametri evolutivi del Genetic Algorithm. Questa classe contiene solo parametri dell'algoritmo: - dimensione della popolazione; - numero massimo di generazioni; - probabilità di crossover; - probabilità di mutazione; - numero di individui elitari; - criterio di arresto per stagnazione; - soglia minima di miglioramento; - seed casuale. Contiene Npop, Gmax, crossover, mutazione, elitismo e stagnazione.
+Configura i parametri evolutivi del Genetic Algorithm. Questa classe contiene solo parametri dell'algoritmo: - dimensione della popolazione; - numero massimo di generazioni; - probabilità di crossover; - probabilità di mutazione; - numero di individui elitari; - criterio di arresto per stagnazione; - soglia minima di miglioramento; - seed casuale.
 
 **Relazione con la formalizzazione**
 
@@ -791,7 +808,7 @@ Campi dichiarati principali:
 | `public double getFitnessImprovementEpsilon()` | public | Restituisce il valore di `FitnessImprovementEpsilon` senza modificarlo. |
 | `public long getRandomSeed()` | public | Restituisce il valore di `RandomSeed` senza modificarlo. |
 | `private static void validateRate(String fieldName, double value)` | private | Controlla la correttezza di `validate rate` e solleva un'eccezione se trova dati incoerenti. |
-| `public String toString()` | public | Converte l'oggetto o i dati in `to string`. |
+| `public String toString()` | public | Converte l'oggetto in una stringa utile per debug e report. |
 
 **Problematiche aperte**
 
@@ -799,7 +816,7 @@ Nessuna specifica nota per questa classe.
 
 ## Package `config.mobility`
 
-Configura i parametri usati nella stima della copertura e della mobilita'.
+Configura i parametri usati nella stima della copertura e dell'instabilita' dei link.
 
 ### `MobilityConfig`
 
@@ -809,11 +826,11 @@ Configura i parametri usati nella stima della copertura e della mobilita'.
 
 **Cosa fa, in parole semplici**
 
-Configurazione dei parametri usati per stimare il tempo di copertura. La classe non calcola direttamente la copertura. Fornisce solo i valori necessari a CoverageEstimator. Parametri fisici/convenzionali per stimare copertura e stabilita'.
+Configurazione dei parametri usati per stimare il tempo di copertura. La classe non calcola direttamente la copertura. Fornisce solo i valori necessari a CoverageEstimator.
 
 **Relazione con la formalizzazione**
 
-Implementa la parte mobility-aware: tempo di copertura, rischio di copertura e limiti della finestra.
+Implementa la parte mobility-aware: tempo di copertura, instabilita' link, rischio handover e limiti temporali collegati alla copertura.
 
 **Con chi comunica**
 
@@ -842,15 +859,15 @@ Campi dichiarati principali:
 | `public double getMaxCoverageTimeSeconds()` | public | Restituisce il valore di `MaxCoverageTimeSeconds` senza modificarlo. |
 | `public double clampCoverageTime(double coverageTimeSeconds)` | public | Limita un tempo di copertura al range usato dal modello. @param coverageTimeSeconds tempo di copertura stimato @return tempo limitato tra 0 e maxCoverageTimeSeconds |
 | `private static double validatePositive(String fieldName, double value)` | private | Controlla la correttezza di `validate positive` e solleva un'eccezione se trova dati incoerenti. |
-| `public String toString()` | public | Converte l'oggetto o i dati in `to string`. |
+| `public String toString()` | public | Converte l'oggetto in una stringa utile per debug e report. |
 
 **Problematiche aperte**
 
-- I 300 secondi per local/cloud sono valori convenzionali di prototipo, non misure di scenario.
+- I 300 secondi per local/cloud sono convenzioni del prototipo, non misure derivate dal simulatore.
 
 ## Package `config.window`
 
-Configura la finestra temporale adattiva, le soglie di dinamicita' e i limiti minimi/massimi.
+Configura la finestra temporale adattiva, inclusa la scelta tra runtime GA osservato e runtime configurato.
 
 ### `TemporalMaximumBoundMode`
 
@@ -864,7 +881,7 @@ Modalità di calcolo di DeltaT_max(k). La modalità adattiva segue la formalizza
 
 **Relazione con la formalizzazione**
 
-Realizza i limiti DeltaT_min, DeltaT_max e la scelta della finestra temporale.
+Realizza i limiti `DeltaT_min`, `DeltaT_max` e la scelta della finestra temporale.
 
 **Con chi comunica**
 
@@ -895,7 +912,7 @@ Modalità di calcolo di DeltaT_min(k). La formula resta quella della formalizzaz
 
 **Relazione con la formalizzazione**
 
-Realizza i limiti DeltaT_min, DeltaT_max e la scelta della finestra temporale.
+Realizza i limiti `DeltaT_min`, `DeltaT_max` e la scelta della finestra temporale.
 
 **Con chi comunica**
 
@@ -914,6 +931,36 @@ Questa classe non dichiara metodi propri; contiene soprattutto dati, costanti o 
 
 Nessuna specifica nota per questa classe.
 
+### `TemporalRuntimeProfile`
+
+- File: `src/config/window/TemporalRuntimeProfile.java:14`
+- Tipo: `enum`
+- Nome completo: `config.window.TemporalRuntimeProfile`
+
+**Cosa fa, in parole semplici**
+
+Profilo temporale usato per costruire i bounds della finestra adattiva. `#OBSERVED_RUNTIME` segue il profilo operativo della formalizzazione: dopo la prima finestra usa il runtime del GA osservato nella finestra precedente. `#CONFIGURED_RUNTIME` mantiene invece una stima configurata e resta disponibile per replay algoritmici astratti e riproducibili. Rende esplicita la scelta modellistica sul tempo del GA, punto centrale nel confronto tra simulazione astratta e simulazione operativa.
+
+**Relazione con la formalizzazione**
+
+Realizza i limiti `DeltaT_min`, `DeltaT_max` e la scelta della finestra temporale.
+
+**Con chi comunica**
+
+Comunica come etichetta condivisa: altre classi lo usano per evitare stringhe libere e rendere esplicite le scelte.
+
+**Metodi**
+
+| Metodo | Visibilita' | Spiegazione semplice |
+|---|---:|---|
+| `public abstract TemporalWindowConfig createWindowConfig()` | public | Crea `create window config` come nuovo oggetto o nuova struttura dati. |
+| `public static TemporalRuntimeProfile parse(String value)` | public | Interpreta input testuale o grezzo e lo trasforma in un valore usabile dal codice. |
+| `public static boolean isSupported(String value)` | public | Risponde con true/false alla domanda `is supported`. |
+
+**Problematiche aperte**
+
+- La scelta tra `OBSERVED_RUNTIME` e `CONFIGURED_RUNTIME` cambia il significato sperimentale dei tempi; non mescolare risultati ottenuti con profili diversi.
+
 ### `TemporalWindowConfig`
 
 - File: `src/config/window/TemporalWindowConfig.java:14`
@@ -926,7 +973,7 @@ Configurazione del gestore temporale del MA-GA. Contiene soglie di dinamicità, 
 
 **Relazione con la formalizzazione**
 
-Realizza i limiti DeltaT_min, DeltaT_max e la scelta della finestra temporale.
+Realizza i limiti `DeltaT_min`, `DeltaT_max` e la scelta della finestra temporale.
 
 **Con chi comunica**
 
@@ -996,11 +1043,373 @@ Campi dichiarati principali:
 | `private static void validatePositive(String fieldName, double value)` | private | Controlla la correttezza di `validate positive` e solleva un'eccezione se trova dati incoerenti. |
 | `private static void validateFiniteAndNonNegative(String fieldName, double value)` | private | Controlla la correttezza di `validate finite and non negative` e solleva un'eccezione se trova dati incoerenti. |
 | `private static void validateRate(String fieldName, double value)` | private | Controlla la correttezza di `validate rate` e solleva un'eccezione se trova dati incoerenti. |
-| `public String toString()` | public | Converte l'oggetto o i dati in `to string`. |
+| `public String toString()` | public | Converte l'oggetto in una stringa utile per debug e report. |
 
 **Problematiche aperte**
 
-- La configurazione default usa 0.1s come stima GA: simulazione astratta, non runtime operativo reale.
+- `defaultConfig()` resta il profilo configurato/astratto; il main usa di default `OBSERVED_RUNTIME`. Nei report va dichiarato sempre quale profilo e' stato usato.
+
+## Package `ga.constraints`
+
+Contiene valutatori e cataloghi usati dal repair per trattare deadline e sostenibilita' mobility-aware in modo esplicito.
+
+### `DeadlineConstraintEvaluator`
+
+- File: `src/ga/constraints/DeadlineConstraintEvaluator.java:23`
+- Tipo: `class`
+- Nome completo: `ga.constraints.DeadlineConstraintEvaluator`
+
+**Cosa fa, in parole semplici**
+
+Valuta il vincolo di deadline del singolo task usando lo stesso modello temporale impiegato dalla fitness. Questa classe non sceglie autonomamente il nodo migliore e non sostituisce il GA. Espone soltanto una valutazione coerente e riutilizzabile dal repair. Valuta in modo riutilizzabile se un gene rispetta deadline e sostenibilita' mobility-aware.
+
+**Relazione con la formalizzazione**
+
+Rafforza il trattamento dei vincoli di deadline e copertura durante il repair, senza aggiungere nuove variabili decisionali.
+
+**Con chi comunica**
+
+Comunica direttamente con: `CoverageEstimator`, `Gene`, `MobilityConfig`, `NodeCandidate`, `NodeType`, `OffloadingTimeBreakdown`, `OffloadingTimeModel`, `SystemSnapshot`, `TaskInstance`, `VehicleSnapshot`.
+In pratica questa classe riceve questi oggetti, li costruisce oppure li passa allo step successivo del flusso.
+
+**Campi o valori importanti**
+
+Campi dichiarati principali:
+- `private static final double EPSILON = 1.0E-9`
+- `private final CoverageEstimator coverageEstimator`
+- `private final OffloadingTimeModel offloadingTimeModel`
+
+**Metodi**
+
+| Metodo | Visibilita' | Spiegazione semplice |
+|---|---:|---|
+| `public DeadlineConstraintEvaluator()` | public | Costruttore: crea l'oggetto e controlla che i dati necessari siano validi. |
+| `public DeadlineConstraintEvaluator(MobilityConfig mobilityConfig)` | public | Costruttore: crea l'oggetto e controlla che i dati necessari siano validi. |
+| `public DeadlineConstraintEvaluator( CoverageEstimator coverageEstimator, OffloadingTimeModel offloadingTimeModel )` | public | Costruttore: crea l'oggetto e controlla che i dati necessari siano validi. |
+| `public DeadlineEvaluation evaluate( Gene gene, TaskInstance task, SystemSnapshot snapshot )` | public | Adapter compatibile con i chiamanti precedenti. |
+| `public DeadlineEvaluation evaluate( Gene gene, TaskInstance task, SnapshotRepairContext context )` | public | Valuta un gene usando gli indici e la cache di copertura dello snapshot. Questo overload evita scansioni lineari ripetute durante il ciclo evolutivo. La semantica del vincolo resta invariata. |
+| `private boolean isRemoteCoverageSufficient( SnapshotRepairContext context, TaskInstance task, NodeCandidate candidate, double completionTimeSeconds )` | private | Risponde con true/false alla domanda `is remote coverage sufficient`. |
+| `private boolean isStrictlyPositive(double value)` | private | Risponde con true/false alla domanda `is strictly positive`. |
+
+**Problematiche aperte**
+
+- Valuta il singolo gene rispetto a deadline e copertura; non dimostra la fattibilita' globale di tutto il cromosoma.
+
+### `DeadlineEvaluation`
+
+- File: `src/ga/constraints/DeadlineEvaluation.java:17`
+- Tipo: `class`
+- Nome completo: `ga.constraints.DeadlineEvaluation`
+
+**Cosa fa, in parole semplici**
+
+Risultato della valutazione temporale di un gene rispetto alla deadline. La valutazione separa due condizioni: rispetto della deadline del task; sostenibilità mobility-aware della scelta remota. Una scelta è ammissibile per il repair ordinario soltanto quando entrambe le condizioni sono rispettate. Il valore di lateness viene usato nella sola modalità degradata best-effort per confrontare alternative tardive. Separa validita', rispetto deadline, sostenibilita' mobilita' e lateness.
+
+**Relazione con la formalizzazione**
+
+Rafforza il trattamento dei vincoli di deadline e copertura durante il repair, senza aggiungere nuove variabili decisionali.
+
+**Con chi comunica**
+
+Comunica principalmente con classi dello stesso package o con il chiamante diretto.
+
+**Campi o valori importanti**
+
+Campi dichiarati principali:
+- `private final double completionTimeSeconds`
+- `private final double deadlineSeconds`
+- `private final double latenessSeconds`
+- `private final boolean deadlineRespected`
+- `private final boolean mobilitySustainable`
+- `private final boolean valid`
+
+**Metodi**
+
+| Metodo | Visibilita' | Spiegazione semplice |
+|---|---:|---|
+| `private DeadlineEvaluation( double completionTimeSeconds, double deadlineSeconds, double latenessSeconds, boolean deadlineRespected, boolean mobilitySustainable, boolean valid )` | private | Costruttore: crea l'oggetto e controlla che i dati necessari siano validi. |
+| `public static DeadlineEvaluation valid( double completionTimeSeconds, double deadlineSeconds, boolean deadlineRespected, boolean mobilitySustainable )` | public | Metodo di supporto: realizza il passo `valid` dentro la responsabilita' della classe. |
+| `public static DeadlineEvaluation invalid(double deadlineSeconds)` | public | Metodo di supporto: realizza il passo `invalid` dentro la responsabilita' della classe. |
+| `public double getCompletionTimeSeconds()` | public | Restituisce il valore di `CompletionTimeSeconds` senza modificarlo. |
+| `public double getDeadlineSeconds()` | public | Restituisce il valore di `DeadlineSeconds` senza modificarlo. |
+| `public double getLatenessSeconds()` | public | Restituisce il valore di `LatenessSeconds` senza modificarlo. |
+| `public boolean isDeadlineRespected()` | public | Risponde con true/false alla domanda `is deadline respected`. |
+| `public boolean isMobilitySustainable()` | public | Risponde con true/false alla domanda `is mobility sustainable`. |
+| `public boolean isValid()` | public | Risponde con true/false alla domanda `is valid`. |
+| `public boolean isAdmissible()` | public | Restituisce true soltanto per una scelta utilizzabile dal repair ordinario. |
+
+**Problematiche aperte**
+
+- La lateness serve al best-effort, ma non certifica che il task sia matematicamente irrecuperabile.
+
+### `DeadlineRepairCatalog`
+
+- File: `src/ga/constraints/DeadlineRepairCatalog.java:32`
+- Tipo: `class`
+- Nome completo: `ga.constraints.DeadlineRepairCatalog`
+
+**Cosa fa, in parole semplici**
+
+Catalogo lazy dei profili deadline-aware riutilizzabili nello snapshot. Il catalogo non decide la strategia globale e non sostituisce il GA. Memorizza soltanto risultati deterministici del repair per una combinazione task-candidato-quota già esplorata: profilo a capacità massima, valutazione temporale e minima scala comune di CPU e banda ammissibile. Le quote vengono ancora esplorate dalla policy limitata del repair. La cache evita di ricalcolare le stesse formule durante figli e generazioni successive dello stesso snapshot. Memorizza profili deadline-aware per evitare ricalcoli durante il repair dello stesso snapshot.
+
+**Relazione con la formalizzazione**
+
+Rafforza il trattamento dei vincoli di deadline e copertura durante il repair, senza aggiungere nuove variabili decisionali.
+
+**Con chi comunica**
+
+Comunica direttamente con: `CoverageEstimator`, `Gene`, `NodeCandidate`, `NodeType`, `OffloadingRatioPolicy`, `OffloadingTimeModel`, `TaskInstance`, `VehicleSnapshot`.
+In pratica questa classe riceve questi oggetti, li costruisce oppure li passa allo step successivo del flusso.
+
+**Campi o valori importanti**
+
+Campi dichiarati principali:
+- `private static final double EPSILON = 1.0E-9`
+- `private static final double MIN_REMOTE_OFFLOADING_RATIO = 0.05`
+- `private static final double MIN_RESOURCE_FRACTION = 0.05`
+- `private final SnapshotRepairContext context`
+- `private final CoverageEstimator coverageEstimator`
+- `private final OffloadingTimeModel offloadingTimeModel`
+- `private final OffloadingRatioPolicy offloadingRatioPolicy`
+- `private final DeadlineConstraintEvaluator deadlineConstraintEvaluator`
+- `private final Map<TaskCandidateKey, List<Double>> baseRatiosByTaskAndCandidate`
+- `private final Map<ProfileKey, DeadlineRepairProfile> profileByKey`
+
+**Metodi**
+
+| Metodo | Visibilita' | Spiegazione semplice |
+|---|---:|---|
+| `public DeadlineRepairCatalog( SnapshotRepairContext context, CoverageEstimator coverageEstimator, OffloadingTimeModel offloadingTimeModel, OffloadingRatioPolicy offloadingRatioPolicy, DeadlineConstraintEvaluator deadlineConstraintEvaluator )` | public | Costruttore: crea l'oggetto e controlla che i dati necessari siano validi. |
+| `public SnapshotRepairContext getContext()` | public | Restituisce il valore di `Context` senza modificarlo. |
+| `public List<Double> buildRatioCandidates( TaskInstance task, NodeCandidate candidate, VehicleSnapshot sourceVehicle, double preferredRatio )` | public | Restituisce le quote considerate dal repair mantenendo lo stesso ordine della policy precedente: quota preferita, quota bilanciata e griglia. |
+| `public DeadlineRepairProfile getProfile( TaskInstance task, NodeCandidate candidate, VehicleSnapshot sourceVehicle, double ratio )` | public | Restituisce il profilo precalcolato o lo calcola al primo utilizzo. |
+| `private List<Double> baseRatios( TaskInstance task, NodeCandidate candidate, VehicleSnapshot sourceVehicle )` | private | Metodo di supporto: realizza il passo `base ratios` dentro la responsabilita' della classe. |
+| `private List<Double> computeBaseRatios( TaskInstance task, NodeCandidate candidate, VehicleSnapshot sourceVehicle )` | private | Calcola `compute base ratios` a partire dai dati ricevuti. |
+| `private DeadlineRepairProfile computeProfile( TaskInstance task, NodeCandidate candidate, VehicleSnapshot sourceVehicle, double ratio )` | private | Calcola `compute profile` a partire dai dati ricevuti. |
+| `private Gene findMinimalFeasibleResourceScale( TaskInstance task, NodeCandidate candidate, VehicleSnapshot sourceVehicle, double ratio, Gene maxCapacityGene, DeadlineEvaluation maxCapacityEvaluation )` | private | Calcola la minima scala comune di CPU e banda che rende ammissibile una scelta remota per una quota data. T_remote(q) = [p * input / Bmax + p * cycles / Fmax + output / Bmax] / q + tau_n Il calcolo è equivalente alla ricerca binaria rimossa nel livello 1, ma viene memorizzato e riutilizzato nello snapshot corrente. |
+| `private double estimateRemoteTemporalLimitSeconds( TaskInstance task, NodeCandidate candidate )` | private | Stima `estimate remote temporal limit seconds` senza modificare lo stato principale. |
+| `private Gene createScaledRemoteGene( TaskInstance task, NodeCandidate candidate, double ratio, double resourceScale )` | private | Crea `create scaled remote gene` come nuovo oggetto o nuova struttura dati. |
+| `private double clampRemoteRatio(double ratio)` | private | Limita un valore dentro un intervallo ammesso. |
+| `private double safeDivide(double numerator, double denominator)` | private | Esegue un'operazione protetta per evitare valori non finiti o divisioni non valide. |
+| `private boolean isStrictlyPositive(double value)` | private | Risponde con true/false alla domanda `is strictly positive`. |
+| `private double clamp(double value, double min, double max)` | private | Limita un valore dentro un intervallo ammesso. |
+
+**Problematiche aperte**
+
+- Esplora una griglia limitata di quote e profili; e' un repair deterministico/cache, non un secondo ottimizzatore completo.
+
+### `DeadlineRepairProfile` (tipo interno di `DeadlineRepairCatalog`)
+
+- File: `src/ga/constraints/DeadlineRepairCatalog.java:336`
+- Tipo: `class`
+- Nome completo: `ga.constraints.DeadlineRepairCatalog.DeadlineRepairProfile`
+
+**Cosa fa, in parole semplici**
+
+Profilo memorizzato per una combinazione task-candidato-quota.
+
+**Relazione con la formalizzazione**
+
+Rafforza il trattamento dei vincoli di deadline e copertura durante il repair, senza aggiungere nuove variabili decisionali.
+
+**Con chi comunica**
+
+Comunica direttamente con: `CoverageEstimator`, `Gene`, `NodeCandidate`, `NodeType`, `OffloadingRatioPolicy`, `OffloadingTimeModel`, `TaskInstance`, `VehicleSnapshot`.
+In pratica questa classe riceve questi oggetti, li costruisce oppure li passa allo step successivo del flusso.
+
+**Campi o valori importanti**
+
+Campi dichiarati principali:
+- `private final Gene minimalFeasibleGene`
+- `private final Gene maxCapacityGene`
+- `private final DeadlineEvaluation maxCapacityEvaluation`
+
+**Metodi**
+
+| Metodo | Visibilita' | Spiegazione semplice |
+|---|---:|---|
+| `private DeadlineRepairProfile( Gene minimalFeasibleGene, Gene maxCapacityGene, DeadlineEvaluation maxCapacityEvaluation )` | private | Costruttore: crea l'oggetto e controlla che i dati necessari siano validi. |
+| `public Gene getMinimalFeasibleGene()` | public | Restituisce il valore di `MinimalFeasibleGene` senza modificarlo. |
+| `public Gene getMaxCapacityGene()` | public | Restituisce il valore di `MaxCapacityGene` senza modificarlo. |
+| `public DeadlineEvaluation getMaxCapacityEvaluation()` | public | Restituisce il valore di `MaxCapacityEvaluation` senza modificarlo. |
+
+**Problematiche aperte**
+
+Nessuna specifica nota per questa classe.
+
+### `TaskCandidateKey` (tipo interno di `DeadlineRepairCatalog`)
+
+- File: `src/ga/constraints/DeadlineRepairCatalog.java:364`
+- Tipo: `class`
+- Nome completo: `ga.constraints.DeadlineRepairCatalog.TaskCandidateKey`
+
+**Cosa fa, in parole semplici**
+
+Classe di supporto del progetto MA-GA.
+
+**Relazione con la formalizzazione**
+
+Rafforza il trattamento dei vincoli di deadline e copertura durante il repair, senza aggiungere nuove variabili decisionali.
+
+**Con chi comunica**
+
+Comunica direttamente con: `CoverageEstimator`, `Gene`, `NodeCandidate`, `NodeType`, `OffloadingRatioPolicy`, `OffloadingTimeModel`, `TaskInstance`, `VehicleSnapshot`.
+In pratica questa classe riceve questi oggetti, li costruisce oppure li passa allo step successivo del flusso.
+
+**Campi o valori importanti**
+
+Campi dichiarati principali:
+- `private final String taskId`
+- `private final String candidateId`
+
+**Metodi**
+
+| Metodo | Visibilita' | Spiegazione semplice |
+|---|---:|---|
+| `private TaskCandidateKey(String taskId, String candidateId)` | private | Costruttore: crea l'oggetto e controlla che i dati necessari siano validi. |
+| `public boolean equals(Object other)` | public | Implementa confronto e hashing per usare l'oggetto in mappe o set. |
+| `public int hashCode()` | public | Risponde con true/false alla domanda `hash code`. |
+
+**Problematiche aperte**
+
+Nessuna specifica nota per questa classe.
+
+### `ProfileKey` (tipo interno di `DeadlineRepairCatalog`)
+
+- File: `src/ga/constraints/DeadlineRepairCatalog.java:392`
+- Tipo: `class`
+- Nome completo: `ga.constraints.DeadlineRepairCatalog.ProfileKey`
+
+**Cosa fa, in parole semplici**
+
+Classe di supporto del progetto MA-GA.
+
+**Relazione con la formalizzazione**
+
+Rafforza il trattamento dei vincoli di deadline e copertura durante il repair, senza aggiungere nuove variabili decisionali.
+
+**Con chi comunica**
+
+Comunica direttamente con: `CoverageEstimator`, `Gene`, `NodeCandidate`, `NodeType`, `OffloadingRatioPolicy`, `OffloadingTimeModel`, `TaskInstance`, `VehicleSnapshot`.
+In pratica questa classe riceve questi oggetti, li costruisce oppure li passa allo step successivo del flusso.
+
+**Campi o valori importanti**
+
+Campi dichiarati principali:
+- `private final String taskId`
+- `private final String candidateId`
+- `private final long ratioBits`
+
+**Metodi**
+
+| Metodo | Visibilita' | Spiegazione semplice |
+|---|---:|---|
+| `private ProfileKey(String taskId, String candidateId, double ratio)` | private | Costruttore: crea l'oggetto e controlla che i dati necessari siano validi. |
+| `public boolean equals(Object other)` | public | Implementa confronto e hashing per usare l'oggetto in mappe o set. |
+| `public int hashCode()` | public | Risponde con true/false alla domanda `hash code`. |
+
+**Problematiche aperte**
+
+Nessuna specifica nota per questa classe.
+
+### `SnapshotRepairContext`
+
+- File: `src/ga/constraints/SnapshotRepairContext.java:28`
+- Tipo: `class`
+- Nome completo: `ga.constraints.SnapshotRepairContext`
+
+**Cosa fa, in parole semplici**
+
+Indici e cache riutilizzabili durante il repair di uno stesso snapshot. Durante una singola esecuzione del GA lo snapshot resta invariato. Questa classe evita quindi di scandire ripetutamente le liste di task, veicoli e candidati per ogni gene, figlio e generazione. Il contesto non introduce nuove decisioni e non modifica la formalizzazione: indicizza soltanto dati già osservati nello snapshot. Indicizza lo snapshot e mette in cache la copertura per repair e deadline evaluator.
+
+**Relazione con la formalizzazione**
+
+Rafforza il trattamento dei vincoli di deadline e copertura durante il repair, senza aggiungere nuove variabili decisionali.
+
+**Con chi comunica**
+
+Comunica direttamente con: `CoverageEstimator`, `NodeCandidate`, `NodeType`, `SystemSnapshot`, `TaskInstance`, `VehicleSnapshot`.
+In pratica questa classe riceve questi oggetti, li costruisce oppure li passa allo step successivo del flusso.
+
+**Campi o valori importanti**
+
+Campi dichiarati principali:
+- `private final SystemSnapshot snapshot`
+- `private final List<TaskInstance> tasks`
+- `private final Map<String, TaskInstance> taskById`
+- `private final Map<String, VehicleSnapshot> vehicleById`
+- `private final Map<String, NodeCandidate> candidateById`
+- `private final Map<String, List<NodeCandidate>> candidatesBySourceVehicleId`
+- `private final Map<String, NodeCandidate> localCandidateBySourceVehicleId`
+- `private final Map<String, Double> availableCpuByExecutionNodeId`
+- `private final Map<CoverageKey, Double> coverageTimeByTaskAndCandidate`
+
+**Metodi**
+
+| Metodo | Visibilita' | Spiegazione semplice |
+|---|---:|---|
+| `public SnapshotRepairContext(SystemSnapshot snapshot)` | public | Costruttore: crea l'oggetto e controlla che i dati necessari siano validi. |
+| `public boolean isFor(SystemSnapshot candidateSnapshot)` | public | Risponde con true/false alla domanda `is for`. |
+| `public SystemSnapshot getSnapshot()` | public | Restituisce il valore di `Snapshot` senza modificarlo. |
+| `public List<TaskInstance> getTasks()` | public | Restituisce il valore di `Tasks` senza modificarlo. |
+| `public TaskInstance getTaskById(String taskId)` | public | Restituisce il valore di `TaskById` senza modificarlo. |
+| `public VehicleSnapshot getVehicleById(String vehicleId)` | public | Restituisce il valore di `VehicleById` senza modificarlo. |
+| `public NodeCandidate getCandidateById(String candidateId)` | public | Restituisce il valore di `CandidateById` senza modificarlo. |
+| `public List<NodeCandidate> getCandidatesForSourceVehicle(String sourceVehicleId)` | public | Restituisce il valore di `CandidatesForSourceVehicle` senza modificarlo. |
+| `public List<NodeCandidate> getCandidatesForTask(TaskInstance task)` | public | Restituisce il valore di `CandidatesForTask` senza modificarlo. |
+| `public NodeCandidate getLocalCandidateForTask(TaskInstance task)` | public | Restituisce il valore di `LocalCandidateForTask` senza modificarlo. |
+| `public Map<String, Double> getAvailableCpuByExecutionNodeId()` | public | Restituisce il valore di `AvailableCpuByExecutionNodeId` senza modificarlo. |
+| `public NodeCandidate requireLocalCandidateForTask(TaskInstance task)` | public | Metodo di supporto: realizza il passo `require local candidate for task` dentro la responsabilita' della classe. |
+| `public double estimateCoverageTimeSeconds( TaskInstance task, NodeCandidate candidate, CoverageEstimator coverageEstimator )` | public | Restituisce il tempo di copertura, calcolandolo una sola volta per coppia task-candidato nello snapshot corrente. |
+| `private double computeCoverageTimeSeconds( TaskInstance task, NodeCandidate candidate, CoverageEstimator coverageEstimator )` | private | Calcola `compute coverage time seconds` a partire dai dati ricevuti. |
+| `private Map<String, TaskInstance> indexTasks(List<TaskInstance> source)` | private | Prepara una mappa di lookup per trovare rapidamente gli oggetti. |
+| `private Map<String, VehicleSnapshot> indexVehicles(List<VehicleSnapshot> source)` | private | Prepara una mappa di lookup per trovare rapidamente gli oggetti. |
+| `private Map<String, NodeCandidate> indexCandidates(List<NodeCandidate> source)` | private | Prepara una mappa di lookup per trovare rapidamente gli oggetti. |
+| `private Map<String, List<NodeCandidate>> indexCandidatesBySourceVehicle( List<NodeCandidate> source )` | private | Prepara una mappa di lookup per trovare rapidamente gli oggetti. |
+| `private Map<String, Double> indexAvailableCpuByExecutionNode( List<NodeCandidate> source )` | private | Prepara una mappa di lookup per trovare rapidamente gli oggetti. |
+| `private Map<String, NodeCandidate> indexLocalCandidates(List<NodeCandidate> source)` | private | Prepara una mappa di lookup per trovare rapidamente gli oggetti. |
+| `private <T> List<T> immutableCopy(List<T> source)` | private | Metodo di supporto: realizza il passo `immutable copy` dentro la responsabilita' della classe. |
+
+**Problematiche aperte**
+
+- La cache e' valida solo per lo snapshot corrente; non va riusata tra snapshot diversi.
+
+### `CoverageKey` (tipo interno di `SnapshotRepairContext`)
+
+- File: `src/ga/constraints/SnapshotRepairContext.java:242`
+- Tipo: `class`
+- Nome completo: `ga.constraints.SnapshotRepairContext.CoverageKey`
+
+**Cosa fa, in parole semplici**
+
+Classe di supporto del progetto MA-GA.
+
+**Relazione con la formalizzazione**
+
+Rafforza il trattamento dei vincoli di deadline e copertura durante il repair, senza aggiungere nuove variabili decisionali.
+
+**Con chi comunica**
+
+Comunica direttamente con: `CoverageEstimator`, `NodeCandidate`, `NodeType`, `SystemSnapshot`, `TaskInstance`, `VehicleSnapshot`.
+In pratica questa classe riceve questi oggetti, li costruisce oppure li passa allo step successivo del flusso.
+
+**Campi o valori importanti**
+
+Campi dichiarati principali:
+- `private final String taskId`
+- `private final String candidateId`
+
+**Metodi**
+
+| Metodo | Visibilita' | Spiegazione semplice |
+|---|---:|---|
+| `private CoverageKey(String taskId, String candidateId)` | private | Costruttore: crea l'oggetto e controlla che i dati necessari siano validi. |
+| `public boolean equals(Object other)` | public | Implementa confronto e hashing per usare l'oggetto in mappe o set. |
+| `public int hashCode()` | public | Risponde con true/false alla domanda `hash code`. |
+
+**Problematiche aperte**
+
+Nessuna specifica nota per questa classe.
 
 ## Package `ga.core`
 
@@ -1049,13 +1458,13 @@ Nessuna specifica nota per questa classe.
 
 ### `MaGaOptimizer`
 
-- File: `src/ga/core/MaGaOptimizer.java:35`
+- File: `src/ga/core/MaGaOptimizer.java:36`
 - Tipo: `class`
 - Nome completo: `ga.core.MaGaOptimizer`
 
 **Cosa fa, in parole semplici**
 
-Orchestratore principale del MA-GA sul singolo snapshot. Il MA-GA resta snapshot-based: ogni esecuzione riceve uno `SystemSnapshot`, prepara una popolazione coerente con quello snapshot, evolve i cromosomi e restituisce sia la soluzione migliore sia il breakdown diagnostico della popolazione finale. La scelta tra cold start, warm start e partial restart non appartiene a questa classe. Il package `window` decide la strategia temporale e passa qui l'eventuale popolazione iniziale. Coordina il ciclo genetico su uno snapshot.
+Orchestratore principale del MA-GA sul singolo snapshot. Il MA-GA resta snapshot-based: ogni esecuzione riceve uno `SystemSnapshot`, prepara una popolazione coerente con quello snapshot, evolve i cromosomi e restituisce sia la soluzione migliore sia il breakdown diagnostico della popolazione finale. La scelta tra cold start, warm start e partial restart non appartiene a questa classe. Il package `window` decide la strategia temporale e passa qui l'eventuale popolazione iniziale. Coordina il ciclo genetico su uno snapshot e usa repair incrementale durante le generazioni.
 
 **Relazione con la formalizzazione**
 
@@ -1063,7 +1472,7 @@ Supporta la traduzione pratica della formalizzazione in codice.
 
 **Con chi comunica**
 
-Comunica direttamente con: `Chromosome`, `CrossoverOperator`, `ElitismOperator`, `EvaluationBreakdown`, `FitnessEvaluator`, `GeneticAlgorithmConfig`, `MaGaConfig`, `MobilityConfig`, `MutationOperator`, `PopulationInitializer`, `RepairOperator`, `SelectionOperator`, `SystemSnapshot`.
+Comunica direttamente con: `Chromosome`, `CrossoverOperator`, `ElitismOperator`, `EvaluationBreakdown`, `FitnessEvaluator`, `GeneticAlgorithmConfig`, `MaGaConfig`, `MobilityConfig`, `MutationOperator`, `MutationResult`, `PopulationInitializer`, `RepairOperator`, `SelectionOperator`, `SystemSnapshot`.
 In pratica questa classe riceve questi oggetti, li costruisce oppure li passa allo step successivo del flusso.
 
 **Campi o valori importanti**
@@ -1086,18 +1495,18 @@ Campi dichiarati principali:
 | Metodo | Visibilita' | Spiegazione semplice |
 |---|---:|---|
 | `public MaGaOptimizer(MaGaConfig config)` | public | Costruttore: crea l'oggetto e controlla che i dati necessari siano validi. |
-| `public Chromosome optimize(SystemSnapshot snapshot)` | public | Esegue il MA-GA partendo da popolazione generata internamente. API di compatibilità per i chiamanti che richiedono solo il miglior cromosoma. Internamente usa il percorso dettagliato. |
-| `public MobilityConfig getMobilityConfig()` | public | Restituisce la configurazione di mobilita usata da repair e fitness. |
+| `public Chromosome optimize(SystemSnapshot snapshot)` | public | Esegue il MA-GA partendo da popolazione generata internamente. |
+| `public MobilityConfig getMobilityConfig()` | public | Restituisce la configurazione di mobilità usata da repair e fitness. |
 | `public Chromosome optimize( SystemSnapshot snapshot, List<Chromosome> initialPopulation )` | public | Esegue il MA-GA partendo da una popolazione iniziale esterna. |
-| `public MaGaResult optimizeDetailed(SystemSnapshot snapshot)` | public | Esegue il MA-GA e restituisce il risultato completo. API di compatibilità per esecuzioni senza popolazione iniziale esterna. |
-| `public MaGaResult optimizeDetailed( SystemSnapshot snapshot, List<Chromosome> initialPopulation )` | public | Esegue il MA-GA e restituisce un risultato completo. Fasi principali: risolve la configurazione GA effettiva per lo snapshot; prepara o ripara la popolazione iniziale; evolve la popolazione con elitismo, selezione, crossover, mutazione e repair; valuta il miglior cromosoma e conserva una popolazione finale riutilizzabile dalle finestre temporali successive. |
+| `public MaGaResult optimizeDetailed(SystemSnapshot snapshot)` | public | Esegue il MA-GA e restituisce il risultato completo. |
+| `public MaGaResult optimizeDetailed( SystemSnapshot snapshot, List<Chromosome> initialPopulation )` | public | Esegue il MA-GA e restituisce un risultato completo. Durante le generazioni interne dello stesso snapshot usa il repair incrementale. La mutazione espone i task realmente modificati; il repair rivaluta solo quei geni ma mantiene sempre il controllo CPU aggregato globale, necessario anche dopo il crossover. |
 | `private List<Chromosome> prepareInitialPopulation( SystemSnapshot snapshot, List<Chromosome> initialPopulation )` | private | Metodo di supporto: realizza il passo `prepare initial population` dentro la responsabilita' della classe. |
-| `private List<Chromosome> prepareFinalPopulationForResult( List<Chromosome> population, Chromosome bestOverall )` | private | Prepara la popolazione finale da conservare in MaGaResult. Il miglior cromosoma globale viene reinserito esplicitamente prima del taglio alla dimensione target, perché potrebbe essere stato trovato in una generazione precedente e non appartenere più alla popolazione corrente. |
+| `private List<Chromosome> prepareFinalPopulationForResult( List<Chromosome> population, Chromosome bestOverall )` | private | Prepara la popolazione finale riutilizzabile dalle finestre successive. |
 | `private boolean shouldApplyCrossover()` | private | Risponde con true/false alla domanda `should apply crossover`. |
-| `private void evaluatePopulation( List<Chromosome> population, SystemSnapshot snapshot )` | private | Metodo di supporto: realizza il passo `evaluate population` dentro la responsabilita' della classe. |
+| `private void evaluatePopulation( List<Chromosome> population, SystemSnapshot snapshot )` | private | Valuta `evaluate population` e restituisce un risultato o un breakdown. |
 | `private Chromosome findBest(List<Chromosome> population)` | private | Cerca `find best` nelle collezioni o nello stato corrente. |
-| `private boolean hasImproved( Chromosome candidate, Chromosome currentBest )` | private | Risponde con true/false alla domanda `has improved`. |
-| `private Chromosome copyChromosome(Chromosome source)` | private | Metodo di supporto: realizza il passo `copy chromosome` dentro la responsabilita' della classe. |
+| `private boolean hasImproved(Chromosome candidate, Chromosome currentBest)` | private | Risponde con true/false alla domanda `has improved`. |
+| `private Chromosome copyChromosome(Chromosome source)` | private | Crea una copia per evitare di modificare direttamente l'oggetto originale. |
 | `private GenerationStat computeGenerationStat( int generationIndex, List<Chromosome> population )` | private | Calcola `compute generation stat` a partire dai dati ricevuti. |
 | `private void validateSnapshot(SystemSnapshot snapshot)` | private | Controlla la correttezza di `validate snapshot` e solleva un'eccezione se trova dati incoerenti. |
 
@@ -1226,21 +1635,21 @@ Nessuna specifica nota per questa classe.
 
 ### `FitnessEvaluator`
 
-- File: `src/ga/fitness/FitnessEvaluator.java:45`
+- File: `src/ga/fitness/FitnessEvaluator.java:52`
 - Tipo: `class`
 - Nome completo: `ga.fitness.FitnessEvaluator`
 
 **Cosa fa, in parole semplici**
 
-Valuta un cromosoma MA-GA rispetto a uno snapshot del sistema. La valutazione combina quattro famiglie di costo: tempo massimo di completamento dei task; latenza media di comunicazione; rischio mobility-aware legato alla copertura; penalità di vincolo e sovrauso risorse. Il tempo di copertura viene calcolato tramite `CoverageEstimator`, così il modello non dipende da un valore precomputato dentro `NodeCandidate`. Implementa la fitness J(C) e produce breakdown diagnostici.
+Valuta un cromosoma MA-GA rispetto a uno snapshot del sistema. La valutazione combina quattro famiglie di costo: tempo massimo di completamento dei task; latenza comunicativa complessivamente introdotta dalle decisioni remote; rischio mobility-aware legato alla copertura e alla stabilità del link; penalità di vincolo e sovrauso risorse. Il tempo di copertura e l'instabilità del collegamento vengono calcolati tramite `CoverageEstimator`, così il modello non dipende da valori precomputati dentro `NodeCandidate`. Il vincolo di deadline mantiene la penalità proporzionale già usata nel breakdown, ma introduce anche una penalità rigida indipendente dai pesi configurabili. In questo modo un cromosoma tardivo non può essere preferito a un cromosoma ammissibile soltanto perché `wR` è basso o nullo. Implementa `J(C)`, ora con latenza sommata, breakdown di mobilita' e penalita' hard per deadline violate.
 
 **Relazione con la formalizzazione**
 
-Realizza la funzione obiettivo J(C) con pesi, normalizzazione e penalita'.
+Realizza la funzione obiettivo `J(C)` con pesi, normalizzazione e penalita'.
 
 **Con chi comunica**
 
-Comunica direttamente con: `Chromosome`, `CoverageEstimator`, `EvaluationBreakdown`, `ExecutionNodeResourceUsageBreakdown`, `FitnessWeights`, `Gene`, `GeneEvaluationBreakdown`, `LinkBandwidthUsageBreakdown`, `LocalResourceUsageBreakdown`, `MaGaConfig`, `NodeCandidate`, `NodeType`, `NormalizationConfig`, `OffloadingTimeBreakdown`, ... altri 5.
+Comunica direttamente con: `Chromosome`, `CoverageEstimator`, `EvaluationBreakdown`, `ExecutionNodeResourceUsageBreakdown`, `FitnessWeights`, `Gene`, `GeneEvaluationBreakdown`, `LinkBandwidthUsageBreakdown`, `LocalResourceUsageBreakdown`, `MaGaConfig`, `MobilityLinkMetrics`, `MobilityPenaltyBreakdown`, `NodeCandidate`, `NodeType`, `NormalizationConfig`, `OffloadingTimeBreakdown`, ... altri 5.
 In pratica questa classe riceve questi oggetti, li costruisce oppure li passa allo step successivo del flusso.
 
 **Campi o valori importanti**
@@ -1248,6 +1657,7 @@ In pratica questa classe riceve questi oggetti, li costruisce oppure li passa al
 Campi dichiarati principali:
 - `private static final double EPSILON = 1.0E-9`
 - `private static final double INVALID_SOLUTION_PENALTY = 1.0E9`
+- `private static final double HARD_DEADLINE_VIOLATION_PENALTY = 1.0E12`
 - `private final MaGaConfig config`
 - `private final CoverageEstimator coverageEstimator`
 - `private final OffloadingTimeModel offloadingTimeModel`
@@ -1256,17 +1666,18 @@ Campi dichiarati principali:
 
 | Metodo | Visibilita' | Spiegazione semplice |
 |---|---:|---|
-| `public FitnessEvaluator(MaGaConfig config)` | public | Costruisce il valutatore usando la configurazione MA-GA. @param config configurazione complessiva del MA-GA |
-| `public FitnessEvaluator( MaGaConfig config, CoverageEstimator coverageEstimator )` | public | Costruisce il valutatore usando uno stimatore di copertura esplicito. @param config configurazione complessiva del MA-GA @param coverageEstimator stimatore del tempo di copertura |
-| `public double evaluate( Chromosome chromosome, SystemSnapshot snapshot )` | public | Calcola solo il valore scalare della fitness. @param chromosome cromosoma da valutare @param snapshot snapshot corrente @return valore finale della fitness |
-| `public EvaluationBreakdown evaluateDetailed( Chromosome chromosome, SystemSnapshot snapshot )` | public | Calcola la valutazione dettagliata di un cromosoma. Il breakdown restituito è usato dai report diagnostici, dal riuso della popolazione e dai test manuali per capire quali vincoli hanno pesato sulla soluzione. @param chromosome cromosoma da valutare @param snapshot snapshot corrente @return breakdown completo della valutazione |
-| `private GeneEvaluationBreakdown evaluateGene( SystemSnapshot snapshot, TaskInstance task, Gene gene, NodeCandidate candidate, VehicleSnapshot sourceVehicle )` | private | Valuta un singolo gene rispetto al task associato. Per candidati locali la quota remota deve essere zero. Per candidati remoti il completion time è il massimo tra ramo locale e ramo remoto, tranne nel full offloading, dove conta solo il ramo remoto. |
-| `private Map<String, ExecutionNodeResourceUsageBreakdown> initializeExecutionNodeCpuUsage(List<NodeCandidate> candidates)` | private | Inizializza l'uso CPU aggregato per nodo fisico. |
-| `private Map<String, LinkBandwidthUsageBreakdown> initializeLinkBandwidthUsage(List<NodeCandidate> candidates)` | private | Inizializza l'uso banda per candidato/link. |
-| `private Map<String, LocalResourceUsageBreakdown> initializeLocalUsage(List<VehicleSnapshot> vehicles)` | private | Inizializza il carico locale per veicolo. |
-| `private double computeResourcePenalty( Map<String, ExecutionNodeResourceUsageBreakdown> cpuUsageByExecutionNode, Map<String, LinkBandwidthUsageBreakdown> bandwidthUsageByCandidate )` | private | Calcola la penalità per superamento delle risorse. |
-| `private double computeMobilityPenalty( NodeCandidate candidate, double coverageTimeSeconds, double completionTimeSeconds, PenaltyConfig penalties )` | private | Calcola la penalità mobility-aware usando la copertura stimata. |
-| `private double computeDeadlinePenalty( double completionTimeSeconds, double deadlineSeconds, PenaltyConfig penalties )` | private | Calcola la penalità di deadline. |
+| `public FitnessEvaluator(MaGaConfig config)` | public | Costruttore: crea l'oggetto e controlla che i dati necessari siano validi. |
+| `public FitnessEvaluator( MaGaConfig config, CoverageEstimator coverageEstimator )` | public | Costruttore: crea l'oggetto e controlla che i dati necessari siano validi. |
+| `public double evaluate(Chromosome chromosome, SystemSnapshot snapshot)` | public | Valuta `evaluate` e restituisce un risultato o un breakdown. |
+| `public EvaluationBreakdown evaluateDetailed( Chromosome chromosome, SystemSnapshot snapshot )` | public | Valuta `evaluate detailed` e restituisce un risultato o un breakdown. |
+| `private GeneEvaluationBreakdown evaluateGene( SystemSnapshot snapshot, TaskInstance task, Gene gene, NodeCandidate candidate, VehicleSnapshot sourceVehicle )` | private | Valuta `evaluate gene` e restituisce un risultato o un breakdown. |
+| `private Map<String, ExecutionNodeResourceUsageBreakdown> initializeExecutionNodeCpuUsage(List<NodeCandidate> candidates)` | private | Metodo di supporto: realizza il passo `initialize execution node cpu usage` dentro la responsabilita' della classe. |
+| `private Map<String, LinkBandwidthUsageBreakdown> initializeLinkBandwidthUsage(List<NodeCandidate> candidates)` | private | Metodo di supporto: realizza il passo `initialize link bandwidth usage` dentro la responsabilita' della classe. |
+| `private Map<String, LocalResourceUsageBreakdown> initializeLocalUsage(List<VehicleSnapshot> vehicles)` | private | Metodo di supporto: realizza il passo `initialize local usage` dentro la responsabilita' della classe. |
+| `private double computeResourcePenalty( Map<String, ExecutionNodeResourceUsageBreakdown> cpuUsageByExecutionNode, Map<String, LinkBandwidthUsageBreakdown> bandwidthUsageByCandidate )` | private | Calcola `compute resource penalty` a partire dai dati ricevuti. |
+| `private MobilityPenaltyBreakdown computeMobilityPenaltyBreakdown( NodeCandidate candidate, MobilityLinkMetrics linkMetrics, double completionTimeSeconds, PenaltyConfig penalties )` | private | Calcola la penalità mobility-aware e conserva il breakdown diagnostico. |
+| `private double computeDeadlinePenalty( double completionTimeSeconds, double deadlineSeconds, PenaltyConfig penalties )` | private | Calcola `compute deadline penalty` a partire dai dati ricevuti. |
+| `private double computeHardDeadlinePenalty( List<GeneEvaluationBreakdown> geneBreakdowns )` | private | Penalità rigida applicata direttamente alla fitness. La parte costante rende ogni violazione nettamente peggiore rispetto a una strategia interamente ammissibile. La parte proporzionale mantiene un ordinamento utile anche quando tutte le alternative disponibili sono degradate. |
 | `private boolean isDeadlineRespected( double completionTimeSeconds, double deadlineSeconds )` | private | Risponde con true/false alla domanda `is deadline respected`. |
 | `private double computeCardinalityPenalty( List<TaskInstance> tasks, List<Gene> genes )` | private | Calcola `compute cardinality penalty` a partire dai dati ricevuti. |
 | `private double computeUnknownGeneTaskPenalty( Map<String, Gene> geneByTaskId, Map<String, TaskInstance> taskById )` | private | Calcola `compute unknown gene task penalty` a partire dai dati ricevuti. |
@@ -1274,21 +1685,20 @@ Campi dichiarati principali:
 | `private Map<String, VehicleSnapshot> indexVehicles( List<VehicleSnapshot> vehicles )` | private | Prepara una mappa di lookup per trovare rapidamente gli oggetti. |
 | `private Map<String, NodeCandidate> indexCandidates( List<NodeCandidate> candidates )` | private | Prepara una mappa di lookup per trovare rapidamente gli oggetti. |
 | `private Map<String, Gene> indexGenes(List<Gene> genes)` | private | Prepara una mappa di lookup per trovare rapidamente gli oggetti. |
-| `private <T> List<T> requireList( List<?> list, String name )` | private | Metodo di supporto: realizza il passo `require list` dentro la responsabilita' della classe. |
+| `private <T> List<T> requireList(List<T> list, String name)` | private | Metodo di supporto: realizza il passo `require list` dentro la responsabilita' della classe. |
 | `private boolean isStrictlyPositive(double value)` | private | Risponde con true/false alla domanda `is strictly positive`. |
-| `private double safeDivide( double numerator, double denominator )` | private | Esegue un'operazione protetta per evitare valori non finiti o divisioni non valide. |
-| `private double clamp( double value, double min, double max )` | private | Limita un valore dentro un intervallo ammesso. |
+| `private double safeDivide(double numerator, double denominator)` | private | Esegue un'operazione protetta per evitare valori non finiti o divisioni non valide. |
+| `private double clamp(double value, double min, double max)` | private | Limita un valore dentro un intervallo ammesso. |
 
 **Problematiche aperte**
 
-- La deadline e' trattata come penalita' soft, mentre nella formalizzazione e' un vincolo di ammissibilita' quando non recuperabile.
-- La componente phi_link della mobilita' esiste come peso, ma nel codice vale ancora 0.0.
-- La latenza e' usata come media sui task, mentre la formalizzazione principale la presenta come somma.
-- La banda e' penalizzata per candidateId/link, non come unico Bmax globale.
+- La deadline non e' piu' soltanto soft: esiste una penalita' hard indipendente da `wR`. Restano pero' possibili soluzioni degradate se il repair non trova alternative ammissibili.
+- La banda e' ancora penalizzata per candidato/link source-aware, non come unico vincolo globale `Bmax`.
+- La saturazione sotto il limite resta diagnostica: diventa penalita' solo oltre il limite.
 
 ## Package `ga.fitness.breakdown`
 
-Conserva i dettagli diagnostici della fitness.
+Conserva dettagli diagnostici della fitness, inclusi risorse, latenza e mobilita'.
 
 ### `EvaluationBreakdown`
 
@@ -1298,7 +1708,7 @@ Conserva i dettagli diagnostici della fitness.
 
 **Cosa fa, in parole semplici**
 
-Risultato dettagliato della valutazione di un cromosoma. Contiene la fitness finale, i contributi normalizzati e i breakdown necessari per report, debug e analisi della soluzione. Scompone il valore della fitness nelle sue componenti.
+Risultato dettagliato della valutazione di un cromosoma. Contiene la fitness finale, i contributi normalizzati e i breakdown necessari per report, debug e analisi della soluzione.
 
 **Relazione con la formalizzazione**
 
@@ -1329,7 +1739,7 @@ Campi dichiarati principali:
 
 | Metodo | Visibilita' | Spiegazione semplice |
 |---|---:|---|
-| `public EvaluationBreakdown( double fitness, double completionTimeSeconds, double communicationLatencySeconds, double mobilityPenalty, double resourcePenalty, double normalizedCompletionTime, double normalizedCommunicationLatency, double normalizedMobilityPenalty, double normalizedResourcePenalty, List<GeneEvaluationBreakdown> geneBreakdowns, List<ExecutionNodeResourceUsageBreakdown> executionNodeResourceUsageBreakdowns, List<LinkBandwidthUsageBreakdown> linkBandwidthUsageBreakdowns, List<LocalResourceUsageBreakdown> localResourceUsageBreakdowns )` | public | Crea il breakdown globale della fitness. @param fitness valore finale della fitness @param completionTimeSeconds tempo di completamento del cromosoma @param communicationLatencySeconds latenza comunicativa media @param mobilityPenalty penalità di mobilità @param resourcePenalty penalità di risorse e vincoli @param normalizedCompletionTime tempo normalizzato @param normalizedCommunicationLatency latenza normalizzata @param normalizedMobilityPenalty penalità mobilità normalizzata @param normalizedResourcePenalty penalità risorse normalizzata @param geneBreakdowns breakdown dei singoli geni @param executionNodeResourceUsageBreakdowns uso CPU per nodo fisico @param linkBandwidthUsageBreakdowns uso banda per candidato/link @param localResourceUsageBreakdowns uso locale per veicolo |
+| `public EvaluationBreakdown( double fitness, double completionTimeSeconds, double communicationLatencySeconds, double mobilityPenalty, double resourcePenalty, double normalizedCompletionTime, double normalizedCommunicationLatency, double normalizedMobilityPenalty, double normalizedResourcePenalty, List<GeneEvaluationBreakdown> geneBreakdowns, List<ExecutionNodeResourceUsageBreakdown> executionNodeResourceUsageBreakdowns, List<LinkBandwidthUsageBreakdown> linkBandwidthUsageBreakdowns, List<LocalResourceUsageBreakdown> localResourceUsageBreakdowns )` | public | Crea il breakdown globale della fitness. @param fitness valore finale della fitness @param completionTimeSeconds tempo di completamento del cromosoma @param communicationLatencySeconds latenza comunicativa totale introdotta dalla soluzione @param mobilityPenalty penalità di mobilità @param resourcePenalty penalità di risorse e vincoli @param normalizedCompletionTime tempo normalizzato @param normalizedCommunicationLatency latenza totale normalizzata @param normalizedMobilityPenalty penalità mobilità normalizzata @param normalizedResourcePenalty penalità risorse normalizzata @param geneBreakdowns breakdown dei singoli geni @param executionNodeResourceUsageBreakdowns uso CPU per nodo fisico @param linkBandwidthUsageBreakdowns uso banda per candidato/link @param localResourceUsageBreakdowns uso locale per veicolo |
 | `public double getFitness()` | public | Restituisce il valore di `Fitness` senza modificarlo. |
 | `public double getCompletionTimeSeconds()` | public | Restituisce il valore di `CompletionTimeSeconds` senza modificarlo. |
 | `public double getCommunicationLatencySeconds()` | public | Restituisce il valore di `CommunicationLatencySeconds` senza modificarlo. |
@@ -1356,7 +1766,7 @@ Nessuna specifica nota per questa classe.
 
 **Cosa fa, in parole semplici**
 
-Uso aggregato della CPU su un nodo fisico di esecuzione. Più candidati possono puntare allo stesso executionNodeId. Questa classe serve a controllare l'uso complessivo della CPU del nodo. Aggrega CPU remota per executionNodeId.
+Uso aggregato della CPU su un nodo fisico di esecuzione. Più candidati possono puntare allo stesso executionNodeId. Questa classe serve a controllare l'uso complessivo della CPU del nodo.
 
 **Relazione con la formalizzazione**
 
@@ -1399,13 +1809,13 @@ Nessuna specifica nota per questa classe.
 
 ### `GeneEvaluationBreakdown`
 
-- File: `src/ga/fitness/breakdown/GeneEvaluationBreakdown.java:12`
+- File: `src/ga/fitness/breakdown/GeneEvaluationBreakdown.java:14`
 - Tipo: `class`
 - Nome completo: `ga.fitness.breakdown.GeneEvaluationBreakdown`
 
 **Cosa fa, in parole semplici**
 
-Dettaglio della valutazione di un singolo gene. Ogni istanza descrive come un task viene eseguito e quali tempi, penalità e risorse derivano dalla scelta fatta dal cromosoma. Spiega il risultato di un singolo gene/task.
+Dettaglio della valutazione di un singolo gene. Ogni istanza descrive come un task viene eseguito e quali tempi, penalità e risorse derivano dalla scelta fatta dal cromosoma.
 
 **Relazione con la formalizzazione**
 
@@ -1433,7 +1843,7 @@ Campi dichiarati principali:
 - `private final double uploadTimeSeconds`
 - `private final double remoteExecutionTimeSeconds`
 - `private final double downloadTimeSeconds`
-- `private final double baseLatencySeconds`
+- `private final double propagationDelaySeconds`
 - `private final double remotePartTimeSeconds`
 - `private final double completionTimeSeconds`
 - `private final double communicationLatencySeconds`
@@ -1443,6 +1853,7 @@ Campi dichiarati principali:
 - `private final boolean deadlineRespected`
 - `private final double coverageTimeSeconds`
 - `private final boolean coverageSufficient`
+- `private final MobilityPenaltyBreakdown mobilityBreakdown`
 
 **Metodi**
 
@@ -1462,7 +1873,8 @@ Campi dichiarati principali:
 | `public double getUploadTimeSeconds()` | public | Restituisce il valore di `UploadTimeSeconds` senza modificarlo. |
 | `public double getRemoteExecutionTimeSeconds()` | public | Restituisce il valore di `RemoteExecutionTimeSeconds` senza modificarlo. |
 | `public double getDownloadTimeSeconds()` | public | Restituisce il valore di `DownloadTimeSeconds` senza modificarlo. |
-| `public double getBaseLatencySeconds()` | public | Restituisce il valore di `BaseLatencySeconds` senza modificarlo. |
+| `public double getPropagationDelaySeconds()` | public | Restituisce tau_n: il ritardo end-to-end aggregato del percorso remoto. |
+| `public double getBaseLatencySeconds()` | public | Alias mantenuto per compatibilità con printer e chiamanti precedenti. @deprecated usare `#getPropagationDelaySeconds()` |
 | `public double getRemotePartTimeSeconds()` | public | Restituisce il valore di `RemotePartTimeSeconds` senza modificarlo. |
 | `public double getCompletionTimeSeconds()` | public | Restituisce il valore di `CompletionTimeSeconds` senza modificarlo. |
 | `public double getCommunicationLatencySeconds()` | public | Restituisce il valore di `CommunicationLatencySeconds` senza modificarlo. |
@@ -1470,8 +1882,9 @@ Campi dichiarati principali:
 | `public double getConstraintPenalty()` | public | Restituisce il valore di `ConstraintPenalty` senza modificarlo. |
 | `public double getDeadlineSeconds()` | public | Restituisce il valore di `DeadlineSeconds` senza modificarlo. |
 | `public boolean isDeadlineRespected()` | public | Risponde con true/false alla domanda `is deadline respected`. |
-| `public double getCoverageTimeSeconds()` | public | Restituisce il tempo di copertura usato nella valutazione. Questo valore deve essere calcolato tramite CoverageEstimator, non letto direttamente dal NodeCandidate. |
+| `public double getCoverageTimeSeconds()` | public | Restituisce il valore di `CoverageTimeSeconds` senza modificarlo. |
 | `public boolean isCoverageSufficient()` | public | Risponde con true/false alla domanda `is coverage sufficient`. |
+| `public MobilityPenaltyBreakdown getMobilityBreakdown()` | public | Restituisce il valore di `MobilityBreakdown` senza modificarlo. |
 
 **Problematiche aperte**
 
@@ -1485,7 +1898,7 @@ Nessuna specifica nota per questa classe.
 
 **Cosa fa, in parole semplici**
 
-Uso della banda associata a un candidato/link source-aware. A differenza della CPU, la banda è legata al collegamento tra sorgente e candidato selezionato. Aggrega banda per candidateId/link.
+Uso della banda associata a un candidato/link source-aware. A differenza della CPU, la banda è legata al collegamento tra sorgente e candidato selezionato.
 
 **Relazione con la formalizzazione**
 
@@ -1526,7 +1939,7 @@ Campi dichiarati principali:
 
 **Problematiche aperte**
 
-- Il vincolo di banda e' per link/candidateId. Se la formalizzazione resta con Bmax globale, questa classe rappresenta una scelta diversa.
+- Il vincolo di banda e' per link/candidateId. Se la formalizzazione resta con `Bmax` globale, questa classe rappresenta una scelta diversa.
 - La saturazione al 95-100% e' diagnostica: diventa penalita' solo se supera il limite.
 
 ### `LocalResourceUsageBreakdown`
@@ -1537,7 +1950,7 @@ Campi dichiarati principali:
 
 **Cosa fa, in parole semplici**
 
-Carico locale stimato per un veicolo. Tiene traccia dei cicli eseguiti localmente e del tempo massimo di esecuzione locale osservato per quel veicolo. Descrive il carico locale su un veicolo.
+Carico locale stimato per un veicolo. Tiene traccia dei cicli eseguiti localmente e del tempo massimo di esecuzione locale osservato per quel veicolo.
 
 **Relazione con la formalizzazione**
 
@@ -1572,27 +1985,80 @@ Campi dichiarati principali:
 
 Nessuna specifica nota per questa classe.
 
+### `MobilityPenaltyBreakdown`
+
+- File: `src/ga/fitness/breakdown/MobilityPenaltyBreakdown.java:15`
+- Tipo: `class`
+- Nome completo: `ga.fitness.breakdown.MobilityPenaltyBreakdown`
+
+**Cosa fa, in parole semplici**
+
+Scomposizione della penalità mobility-aware associata a un gene. La classe conserva sia i valori grezzi sia i contributi pesati usati dalla fitness. Non modifica il calcolo: rende soltanto il risultato osservabile nei report diagnostici. Scompone `Pmob` in rischio copertura, instabilita' link e rischio handover.
+
+**Relazione con la formalizzazione**
+
+Implementa la parte mobility-aware: tempo di copertura, instabilita' link, rischio handover e limiti temporali collegati alla copertura.
+
+**Con chi comunica**
+
+Comunica direttamente con: `MobilityLinkMetrics`, `NodeType`.
+In pratica questa classe riceve questi oggetti, li costruisce oppure li passa allo step successivo del flusso.
+
+**Campi o valori importanti**
+
+Campi dichiarati principali:
+- `private final MobilityLinkMetrics linkMetrics`
+- `private final double coverageRisk`
+- `private final double linkInstability`
+- `private final double handoverRisk`
+- `private final double weightedCoverageRisk`
+- `private final double weightedLinkInstability`
+- `private final double weightedHandoverRisk`
+- `private final double totalMobilityPenalty`
+
+**Metodi**
+
+| Metodo | Visibilita' | Spiegazione semplice |
+|---|---:|---|
+| `public MobilityPenaltyBreakdown( MobilityLinkMetrics linkMetrics, double coverageRisk, double linkInstability, double handoverRisk, double weightedCoverageRisk, double weightedLinkInstability, double weightedHandoverRisk )` | public | Costruttore: crea l'oggetto e controlla che i dati necessari siano validi. |
+| `public static MobilityPenaltyBreakdown zero(MobilityLinkMetrics linkMetrics)` | public | Metodo di supporto: realizza il passo `zero` dentro la responsabilita' della classe. |
+| `public static MobilityPenaltyBreakdown legacy( NodeType nodeType, double coverageTimeSeconds, double totalMobilityPenalty )` | public | Adapter conservativo per eventuali chiamanti legacy che non producono ancora il breakdown dettagliato. |
+| `public MobilityLinkMetrics getLinkMetrics()` | public | Restituisce il valore di `LinkMetrics` senza modificarlo. |
+| `public double getCoverageRisk()` | public | Restituisce il valore di `CoverageRisk` senza modificarlo. |
+| `public double getLinkInstability()` | public | Restituisce il valore di `LinkInstability` senza modificarlo. |
+| `public double getHandoverRisk()` | public | Restituisce il valore di `HandoverRisk` senza modificarlo. |
+| `public double getWeightedCoverageRisk()` | public | Restituisce il valore di `WeightedCoverageRisk` senza modificarlo. |
+| `public double getWeightedLinkInstability()` | public | Restituisce il valore di `WeightedLinkInstability` senza modificarlo. |
+| `public double getWeightedHandoverRisk()` | public | Restituisce il valore di `WeightedHandoverRisk` senza modificarlo. |
+| `public double getTotalMobilityPenalty()` | public | Restituisce il valore di `TotalMobilityPenalty` senza modificarlo. |
+| `private static double clamp01(double value)` | private | Limita un valore dentro un intervallo ammesso. |
+| `private static double finiteOrZero(double value)` | private | Metodo di supporto: realizza il passo `finite or zero` dentro la responsabilita' della classe. |
+
+**Problematiche aperte**
+
+Nessuna specifica nota per questa classe.
+
 ## Package `ga.operators`
 
 Contiene inizializzazione, selezione, crossover, mutazione, repair e policy di allocazione.
 
 ### `CpuAggregateRepairOperator`
 
-- File: `src/ga/operators/CpuAggregateRepairOperator.java:23`
+- File: `src/ga/operators/CpuAggregateRepairOperator.java:26`
 - Tipo: `class`
 - Nome completo: `ga.operators.CpuAggregateRepairOperator`
 
 **Cosa fa, in parole semplici**
 
-Ripara l'allocazione CPU aggregata sui nodi fisici remoti. Il RepairOperator già limita la CPU di un singolo gene rispetto al candidato scelto. Questo operatore lavora a livello di cromosoma e controlla invece la somma delle CPU assegnate allo stesso executionNodeId. La banda non viene modificata: il repair della banda resta una OpenIssue. Riduce CPU remota quando piu' geni sovraccaricano lo stesso nodo fisico.
+Ripara l'allocazione CPU aggregata sui nodi fisici remoti. Il RepairOperator limita già la CPU del singolo gene rispetto al candidato scelto. Questo operatore controlla invece la somma delle CPU assegnate allo stesso `executionNodeId`. La banda non viene modificata: il repair della banda resta una OpenIssue. Riduce la CPU assegnata quando piu' geni sovraccaricano lo stesso nodo fisico.
 
 **Relazione con la formalizzazione**
 
-Agisce sul processo evolutivo: crea, modifica o ripara cromosomi senza cambiare la formalizzazione delle variabili decisionali.
+Agisce sul processo evolutivo: crea, modifica o ripara cromosomi mantenendo la forma delle variabili decisionali.
 
 **Con chi comunica**
 
-Comunica direttamente con: `Chromosome`, `Gene`, `NodeCandidate`, `NodeType`, `SystemSnapshot`.
+Comunica direttamente con: `Chromosome`, `Gene`, `NodeCandidate`, `NodeType`, `SnapshotRepairContext`, `SystemSnapshot`.
 In pratica questa classe riceve questi oggetti, li costruisce oppure li passa allo step successivo del flusso.
 
 **Campi o valori importanti**
@@ -1604,15 +2070,58 @@ Campi dichiarati principali:
 
 | Metodo | Visibilita' | Spiegazione semplice |
 |---|---:|---|
-| `public Chromosome repairChromosome( Chromosome chromosome, SystemSnapshot snapshot )` | public | Ridimensiona proporzionalmente la CPU dei geni remoti quando la somma assegnata a uno stesso nodo fisico supera la CPU disponibile. @param chromosome cromosoma già riparato a livello di singolo gene @param snapshot snapshot corrente @return cromosoma con CPU aggregate coerenti |
-| `private Map<String, NodeCandidate> indexCandidates(SystemSnapshot snapshot)` | private | Indicizza i candidati tramite candidateId. |
-| `private Map<String, Double> buildAvailableCpuByExecutionNode( SystemSnapshot snapshot )` | private | Costruisce la capacità CPU disponibile per ogni nodo fisico remoto. LOCAL viene escluso perché la CPU locale viene trattata separatamente dalla fitness attuale. |
-| `private Map<String, Double> computeUsedCpuByExecutionNode( Chromosome chromosome, Map<String, NodeCandidate> candidateById )` | private | Calcola la CPU remota totale richiesta da ogni nodo fisico. |
+| `public Chromosome repairChromosome( Chromosome chromosome, SystemSnapshot snapshot )` | public | Adapter compatibile con i chiamanti precedenti. |
+| `public CpuAggregateRepairResult repairChromosomeDetailed( Chromosome chromosome, SystemSnapshot snapshot, SnapshotRepairContext context )` | public | Ridimensiona proporzionalmente la CPU dei geni remoti quando la somma assegnata allo stesso nodo fisico supera la CPU disponibile. L'esito dettagliato permette al chiamante di ripetere il repair gene-level soltanto sui task effettivamente modificati. |
+| `private Map<String, Double> computeUsedCpuByExecutionNode( Chromosome chromosome, SnapshotRepairContext context )` | private | Calcola la CPU remota totale richiesta da ogni nodo fisico. |
 | `private Map<String, Double> computeScaleFactorByExecutionNode( Map<String, Double> usedCpuByExecutionNode, Map<String, Double> availableCpuByExecutionNode )` | private | Calcola il fattore di riduzione per i nodi sovra-allocati. |
 
 **Problematiche aperte**
 
-- Esiste un repair aggregato CPU, ma non esiste ancora un repair aggregato equivalente per la banda.
+- Ridimensiona la CPU aggregata per executionNodeId, ma non modifica la banda: il repair banda resta OpenIssue.
+
+### `CpuAggregateRepairResult`
+
+- File: `src/ga/operators/CpuAggregateRepairResult.java:17`
+- Tipo: `class`
+- Nome completo: `ga.operators.CpuAggregateRepairResult`
+
+**Cosa fa, in parole semplici**
+
+Esito del repair CPU aggregato. Oltre al cromosoma riparato, espone i nodi fisici ridimensionati e i task effettivamente coinvolti. Il RepairOperator può così limitare il secondo passaggio ai soli geni modificati dal ridimensionamento aggregato. Dice al repair quali nodi e task sono stati toccati dal ridimensionamento CPU.
+
+**Relazione con la formalizzazione**
+
+Agisce sul processo evolutivo: crea, modifica o ripara cromosomi mantenendo la forma delle variabili decisionali.
+
+**Con chi comunica**
+
+Comunica direttamente con: `Chromosome`.
+In pratica questa classe riceve questi oggetti, li costruisce oppure li passa allo step successivo del flusso.
+
+**Campi o valori importanti**
+
+Campi dichiarati principali:
+- `private final Chromosome chromosome`
+- `private final Set<String> scaledExecutionNodeIds`
+- `private final Set<String> affectedTaskIds`
+- `private final boolean changed`
+
+**Metodi**
+
+| Metodo | Visibilita' | Spiegazione semplice |
+|---|---:|---|
+| `private CpuAggregateRepairResult( Chromosome chromosome, Set<String> scaledExecutionNodeIds, Set<String> affectedTaskIds, boolean changed )` | private | Costruttore: crea l'oggetto e controlla che i dati necessari siano validi. |
+| `public static CpuAggregateRepairResult unchanged(Chromosome chromosome)` | public | Metodo di supporto: realizza il passo `unchanged` dentro la responsabilita' della classe. |
+| `public static CpuAggregateRepairResult changed( Chromosome chromosome, Set<String> scaledExecutionNodeIds, Set<String> affectedTaskIds )` | public | Metodo di supporto: realizza il passo `changed` dentro la responsabilita' della classe. |
+| `public Chromosome getChromosome()` | public | Restituisce il valore di `Chromosome` senza modificarlo. |
+| `public Set<String> getScaledExecutionNodeIds()` | public | Restituisce il valore di `ScaledExecutionNodeIds` senza modificarlo. |
+| `public Set<String> getAffectedTaskIds()` | public | Restituisce il valore di `AffectedTaskIds` senza modificarlo. |
+| `public boolean isChanged()` | public | Risponde con true/false alla domanda `is changed`. |
+| `private static Set<String> immutableCopy(Set<String> source)` | private | Metodo di supporto: realizza il passo `immutable copy` dentro la responsabilita' della classe. |
+
+**Problematiche aperte**
+
+Nessuna specifica nota per questa classe.
 
 ### `CrossoverOperator`
 
@@ -1622,11 +2131,11 @@ Campi dichiarati principali:
 
 **Cosa fa, in parole semplici**
 
-Operatore di crossover. Combina due cromosomi tramite single-point crossover. I geni prima del punto di taglio arrivano dal primo genitore, quelli successivi dal secondo. Se i cromosomi hanno lunghezze diverse viene usata la lunghezza minima. Combina due cromosomi genitori.
+Operatore di crossover. Combina due cromosomi tramite single-point crossover. I geni prima del punto di taglio arrivano dal primo genitore, quelli successivi dal secondo. Se i cromosomi hanno lunghezze diverse viene usata la lunghezza minima.
 
 **Relazione con la formalizzazione**
 
-Agisce sul processo evolutivo: crea, modifica o ripara cromosomi senza cambiare la formalizzazione delle variabili decisionali.
+Agisce sul processo evolutivo: crea, modifica o ripara cromosomi mantenendo la forma delle variabili decisionali.
 
 **Con chi comunica**
 
@@ -1658,11 +2167,11 @@ Nessuna specifica nota per questa classe.
 
 **Cosa fa, in parole semplici**
 
-Operatore di elitismo. Copia nella generazione successiva i migliori cromosomi della popolazione corrente, preservando le soluzioni già trovate durante l'evoluzione. Conserva gli individui migliori.
+Operatore di elitismo. Copia nella generazione successiva i migliori cromosomi della popolazione corrente, preservando le soluzioni già trovate durante l'evoluzione.
 
 **Relazione con la formalizzazione**
 
-Agisce sul processo evolutivo: crea, modifica o ripara cromosomi senza cambiare la formalizzazione delle variabili decisionali.
+Agisce sul processo evolutivo: crea, modifica o ripara cromosomi mantenendo la forma delle variabili decisionali.
 
 **Con chi comunica**
 
@@ -1682,17 +2191,17 @@ Nessuna specifica nota per questa classe.
 
 ### `MutationOperator`
 
-- File: `src/ga/operators/MutationOperator.java:34`
+- File: `src/ga/operators/MutationOperator.java:37`
 - Tipo: `class`
 - Nome completo: `ga.operators.MutationOperator`
 
 **Cosa fa, in parole semplici**
 
-Operatore di mutazione del MA-GA. La mutazione mantiene la componente casuale dell'algoritmo genetico, ma non agisce più solo con piccole variazioni locali. Per la quota di offloading p_i usa più modalità: - piccola perturbazione locale; - reset casuale; - salto verso p = 1; - salto verso p bilanciato tra ramo locale e ramo remoto. Inoltre, quando muta il candidato, sceglie solo candidati validi per il veicolo sorgente del task. Modifica geni durante l'evoluzione.
+Operatore di mutazione del MA-GA. La mutazione mantiene la componente casuale dell'algoritmo genetico, ma non agisce più solo con piccole variazioni locali. Per la quota di offloading `p_i` usa più modalità: piccola perturbazione locale; reset casuale; salto verso `p = 1`; salto verso una quota bilanciata tra ramo locale e ramo remoto. Inoltre, quando muta il candidato, sceglie solo candidati validi per il veicolo sorgente del task. Muta geni e restituisce anche i task realmente modificati.
 
 **Relazione con la formalizzazione**
 
-Agisce sul processo evolutivo: crea, modifica o ripara cromosomi senza cambiare la formalizzazione delle variabili decisionali.
+Agisce sul processo evolutivo: crea, modifica o ripara cromosomi mantenendo la forma delle variabili decisionali.
 
 **Con chi comunica**
 
@@ -1702,7 +2211,6 @@ In pratica questa classe riceve questi oggetti, li costruisce oppure li passa al
 **Campi o valori importanti**
 
 Campi dichiarati principali:
-- `private static final double MIN_RESOURCE_FRACTION = 0.05`
 - `private static final double CANDIDATE_MUTATION_PROBABILITY = 0.25`
 - `private static final double REMOTE_CANDIDATE_PREFERENCE = 0.60`
 - `private static final double BEST_REMOTE_CANDIDATE_PROBABILITY = 0.55`
@@ -1715,23 +2223,63 @@ Campi dichiarati principali:
 
 | Metodo | Visibilita' | Spiegazione semplice |
 |---|---:|---|
-| `public MutationOperator(Random random)` | public | Costruisce l'operatore di mutazione. @param random generatore casuale condiviso dal GA |
-| `public Chromosome mutate( Chromosome chromosome, SystemSnapshot snapshot, double mutationRate )` | public | Applica la mutazione a un cromosoma. Ogni gene viene mutato con probabilità mutationRate. I geni non mutati vengono copiati senza modifiche. @param chromosome cromosoma da mutare @param snapshot snapshot corrente @param mutationRate probabilità di mutazione per gene @return cromosoma mutato |
-| `private Gene mutateGene( Gene gene, SystemSnapshot snapshot )` | private | Muta un singolo gene. La mutazione può: - mantenere il candidato e cambiare solo p_i/risorse; - cambiare candidato e ricalcolare p_i in modo coerente; - trasformare una decisione locale in una remota; - trasformare una decisione remota in locale, se il candidato locale viene scelto. |
-| `private NodeCandidate selectCandidateForMutation( TaskInstance task, List<NodeCandidate> validCandidates, VehicleSnapshot sourceVehicle )` | private | Sceglie un candidato valido per la mutazione. Preferisce candidati remoti perché il problema osservato nei report è un uso troppo conservativo del locale. Non elimina però il locale: mantiene una quota di casualità e quindi di diversità. |
-| `private double mutateOffloadingRatio( Gene gene, TaskInstance task, NodeCandidate candidate, VehicleSnapshot sourceVehicle, boolean candidateChanged )` | private | Muta la quota di offloading p_i. La mutazione resta genetica e casuale, ma quando serve una quota "ragionata" usa una stima deadline-aware invece del solo bilanciamento locale/remoto. |
+| `public MutationOperator(Random random)` | public | Costruisce l'operatore di mutazione. |
+| `public Chromosome mutate( Chromosome chromosome, SystemSnapshot snapshot, double mutationRate )` | public | Adapter compatibile con i chiamanti precedenti. @return cromosoma mutato |
+| `public MutationResult mutateDetailed( Chromosome chromosome, SystemSnapshot snapshot, double mutationRate )` | public | Applica la mutazione e conserva gli identificativi dei task modificati. Ogni gene viene selezionato con probabilità `mutationRate`. Un task viene marcato dirty soltanto se la decisione risultante differisce realmente da quella precedente. Il tracking non cambia la probabilità o la logica della mutazione: espone soltanto informazione già disponibile per evitare repair ridondanti. |
+| `private Gene mutateGene(Gene gene, SystemSnapshot snapshot)` | private | Muta un singolo gene. |
+| `private NodeCandidate selectCandidateForMutation( TaskInstance task, List<NodeCandidate> validCandidates, VehicleSnapshot sourceVehicle )` | private | Sceglie un candidato valido per la mutazione. |
+| `private double mutateOffloadingRatio( Gene gene, TaskInstance task, NodeCandidate candidate, VehicleSnapshot sourceVehicle, boolean candidateChanged )` | private | Muta la quota di offloading `p_i`. |
 | `private Gene createLocalGene( TaskInstance task, NodeCandidate candidate, VehicleSnapshot sourceVehicle )` | private | Crea un gene locale coerente. |
-| `private NodeCandidate selectBestEstimatedRemoteCandidate( TaskInstance task, List<NodeCandidate> remoteCandidates, VehicleSnapshot sourceVehicle )` | private | Sceglie il candidato remoto con migliore stima euristica. La stima non sostituisce la fitness. Serve solo a non sprecare mutazioni su candidati palesemente peggiori. |
-| `private double estimateBestCompletion( TaskInstance task, NodeCandidate candidate, VehicleSnapshot sourceVehicle )` | private | Stima euristica del miglior completion ottenibile con un candidato remoto. Usa lo stesso modello usato dalla policy di p: local(p) = (1 - p) * A remote(p) = L + p * B |
-| `private double estimateLocalOnlyTime( TaskInstance task, VehicleSnapshot sourceVehicle )` | private | Stima il tempo locale puro. |
-| `private double estimateRemoteLinearTime( TaskInstance task, NodeCandidate candidate )` | private | Stima upload + esecuzione remota + download per p = 1. |
+| `private NodeCandidate selectBestEstimatedRemoteCandidate( TaskInstance task, List<NodeCandidate> remoteCandidates, VehicleSnapshot sourceVehicle )` | private | Sceglie il candidato remoto con migliore stima euristica. |
+| `private double estimateBestCompletion( TaskInstance task, NodeCandidate candidate, VehicleSnapshot sourceVehicle )` | private | Stima euristica del miglior completion ottenibile da un remoto. |
+| `private double estimateLocalOnlyTime( TaskInstance task, VehicleSnapshot sourceVehicle )` | private | Stima `estimate local only time` senza modificare lo stato principale. |
+| `private double estimateRemoteLinearTime( TaskInstance task, NodeCandidate candidate )` | private | Stima `estimate remote linear time` senza modificare lo stato principale. |
 | `private List<NodeCandidate> findCandidatesForTask( TaskInstance task, SystemSnapshot snapshot )` | private | Trova i candidati validi per il veicolo sorgente del task. |
-| `private List<NodeCandidate> findRemoteCandidates( List<NodeCandidate> candidates )` | private | Estrae i candidati remoti. |
-| `private NodeCandidate findLocalCandidate( List<NodeCandidate> candidates )` | private | Trova il candidato locale, se presente. |
-| `private NodeCandidate findCandidate( SystemSnapshot snapshot, String candidateId )` | private | Cerca un candidato tramite candidateId. |
-| `private VehicleSnapshot findVehicle( SystemSnapshot snapshot, String vehicleId )` | private | Cerca il veicolo sorgente. |
-| `private TaskInstance findTask( SystemSnapshot snapshot, String taskId )` | private | Cerca il task associato al gene. |
-| `private void validateRate(double value)` | private | Valida una probabilità. |
+| `private List<NodeCandidate> findRemoteCandidates(List<NodeCandidate> candidates)` | private | Cerca `find remote candidates` nelle collezioni o nello stato corrente. |
+| `private NodeCandidate findLocalCandidate(List<NodeCandidate> candidates)` | private | Cerca `find local candidate` nelle collezioni o nello stato corrente. |
+| `private NodeCandidate findCandidate(SystemSnapshot snapshot, String candidateId)` | private | Cerca `find candidate` nelle collezioni o nello stato corrente. |
+| `private VehicleSnapshot findVehicle(SystemSnapshot snapshot, String vehicleId)` | private | Cerca `find vehicle` nelle collezioni o nello stato corrente. |
+| `private TaskInstance findTask(SystemSnapshot snapshot, String taskId)` | private | Cerca `find task` nelle collezioni o nello stato corrente. |
+| `private boolean sameDecision(Gene first, Gene second)` | private | Confronta semanticamente due geni immutabili. |
+| `private void validateRate(double value)` | private | Controlla la correttezza di `validate rate` e solleva un'eccezione se trova dati incoerenti. |
+
+**Problematiche aperte**
+
+Nessuna specifica nota per questa classe.
+
+### `MutationResult`
+
+- File: `src/ga/operators/MutationResult.java:18`
+- Tipo: `class`
+- Nome completo: `ga.operators.MutationResult`
+
+**Cosa fa, in parole semplici**
+
+Esito della mutazione di un cromosoma. Oltre al cromosoma mutato conserva gli identificativi dei task per cui la decisione genetica è cambiata realmente. Questo permette al repair incrementale di rivalutare soltanto i geni dirty durante le generazioni interne dello stesso snapshot. Trasporta cromosoma mutato e dirty task ids verso il repair incrementale.
+
+**Relazione con la formalizzazione**
+
+Agisce sul processo evolutivo: crea, modifica o ripara cromosomi mantenendo la forma delle variabili decisionali.
+
+**Con chi comunica**
+
+Comunica direttamente con: `Chromosome`.
+In pratica questa classe riceve questi oggetti, li costruisce oppure li passa allo step successivo del flusso.
+
+**Campi o valori importanti**
+
+Campi dichiarati principali:
+- `private final Chromosome chromosome`
+- `private final Set<String> mutatedTaskIds`
+
+**Metodi**
+
+| Metodo | Visibilita' | Spiegazione semplice |
+|---|---:|---|
+| `public MutationResult(Chromosome chromosome, Set<String> mutatedTaskIds)` | public | Costruttore: crea l'oggetto e controlla che i dati necessari siano validi. |
+| `public Chromosome getChromosome()` | public | Restituisce il valore di `Chromosome` senza modificarlo. |
+| `public Set<String> getMutatedTaskIds()` | public | Restituisce il valore di `MutatedTaskIds` senza modificarlo. |
+| `public boolean hasMutations()` | public | Risponde con true/false alla domanda `has mutations`. |
 
 **Problematiche aperte**
 
@@ -1745,11 +2293,11 @@ Nessuna specifica nota per questa classe.
 
 **Cosa fa, in parole semplici**
 
-Policy centralizzata per generare e modificare la quota di offloading p_i. Questa classe non sceglie il candidato di esecuzione e non valuta la fitness. Serve solo a produrre valori di offloadingRatio più coerenti con il problema. Rispetto alla formalizzazione, questa classe opera solo sulla variabile decisionale p_i del gene: g_i = (p_i, f_i, b_i, n_i) Non introduce nuove variabili decisionali e non modifica la funzione di fitness. Le stime interne usano parametri già presenti nel modello: deadline del task; dimensione dei dati in input/output; cicli CPU richiesti dal task; CPU locale; CPU e banda massime del candidato; latenza base del candidato. Obiettivo: mantenere esplorazione casuale; rendere esplorabili i casi p = 0, p = 1 e partial offloading; evitare che inizializzazione e mutazione producano troppe quote formalmente valide ma temporalmente poco plausibili; ridurre il rischio di upload bottleneck quando il task è communication-heavy. Propone valori di p_i piu' sensati per inizializzazione e mutazione.
+Policy centralizzata per generare e modificare la quota di offloading p_i. Questa classe non sceglie il candidato di esecuzione e non valuta la fitness. Serve solo a produrre valori di offloadingRatio più coerenti con il problema. Rispetto alla formalizzazione, questa classe opera solo sulla variabile decisionale p_i del gene: g_i = (p_i, f_i, b_i, n_i) Non introduce nuove variabili decisionali e non modifica la funzione di fitness. Le stime interne usano parametri già presenti nel modello: deadline del task; dimensione dei dati in input/output; cicli CPU richiesti dal task; CPU locale; CPU e banda massime del candidato; latenza base del candidato. Obiettivo: mantenere esplorazione casuale; rendere esplorabili i casi p = 0, p = 1 e partial offloading; evitare che inizializzazione e mutazione producano troppe quote formalmente valide ma temporalmente poco plausibili; ridurre il rischio di upload bottleneck quando il task è communication-heavy. Propone valori di `p_i` piu' sensati per inizializzazione e mutazione.
 
 **Relazione con la formalizzazione**
 
-Agisce sul processo evolutivo: crea, modifica o ripara cromosomi senza cambiare la formalizzazione delle variabili decisionali.
+Agisce sul processo evolutivo: crea, modifica o ripara cromosomi mantenendo la forma delle variabili decisionali.
 
 **Con chi comunica**
 
@@ -1801,11 +2349,11 @@ Nessuna specifica nota per questa classe.
 
 **Cosa fa, in parole semplici**
 
-Genera la popolazione iniziale del MA-GA. Nel modello source-aware, per ogni task vengono considerati solo i candidati validi per il veicolo sorgente del task. La popolazione iniziale non è più solo casuale. Vengono generati cromosomi con profili diversi: - RANDOM: esplorazione casuale classica; - LOCAL_BIASED: soluzione prevalentemente locale; - BALANCED_REMOTE: candidati remoti con quota p bilanciata; - FULL_REMOTE_TRIAL: candidati remoti con p = 1. La selezione finale resta affidata alla fitness. Questi profili servono solo a rendere lo spazio iniziale più ricco. Crea cromosomi iniziali con profili locali/remoti/random.
+Genera la popolazione iniziale del MA-GA. Nel modello source-aware, per ogni task vengono considerati solo i candidati validi per il veicolo sorgente del task. La popolazione iniziale non è più solo casuale. Vengono generati cromosomi con profili diversi: - RANDOM: esplorazione casuale classica; - LOCAL_BIASED: soluzione prevalentemente locale; - BALANCED_REMOTE: candidati remoti con quota p bilanciata; - FULL_REMOTE_TRIAL: candidati remoti con p = 1. La selezione finale resta affidata alla fitness. Questi profili servono solo a rendere lo spazio iniziale più ricco. Crea cromosomi iniziali con profili locali/remoti/random e passa tutto al repair.
 
 **Relazione con la formalizzazione**
 
-Agisce sul processo evolutivo: crea, modifica o ripara cromosomi senza cambiare la formalizzazione delle variabili decisionali.
+Agisce sul processo evolutivo: crea, modifica o ripara cromosomi mantenendo la forma delle variabili decisionali.
 
 **Con chi comunica**
 
@@ -1861,7 +2409,7 @@ Profili di inizializzazione della popolazione.
 
 **Relazione con la formalizzazione**
 
-Agisce sul processo evolutivo: crea, modifica o ripara cromosomi senza cambiare la formalizzazione delle variabili decisionali.
+Agisce sul processo evolutivo: crea, modifica o ripara cromosomi mantenendo la forma delle variabili decisionali.
 
 **Con chi comunica**
 
@@ -1883,21 +2431,21 @@ Nessuna specifica nota per questa classe.
 
 ### `RepairOperator`
 
-- File: `src/ga/operators/RepairOperator.java:42`
+- File: `src/ga/operators/RepairOperator.java:47`
 - Tipo: `class`
 - Nome completo: `ga.operators.RepairOperator`
 
 **Cosa fa, in parole semplici**
 
-Ripara cromosomi e geni incoerenti. Nel modello source-aware, un gene è valido solo se il candidato scelto è compatibile con il veicolo sorgente del task. La riparazione avviene su tre livelli: livello gene: corregge candidato, quota di offloading, CPU e banda; livello mobilità: evita candidati remoti con copertura insufficiente; livello cromosoma: ridimensiona la CPU aggregata sui nodi fisici remoti. La riparazione mobility-aware implementa direttamente il vincolo: T_i(C) Non modifica la fitness, non aggiunge nuove variabili decisionali e non sostituisce la selezione genetica: elimina solo geni remoti che violano un vincolo già presente nella formalizzazione. Corregge geni e cromosomi rispetto ai vincoli base.
+Ripara cromosomi e geni incoerenti. Nel modello source-aware, un gene è valido solo se il candidato scelto è compatibile con il veicolo sorgente del task. La riparazione avviene su quattro livelli: livello gene: corregge candidato, quota di offloading, CPU e banda; livello mobilità: evita candidati remoti con copertura insufficiente; livello deadline: prova una correzione limitata e aderente al modello; livello cromosoma: ridimensiona la CPU aggregata sui nodi fisici remoti. Gli indici e il catalogo lazy sono ottimizzazioni implementative. Non introducono nuove variabili decisionali e non sostituiscono selezione, crossover, mutazione o fitness del Genetic Algorithm. Corregge cromosomi su candidati, mobilita', deadline e CPU aggregata, con fallback best-effort quando necessario.
 
 **Relazione con la formalizzazione**
 
-Agisce sul processo evolutivo: crea, modifica o ripara cromosomi senza cambiare la formalizzazione delle variabili decisionali.
+Agisce sul processo evolutivo: crea, modifica o ripara cromosomi mantenendo la forma delle variabili decisionali.
 
 **Con chi comunica**
 
-Comunica direttamente con: `Chromosome`, `CoverageEstimator`, `Gene`, `MobilityConfig`, `NodeCandidate`, `NodeType`, `OffloadingTimeModel`, `SystemSnapshot`, `TaskInstance`, `VehicleSnapshot`.
+Comunica direttamente con: `Chromosome`, `CoverageEstimator`, `DeadlineConstraintEvaluator`, `DeadlineEvaluation`, `DeadlineRepairCatalog`, `DeadlineRepairProfile`, `Gene`, `MobilityConfig`, `NodeCandidate`, `NodeType`, `OffloadingTimeModel`, `SnapshotRepairContext`, `SystemSnapshot`, `TaskInstance`, `VehicleSnapshot`.
 In pratica questa classe riceve questi oggetti, li costruisce oppure li passa allo step successivo del flusso.
 
 **Campi o valori importanti**
@@ -1910,36 +2458,49 @@ Campi dichiarati principali:
 - `private final CpuAggregateRepairOperator cpuAggregateRepairOperator`
 - `private final CoverageEstimator coverageEstimator`
 - `private final OffloadingTimeModel offloadingTimeModel`
+- `private final OffloadingRatioPolicy offloadingRatioPolicy`
+- `private final DeadlineConstraintEvaluator deadlineConstraintEvaluator`
+- `private SnapshotRepairContext cachedContext`
+- `private DeadlineRepairCatalog cachedDeadlineRepairCatalog`
 
 **Metodi**
 
 | Metodo | Visibilita' | Spiegazione semplice |
 |---|---:|---|
 | `public RepairOperator()` | public | Costruttore compatibile con il codice precedente. |
-| `public RepairOperator(MobilityConfig mobilityConfig)` | public | Costruisce il repair operator principale con configurazione di mobilità esplicita. @param mobilityConfig configurazione usata da CoverageEstimator |
-| `public Chromosome repairChromosome( Chromosome chromosome, SystemSnapshot snapshot )` | public | Ripara un cromosoma rispetto allo snapshot corrente. @param chromosome cromosoma da riparare @param snapshot snapshot corrente @return cromosoma riparato |
-| `private Chromosome repairGenes( Chromosome chromosome, SystemSnapshot snapshot )` | private | Metodo di supporto: realizza il passo `repair genes` dentro la responsabilita' della classe. |
-| `public Gene repairGene( Gene gene, TaskInstance task, SystemSnapshot snapshot )` | public | Ripara un gene rispetto al task e allo snapshot corrente. @param gene gene da riparare @param task task associato al gene @param snapshot snapshot corrente @return gene coerente con il task |
-| `private Gene createFallbackGene( TaskInstance task, SystemSnapshot snapshot )` | private | Crea un gene di fallback quando il cromosoma non contiene il task. |
-| `private NodeCandidate defaultCandidate( TaskInstance task, SystemSnapshot snapshot )` | private | Sceglie il candidato di default per un task. Preferisce LOCAL del veicolo sorgente, se presente. |
-| `private NodeCandidate findLocalCandidate( TaskInstance task, SystemSnapshot snapshot )` | private | Cerca `find local candidate` nelle collezioni o nello stato corrente. |
-| `private NodeCandidate findCoverageSustainableRemoteCandidate( SystemSnapshot snapshot, TaskInstance task, VehicleSnapshot sourceVehicle, double offloadingRatio, double allocatedCpu, double allocatedBandwidth, String excludedCandidateId )` | private | Cerca un candidato remoto alternativo che soddisfi la copertura. La scelta resta prudente: non si cerca il candidato con fitness migliore, ma il candidato remoto con completion time stimato più basso tra quelli che rispettano la copertura. Questo è repair di vincolo, non una seconda ottimizzazione locale. |
-| `private boolean isCoverageSufficient( SystemSnapshot snapshot, TaskInstance task, NodeCandidate candidate, VehicleSnapshot sourceVehicle, double offloadingRatio, double allocatedCpu, double allocatedBandwidth )` | private | Risponde con true/false alla domanda `is coverage sufficient`. |
-| `private double estimateCoverageTimeSeconds( SystemSnapshot snapshot, TaskInstance task, NodeCandidate candidate )` | private | Metodo di supporto: realizza il passo `estimate coverage time seconds` dentro la responsabilita' della classe. |
+| `public RepairOperator(MobilityConfig mobilityConfig)` | public | Costruisce il repair operator con configurazione di mobilità esplicita. |
+| `public Chromosome repairChromosome(Chromosome chromosome, SystemSnapshot snapshot)` | public | Ripara integralmente un cromosoma rispetto allo snapshot corrente. Questo percorso resta obbligatorio per popolazioni appena create, cromosomi provenienti da una finestra precedente e chiamanti esterni che non dispongono dell'elenco dei geni modificati. |
+| `public Chromosome repairChromosomeIncremental( Chromosome chromosome, SystemSnapshot snapshot, Set<String> dirtyTaskIds )` | public | Ripara incrementalmente un figlio prodotto durante l'evoluzione nello stesso snapshot. I genitori della generazione corrente sono già stati riparati. Un gene ereditato senza modifiche resta quindi individualmente valido. Il metodo rivaluta soltanto i task indicati come dirty, ma esegue sempre il repair CPU aggregato sull'intero cromosoma: il crossover può infatti combinare geni validi singolarmente e creare una nuova contesa collettiva. Se la struttura del cromosoma non rispetta l'insieme dei task dello snapshot, il metodo effettua automaticamente un repair completo. @param chromosome figlio da riparare @param snapshot snapshot corrente @param dirtyTaskIds task realmente modificati dalla mutazione @return cromosoma riparato |
+| `private Chromosome repairChromosomeInternal( Chromosome chromosome, SystemSnapshot snapshot, Set<String> initialTargetedTaskIds )` | private | Implementazione condivisa dai percorsi completo e incrementale. `initialTargetedTaskIds == null` indica il repair completo del primo passaggio. Un insieme vuoto indica invece che nessun gene necessita di repair individuale prima del controllo CPU aggregato globale. |
+| `private Chromosome repairGenes( Chromosome chromosome, SystemSnapshot snapshot, SnapshotRepairContext context, DeadlineRepairCatalog catalog, Set<String> targetedTaskIds )` | private | Ripara tutti i geni nel primo passaggio e soltanto i geni indicati nei passaggi successivi. I geni non coinvolti dal ridimensionamento CPU aggregato vengono conservati senza una rivalutazione ridondante. |
+| `public Gene repairGene(Gene gene, TaskInstance task, SystemSnapshot snapshot)` | public | Adapter compatibile con i chiamanti precedenti. |
+| `private Gene repairGene( Gene gene, TaskInstance task, SystemSnapshot snapshot, SnapshotRepairContext context, DeadlineRepairCatalog catalog )` | private | Ripara un gene usando indici e catalogo dello snapshot corrente. |
+| `private Gene repairDeadlineIfNeeded( Gene currentGene, TaskInstance task, SnapshotRepairContext context, DeadlineRepairCatalog catalog, VehicleSnapshot sourceVehicle, NodeCandidate localCandidate )` | private | Applica la policy deadline-aware soltanto quando il gene corrente non rispetta la deadline. prova quote alternative mantenendo il nodo remoto corrente; prova candidati remoti alternativi; prova l'esecuzione locale; se nessuna alternativa è ammissibile, sceglie il best-effort. |
+| `private Gene findDeadlineFeasibleRemoteAlternative( TaskInstance task, VehicleSnapshot sourceVehicle, String excludedCandidateId, Gene currentGene, SnapshotRepairContext context, DeadlineRepairCatalog catalog )` | private | Cerca `find deadline feasible remote alternative` nelle collezioni o nello stato corrente. |
+| `private Gene findDeadlineFeasibleGeneForCandidate( TaskInstance task, VehicleSnapshot sourceVehicle, NodeCandidate candidate, double preferredRatio, double preferredCpu, double preferredBandwidth, SnapshotRepairContext context, DeadlineRepairCatalog catalog )` | private | Cerca `find deadline feasible gene for candidate` nelle collezioni o nello stato corrente. |
+| `private Gene selectDegradedBestEffortGene( TaskInstance task, VehicleSnapshot sourceVehicle, Gene localGene, Gene currentGene, SnapshotRepairContext context, DeadlineRepairCatalog catalog )` | private | Applica la policy deadline-aware soltanto quando il gene corrente non rispetta la deadline. prova quote alternative mantenendo il nodo remoto corrente; prova candidati remoti alternativi; prova l'esecuzione locale; se nessuna alternativa è ammissibile, sceglie il best-effort. private Gene repairDeadlineIfNeeded( Gene currentGene, TaskInstance task, SnapshotRepairContext context, DeadlineRepairCatalog catalog, VehicleSnapshot sourceVehicle, NodeCandidate localCandidate ) { DeadlineEvaluation currentEvaluation = deadlineConstraintEvaluator.evaluate( currentGene, task, context ); if (currentEvaluation.isDeadlineRespected()) { return currentGene; } NodeCandidate currentCandidate = context.getCandidateById( currentGene.getSelectedCandidateId() ); if (currentCandidate != null && currentCandidate.getType() != NodeType.LOCAL) { Gene repairedOnCurrentCandidate = findDeadlineFeasibleGeneForCandidate( task, sourceVehicle, currentCandidate, currentGene.getOffloadingRatio(), currentGene.getAllocatedCpu(), currentGene.getAllocatedBandwidth(), context, catalog ); if (repairedOnCurrentCandidate != null) { return repairedOnCurrentCandidate; } } Gene repairedOnAlternativeRemote = findDeadlineFeasibleRemoteAlternative( task, sourceVehicle, currentCandidate == null ? null : currentCandidate.getCandidateId(), currentGene, context, catalog ); if (repairedOnAlternativeRemote != null) { return repairedOnAlternativeRemote; } Gene localGene = createLocalGene(task, localCandidate, sourceVehicle); if (deadlineConstraintEvaluator.evaluate(localGene, task, context).isAdmissible()) { return localGene; } return selectDegradedBestEffortGene( task, sourceVehicle, localGene, currentGene, context, catalog ); } private Gene findDeadlineFeasibleRemoteAlternative( TaskInstance task, VehicleSnapshot sourceVehicle, String excludedCandidateId, Gene currentGene, SnapshotRepairContext context, DeadlineRepairCatalog catalog ) { Gene bestGene = null; DeadlineEvaluation bestEvaluation = null; for (NodeCandidate candidate : context.getCandidatesForTask(task)) { if (candidate.getType() == NodeType.LOCAL) { continue; } if (candidate.getCandidateId().equals(excludedCandidateId)) { continue; } Gene candidateGene = findDeadlineFeasibleGeneForCandidate( task, sourceVehicle, candidate, currentGene.getOffloadingRatio(), currentGene.getAllocatedCpu(), currentGene.getAllocatedBandwidth(), context, catalog ); if (candidateGene == null) { continue; } DeadlineEvaluation evaluation = deadlineConstraintEvaluator.evaluate( candidateGene, task, context ); if (bestGene == null \|\| evaluation.getCompletionTimeSeconds() < bestEvaluation.getCompletionTimeSeconds()) { bestGene = candidateGene; bestEvaluation = evaluation; } } return bestGene; } private Gene findDeadlineFeasibleGeneForCandidate( TaskInstance task, VehicleSnapshot sourceVehicle, NodeCandidate candidate, double preferredRatio, double preferredCpu, double preferredBandwidth, SnapshotRepairContext context, DeadlineRepairCatalog catalog ) { Gene bestGene = null; double bestPressure = Double.POSITIVE_INFINITY; double bestCompletion = Double.POSITIVE_INFINITY; for (double ratio : catalog.buildRatioCandidates( task, candidate, sourceVehicle, preferredRatio )) { Gene preservedResourcesGene = new Gene( task.getTaskId(), candidate.getCandidateId(), ratio, clampResource(preferredCpu, candidate.getAvailableCpu()), clampResource( preferredBandwidth, candidate.getAvailableBandwidth() ) ); Gene feasibleGene; DeadlineEvaluation evaluation = deadlineConstraintEvaluator.evaluate( preservedResourcesGene, task, context ); if (evaluation.isAdmissible()) { feasibleGene = preservedResourcesGene; } else { feasibleGene = catalog .getProfile(task, candidate, sourceVehicle, ratio) .getMinimalFeasibleGene(); if (feasibleGene != null) { evaluation = deadlineConstraintEvaluator.evaluate( feasibleGene, task, context ); } } if (feasibleGene == null \|\| !evaluation.isAdmissible()) { continue; } double pressure = computeResourcePressure(feasibleGene, candidate); if (pressure < bestPressure - EPSILON \|\| (Math.abs(pressure - bestPressure) <= EPSILON && evaluation.getCompletionTimeSeconds() < bestCompletion)) { bestGene = feasibleGene; bestPressure = pressure; bestCompletion = evaluation.getCompletionTimeSeconds(); } } return bestGene; } /* Quando nessuna configurazione valutata dal repair riesce a rispettare la deadline, il task entra in modalità DEGRADED_BEST_EFFORT. La scelta confronta il fallback LOCAL e i candidati remoti sostenibili rispetto alla mobilità, quindi conserva l'alternativa con lo sforamento previsto più basso. Non viene usata una priorità esplicita e il CLOUD non viene privilegiato automaticamente: può essere selezionato soltanto se riduce realmente la lateness stimata. Questa sezione non certifica l'insoddisfacibilità matematica globale del task: il repair esplora intenzionalmente un insieme limitato di quote e risorse per non trasformarsi in un secondo ottimizzatore. |
+| `private boolean isBetterBestEffortChoice( Gene candidateGene, DeadlineEvaluation candidateEvaluation, Gene currentBestGene, DeadlineEvaluation currentBestEvaluation, SnapshotRepairContext context )` | private | Risponde con true/false alla domanda `is better best effort choice`. |
+| `private double computeResourcePressure(Gene gene, NodeCandidate candidate)` | private | Calcola `compute resource pressure` a partire dai dati ricevuti. |
+| `private Gene createFallbackGene( TaskInstance task, SnapshotRepairContext context )` | private | Crea un gene locale di fallback quando il cromosoma non contiene il task. |
+| `private NodeCandidate findCoverageSustainableRemoteCandidate( TaskInstance task, VehicleSnapshot sourceVehicle, double offloadingRatio, double allocatedCpu, double allocatedBandwidth, String excludedCandidateId, SnapshotRepairContext context )` | private | Cerca un candidato remoto alternativo che soddisfi la copertura. |
+| `private boolean isCoverageSufficient( TaskInstance task, NodeCandidate candidate, VehicleSnapshot sourceVehicle, double offloadingRatio, double allocatedCpu, double allocatedBandwidth, SnapshotRepairContext context )` | private | Risponde con true/false alla domanda `is coverage sufficient`. |
+| `private double estimateCoverageTimeSeconds( TaskInstance task, NodeCandidate candidate, SnapshotRepairContext context )` | private | Stima `estimate coverage time seconds` senza modificare lo stato principale. |
 | `private double estimateCompletionTimeSeconds( TaskInstance task, NodeCandidate candidate, VehicleSnapshot sourceVehicle, double offloadingRatio, double allocatedCpu, double allocatedBandwidth )` | private | Stima il completion time usando la stessa struttura della fitness. |
 | `private Gene createLocalGene( TaskInstance task, NodeCandidate candidate, VehicleSnapshot sourceVehicle )` | private | Crea `create local gene` come nuovo oggetto o nuova struttura dati. |
-| `private List<NodeCandidate> findCandidatesForTask( TaskInstance task, SystemSnapshot snapshot )` | private | Trova candidati validi per un task. |
-| `private Gene findGene( Chromosome chromosome, String taskId )` | private | Cerca un gene per taskId. |
-| `private NodeCandidate findCandidate( SystemSnapshot snapshot, String candidateId )` | private | Cerca un candidato per candidateId. |
-| `private VehicleSnapshot findVehicle( SystemSnapshot snapshot, String vehicleId )` | private | Cerca un veicolo. |
-| `private double clampResource( double value, double maxAvailable )` | private | Limita una risorsa al range ammesso dal singolo candidato. |
+| `private Map<String, Gene> indexGenes(Chromosome chromosome)` | private | Prepara una mappa di lookup per trovare rapidamente gli oggetti. |
+| `private boolean hasCompleteTaskCoverage( Chromosome chromosome, SnapshotRepairContext context )` | private | Verifica che il figlio contenga esattamente un gene per task attivo. |
+| `private Set<String> normalizeDirtyTaskIds( Set<String> dirtyTaskIds, SnapshotRepairContext context )` | private | Mantiene solo identificativi dirty appartenenti allo snapshot corrente. |
+| `private double clampResource(double value, double maxAvailable)` | private | Limita una risorsa al range ammesso dal singolo candidato. |
+| `private SnapshotRepairContext contextFor(SystemSnapshot snapshot)` | private | Metodo di supporto: realizza il passo `context for` dentro la responsabilita' della classe. |
+| `private DeadlineRepairCatalog catalogFor(SnapshotRepairContext context)` | private | Metodo di supporto: realizza il passo `catalog for` dentro la responsabilita' della classe. |
+| `private double safeDivide(double numerator, double denominator)` | private | Esegue un'operazione protetta per evitare valori non finiti o divisioni non valide. |
 | `private boolean isStrictlyPositive(double value)` | private | Risponde con true/false alla domanda `is strictly positive`. |
-| `private double clamp( double value, double min, double max )` | private | Limita un valore dentro un intervallo. |
+| `private double clamp(double value, double min, double max)` | private | Limita un valore dentro un intervallo ammesso. |
 
 **Problematiche aperte**
 
-- Quando non trova un remoto sostenibile puo' ricadere sul locale; non ripara direttamente le violazioni di deadline finali.
-- Non contiene un repair aggregato della banda globale o di gateway.
+- Il best-effort degradato non e' una prova di infeasibilita' globale: indica solo che il repair limitato non ha trovato una scelta ammissibile.
+- Il repair aggregato resta sulla CPU; non esiste ancora un repair aggregato equivalente per banda globale o gateway.
 
 ### `ResourceAllocationDecision`
 
@@ -1949,11 +2510,11 @@ Campi dichiarati principali:
 
 **Cosa fa, in parole semplici**
 
-Risultato di una scelta di allocazione delle risorse per un gene. La classe è immutabile e contiene CPU, banda e modalità diagnostica dell'allocazione. Oggetto risultato della policy di allocazione risorse.
+Risultato di una scelta di allocazione delle risorse per un gene. La classe è immutabile e contiene CPU, banda e modalità diagnostica dell'allocazione.
 
 **Relazione con la formalizzazione**
 
-Agisce sul processo evolutivo: crea, modifica o ripara cromosomi senza cambiare la formalizzazione delle variabili decisionali.
+Agisce sul processo evolutivo: crea, modifica o ripara cromosomi mantenendo la forma delle variabili decisionali.
 
 **Con chi comunica**
 
@@ -1975,7 +2536,7 @@ Campi dichiarati principali:
 | `public double getAllocatedBandwidth()` | public | Restituisce il valore di `AllocatedBandwidth` senza modificarlo. |
 | `public Mode getMode()` | public | Restituisce il valore di `Mode` senza modificarlo. |
 | `private static double validateFinite(String fieldName, double value)` | private | Controlla la correttezza di `validate finite` e solleva un'eccezione se trova dati incoerenti. |
-| `public String toString()` | public | Converte l'oggetto o i dati in `to string`. |
+| `public String toString()` | public | Converte l'oggetto in una stringa utile per debug e report. |
 
 **Problematiche aperte**
 
@@ -1993,7 +2554,7 @@ Enum: rappresenta un insieme chiuso di valori usati per rendere esplicite le sce
 
 **Relazione con la formalizzazione**
 
-Agisce sul processo evolutivo: crea, modifica o ripara cromosomi senza cambiare la formalizzazione delle variabili decisionali.
+Agisce sul processo evolutivo: crea, modifica o ripara cromosomi mantenendo la forma delle variabili decisionali.
 
 **Con chi comunica**
 
@@ -2020,11 +2581,11 @@ Nessuna specifica nota per questa classe.
 
 **Cosa fa, in parole semplici**
 
-Policy centralizzata per generare e mutare CPU e banda assegnate a un gene. Questa classe non sostituisce il Genetic Algorithm. Produce allocazioni iniziali e mutazioni plausibili, lasciando alla fitness la responsabilità di premiare o scartare le soluzioni. Il suo compito è evitare combinazioni palesemente incoerenti tra: p_i quota di offloading f_i CPU assegnata b_i banda assegnata deadline vincolo temporale del task candidate capacity capacità massima del candidato La policy mantiene la componente genetica: una parte delle allocazioni resta casuale; le allocazioni deadline-aware sono perturbate con rumore; la mutazione conserva small-step e random reset; la fitness resta responsabile della selezione finale. Propone f_i e b_i coerenti con quota, deadline e capacita' del candidato.
+Policy centralizzata per generare e mutare CPU e banda assegnate a un gene. Questa classe non sostituisce il Genetic Algorithm. Produce allocazioni iniziali e mutazioni plausibili, lasciando alla fitness la responsabilità di premiare o scartare le soluzioni. Il suo compito è evitare combinazioni palesemente incoerenti tra: p_i quota di offloading f_i CPU assegnata b_i banda assegnata deadline vincolo temporale del task candidate capacity capacità massima del candidato La policy mantiene la componente genetica: una parte delle allocazioni resta casuale; le allocazioni deadline-aware sono perturbate con rumore; la mutazione conserva small-step e random reset; la fitness resta responsabile della selezione finale. Propone `f_i` e `b_i` coerenti con quota, deadline e capacita' del candidato.
 
 **Relazione con la formalizzazione**
 
-Agisce sul processo evolutivo: crea, modifica o ripara cromosomi senza cambiare la formalizzazione delle variabili decisionali.
+Agisce sul processo evolutivo: crea, modifica o ripara cromosomi mantenendo la forma delle variabili decisionali.
 
 **Con chi comunica**
 
@@ -2057,9 +2618,9 @@ Campi dichiarati principali:
 | `private ResourceAllocationDecision allocateForFeasibleChoice( TaskInstance task, NodeCandidate candidate, double offloadingRatio, Random random, double roll )` | private | Metodo di supporto: realizza il passo `allocate for feasible choice` dentro la responsabilita' della classe. |
 | `private ResourceAllocationDecision allocateForBorderlineChoice( NodeCandidate candidate, double offloadingRatio, Random random, double roll )` | private | Metodo di supporto: realizza il passo `allocate for borderline choice` dentro la responsabilita' della classe. |
 | `private ResourceAllocationDecision allocateForInfeasibleChoice( NodeCandidate candidate, double offloadingRatio, Random random, double roll )` | private | Metodo di supporto: realizza il passo `allocate for infeasible choice` dentro la responsabilita' della classe. |
-| `private ResourceAllocationDecision mutateFeasibleChoice( Gene currentGene, TaskInstance task, NodeCandidate candidate, double offloadingRatio, Random random, double roll )` | private | Metodo di supporto: realizza il passo `mutate feasible choice` dentro la responsabilita' della classe. |
-| `private ResourceAllocationDecision mutateBorderlineChoice( Gene currentGene, NodeCandidate candidate, double offloadingRatio, Random random, double roll )` | private | Metodo di supporto: realizza il passo `mutate borderline choice` dentro la responsabilita' della classe. |
-| `private ResourceAllocationDecision mutateInfeasibleChoice( Gene currentGene, NodeCandidate candidate, double offloadingRatio, Random random, double roll )` | private | Metodo di supporto: realizza il passo `mutate infeasible choice` dentro la responsabilita' della classe. |
+| `private ResourceAllocationDecision mutateFeasibleChoice( Gene currentGene, TaskInstance task, NodeCandidate candidate, double offloadingRatio, Random random, double roll )` | private | Applica una mutazione genetica collegata a `mutate feasible choice`. |
+| `private ResourceAllocationDecision mutateBorderlineChoice( Gene currentGene, NodeCandidate candidate, double offloadingRatio, Random random, double roll )` | private | Applica una mutazione genetica collegata a `mutate borderline choice`. |
+| `private ResourceAllocationDecision mutateInfeasibleChoice( Gene currentGene, NodeCandidate candidate, double offloadingRatio, Random random, double roll )` | private | Applica una mutazione genetica collegata a `mutate infeasible choice`. |
 | `private Feasibility classifyFeasibility( TaskInstance task, NodeCandidate candidate, VehicleSnapshot sourceVehicle, double offloadingRatio )` | private | Classifica se una scelta remota è plausibile rispetto alla deadline. La stima è ottimistica: usa max CPU e max bandwidth del candidato. Se fallisce anche così, assegnare risorse aggressive non risolve il problema e rischia solo di saturare il sistema. |
 | `private ResourceAllocationDecision localAllocation( NodeCandidate candidate, VehicleSnapshot sourceVehicle )` | private | Metodo di supporto: realizza il passo `local allocation` dentro la responsabilita' della classe. |
 | `private ResourceAllocationDecision deadlineAwareAllocation( TaskInstance task, NodeCandidate candidate, double offloadingRatio, Random random )` | private | Allocazione deadline-aware per scelte effettivamente fattibili. |
@@ -2069,12 +2630,12 @@ Campi dichiarati principali:
 | `private ResourceAllocationDecision randomRemoteAllocation( NodeCandidate candidate, Random random )` | private | Metodo di supporto: realizza il passo `random remote allocation` dentro la responsabilita' della classe. |
 | `private ResourceAllocationDecision smallStepMutation( Gene gene, NodeCandidate candidate, Random random )` | private | Metodo di supporto: realizza il passo `small step mutation` dentro la responsabilita' della classe. |
 | `private ResourceAllocationDecision fractionRangeAllocation( NodeCandidate candidate, double minFraction, double maxFraction, Random random, ResourceAllocationDecision.Mode mode )` | private | Metodo di supporto: realizza il passo `fraction range allocation` dentro la responsabilita' della classe. |
-| `private double estimateLocalBranchTime( TaskInstance task, VehicleSnapshot sourceVehicle, double offloadingRatio )` | private | Metodo di supporto: realizza il passo `estimate local branch time` dentro la responsabilita' della classe. |
-| `private double estimateRemoteBranchLowerBound( TaskInstance task, NodeCandidate candidate, double offloadingRatio )` | private | Metodo di supporto: realizza il passo `estimate remote branch lower bound` dentro la responsabilita' della classe. |
-| `private double mutateResourceBySmallStep( double currentValue, double maxAvailable, Random random )` | private | Metodo di supporto: realizza il passo `mutate resource by small step` dentro la responsabilita' della classe. |
+| `private double estimateLocalBranchTime( TaskInstance task, VehicleSnapshot sourceVehicle, double offloadingRatio )` | private | Stima `estimate local branch time` senza modificare lo stato principale. |
+| `private double estimateRemoteBranchLowerBound( TaskInstance task, NodeCandidate candidate, double offloadingRatio )` | private | Stima `estimate remote branch lower bound` senza modificare lo stato principale. |
+| `private double mutateResourceBySmallStep( double currentValue, double maxAvailable, Random random )` | private | Applica una mutazione genetica collegata a `mutate resource by small step`. |
 | `private double randomResource( double maxAvailable, Random random )` | private | Metodo di supporto: realizza il passo `random resource` dentro la responsabilita' della classe. |
 | `private double clampResource( double value, double maxAvailable )` | private | Limita un valore dentro un intervallo ammesso. |
-| `private double normalizeRemoteRatio(double value)` | private | Normalizza `normalize remote ratio` per renderlo confrontabile o sicuro. |
+| `private double normalizeRemoteRatio(double value)` | private | Metodo di supporto: realizza il passo `normalize remote ratio` dentro la responsabilita' della classe. |
 | `private double randomFactor( Random random, double min, double max )` | private | Metodo di supporto: realizza il passo `random factor` dentro la responsabilita' della classe. |
 | `private double randomBetween( double min, double max, Random random )` | private | Metodo di supporto: realizza il passo `random between` dentro la responsabilita' della classe. |
 | `private double safeNonNegative(double value)` | private | Esegue un'operazione protetta per evitare valori non finiti o divisioni non valide. |
@@ -2083,8 +2644,8 @@ Campi dichiarati principali:
 
 **Problematiche aperte**
 
-- Riduce molte scelte deboli, ma resta una policy euristica: non garantisce deadline-feasibility finale.
-- Non conosce un budget globale condiviso di banda, lavora sulle capacita' del candidato/link.
+- Riduce molte scelte deboli, ma resta euristica: non garantisce da sola la deadline-feasibility finale.
+- Lavora sulle capacita' del candidato/link, non su un budget globale condiviso di banda.
 
 ### `Feasibility` (tipo interno di `ResourceAllocationPolicy`)
 
@@ -2098,7 +2659,7 @@ Enum: rappresenta un insieme chiuso di valori usati per rendere esplicite le sce
 
 **Relazione con la formalizzazione**
 
-Agisce sul processo evolutivo: crea, modifica o ripara cromosomi senza cambiare la formalizzazione delle variabili decisionali.
+Agisce sul processo evolutivo: crea, modifica o ripara cromosomi mantenendo la forma delle variabili decisionali.
 
 **Con chi comunica**
 
@@ -2126,11 +2687,11 @@ Nessuna specifica nota per questa classe.
 
 **Cosa fa, in parole semplici**
 
-Operatore di selezione dei genitori. Implementa una tournament selection per un problema di minimizzazione: a ogni selezione vengono estratti `tournamentSize` cromosomi e viene restituito quello con fitness più bassa. Sceglie genitori tramite torneo.
+Operatore di selezione dei genitori. Implementa una tournament selection per un problema di minimizzazione: a ogni selezione vengono estratti `tournamentSize` cromosomi e viene restituito quello con fitness più bassa.
 
 **Relazione con la formalizzazione**
 
-Agisce sul processo evolutivo: crea, modifica o ripara cromosomi senza cambiare la formalizzazione delle variabili decisionali.
+Agisce sul processo evolutivo: crea, modifica o ripara cromosomi mantenendo la forma delle variabili decisionali.
 
 **Con chi comunica**
 
@@ -2156,17 +2717,17 @@ Nessuna specifica nota per questa classe.
 
 ## Package `io.reporting`
 
-Stampa report leggibili per capire cosa ha fatto il GA e il gestore temporale.
+Stampa report leggibili per capire cosa ha fatto il GA e dove nascono costi o violazioni.
 
 ### `AdaptiveWindowDiagnosticPrinter`
 
-- File: `src/io/reporting/AdaptiveWindowDiagnosticPrinter.java:14`
+- File: `src/io/reporting/AdaptiveWindowDiagnosticPrinter.java:19`
 - Tipo: `class`
 - Nome completo: `io.reporting.AdaptiveWindowDiagnosticPrinter`
 
 **Cosa fa, in parole semplici**
 
-Printer compatto per controllare la finestra adattiva.
+Printer compatto per controllare la finestra adattiva. Oltre ai bounds, mostra se il runtime osservato del GA è compatibile con la durata della finestra corrente e con quella successiva. L'avviso non modifica il comportamento del manager: rende visibile una condizione che dovrà essere discussa prima di introdurre budget adattivi o asincronia.
 
 **Relazione con la formalizzazione**
 
@@ -2180,6 +2741,7 @@ In pratica questa classe riceve questi oggetti, li costruisce oppure li passa al
 **Campi o valori importanti**
 
 Campi dichiarati principali:
+- `private static final double EPSILON_SECONDS = 1.0E-6`
 - `private final PrintStream out`
 
 **Metodi**
@@ -2188,16 +2750,17 @@ Campi dichiarati principali:
 |---|---:|---|
 | `public AdaptiveWindowDiagnosticPrinter()` | public | Costruttore: crea l'oggetto e controlla che i dati necessari siano validi. |
 | `public AdaptiveWindowDiagnosticPrinter(PrintStream out)` | public | Costruttore: crea l'oggetto e controlla che i dati necessari siano validi. |
-| `public void print(TemporalWindowResult result)` | public | Stampa `print` in forma leggibile per l'utente o per la diagnostica. |
+| `public void print(TemporalWindowResult result)` | public | Stampa una sezione diagnostica o un report leggibile. |
+| `private String runtimeBudgetStatus( AdaptiveWindowDecision decision, TemporalWindowBounds bounds )` | private | Metodo di supporto: realizza il passo `runtime budget status` dentro la responsabilita' della classe. |
 | `private String formatSeconds(double value)` | private | Metodo di supporto: realizza il passo `format seconds` dentro la responsabilita' della classe. |
 
 **Problematiche aperte**
 
-- Mostra gaUsed e gaObserved: se divergono molto, il report segnala una scelta di modello temporale da discutere.
+Nessuna specifica nota per questa classe.
 
 ### `AdaptiveWindowReportPrinter`
 
-- File: `src/io/reporting/AdaptiveWindowReportPrinter.java:17`
+- File: `src/io/reporting/AdaptiveWindowReportPrinter.java:18`
 - Tipo: `class`
 - Nome completo: `io.reporting.AdaptiveWindowReportPrinter`
 
@@ -2211,7 +2774,7 @@ Non cambia il modello: rende osservabili fitness, vincoli, tempi e diagnosi.
 
 **Con chi comunica**
 
-Comunica direttamente con: `FilteringSystemStateSource`, `MaGaConfig`, `TemporalWindowResult`.
+Comunica direttamente con: `FilteringSystemStateSource`, `MaGaConfig`, `TemporalRuntimeProfile`, `TemporalWindowResult`.
 In pratica questa classe riceve questi oggetti, li costruisce oppure li passa allo step successivo del flusso.
 
 **Campi o valori importanti**
@@ -2226,12 +2789,13 @@ Campi dichiarati principali:
 |---|---:|---|
 | `public AdaptiveWindowReportPrinter(MaGaConfig config)` | public | Costruttore: crea l'oggetto e controlla che i dati necessari siano validi. |
 | `public AdaptiveWindowReportPrinter(MaGaConfig config, PrintStream out)` | public | Costruttore: crea l'oggetto e controlla che i dati necessari siano validi. |
-| `public void print( String requestedSourceMode, String snapshotFolder, TemporalWindowResult result, FilteringSystemStateSource filteredSource )` | public | Stampa `print` in forma leggibile per l'utente o per la diagnostica. |
-| `private void printExecutionMetadata(String requestedSourceMode, String snapshotFolder)` | private | Stampa `print execution metadata` in forma leggibile per l'utente o per la diagnostica. |
+| `public void print( String requestedSourceMode, String snapshotFolder, TemporalWindowResult result, FilteringSystemStateSource filteredSource )` | public | Mantiene compatibilità con eventuali chiamanti precedenti. Il vecchio overload non esponeva il profilo temporale e viene quindi interpretato come replay astratto configurato. |
+| `public void print( String requestedSourceMode, TemporalRuntimeProfile runtimeProfile, String snapshotFolder, TemporalWindowResult result, FilteringSystemStateSource filteredSource )` | public | Stampa una sezione diagnostica o un report leggibile. |
+| `private void printExecutionMetadata( String requestedSourceMode, TemporalRuntimeProfile runtimeProfile, String snapshotFolder )` | private | Stampa una sezione diagnostica o un report leggibile. |
 
 **Problematiche aperte**
 
-- Dichiara correttamente la differenza JSON_TIME/JSON_SEQUENCE, ma la sorgente time-indexed va resa coerente con la nota.
+Nessuna specifica nota per questa classe.
 
 ### `CandidateFilteringPrinter`
 
@@ -2263,12 +2827,62 @@ Campi dichiarati principali:
 |---|---:|---|
 | `public CandidateFilteringPrinter()` | public | Costruttore: crea l'oggetto e controlla che i dati necessari siano validi. |
 | `public CandidateFilteringPrinter(PrintStream out)` | public | Costruttore: crea l'oggetto e controlla che i dati necessari siano validi. |
-| `public void print(List<CandidateFilteringResult> results)` | public | Stampa `print` in forma leggibile per l'utente o per la diagnostica. |
+| `public void print(List<CandidateFilteringResult> results)` | public | Stampa una sezione diagnostica o un report leggibile. |
 | `private String formatReasons( Map<CandidateRejectionReason, Integer> reasonMap )` | private | Metodo di supporto: realizza il passo `format reasons` dentro la responsabilita' della classe. |
 
 **Problematiche aperte**
 
 Nessuna specifica nota per questa classe.
+
+### `DeadlineBestEffortDiagnosticPrinter`
+
+- File: `src/io/reporting/DeadlineBestEffortDiagnosticPrinter.java:21`
+- Tipo: `class`
+- Nome completo: `io.reporting.DeadlineBestEffortDiagnosticPrinter`
+
+**Cosa fa, in parole semplici**
+
+Report dedicato alle decisioni finali che restano fuori deadline dopo il repair. Una violazione residua viene indicata come `DEGRADED_BEST_EFFORT`: il repair ha confrontato un insieme limitato di alternative coerenti e ha mantenuto quella con lo sforamento stimato più basso. La marcatura non certifica l'insoddisfacibilità matematica globale del task. Evidenzia i task finiti in scelta degradata best-effort.
+
+**Relazione con la formalizzazione**
+
+Non cambia il modello: rende osservabili fitness, vincoli, tempi e diagnosi.
+
+**Con chi comunica**
+
+Comunica direttamente con: `EvaluationBreakdown`, `GeneEvaluationBreakdown`, `TemporalStepResult`, `TemporalWindowResult`.
+In pratica questa classe riceve questi oggetti, li costruisce oppure li passa allo step successivo del flusso.
+
+**Campi o valori importanti**
+
+Campi dichiarati principali:
+- `private static final int DEFAULT_TOP_LIMIT = 10`
+- `private final PrintStream out`
+- `private final int topLimit`
+
+**Metodi**
+
+| Metodo | Visibilita' | Spiegazione semplice |
+|---|---:|---|
+| `public DeadlineBestEffortDiagnosticPrinter()` | public | Costruttore: crea l'oggetto e controlla che i dati necessari siano validi. |
+| `public DeadlineBestEffortDiagnosticPrinter(PrintStream out)` | public | Costruttore: crea l'oggetto e controlla che i dati necessari siano validi. |
+| `public DeadlineBestEffortDiagnosticPrinter(PrintStream out, int topLimit)` | public | Costruttore: crea l'oggetto e controlla che i dati necessari siano validi. |
+| `public void print(TemporalWindowResult result)` | public | Stampa una sezione diagnostica o un report leggibile. |
+| `private void printHeader()` | private | Stampa una sezione diagnostica o un report leggibile. |
+| `private void printInterpretation()` | private | Stampa una sezione diagnostica o un report leggibile. |
+| `private void printWindowSummary(List<TemporalStepResult> steps)` | private | Stampa una sezione diagnostica o un report leggibile. |
+| `private void printTopResidualViolations(List<TemporalStepResult> steps)` | private | Stampa una sezione diagnostica o un report leggibile. |
+| `private List<GeneEvaluationBreakdown> degradedGenes(EvaluationBreakdown evaluation)` | private | Metodo di supporto: realizza il passo `degraded genes` dentro la responsabilita' della classe. |
+| `private double maxLateness(List<GeneEvaluationBreakdown> degraded)` | private | Metodo di supporto: realizza il passo `max lateness` dentro la responsabilita' della classe. |
+| `private double averageLateness(List<GeneEvaluationBreakdown> degraded)` | private | Metodo di supporto: realizza il passo `average lateness` dentro la responsabilita' della classe. |
+| `private double latenessSeconds(GeneEvaluationBreakdown gene)` | private | Metodo di supporto: realizza il passo `lateness seconds` dentro la responsabilita' della classe. |
+| `private void printSection(String title)` | private | Stampa una sezione diagnostica o un report leggibile. |
+| `private String format(double value)` | private | Metodo di supporto: realizza il passo `format` dentro la responsabilita' della classe. |
+| `private String formatSeconds(double value)` | private | Metodo di supporto: realizza il passo `format seconds` dentro la responsabilita' della classe. |
+
+**Problematiche aperte**
+
+- Il report segnala fallback degradati, ma non sostituisce un'analisi matematica di infeasibilita'.
 
 ### `DeepTemporalWindowDiagnosticPrinter`
 
@@ -2286,7 +2900,7 @@ Non cambia il modello: rende osservabili fitness, vincoli, tempi e diagnosi.
 
 **Con chi comunica**
 
-Comunica direttamente con: `DeadlineViolationAnalyzer`, `DeadlineViolationCause`, `DeadlineViolationDiagnosis`, `DeadlineViolationWindowSummary`, `DecisionType`, `DynamicityBreakdown`, `EvaluationBreakdown`, `ExecutionNodeResourceUsageBreakdown`, `GaParameterScalingResult`, `GeneEvaluationBreakdown`, `GenerationStat`, `GeneticAlgorithmConfig`, `LinkBandwidthUsageBreakdown`, `MaGaConfig`, ... altri 3.
+Comunica direttamente con: `DeadlineViolationAnalyzer`, `DeadlineViolationCause`, `DeadlineViolationDiagnosis`, `DeadlineViolationWindowSummary`, `DecisionType`, `DynamicityBreakdown`, `EvaluationBreakdown`, `ExecutionNodeResourceUsageBreakdown`, `GaParameterScalingResult`, `GeneEvaluationBreakdown`, `GenerationStat`, `GeneticAlgorithmConfig`, `LinkBandwidthUsageBreakdown`, `MaGaConfig`, `NodeType`, `TemporalStepResult`, ... altri 1.
 In pratica questa classe riceve questi oggetti, li costruisce oppure li passa allo step successivo del flusso.
 
 **Campi o valori importanti**
@@ -2307,26 +2921,26 @@ Campi dichiarati principali:
 | `public DeepTemporalWindowDiagnosticPrinter(MaGaConfig config)` | public | Costruisce il printer con configurazione MA-GA. @param config configurazione usata nel test |
 | `public DeepTemporalWindowDiagnosticPrinter( MaGaConfig config, PrintStream out, int topLimit )` | public | Costruisce il printer completo. @param config configurazione usata nel test, può essere null @param out stream di output @param topLimit numero massimo di task mostrati nelle sezioni top-N |
 | `public void print(TemporalWindowResult result)` | public | Stampa il report diagnostico mirato. @param result risultato prodotto da TemporalWindowManager |
-| `private void printHeader()` | private | Stampa `print header` in forma leggibile per l'utente o per la diagnostica. |
-| `private void printExecutiveSummary( TemporalWindowResult result, List<TemporalStepResult> steps )` | private | Stampa `print executive summary` in forma leggibile per l'utente o per la diagnostica. |
-| `private void printTemporalAndDynamicitySummary( List<TemporalStepResult> steps )` | private | Stampa `print temporal and dynamicity summary` in forma leggibile per l'utente o per la diagnostica. |
-| `private void printGaConvergenceSummary(List<TemporalStepResult> steps)` | private | Stampa `print ga convergence summary` in forma leggibile per l'utente o per la diagnostica. |
-| `private void printDecisionAndOffloadingSummary( List<TemporalStepResult> steps )` | private | Stampa `print decision and offloading summary` in forma leggibile per l'utente o per la diagnostica. |
-| `private void printDeadlineCauseSummary(List<TemporalStepResult> steps)` | private | Stampa `print deadline cause summary` in forma leggibile per l'utente o per la diagnostica. |
-| `private void printTopDeadlineViolations(List<TemporalStepResult> steps)` | private | Stampa `print top deadline violations` in forma leggibile per l'utente o per la diagnostica. |
-| `private void printCoverageProblemSummary(List<TemporalStepResult> steps)` | private | Stampa `print coverage problem summary` in forma leggibile per l'utente o per la diagnostica. |
-| `private void printResourcePressureSummary(List<TemporalStepResult> steps)` | private | Stampa `print resource pressure summary` in forma leggibile per l'utente o per la diagnostica. |
-| `private void printWorstWindows(List<TemporalStepResult> steps)` | private | Stampa `print worst windows` in forma leggibile per l'utente o per la diagnostica. |
-| `private void printWorstByFitness(List<TemporalStepResult> steps)` | private | Stampa `print worst by fitness` in forma leggibile per l'utente o per la diagnostica. |
-| `private void printWorstByDeadline(List<TemporalStepResult> steps)` | private | Stampa `print worst by deadline` in forma leggibile per l'utente o per la diagnostica. |
-| `private void printWorstByCoverage(List<TemporalStepResult> steps)` | private | Stampa `print worst by coverage` in forma leggibile per l'utente o per la diagnostica. |
-| `private void printDiagnosis(List<TemporalStepResult> steps)` | private | Stampa `print diagnosis` in forma leggibile per l'utente o per la diagnostica. |
+| `private void printHeader()` | private | Stampa una sezione diagnostica o un report leggibile. |
+| `private void printExecutiveSummary( TemporalWindowResult result, List<TemporalStepResult> steps )` | private | Stampa una sezione diagnostica o un report leggibile. |
+| `private void printTemporalAndDynamicitySummary( List<TemporalStepResult> steps )` | private | Stampa una sezione diagnostica o un report leggibile. |
+| `private void printGaConvergenceSummary(List<TemporalStepResult> steps)` | private | Stampa una sezione diagnostica o un report leggibile. |
+| `private void printDecisionAndOffloadingSummary( List<TemporalStepResult> steps )` | private | Stampa una sezione diagnostica o un report leggibile. |
+| `private void printDeadlineCauseSummary(List<TemporalStepResult> steps)` | private | Stampa una sezione diagnostica o un report leggibile. |
+| `private void printTopDeadlineViolations(List<TemporalStepResult> steps)` | private | Stampa una sezione diagnostica o un report leggibile. |
+| `private void printCoverageProblemSummary(List<TemporalStepResult> steps)` | private | Stampa una sezione diagnostica o un report leggibile. |
+| `private void printResourcePressureSummary(List<TemporalStepResult> steps)` | private | Stampa una sezione diagnostica o un report leggibile. |
+| `private void printWorstWindows(List<TemporalStepResult> steps)` | private | Stampa una sezione diagnostica o un report leggibile. |
+| `private void printWorstByFitness(List<TemporalStepResult> steps)` | private | Stampa una sezione diagnostica o un report leggibile. |
+| `private void printWorstByDeadline(List<TemporalStepResult> steps)` | private | Stampa una sezione diagnostica o un report leggibile. |
+| `private void printWorstByCoverage(List<TemporalStepResult> steps)` | private | Stampa una sezione diagnostica o un report leggibile. |
+| `private void printDiagnosis(List<TemporalStepResult> steps)` | private | Stampa una sezione diagnostica o un report leggibile. |
 | `private DeadlineViolationWindowSummary deadlineSummary( TemporalStepResult step )` | private | Metodo di supporto: realizza il passo `deadline summary` dentro la responsabilita' della classe. |
 | `private GeneticAlgorithmConfig resolveEffectiveConfig( TemporalStepResult step )` | private | Metodo di supporto: realizza il passo `resolve effective config` dentro la responsabilita' della classe. |
 | `private String triggerLabel(TemporalStepResult step)` | private | Metodo di supporto: realizza il passo `trigger label` dentro la responsabilita' della classe. |
 | `private <T> List<T> limit(List<T> values, int limit)` | private | Metodo di supporto: realizza il passo `limit` dentro la responsabilita' della classe. |
-| `private void printCauseCounters( Map<DeadlineViolationCause, Integer> counters )` | private | Stampa `print cause counters` in forma leggibile per l'utente o per la diagnostica. |
-| `private void printSection(String title)` | private | Stampa `print section` in forma leggibile per l'utente o per la diagnostica. |
+| `private void printCauseCounters( Map<DeadlineViolationCause, Integer> counters )` | private | Stampa una sezione diagnostica o un report leggibile. |
+| `private void printSection(String title)` | private | Stampa una sezione diagnostica o un report leggibile. |
 | `private String format(double value)` | private | Metodo di supporto: realizza il passo `format` dentro la responsabilita' della classe. |
 | `private String formatSeconds(double value)` | private | Metodo di supporto: realizza il passo `format seconds` dentro la responsabilita' della classe. |
 | `private String formatPercent(double value)` | private | Metodo di supporto: realizza il passo `format percent` dentro la responsabilita' della classe. |
@@ -2351,7 +2965,7 @@ Non cambia il modello: rende osservabili fitness, vincoli, tempi e diagnosi.
 
 **Con chi comunica**
 
-Comunica direttamente con: `DeadlineViolationAnalyzer`, `DeadlineViolationCause`, `DeadlineViolationDiagnosis`, `DeadlineViolationWindowSummary`, `DecisionType`, `DynamicityBreakdown`, `EvaluationBreakdown`, `ExecutionNodeResourceUsageBreakdown`, `GaParameterScalingResult`, `GeneEvaluationBreakdown`, `GenerationStat`, `GeneticAlgorithmConfig`, `LinkBandwidthUsageBreakdown`, `MaGaConfig`, ... altri 3.
+Comunica direttamente con: `DeadlineViolationAnalyzer`, `DeadlineViolationCause`, `DeadlineViolationDiagnosis`, `DeadlineViolationWindowSummary`, `DecisionType`, `DynamicityBreakdown`, `EvaluationBreakdown`, `ExecutionNodeResourceUsageBreakdown`, `GaParameterScalingResult`, `GeneEvaluationBreakdown`, `GenerationStat`, `GeneticAlgorithmConfig`, `LinkBandwidthUsageBreakdown`, `MaGaConfig`, `NodeType`, `TemporalStepResult`, ... altri 1.
 In pratica questa classe riceve questi oggetti, li costruisce oppure li passa allo step successivo del flusso.
 
 **Campi o valori importanti**
@@ -2389,7 +3003,7 @@ Non cambia il modello: rende osservabili fitness, vincoli, tempi e diagnosi.
 
 **Con chi comunica**
 
-Comunica direttamente con: `DeadlineViolationAnalyzer`, `DeadlineViolationCause`, `DeadlineViolationDiagnosis`, `DeadlineViolationWindowSummary`, `DecisionType`, `DynamicityBreakdown`, `EvaluationBreakdown`, `ExecutionNodeResourceUsageBreakdown`, `GaParameterScalingResult`, `GeneEvaluationBreakdown`, `GenerationStat`, `GeneticAlgorithmConfig`, `LinkBandwidthUsageBreakdown`, `MaGaConfig`, ... altri 3.
+Comunica direttamente con: `DeadlineViolationAnalyzer`, `DeadlineViolationCause`, `DeadlineViolationDiagnosis`, `DeadlineViolationWindowSummary`, `DecisionType`, `DynamicityBreakdown`, `EvaluationBreakdown`, `ExecutionNodeResourceUsageBreakdown`, `GaParameterScalingResult`, `GeneEvaluationBreakdown`, `GenerationStat`, `GeneticAlgorithmConfig`, `LinkBandwidthUsageBreakdown`, `MaGaConfig`, `NodeType`, `TemporalStepResult`, ... altri 1.
 In pratica questa classe riceve questi oggetti, li costruisce oppure li passa allo step successivo del flusso.
 
 **Campi o valori importanti**
@@ -2441,7 +3055,7 @@ Non cambia il modello: rende osservabili fitness, vincoli, tempi e diagnosi.
 
 **Con chi comunica**
 
-Comunica direttamente con: `DeadlineViolationAnalyzer`, `DeadlineViolationCause`, `DeadlineViolationDiagnosis`, `DeadlineViolationWindowSummary`, `DecisionType`, `DynamicityBreakdown`, `EvaluationBreakdown`, `ExecutionNodeResourceUsageBreakdown`, `GaParameterScalingResult`, `GeneEvaluationBreakdown`, `GenerationStat`, `GeneticAlgorithmConfig`, `LinkBandwidthUsageBreakdown`, `MaGaConfig`, ... altri 3.
+Comunica direttamente con: `DeadlineViolationAnalyzer`, `DeadlineViolationCause`, `DeadlineViolationDiagnosis`, `DeadlineViolationWindowSummary`, `DecisionType`, `DynamicityBreakdown`, `EvaluationBreakdown`, `ExecutionNodeResourceUsageBreakdown`, `GaParameterScalingResult`, `GeneEvaluationBreakdown`, `GenerationStat`, `GeneticAlgorithmConfig`, `LinkBandwidthUsageBreakdown`, `MaGaConfig`, `NodeType`, `TemporalStepResult`, ... altri 1.
 In pratica questa classe riceve questi oggetti, li costruisce oppure li passa allo step successivo del flusso.
 
 **Campi o valori importanti**
@@ -2483,7 +3097,7 @@ Non cambia il modello: rende osservabili fitness, vincoli, tempi e diagnosi.
 
 **Con chi comunica**
 
-Comunica direttamente con: `DeadlineViolationAnalyzer`, `DeadlineViolationCause`, `DeadlineViolationDiagnosis`, `DeadlineViolationWindowSummary`, `DecisionType`, `DynamicityBreakdown`, `EvaluationBreakdown`, `ExecutionNodeResourceUsageBreakdown`, `GaParameterScalingResult`, `GeneEvaluationBreakdown`, `GenerationStat`, `GeneticAlgorithmConfig`, `LinkBandwidthUsageBreakdown`, `MaGaConfig`, ... altri 3.
+Comunica direttamente con: `DeadlineViolationAnalyzer`, `DeadlineViolationCause`, `DeadlineViolationDiagnosis`, `DeadlineViolationWindowSummary`, `DecisionType`, `DynamicityBreakdown`, `EvaluationBreakdown`, `ExecutionNodeResourceUsageBreakdown`, `GaParameterScalingResult`, `GeneEvaluationBreakdown`, `GenerationStat`, `GeneticAlgorithmConfig`, `LinkBandwidthUsageBreakdown`, `MaGaConfig`, `NodeType`, `TemporalStepResult`, ... altri 1.
 In pratica questa classe riceve questi oggetti, li costruisce oppure li passa allo step successivo del flusso.
 
 **Campi o valori importanti**
@@ -2523,7 +3137,7 @@ Non cambia il modello: rende osservabili fitness, vincoli, tempi e diagnosi.
 
 **Con chi comunica**
 
-Comunica direttamente con: `DeadlineViolationAnalyzer`, `DeadlineViolationCause`, `DeadlineViolationDiagnosis`, `DeadlineViolationWindowSummary`, `DecisionType`, `DynamicityBreakdown`, `EvaluationBreakdown`, `ExecutionNodeResourceUsageBreakdown`, `GaParameterScalingResult`, `GeneEvaluationBreakdown`, `GenerationStat`, `GeneticAlgorithmConfig`, `LinkBandwidthUsageBreakdown`, `MaGaConfig`, ... altri 3.
+Comunica direttamente con: `DeadlineViolationAnalyzer`, `DeadlineViolationCause`, `DeadlineViolationDiagnosis`, `DeadlineViolationWindowSummary`, `DecisionType`, `DynamicityBreakdown`, `EvaluationBreakdown`, `ExecutionNodeResourceUsageBreakdown`, `GaParameterScalingResult`, `GeneEvaluationBreakdown`, `GenerationStat`, `GeneticAlgorithmConfig`, `LinkBandwidthUsageBreakdown`, `MaGaConfig`, `NodeType`, `TemporalStepResult`, ... altri 1.
 In pratica questa classe riceve questi oggetti, li costruisce oppure li passa allo step successivo del flusso.
 
 **Campi o valori importanti**
@@ -2552,7 +3166,7 @@ Nessuna specifica nota per questa classe.
 
 ### `GaBatchReportPrinter`
 
-- File: `src/io/reporting/GaBatchReportPrinter.java:19`
+- File: `src/io/reporting/GaBatchReportPrinter.java:20`
 - Tipo: `class`
 - Nome completo: `io.reporting.GaBatchReportPrinter`
 
@@ -2581,16 +3195,19 @@ Campi dichiarati principali:
 |---|---:|---|
 | `public GaBatchReportPrinter(MaGaConfig config)` | public | Costruttore: crea l'oggetto e controlla che i dati necessari siano validi. |
 | `public GaBatchReportPrinter(MaGaConfig config, PrintStream out)` | public | Costruttore: crea l'oggetto e controlla che i dati necessari siano validi. |
-| `public void print( String snapshotFolder, List<SnapshotRun> runs, boolean includeDetailedReports )` | public | Stampa `print` in forma leggibile per l'utente o per la diagnostica. |
-| `private void printHeader(String snapshotFolder, int runCount)` | private | Stampa `print header` in forma leggibile per l'utente o per la diagnostica. |
-| `private void printComparisonTable(List<SnapshotRun> runs)` | private | Stampa `print comparison table` in forma leggibile per l'utente o per la diagnostica. |
-| `private void printWorstSnapshots(List<SnapshotRun> runs)` | private | Stampa `print worst snapshots` in forma leggibile per l'utente o per la diagnostica. |
-| `private void printDetailedReports(List<SnapshotRun> runs)` | private | Stampa `print detailed reports` in forma leggibile per l'utente o per la diagnostica. |
+| `public void print( String snapshotFolder, List<SnapshotRun> runs, boolean includeDetailedReports )` | public | Stampa una sezione diagnostica o un report leggibile. |
+| `private void printHeader(String snapshotFolder, int runCount)` | private | Stampa una sezione diagnostica o un report leggibile. |
+| `private void printComparisonTable(List<SnapshotRun> runs)` | private | Stampa una sezione diagnostica o un report leggibile. |
+| `private void printWorstSnapshots(List<SnapshotRun> runs)` | private | Stampa una sezione diagnostica o un report leggibile. |
+| `private void printDetailedReports(List<SnapshotRun> runs)` | private | Stampa una sezione diagnostica o un report leggibile. |
 | `private long countDeadlineViolations(EvaluationBreakdown evaluation)` | private | Metodo di supporto: realizza il passo `count deadline violations` dentro la responsabilita' della classe. |
+| `private long countDegradedBestEffort(EvaluationBreakdown evaluation)` | private | Metodo di supporto: realizza il passo `count degraded best effort` dentro la responsabilita' della classe. |
+| `private double computeMaxLateness(EvaluationBreakdown evaluation)` | private | Calcola `compute max lateness` a partire dai dati ricevuti. |
+| `private double latenessSeconds(GeneEvaluationBreakdown gene)` | private | Metodo di supporto: realizza il passo `lateness seconds` dentro la responsabilita' della classe. |
 | `private long countCpuViolations(EvaluationBreakdown evaluation)` | private | Metodo di supporto: realizza il passo `count cpu violations` dentro la responsabilita' della classe. |
 | `private long countBandwidthViolations(EvaluationBreakdown evaluation)` | private | Metodo di supporto: realizza il passo `count bandwidth violations` dentro la responsabilita' della classe. |
 | `private double improvementRatio(MaGaResult result)` | private | Metodo di supporto: realizza il passo `improvement ratio` dentro la responsabilita' della classe. |
-| `private void printSection(String title)` | private | Stampa `print section` in forma leggibile per l'utente o per la diagnostica. |
+| `private void printSection(String title)` | private | Stampa una sezione diagnostica o un report leggibile. |
 | `private String format(double value)` | private | Metodo di supporto: realizza il passo `format` dentro la responsabilita' della classe. |
 | `private String formatSeconds(double value)` | private | Metodo di supporto: realizza il passo `format seconds` dentro la responsabilita' della classe. |
 | `private String formatPercent(double value)` | private | Metodo di supporto: realizza il passo `format percent` dentro la responsabilita' della classe. |
@@ -2601,7 +3218,7 @@ Nessuna specifica nota per questa classe.
 
 ### `SnapshotRun` (tipo interno di `GaBatchReportPrinter`)
 
-- File: `src/io/reporting/GaBatchReportPrinter.java:200`
+- File: `src/io/reporting/GaBatchReportPrinter.java:241`
 - Tipo: `record`
 - Nome completo: `io.reporting.GaBatchReportPrinter.SnapshotRun`
 
@@ -2623,6 +3240,165 @@ In pratica questa classe riceve questi oggetti, li costruisce oppure li passa al
 | Metodo | Visibilita' | Spiegazione semplice |
 |---|---:|---|
 | `public SnapshotRun` | public | Costruttore: crea l'oggetto e controlla che i dati necessari siano validi. |
+
+**Problematiche aperte**
+
+Nessuna specifica nota per questa classe.
+
+### `LatencyDiagnosticPrinter`
+
+- File: `src/io/reporting/LatencyDiagnosticPrinter.java:33`
+- Tipo: `class`
+- Nome completo: `io.reporting.LatencyDiagnosticPrinter`
+
+**Cosa fa, in parole semplici**
+
+Report diagnostico dedicato alla latenza comunicativa. La classe non ricalcola la fitness. Legge i breakdown prodotti per il miglior cromosoma di ogni finestra e rende esplicita la semantica adottata nella fase 6A: L_i = p * input / b + output / b + tau_n per p > 0 L(C) = sum_i L_i `tau_n` è interpretato come ritardo end-to-end aggregato del percorso remoto. Il valore è indipendente da `p` e viene conteggiato una sola volta per ogni scelta remota. Spiega e verifica la semantica attuale di `L(C) = sum_i L_i`.
+
+**Relazione con la formalizzazione**
+
+Non cambia il modello: rende osservabili fitness, vincoli, tempi e diagnosi.
+
+**Con chi comunica**
+
+Comunica direttamente con: `EvaluationBreakdown`, `GeneEvaluationBreakdown`, `MaGaConfig`, `NodeType`, `TemporalStepResult`, `TemporalWindowResult`.
+In pratica questa classe riceve questi oggetti, li costruisce oppure li passa allo step successivo del flusso.
+
+**Campi o valori importanti**
+
+Campi dichiarati principali:
+- `private static final double EPSILON = 1.0E-9`
+- `private static final int DEFAULT_TOP_LIMIT = 10`
+- `private final MaGaConfig config`
+- `private final PrintStream out`
+- `private final int topLimit`
+
+**Metodi**
+
+| Metodo | Visibilita' | Spiegazione semplice |
+|---|---:|---|
+| `public LatencyDiagnosticPrinter(MaGaConfig config, PrintStream out)` | public | Costruttore: crea l'oggetto e controlla che i dati necessari siano validi. |
+| `public LatencyDiagnosticPrinter( MaGaConfig config, PrintStream out, int topLimit )` | public | Costruttore: crea l'oggetto e controlla che i dati necessari siano validi. |
+| `public void print(TemporalWindowResult result)` | public | Stampa una sezione diagnostica o un report leggibile. |
+| `private void printConfiguration()` | private | Stampa una sezione diagnostica o un report leggibile. |
+| `private void printSummaryByWindow(TemporalWindowResult result)` | private | Stampa una sezione diagnostica o un report leggibile. |
+| `private void printTopCommunicationDecisions(TemporalWindowResult result)` | private | Stampa una sezione diagnostica o un report leggibile. |
+| `private void printAssumptions()` | private | Stampa una sezione diagnostica o un report leggibile. |
+| `private List<GeneEvaluationBreakdown> remoteGenes( List<GeneEvaluationBreakdown> genes )` | private | Metodo di supporto: realizza il passo `remote genes` dentro la responsabilita' della classe. |
+| `private void printSectionTitle(String title)` | private | Stampa una sezione diagnostica o un report leggibile. |
+| `private void printf(String format, Object... values)` | private | Stampa una sezione diagnostica o un report leggibile. |
+
+**Problematiche aperte**
+
+Nessuna specifica nota per questa classe.
+
+### `MobilityDiagnosticPrinter`
+
+- File: `src/io/reporting/MobilityDiagnosticPrinter.java:29`
+- Tipo: `class`
+- Nome completo: `io.reporting.MobilityDiagnosticPrinter`
+
+**Cosa fa, in parole semplici**
+
+Report diagnostico dedicato alla mobilità. La classe non ricalcola la fitness. Legge i breakdown prodotti durante la valutazione del miglior cromosoma di ogni finestra e rende espliciti distanza, copertura, phi_cov, phi_link, phi_ho e contributi pesati. Rende visibili copertura, instabilita' e componenti della penalita' mobility-aware.
+
+**Relazione con la formalizzazione**
+
+Non cambia il modello: rende osservabili fitness, vincoli, tempi e diagnosi.
+
+**Con chi comunica**
+
+Comunica direttamente con: `GeneEvaluationBreakdown`, `MaGaConfig`, `MobilityConfig`, `MobilityLinkMetrics`, `MobilityPenaltyBreakdown`, `NodeType`, `PenaltyConfig`, `TemporalStepResult`, `TemporalWindowResult`.
+In pratica questa classe riceve questi oggetti, li costruisce oppure li passa allo step successivo del flusso.
+
+**Campi o valori importanti**
+
+Campi dichiarati principali:
+- `private static final int DEFAULT_TOP_RISK_LIMIT = 10`
+- `private final MaGaConfig config`
+- `private final PrintStream out`
+- `private final int topRiskLimit`
+
+**Metodi**
+
+| Metodo | Visibilita' | Spiegazione semplice |
+|---|---:|---|
+| `public MobilityDiagnosticPrinter(MaGaConfig config, PrintStream out)` | public | Costruttore: crea l'oggetto e controlla che i dati necessari siano validi. |
+| `public MobilityDiagnosticPrinter( MaGaConfig config, PrintStream out, int topRiskLimit )` | public | Costruttore: crea l'oggetto e controlla che i dati necessari siano validi. |
+| `public void print(TemporalWindowResult result)` | public | Stampa una sezione diagnostica o un report leggibile. |
+| `private void printConfiguration()` | private | Stampa una sezione diagnostica o un report leggibile. |
+| `private void printPenaltySummaryByWindow(TemporalWindowResult result)` | private | Stampa una sezione diagnostica o un report leggibile. |
+| `private void printSummaryByNodeType(TemporalWindowResult result)` | private | Stampa una sezione diagnostica o un report leggibile. |
+| `private void printTopMobilityRiskDecisions(TemporalWindowResult result)` | private | Stampa una sezione diagnostica o un report leggibile. |
+| `private void printModelAssumptions()` | private | Stampa una sezione diagnostica o un report leggibile. |
+| `private List<GeneEvaluationBreakdown> genes(TemporalStepResult step)` | private | Metodo di supporto: realizza il passo `genes` dentro la responsabilita' della classe. |
+| `private List<GeneEvaluationBreakdown> remoteGenes(TemporalStepResult step)` | private | Metodo di supporto: realizza il passo `remote genes` dentro la responsabilita' della classe. |
+| `private String modelSummary(List<GeneEvaluationBreakdown> genes)` | private | Metodo di supporto: realizza il passo `model summary` dentro la responsabilita' della classe. |
+| `private String numberOrDash(double value)` | private | Metodo di supporto: realizza il passo `number or dash` dentro la responsabilita' della classe. |
+| `private String metersOrDash(double value)` | private | Metodo di supporto: realizza il passo `meters or dash` dentro la responsabilita' della classe. |
+| `private String speedOrDash(double value)` | private | Metodo di supporto: realizza il passo `speed or dash` dentro la responsabilita' della classe. |
+| `private void printSectionTitle(String title)` | private | Stampa una sezione diagnostica o un report leggibile. |
+| `private void printf(String format, Object... values)` | private | Stampa una sezione diagnostica o un report leggibile. |
+
+**Problematiche aperte**
+
+Nessuna specifica nota per questa classe.
+
+### `Stats` (tipo interno di `MobilityDiagnosticPrinter`)
+
+- File: `src/io/reporting/MobilityDiagnosticPrinter.java:281`
+- Tipo: `class`
+- Nome completo: `io.reporting.MobilityDiagnosticPrinter.Stats`
+
+**Cosa fa, in parole semplici**
+
+Classe di supporto del progetto MA-GA.
+
+**Relazione con la formalizzazione**
+
+Non cambia il modello: rende osservabili fitness, vincoli, tempi e diagnosi.
+
+**Con chi comunica**
+
+Comunica direttamente con: `GeneEvaluationBreakdown`, `MaGaConfig`, `MobilityConfig`, `MobilityLinkMetrics`, `MobilityPenaltyBreakdown`, `NodeType`, `PenaltyConfig`, `TemporalStepResult`, `TemporalWindowResult`.
+In pratica questa classe riceve questi oggetti, li costruisce oppure li passa allo step successivo del flusso.
+
+**Campi o valori importanti**
+
+Campi dichiarati principali:
+- `private int count`
+- `private int cloudPlaceholderCount`
+- `private double totalMobilityPenalty`
+- `private double totalCoverageTime`
+- `private double minimumCoverageTime = Double.POSITIVE_INFINITY`
+- `private double totalCoverageRisk`
+- `private double maximumCoverageRisk`
+- `private double totalLinkInstability`
+- `private double maximumLinkInstability`
+- `private double totalHandoverRisk`
+- `private double maximumHandoverRisk`
+- `private double totalDistance`
+- `private int distanceCount`
+- `private double totalRadius`
+- `private int radiusCount`
+- `private double totalSourceSpeed`
+- `private int sourceSpeedCount`
+- `private double totalRelativeSpeed`
+- `private int relativeSpeedCount`
+- `private double averageCoverageTime = Double.NaN`
+- `private double averageCoverageRisk`
+- `private double averageLinkInstability`
+- `private double averageHandoverRisk`
+- `private double averageDistance = Double.NaN`
+- `private double averageRadius = Double.NaN`
+- `private double averageSourceSpeed = Double.NaN`
+- `private double averageRelativeSpeed = Double.NaN`
+
+**Metodi**
+
+| Metodo | Visibilita' | Spiegazione semplice |
+|---|---:|---|
+| `private static Stats from(List<GeneEvaluationBreakdown> genes)` | private | Metodo di supporto: realizza il passo `from` dentro la responsabilita' della classe. |
 
 **Problematiche aperte**
 
@@ -2658,7 +3434,7 @@ Campi dichiarati principali:
 |---|---:|---|
 | `public PopulationReuseDecisionDiagnosticPrinter()` | public | Costruttore: crea l'oggetto e controlla che i dati necessari siano validi. |
 | `public PopulationReuseDecisionDiagnosticPrinter(PrintStream out)` | public | Costruttore: crea l'oggetto e controlla che i dati necessari siano validi. |
-| `public void print(TemporalWindowResult result)` | public | Stampa `print` in forma leggibile per l'utente o per la diagnostica. |
+| `public void print(TemporalWindowResult result)` | public | Stampa una sezione diagnostica o un report leggibile. |
 | `private String format(double value)` | private | Metodo di supporto: realizza il passo `format` dentro la responsabilita' della classe. |
 
 **Problematiche aperte**
@@ -2681,7 +3457,7 @@ Non cambia il modello: rende osservabili fitness, vincoli, tempi e diagnosi.
 
 **Con chi comunica**
 
-Comunica direttamente con: `DecisionType`, `EvaluationBreakdown`, `ExecutionNodeResourceUsageBreakdown`, `FitnessWeights`, `GaParameterScalingResult`, `GeneEvaluationBreakdown`, `GenerationStat`, `GeneticAlgorithmConfig`, `LinkBandwidthUsageBreakdown`, `LocalResourceUsageBreakdown`, `MaGaConfig`, `MaGaResult`, `NodeCandidate`, `NodeType`, ... altri 3.
+Comunica direttamente con: `DecisionType`, `EvaluationBreakdown`, `ExecutionNodeResourceUsageBreakdown`, `FitnessWeights`, `GaParameterScalingResult`, `GeneEvaluationBreakdown`, `GenerationStat`, `GeneticAlgorithmConfig`, `LinkBandwidthUsageBreakdown`, `LocalResourceUsageBreakdown`, `MaGaConfig`, `MaGaResult`, `NodeCandidate`, `NodeType`, `SystemSnapshot`, `TaskInstance`, ... altri 1.
 In pratica questa classe riceve questi oggetti, li costruisce oppure li passa allo step successivo del flusso.
 
 **Campi o valori importanti**
@@ -2702,31 +3478,31 @@ Campi dichiarati principali:
 | `public StressResultPrinter(MaGaConfig config, PrintStream out)` | public | Costruisce il printer con stream personalizzato. @param config configurazione MA-GA usata nell'esecuzione @param out stream di output |
 | `public StressResultPrinter( MaGaConfig config, PrintStream out, int topLimit )` | public | Costruisce il printer con stream e numero massimo di righe top-N. @param config configurazione MA-GA usata nell'esecuzione @param out stream di output @param topLimit numero massimo di elementi nelle classifiche diagnostiche |
 | `public void printStressReport( SystemSnapshot snapshot, MaGaResult result )` | public | Stampa il report diagnostico dello stress test. @param snapshot snapshot usato come input del MA-GA @param result risultato prodotto da MaGaOptimizer |
-| `private void printHeader()` | private | Stampa `print header` in forma leggibile per l'utente o per la diagnostica. |
-| `private void printScenarioSummary(SystemSnapshot snapshot)` | private | Stampa `print scenario summary` in forma leggibile per l'utente o per la diagnostica. |
-| `private void printGaSummary( SystemSnapshot snapshot, MaGaResult result )` | private | Stampa `print ga summary` in forma leggibile per l'utente o per la diagnostica. |
-| `private void printFitnessSummary(EvaluationBreakdown evaluation)` | private | Stampa `print fitness summary` in forma leggibile per l'utente o per la diagnostica. |
-| `private void printDecisionDistribution(EvaluationBreakdown evaluation)` | private | Stampa `print decision distribution` in forma leggibile per l'utente o per la diagnostica. |
-| `private void printDeadlineSummary(EvaluationBreakdown evaluation)` | private | Stampa `print deadline summary` in forma leggibile per l'utente o per la diagnostica. |
-| `private void printResourceSummary(EvaluationBreakdown evaluation)` | private | Stampa `print resource summary` in forma leggibile per l'utente o per la diagnostica. |
-| `private void printMobilitySummary(EvaluationBreakdown evaluation)` | private | Stampa `print mobility summary` in forma leggibile per l'utente o per la diagnostica. |
-| `private void printTopProblematicTasks(EvaluationBreakdown evaluation)` | private | Stampa `print top problematic tasks` in forma leggibile per l'utente o per la diagnostica. |
-| `private void printGenerationTrend(MaGaResult result)` | private | Stampa `print generation trend` in forma leggibile per l'utente o per la diagnostica. |
-| `private void printInterpretationHints( SystemSnapshot snapshot, MaGaResult result )` | private | Stampa `print interpretation hints` in forma leggibile per l'utente o per la diagnostica. |
+| `private void printHeader()` | private | Stampa una sezione diagnostica o un report leggibile. |
+| `private void printScenarioSummary(SystemSnapshot snapshot)` | private | Stampa una sezione diagnostica o un report leggibile. |
+| `private void printGaSummary( SystemSnapshot snapshot, MaGaResult result )` | private | Stampa una sezione diagnostica o un report leggibile. |
+| `private void printFitnessSummary(EvaluationBreakdown evaluation)` | private | Stampa una sezione diagnostica o un report leggibile. |
+| `private void printDecisionDistribution(EvaluationBreakdown evaluation)` | private | Stampa una sezione diagnostica o un report leggibile. |
+| `private void printDeadlineSummary(EvaluationBreakdown evaluation)` | private | Stampa una sezione diagnostica o un report leggibile. |
+| `private void printResourceSummary(EvaluationBreakdown evaluation)` | private | Stampa una sezione diagnostica o un report leggibile. |
+| `private void printMobilitySummary(EvaluationBreakdown evaluation)` | private | Stampa una sezione diagnostica o un report leggibile. |
+| `private void printTopProblematicTasks(EvaluationBreakdown evaluation)` | private | Stampa una sezione diagnostica o un report leggibile. |
+| `private void printGenerationTrend(MaGaResult result)` | private | Stampa una sezione diagnostica o un report leggibile. |
+| `private void printInterpretationHints( SystemSnapshot snapshot, MaGaResult result )` | private | Stampa una sezione diagnostica o un report leggibile. |
 | `private Map<NodeType, Integer> countCandidatesByType( List<NodeCandidate> candidates )` | private | Metodo di supporto: realizza il passo `count candidates by type` dentro la responsabilita' della classe. |
 | `private int countPhysicalExecutionNodes(List<NodeCandidate> candidates)` | private | Metodo di supporto: realizza il passo `count physical execution nodes` dentro la responsabilita' della classe. |
-| `private void printTopCpuResources( String title, List<ExecutionNodeResourceUsageBreakdown> usages )` | private | Stampa `print top cpu resources` in forma leggibile per l'utente o per la diagnostica. |
-| `private void printTopBandwidthResources( String title, List<LinkBandwidthUsageBreakdown> usages )` | private | Stampa `print top bandwidth resources` in forma leggibile per l'utente o per la diagnostica. |
-| `private void printLocalWorkloadSummary( List<LocalResourceUsageBreakdown> localUsages )` | private | Stampa `print local workload summary` in forma leggibile per l'utente o per la diagnostica. |
-| `private void printGeneTableHeader()` | private | Stampa `print gene table header` in forma leggibile per l'utente o per la diagnostica. |
-| `private void printGeneTableRow( GeneEvaluationBreakdown gene, String note )` | private | Stampa `print gene table row` in forma leggibile per l'utente o per la diagnostica. |
+| `private void printTopCpuResources( String title, List<ExecutionNodeResourceUsageBreakdown> usages )` | private | Stampa una sezione diagnostica o un report leggibile. |
+| `private void printTopBandwidthResources( String title, List<LinkBandwidthUsageBreakdown> usages )` | private | Stampa una sezione diagnostica o un report leggibile. |
+| `private void printLocalWorkloadSummary( List<LocalResourceUsageBreakdown> localUsages )` | private | Stampa una sezione diagnostica o un report leggibile. |
+| `private void printGeneTableHeader()` | private | Stampa una sezione diagnostica o un report leggibile. |
+| `private void printGeneTableRow( GeneEvaluationBreakdown gene, String note )` | private | Stampa una sezione diagnostica o un report leggibile. |
 | `private boolean isNearCriticalCoverage(GeneEvaluationBreakdown gene)` | private | Risponde con true/false alla domanda `is near critical coverage`. |
 | `private double coverageMarginRatio(GeneEvaluationBreakdown gene)` | private | Metodo di supporto: realizza il passo `coverage margin ratio` dentro la responsabilita' della classe. |
 | `private double deadlineViolationRatio(GeneEvaluationBreakdown gene)` | private | Metodo di supporto: realizza il passo `deadline violation ratio` dentro la responsabilita' della classe. |
 | `private String detectDominantTerm( double weightedT, double weightedL, double weightedMobility, double weightedResources )` | private | Metodo di supporto: realizza il passo `detect dominant term` dentro la responsabilita' della classe. |
 | `private <T> List<T> limit(List<T> values)` | private | Metodo di supporto: realizza il passo `limit` dentro la responsabilita' della classe. |
 | `private List<GenerationStat> sampleHistory(List<GenerationStat> history)` | private | Metodo di supporto: realizza il passo `sample history` dentro la responsabilita' della classe. |
-| `private void printSection(String title)` | private | Stampa `print section` in forma leggibile per l'utente o per la diagnostica. |
+| `private void printSection(String title)` | private | Stampa una sezione diagnostica o un report leggibile. |
 | `private String format(double value)` | private | Metodo di supporto: realizza il passo `format` dentro la responsabilita' della classe. |
 | `private String formatSeconds(double value)` | private | Metodo di supporto: realizza il passo `format seconds` dentro la responsabilita' della classe. |
 | `private String formatPercent(double value)` | private | Metodo di supporto: realizza il passo `format percent` dentro la responsabilita' della classe. |
@@ -2766,14 +3542,14 @@ Campi dichiarati principali:
 |---|---:|---|
 | `public SystemStateSourceDiagnosticPrinter()` | public | Costruttore: crea l'oggetto e controlla che i dati necessari siano validi. |
 | `public SystemStateSourceDiagnosticPrinter(PrintStream out)` | public | Costruttore: crea l'oggetto e controlla che i dati necessari siano validi. |
-| `public void print(TemporalWindowResult result)` | public | Stampa `print` in forma leggibile per l'utente o per la diagnostica. |
+| `public void print(TemporalWindowResult result)` | public | Stampa una sezione diagnostica o un report leggibile. |
 | `private String interpret(String mode, double shift)` | private | Metodo di supporto: realizza il passo `interpret` dentro la responsabilita' della classe. |
 | `private boolean isFutureLookAhead(double shift)` | private | Risponde con true/false alla domanda `is future look ahead`. |
 | `private String formatSeconds(double value)` | private | Metodo di supporto: realizza il passo `format seconds` dentro la responsabilita' della classe. |
 
 **Problematiche aperte**
 
-- Segnala futureLookAhead, ma non lo impedisce. In JSON_TIME futureLookAhead=true e' anomalo.
+Nessuna specifica nota per questa classe.
 
 ### `TemporalTimingDiagnosticPrinter`
 
@@ -2805,7 +3581,7 @@ Campi dichiarati principali:
 |---|---:|---|
 | `public TemporalTimingDiagnosticPrinter()` | public | Costruttore: crea l'oggetto e controlla che i dati necessari siano validi. |
 | `public TemporalTimingDiagnosticPrinter(PrintStream out)` | public | Costruttore: crea l'oggetto e controlla che i dati necessari siano validi. |
-| `public void print(TemporalWindowResult result)` | public | Stampa `print` in forma leggibile per l'utente o per la diagnostica. |
+| `public void print(TemporalWindowResult result)` | public | Stampa una sezione diagnostica o un report leggibile. |
 | `private String formatSeconds(double value)` | private | Metodo di supporto: realizza il passo `format seconds` dentro la responsabilita' della classe. |
 
 **Problematiche aperte**
@@ -2824,7 +3600,7 @@ Analizza le deadline violate e ne spiega la causa probabile.
 
 **Cosa fa, in parole semplici**
 
-Analizzatore diagnostico delle deadline. La versione raffinata distingue meglio: - task completamente locali; - task parzialmente offloadati ma dominati dal ramo locale; - task parzialmente offloadati ma dominati dal ramo remoto; - veri casi misti locale/remoto; - problemi di copertura. La classe non modifica fitness, repair o cromosomi. Legge il breakdown e classifica la causa delle deadline violate.
+Analizzatore diagnostico delle deadline. La versione raffinata distingue meglio: - task completamente locali; - task parzialmente offloadati ma dominati dal ramo locale; - task parzialmente offloadati ma dominati dal ramo remoto; - veri casi misti locale/remoto; - problemi di copertura. La classe non modifica fitness, repair o cromosomi.
 
 **Relazione con la formalizzazione**
 
@@ -2980,7 +3756,8 @@ Campi dichiarati principali:
 - `private final DeadlineViolationCause primaryCause`
 - `private final DeadlineViolationCause secondaryCause`
 - `private final String dominantComponentName`
-- ... altri 2 campi interni.
+- `private final double dominantComponentSeconds`
+- `private final String note`
 
 **Metodi**
 
@@ -3084,11 +3861,11 @@ Legge file JSON e li converte nel modello interno.
 
 **Cosa fa, in parole semplici**
 
-Carica e valida tutti gli snapshot JSON contenuti direttamente in una cartella. Il loader non impone più prefissi legati ai vecchi stress test. Una cartella rappresenta uno scenario e può quindi contenere file con nomi descrittivi differenti. I JSON vengono caricati in ordine alfabetico e restituiti in ordine temporale stabile. Carica una cartella di snapshot ordinati.
+Carica e valida tutti gli snapshot JSON contenuti direttamente in una cartella. Il loader non impone più prefissi legati ai vecchi stress test. Una cartella rappresenta uno scenario e può quindi contenere file con nomi descrittivi differenti. I JSON vengono caricati in ordine alfabetico e restituiti in ordine temporale stabile.
 
 **Relazione con la formalizzazione**
 
-Fornisce o valida lo stato osservato S_k prima che il GA possa ragionare.
+Fornisce o valida lo stato osservato `S_k` prima che il GA possa ragionare.
 
 **Con chi comunica**
 
@@ -3118,21 +3895,21 @@ Nessuna specifica nota per questa classe.
 
 ### `SnapshotLoader`
 
-- File: `src/io/snapshot/SnapshotLoader.java:27`
+- File: `src/io/snapshot/SnapshotLoader.java:28`
 - Tipo: `class`
 - Nome completo: `io.snapshot.SnapshotLoader`
 
 **Cosa fa, in parole semplici**
 
-Carica uno snapshot statico del sistema da file JSON. Il loader separa tre passaggi: lettura del JSON in DTO grezzi, validazione centralizzata in `SnapshotValidator` e mapping verso il modello interno. Legge un file JSON, valida e converte verso SystemSnapshot.
+Carica uno snapshot statico del sistema da file JSON. Il loader separa quattro passaggi: lettura del JSON in DTO grezzi, validazione centralizzata in `SnapshotValidator`, mapping verso il modello interno e verifica dell'invariante locale necessario al repair.
 
 **Relazione con la formalizzazione**
 
-Fornisce o valida lo stato osservato S_k prima che il GA possa ragionare.
+Fornisce o valida lo stato osservato `S_k` prima che il GA possa ragionare.
 
 **Con chi comunica**
 
-Comunica direttamente con: `NodeCandidate`, `NodeCandidateInputDto`, `NodeType`, `ObjectMapper`, `SnapshotInputDto`, `SnapshotValidator`, `SystemSnapshot`, `TaskInputDto`, `TaskInstance`, `VehicleInputDto`, `VehicleSnapshot`.
+Comunica direttamente con: `LocalCandidateInvariantValidator`, `NodeCandidate`, `NodeCandidateInputDto`, `NodeType`, `ObjectMapper`, `SnapshotInputDto`, `SnapshotValidator`, `SystemSnapshot`, `TaskInputDto`, `TaskInstance`, `VehicleInputDto`, `VehicleSnapshot`.
 In pratica questa classe riceve questi oggetti, li costruisce oppure li passa allo step successivo del flusso.
 
 **Campi o valori importanti**
@@ -3140,18 +3917,20 @@ In pratica questa classe riceve questi oggetti, li costruisce oppure li passa al
 Campi dichiarati principali:
 - `private final ObjectMapper objectMapper`
 - `private final SnapshotValidator snapshotValidator`
+- `private final LocalCandidateInvariantValidator localCandidateInvariantValidator`
 
 **Metodi**
 
 | Metodo | Visibilita' | Spiegazione semplice |
 |---|---:|---|
-| `public SnapshotLoader()` | public | Costruisce un loader basato su Jackson e sul validator standard. |
-| `public SnapshotLoader(SnapshotValidator snapshotValidator)` | public | Costruisce un loader con validator esplicito. @param snapshotValidator validator da usare prima del mapping |
+| `public SnapshotLoader()` | public | Costruisce un loader basato su Jackson e sui validator standard. |
+| `public SnapshotLoader(SnapshotValidator snapshotValidator)` | public | Costruisce un loader mantenendo compatibilità con i chiamanti esistenti. @param snapshotValidator validator da usare prima del mapping |
+| `public SnapshotLoader( SnapshotValidator snapshotValidator, LocalCandidateInvariantValidator localCandidateInvariantValidator )` | public | Costruisce un loader con validator espliciti. @param snapshotValidator validator dei DTO grezzi @param localCandidateInvariantValidator validator del fallback locale |
 | `public SystemSnapshot load(String filePath) throws IOException` | public | Carica uno snapshot da file JSON. @param filePath percorso del file JSON @return snapshot convertito nel modello interno @throws IOException se il file non e' leggibile o il JSON non e' valido |
 | `private SystemSnapshot toSystemSnapshot(SnapshotInputDto dto)` | private | Converte il DTO principale in `SystemSnapshot`. |
-| `private List<VehicleSnapshot> toVehicles( List<VehicleInputDto> vehicleDtos )` | private | Converte i veicoli JSON in `VehicleSnapshot`. |
+| `private List<VehicleSnapshot> toVehicles(List<VehicleInputDto> vehicleDtos)` | private | Converte i veicoli JSON in `VehicleSnapshot`. |
 | `private List<TaskInstance> toTasks(List<TaskInputDto> taskDtos)` | private | Converte i task JSON in `TaskInstance`. |
-| `private List<NodeCandidate> toCandidateNodes( List<NodeCandidateInputDto> nodeDtos )` | private | Converte i candidati JSON in `NodeCandidate`. |
+| `private List<NodeCandidate> toCandidateNodes(List<NodeCandidateInputDto> nodeDtos)` | private | Converte i candidati JSON in `NodeCandidate`. |
 | `private NodeType parseNodeType(String value)` | private | Converte il tipo del nodo da stringa JSON a enum. |
 
 **Problematiche aperte**
@@ -3170,7 +3949,7 @@ Catalogo centralizzato dei dataset inclusi nel repository. La struttura distingu
 
 **Relazione con la formalizzazione**
 
-Fornisce o valida lo stato osservato S_k prima che il GA possa ragionare.
+Fornisce o valida lo stato osservato `S_k` prima che il GA possa ragionare.
 
 **Con chi comunica**
 
@@ -3202,17 +3981,17 @@ Rappresenta gli oggetti grezzi letti dal JSON prima della validazione.
 
 ### `NodeCandidateInputDto`
 
-- File: `src/io/snapshot/dto/NodeCandidateInputDto.java:6`
+- File: `src/io/snapshot/dto/NodeCandidateInputDto.java:11`
 - Tipo: `class`
 - Nome completo: `io.snapshot.dto.NodeCandidateInputDto`
 
 **Cosa fa, in parole semplici**
 
-DTO grezzo di un candidato di esecuzione nello snapshot di input.
+DTO grezzo di un candidato di esecuzione nello snapshot di input. Il campo JSON `baseLatencySeconds` viene mantenuto per compatibilità con gli snapshot già prodotti. Semanticamente rappresenta `tau_n`: il ritardo end-to-end aggregato del percorso remoto, conteggiato una sola volta per ogni scelta remota.
 
 **Relazione con la formalizzazione**
 
-Fornisce o valida lo stato osservato S_k prima che il GA possa ragionare.
+Fornisce o valida lo stato osservato `S_k` prima che il GA possa ragionare.
 
 **Con chi comunica**
 
@@ -3253,7 +4032,7 @@ DTO grezzo dello snapshot letto da JSON o da un adapter esterno. Non contiene lo
 
 **Relazione con la formalizzazione**
 
-Fornisce o valida lo stato osservato S_k prima che il GA possa ragionare.
+Fornisce o valida lo stato osservato `S_k` prima che il GA possa ragionare.
 
 **Con chi comunica**
 
@@ -3289,7 +4068,7 @@ DTO grezzo di un task nello snapshot di input.
 
 **Relazione con la formalizzazione**
 
-Fornisce o valida lo stato osservato S_k prima che il GA possa ragionare.
+Fornisce o valida lo stato osservato `S_k` prima che il GA possa ragionare.
 
 **Con chi comunica**
 
@@ -3326,7 +4105,7 @@ DTO grezzo di un veicolo nello snapshot di input.
 
 **Relazione con la formalizzazione**
 
-Fornisce o valida lo stato osservato S_k prima che il GA possa ragionare.
+Fornisce o valida lo stato osservato `S_k` prima che il GA possa ragionare.
 
 **Con chi comunica**
 
@@ -3366,7 +4145,7 @@ Soluzione candidata del GA. Ogni cromosoma contiene un gene per task e una fitne
 
 **Relazione con la formalizzazione**
 
-Collega direttamente il codice alla rappresentazione della soluzione: gene = decisione per task, cromosoma = strategia completa C.
+Collega direttamente il codice alla rappresentazione della soluzione: gene = decisione per task, cromosoma = strategia completa `C`.
 
 **Con chi comunica**
 
@@ -3390,7 +4169,7 @@ Campi dichiarati principali:
 | `public void setGenes(List<Gene> genes)` | public | Aggiorna il valore di `Genes` nell'oggetto. |
 | `public double getFitness()` | public | Restituisce il valore di `Fitness` senza modificarlo. |
 | `public void setFitness(double fitness)` | public | Aggiorna il valore di `Fitness` nell'oggetto. |
-| `public String toString()` | public | Converte l'oggetto o i dati in `to string`. |
+| `public String toString()` | public | Converte l'oggetto in una stringa utile per debug e report. |
 
 **Problematiche aperte**
 
@@ -3408,7 +4187,7 @@ Rappresenta la decisione di offloading per un singolo task. Formalmente: g_i = (
 
 **Relazione con la formalizzazione**
 
-Collega direttamente il codice alla rappresentazione della soluzione: gene = decisione per task, cromosoma = strategia completa C.
+Collega direttamente il codice alla rappresentazione della soluzione: gene = decisione per task, cromosoma = strategia completa `C`.
 
 **Con chi comunica**
 
@@ -3437,7 +4216,7 @@ Campi dichiarati principali:
 | `public double getAllocatedBandwidth()` | public | Restituisce la banda assegnata. |
 | `private static String requireText(String value, String fieldName)` | private | Verifica che una stringa sia valorizzata. |
 | `private static double validateFinite(String fieldName, double value)` | private | Verifica che un double sia finito. |
-| `public String toString()` | public | Converte l'oggetto o i dati in `to string`. |
+| `public String toString()` | public | Converte l'oggetto in una stringa utile per debug e report. |
 
 **Problematiche aperte**
 
@@ -3445,21 +4224,21 @@ Nessuna specifica nota per questa classe.
 
 ## Package `model.mobility`
 
-Stima il tempo di copertura, cioe' il legame tra mobilita' e sostenibilita' dell'offloading.
+Stima metriche mobility-aware: copertura, distanza, velocita' relativa e instabilita' del link.
 
 ### `CoverageEstimator`
 
-- File: `src/model/mobility/CoverageEstimator.java:19`
+- File: `src/model/mobility/CoverageEstimator.java:20`
 - Tipo: `class`
 - Nome completo: `model.mobility.CoverageEstimator`
 
 **Cosa fa, in parole semplici**
 
-Stima il tempo di copertura di un candidato rispetto a un task. La classe usa lo snapshot corrente, il task e il candidato selezionato. Il tempo di copertura non viene più letto da NodeCandidate. Calcola Tcoverage_i(n) usato nella penalita' mobility-aware.
+Stima le grandezze mobility-aware di un candidato rispetto a un task. La classe usa lo snapshot corrente, il task e il candidato selezionato. Il tempo di copertura e l'instabilità del collegamento vengono ricavati da un'unica stima, così fitness e report osservano gli stessi valori. Calcola copertura e instabilita' link con una stima unica usata da fitness, repair e report.
 
 **Relazione con la formalizzazione**
 
-Implementa la parte mobility-aware: tempo di copertura, rischio di copertura e limiti della finestra.
+Implementa la parte mobility-aware: tempo di copertura, instabilita' link, rischio handover e limiti temporali collegati alla copertura.
 
 **Con chi comunica**
 
@@ -3475,18 +4254,113 @@ Campi dichiarati principali:
 
 | Metodo | Visibilita' | Spiegazione semplice |
 |---|---:|---|
-| `public CoverageEstimator(MobilityConfig mobilityConfig)` | public | Costruisce lo stimatore usando la configurazione di mobilità. @param mobilityConfig configurazione dei parametri di copertura |
-| `public double estimateCoverageTimeSeconds( SystemSnapshot snapshot, TaskInstance task, NodeCandidate candidate )` | public | Stima il tempo di copertura per una scelta task-candidato. @param snapshot stato corrente del sistema @param task task da eseguire @param candidate candidato scelto per il task @return tempo di copertura stimato in secondi |
-| `private double estimateInfrastructureCoverage( SystemSnapshot snapshot, TaskInstance task, NodeCandidate candidate )` | private | Stima la copertura verso un nodo infrastrutturale, ad esempio EDGE/RSU. |
-| `private double estimateV2vCoverage( SystemSnapshot snapshot, TaskInstance task, NodeCandidate candidate )` | private | Stima la copertura di un collegamento V2V. |
-| `private VehicleSnapshot findVehicleById( SystemSnapshot snapshot, String vehicleId )` | private | Recupera un veicolo dallo snapshot. |
-| `private void validateCandidateForTask( TaskInstance task, NodeCandidate candidate )` | private | Verifica che il candidato appartenga al veicolo sorgente del task. |
-| `private double distance( double x1, double y1, double x2, double y2 )` | private | Calcola distanza euclidea tra due punti. |
+| `public CoverageEstimator(MobilityConfig mobilityConfig)` | public | Costruttore: crea l'oggetto e controlla che i dati necessari siano validi. |
+| `public MobilityLinkMetrics estimateLinkMetrics( SystemSnapshot snapshot, TaskInstance task, NodeCandidate candidate )` | public | Calcola tutte le metriche mobility-aware grezze del collegamento. |
+| `public double estimateCoverageTimeSeconds( SystemSnapshot snapshot, TaskInstance task, NodeCandidate candidate )` | public | Stima `estimate coverage time seconds` senza modificare lo stato principale. |
+| `public double estimateLinkInstability( SystemSnapshot snapshot, TaskInstance task, NodeCandidate candidate )` | public | Stima `estimate link instability` senza modificare lo stato principale. |
+| `private MobilityLinkMetrics estimateInfrastructureMetrics( SystemSnapshot snapshot, TaskInstance task, NodeCandidate candidate )` | private | Stima `estimate infrastructure metrics` senza modificare lo stato principale. |
+| `private MobilityLinkMetrics estimateV2vMetrics( SystemSnapshot snapshot, TaskInstance task, NodeCandidate candidate )` | private | Stima `estimate v2v metrics` senza modificare lo stato principale. |
+| `private void requireInfrastructureGeometry(NodeCandidate candidate)` | private | Metodo di supporto: realizza il passo `require infrastructure geometry` dentro la responsabilita' della classe. |
+| `private VehicleSnapshot findVehicleById( SystemSnapshot snapshot, String vehicleId )` | private | Cerca `find vehicle by id` nelle collezioni o nello stato corrente. |
+| `private void validateCandidateForTask( TaskInstance task, NodeCandidate candidate )` | private | Controlla la correttezza di `validate candidate for task` e solleva un'eccezione se trova dati incoerenti. |
+| `private double distance( double x1, double y1, double x2, double y2 )` | private | Metodo di supporto: realizza il passo `distance` dentro la responsabilita' della classe. |
+| `private double clamp01(double value)` | private | Limita un valore dentro un intervallo ammesso. |
 
 **Problematiche aperte**
 
-- La copertura cloud e' convenzionale, non ancora collegata al gateway/RSU di accesso.
-- La copertura V2V usa la differenza scalare delle velocita', non un vettore direzionale completo.
+- La copertura cloud e' ancora un placeholder stabile: il gateway radio verso cloud non e' modellato esplicitamente.
+- La copertura V2V usa differenza scalare di velocita', non vettori direzionali completi.
+- La copertura edge usa geometria e velocita' scalare, senza heading del veicolo.
+
+### `MobilityLinkMetrics`
+
+- File: `src/model/mobility/MobilityLinkMetrics.java:14`
+- Tipo: `class`
+- Nome completo: `model.mobility.MobilityLinkMetrics`
+
+**Cosa fa, in parole semplici**
+
+Metriche geometriche e cinematiche usate per valutare un collegamento. L'oggetto separa i dati grezzi del modello di mobilità dalla fitness. In questo modo il report può spiegare come sono stati ottenuti tempo di copertura e instabilità del collegamento senza ricalcolarli a posteriori. Rende osservabile il modello di mobilita' usato per ogni collegamento.
+
+**Relazione con la formalizzazione**
+
+Implementa la parte mobility-aware: tempo di copertura, instabilita' link, rischio handover e limiti temporali collegati alla copertura.
+
+**Con chi comunica**
+
+Comunica direttamente con: `NodeType`.
+In pratica questa classe riceve questi oggetti, li costruisce oppure li passa allo step successivo del flusso.
+
+**Campi o valori importanti**
+
+Campi dichiarati principali:
+- `private final NodeType nodeType`
+- `private final ModelMode modelMode`
+- `private final double distanceMeters`
+- `private final double coverageRadiusMeters`
+- `private final double sourceSpeedMetersPerSecond`
+- `private final double relativeSpeedMetersPerSecond`
+- `private final double coverageTimeSeconds`
+- `private final double linkInstability`
+
+**Metodi**
+
+| Metodo | Visibilita' | Spiegazione semplice |
+|---|---:|---|
+| `public MobilityLinkMetrics( NodeType nodeType, ModelMode modelMode, double distanceMeters, double coverageRadiusMeters, double sourceSpeedMetersPerSecond, double relativeSpeedMetersPerSecond, double coverageTimeSeconds, double linkInstability )` | public | Costruttore: crea l'oggetto e controlla che i dati necessari siano validi. |
+| `public static MobilityLinkMetrics local(double coverageTimeSeconds)` | public | Metodo di supporto: realizza il passo `local` dentro la responsabilita' della classe. |
+| `public static MobilityLinkMetrics cloud(double coverageTimeSeconds)` | public | Metodo di supporto: realizza il passo `cloud` dentro la responsabilita' della classe. |
+| `public static MobilityLinkMetrics legacy( NodeType nodeType, double coverageTimeSeconds )` | public | Metodo di supporto: realizza il passo `legacy` dentro la responsabilita' della classe. |
+| `public NodeType getNodeType()` | public | Restituisce il valore di `NodeType` senza modificarlo. |
+| `public ModelMode getModelMode()` | public | Restituisce il valore di `ModelMode` senza modificarlo. |
+| `public double getDistanceMeters()` | public | Restituisce il valore di `DistanceMeters` senza modificarlo. |
+| `public double getCoverageRadiusMeters()` | public | Restituisce il valore di `CoverageRadiusMeters` senza modificarlo. |
+| `public double getSourceSpeedMetersPerSecond()` | public | Restituisce il valore di `SourceSpeedMetersPerSecond` senza modificarlo. |
+| `public double getRelativeSpeedMetersPerSecond()` | public | Restituisce il valore di `RelativeSpeedMetersPerSecond` senza modificarlo. |
+| `public double getCoverageTimeSeconds()` | public | Restituisce il valore di `CoverageTimeSeconds` senza modificarlo. |
+| `public double getLinkInstability()` | public | Restituisce il valore di `LinkInstability` senza modificarlo. |
+| `public boolean isCloudStablePlaceholder()` | public | Risponde con true/false alla domanda `is cloud stable placeholder`. |
+| `public boolean hasGeometricDistance()` | public | Risponde con true/false alla domanda `has geometric distance`. |
+| `public boolean hasCoverageRadius()` | public | Risponde con true/false alla domanda `has coverage radius`. |
+| `public boolean hasRelativeSpeed()` | public | Risponde con true/false alla domanda `has relative speed`. |
+| `private static double finiteOrZero(double value)` | private | Metodo di supporto: realizza il passo `finite or zero` dentro la responsabilita' della classe. |
+| `private static double clamp01(double value)` | private | Limita un valore dentro un intervallo ammesso. |
+
+**Problematiche aperte**
+
+- I valori `CLOUD_STABLE_PLACEHOLDER` e `V2V_SCALAR_RELATIVE_SPEED` indicano approssimazioni ancora da sostituire con dati piu' ricchi.
+
+### `ModelMode` (tipo interno di `MobilityLinkMetrics`)
+
+- File: `src/model/mobility/MobilityLinkMetrics.java:19`
+- Tipo: `enum`
+- Nome completo: `model.mobility.MobilityLinkMetrics.ModelMode`
+
+**Cosa fa, in parole semplici**
+
+Modalità usata per stimare le metriche del collegamento.
+
+**Relazione con la formalizzazione**
+
+Supporta la traduzione pratica della formalizzazione in codice.
+
+**Con chi comunica**
+
+Comunica direttamente con: `NodeType`.
+In pratica questa classe riceve questi oggetti, li costruisce oppure li passa allo step successivo del flusso.
+
+**Campi o valori importanti**
+
+Valori enum principali:
+`LOCAL_CONVENTIONAL`, `EDGE_GEOMETRIC`, `V2V_SCALAR_RELATIVE_SPEED`, `CLOUD_STABLE_PLACEHOLDER`, `LEGACY_UNAVAILABLE`
+
+**Metodi**
+
+Questa classe non dichiara metodi propri; contiene soprattutto dati, costanti o valori enum.
+
+**Problematiche aperte**
+
+Nessuna specifica nota per questa classe.
 
 ## Package `model.node`
 
@@ -3494,17 +4368,17 @@ Descrive i tipi e le istanze dei nodi candidati: locale, veicolo, edge, cloud.
 
 ### `NodeCandidate`
 
-- File: `src/model/node/NodeCandidate.java:17`
+- File: `src/model/node/NodeCandidate.java:25`
 - Tipo: `class`
 - Nome completo: `model.node.NodeCandidate`
 
 **Cosa fa, in parole semplici**
 
-Rappresenta una possibile opzione di esecuzione per un task generato da uno specifico veicolo sorgente. Il candidato è source-aware: - sourceVehicleId indica il veicolo che può usare questo candidato; - executionNodeId indica il nodo fisico che eseguirà il task. Il tempo di copertura non è memorizzato in questa classe. Verrà calcolato da una classe dedicata usando veicoli, posizione del nodo, raggio di copertura e, nel caso V2V, veicolo target. Rappresenta un possibile nodo n_i per un task: local, vehicle, edge o cloud.
+Rappresenta una possibile opzione di esecuzione per un task generato da uno specifico veicolo sorgente. Il candidato è source-aware: `sourceVehicleId` indica il veicolo che può usare il candidato; `executionNodeId` indica il nodo fisico che eseguirà il task; `propagationDelaySeconds` rappresenta `tau_n`, cioè il ritardo end-to-end aggregato del percorso remoto. Il ritardo di propagazione esclude i tempi di trasferimento dipendenti dalla banda. Viene conteggiato una sola volta per ogni scelta remota ed è nullo per i candidati locali. Il tempo di copertura non è memorizzato in questa classe. Viene calcolato da una classe dedicata usando veicoli, posizione del nodo, raggio di copertura e, nel caso V2V, veicolo target. Rappresenta un possibile nodo `n_i` per un task: local, vehicle, edge o cloud.
 
 **Relazione con la formalizzazione**
 
-Rappresenta parametri osservati nello stato S_k, non variabili decise dal GA.
+Rappresenta parametri osservati nello stato `S_k`, non variabili decise dal GA.
 
 **Con chi comunica**
 
@@ -3520,7 +4394,7 @@ Campi dichiarati principali:
 - `private final NodeType type`
 - `private final double availableCpu`
 - `private final double availableBandwidth`
-- `private final double baseLatencySeconds`
+- `private final double propagationDelaySeconds`
 - `private final Double nodeX`
 - `private final Double nodeY`
 - `private final Double coverageRadiusMeters`
@@ -3529,7 +4403,7 @@ Campi dichiarati principali:
 
 | Metodo | Visibilita' | Spiegazione semplice |
 |---|---:|---|
-| `public NodeCandidate( String candidateId, String sourceVehicleId, String executionNodeId, NodeType type, double availableCpu, double availableBandwidth, double baseLatencySeconds, Double nodeX, Double nodeY, Double coverageRadiusMeters )` | public | Costruisce un candidato di esecuzione source-aware. @param candidateId identificativo univoco del candidato @param sourceVehicleId veicolo sorgente per cui il candidato è valido @param executionNodeId nodo fisico che esegue il task @param type tipo del candidato @param availableCpu CPU disponibile sul nodo di esecuzione @param availableBandwidth banda disponibile sul link sorgente-destinazione @param baseLatencySeconds latenza base del collegamento @param nodeX coordinata X del nodo infrastrutturale, se applicabile @param nodeY coordinata Y del nodo infrastrutturale, se applicabile @param coverageRadiusMeters raggio di copertura del nodo, se applicabile |
+| `public NodeCandidate( String candidateId, String sourceVehicleId, String executionNodeId, NodeType type, double availableCpu, double availableBandwidth, double propagationDelaySeconds, Double nodeX, Double nodeY, Double coverageRadiusMeters )` | public | Costruisce un candidato di esecuzione source-aware. @param candidateId identificativo univoco del candidato @param sourceVehicleId veicolo sorgente per cui il candidato è valido @param executionNodeId nodo fisico che esegue il task @param type tipo del candidato @param availableCpu CPU disponibile sul nodo di esecuzione @param availableBandwidth banda disponibile sul link sorgente-destinazione @param propagationDelaySeconds ritardo end-to-end aggregato `tau_n` @param nodeX coordinata X del nodo infrastrutturale, se applicabile @param nodeY coordinata Y del nodo infrastrutturale, se applicabile @param coverageRadiusMeters raggio di copertura del nodo, se applicabile |
 | `public String getCandidateId()` | public | Restituisce il valore di `CandidateId` senza modificarlo. |
 | `public String getNodeId()` | public | Metodo di compatibilità con vecchie parti del codice. @return identificativo del candidato |
 | `public String getSourceVehicleId()` | public | Restituisce il valore di `SourceVehicleId` senza modificarlo. |
@@ -3537,7 +4411,8 @@ Campi dichiarati principali:
 | `public NodeType getType()` | public | Restituisce il valore di `Type` senza modificarlo. |
 | `public double getAvailableCpu()` | public | Restituisce il valore di `AvailableCpu` senza modificarlo. |
 | `public double getAvailableBandwidth()` | public | Restituisce il valore di `AvailableBandwidth` senza modificarlo. |
-| `public double getBaseLatencySeconds()` | public | Restituisce il valore di `BaseLatencySeconds` senza modificarlo. |
+| `public double getPropagationDelaySeconds()` | public | Restituisce `tau_n`: il ritardo end-to-end aggregato del percorso remoto, esclusi i tempi di trasferimento dipendenti dalla banda. @return ritardo fisso conteggiato una volta per ogni scelta remota |
+| `public double getBaseLatencySeconds()` | public | Alias mantenuto per compatibilità con il nome storico usato dal JSON e da alcune parti del prototipo. @return lo stesso valore restituito da `#getPropagationDelaySeconds()` @deprecated usare `#getPropagationDelaySeconds()` |
 | `public Double getNodeX()` | public | @return coordinata X del nodo, se presente |
 | `public Double getNodeY()` | public | @return coordinata Y del nodo, se presente |
 | `public Double getCoverageRadiusMeters()` | public | @return raggio di copertura del nodo, se presente |
@@ -3546,14 +4421,14 @@ Campi dichiarati principali:
 | `public boolean isEdge()` | public | Risponde con true/false alla domanda `is edge`. |
 | `public boolean isCloud()` | public | Risponde con true/false alla domanda `is cloud`. |
 | `public boolean isRemote()` | public | Risponde con true/false alla domanda `is remote`. |
-| `public boolean isInfrastructureCandidate()` | public | @return true se il candidato rappresenta un nodo con posizione e raggio fisici |
+| `public boolean isInfrastructureCandidate()` | public | @return true se il candidato rappresenta un nodo con geometria fisica |
 | `public boolean hasCoverageGeometry()` | public | @return true se posizione e raggio sono disponibili |
 | `public boolean isValidForSourceVehicle(String vehicleId)` | public | Verifica se il candidato è utilizzabile dal veicolo sorgente indicato. @param vehicleId veicolo sorgente da controllare @return true se il candidato è valido per quel veicolo |
 | `private static String requireText(String value, String fieldName)` | private | Metodo di supporto: realizza il passo `require text` dentro la responsabilita' della classe. |
 | `private static double validateFiniteNonNegative( String fieldName, double value )` | private | Controlla la correttezza di `validate finite non negative` e solleva un'eccezione se trova dati incoerenti. |
-| `private static Double validateOptionalFinite( String fieldName, Double value )` | private | Controlla la correttezza di `validate optional finite` e solleva un'eccezione se trova dati incoerenti. |
-| `private static Double validateOptionalPositive( String fieldName, Double value )` | private | Controlla la correttezza di `validate optional positive` e solleva un'eccezione se trova dati incoerenti. |
-| `public String toString()` | public | Converte l'oggetto o i dati in `to string`. |
+| `private static Double validateOptionalFinite(String fieldName, Double value)` | private | Controlla la correttezza di `validate optional finite` e solleva un'eccezione se trova dati incoerenti. |
+| `private static Double validateOptionalPositive(String fieldName, Double value)` | private | Controlla la correttezza di `validate optional positive` e solleva un'eccezione se trova dati incoerenti. |
+| `public String toString()` | public | Converte l'oggetto in una stringa utile per debug e report. |
 
 **Problematiche aperte**
 
@@ -3596,17 +4471,17 @@ Implementa le formule temporali di esecuzione locale, remota e parziale.
 
 ### `OffloadingTimeBreakdown`
 
-- File: `src/model/offloading/OffloadingTimeBreakdown.java:9`
+- File: `src/model/offloading/OffloadingTimeBreakdown.java:17`
 - Tipo: `class`
 - Nome completo: `model.offloading.OffloadingTimeBreakdown`
 
 **Cosa fa, in parole semplici**
 
-Componenti temporali di una decisione di offloading. Il breakdown segue la formalizzazione del gene: ramo locale, ramo remoto, latenza di comunicazione e tempo finale di completamento. Conserva i pezzi temporali calcolati dal modello di offloading.
+Componenti temporali di una decisione di offloading. Il breakdown segue la formalizzazione del gene: ramo locale, ramo remoto, latenza di comunicazione e tempo finale di completamento. Per una scelta parzialmente remota, `downloadTimeSeconds` rappresenta il download integrale del risultato remoto. Non scala con la quota di offloading quando `p > 0`. `propagationDelaySeconds` rappresenta `tau_n`: il ritardo end-to-end aggregato del percorso remoto. Il valore viene conteggiato una sola volta per ogni scelta remota ed è indipendente dalla quota `p`. Conserva i pezzi temporali calcolati dal modello di offloading.
 
 **Relazione con la formalizzazione**
 
-Implementa le formule dei tempi T_i(C), rami locale/remoto e latenza comunicativa.
+Implementa le formule dei tempi `T_i(C)`, rami locale/remoto e latenza comunicativa.
 
 **Con chi comunica**
 
@@ -3622,7 +4497,7 @@ Campi dichiarati principali:
 - `private final double uploadTimeSeconds`
 - `private final double remoteExecutionTimeSeconds`
 - `private final double downloadTimeSeconds`
-- `private final double baseLatencySeconds`
+- `private final double propagationDelaySeconds`
 - `private final double remotePartTimeSeconds`
 - `private final double communicationLatencySeconds`
 - `private final double completionTimeSeconds`
@@ -3631,14 +4506,15 @@ Campi dichiarati principali:
 
 | Metodo | Visibilita' | Spiegazione semplice |
 |---|---:|---|
-| `OffloadingTimeBreakdown( double offloadingRatio, double localCpuCycles, double localExecutionTimeSeconds, double uploadTimeSeconds, double remoteExecutionTimeSeconds, double downloadTimeSeconds, double baseLatencySeconds, double remotePartTimeSeconds, double communicationLatencySeconds, double completionTimeSeconds )` | package-private | Costruttore: crea l'oggetto e controlla che i dati necessari siano validi. |
+| `OffloadingTimeBreakdown( double offloadingRatio, double localCpuCycles, double localExecutionTimeSeconds, double uploadTimeSeconds, double remoteExecutionTimeSeconds, double downloadTimeSeconds, double propagationDelaySeconds, double remotePartTimeSeconds, double communicationLatencySeconds, double completionTimeSeconds )` | package-private | Costruttore: crea l'oggetto e controlla che i dati necessari siano validi. |
 | `public double getOffloadingRatio()` | public | Restituisce il valore di `OffloadingRatio` senza modificarlo. |
 | `public double getLocalCpuCycles()` | public | Restituisce il valore di `LocalCpuCycles` senza modificarlo. |
 | `public double getLocalExecutionTimeSeconds()` | public | Restituisce il valore di `LocalExecutionTimeSeconds` senza modificarlo. |
 | `public double getUploadTimeSeconds()` | public | Restituisce il valore di `UploadTimeSeconds` senza modificarlo. |
 | `public double getRemoteExecutionTimeSeconds()` | public | Restituisce il valore di `RemoteExecutionTimeSeconds` senza modificarlo. |
 | `public double getDownloadTimeSeconds()` | public | Restituisce il valore di `DownloadTimeSeconds` senza modificarlo. |
-| `public double getBaseLatencySeconds()` | public | Restituisce il valore di `BaseLatencySeconds` senza modificarlo. |
+| `public double getPropagationDelaySeconds()` | public | Restituisce tau_n: il ritardo end-to-end aggregato del percorso remoto. |
+| `public double getBaseLatencySeconds()` | public | Alias mantenuto per compatibilità con chiamanti precedenti. @deprecated usare `#getPropagationDelaySeconds()` |
 | `public double getRemotePartTimeSeconds()` | public | Restituisce il valore di `RemotePartTimeSeconds` senza modificarlo. |
 | `public double getCommunicationLatencySeconds()` | public | Restituisce il valore di `CommunicationLatencySeconds` senza modificarlo. |
 | `public double getCompletionTimeSeconds()` | public | Restituisce il valore di `CompletionTimeSeconds` senza modificarlo. |
@@ -3649,17 +4525,17 @@ Nessuna specifica nota per questa classe.
 
 ### `OffloadingTimeModel`
 
-- File: `src/model/offloading/OffloadingTimeModel.java:25`
+- File: `src/model/offloading/OffloadingTimeModel.java:31`
 - Tipo: `class`
 - Nome completo: `model.offloading.OffloadingTimeModel`
 
 **Cosa fa, in parole semplici**
 
-Modello unico dei tempi di offloading. La formalizzazione usa una quota remota `p_i`. Questa classe applica la quota alle componenti del ramo remoto: T_local(p) = (1 - p) * cycles / f_local T_remote(p) = p * input / b + p * cycles / f + p * output / b + L_base T_i = max(T_local, T_remote) se p Per i geni locali vale `p = 0`, la banda è nulla e il tempo è `cycles / f_local`. Implementa le formule Tlocal, Tremote e T_i.
+Modello unico dei tempi di offloading. La formalizzazione usa una quota remota `p_i`. Per una scelta parzialmente remota, upload ed esecuzione remota scalano con `p_i`, mentre il risultato remoto viene restituito integralmente: T_local(p) = (1 - p) * cycles / f_local T_remote(p) = p * input / b + p * cycles / f + output / b + tau_n T_i = max(T_local, T_remote) se 0 Per i geni locali vale `p = 0`, la banda è nulla e il tempo è `cycles / f_local`. `tau_n` è interpretato come ritardo end-to-end aggregato del percorso remoto. Il valore esclude i tempi di trasferimento dipendenti dalla banda, viene conteggiato una sola volta per ogni scelta remota e non scala con `p_i`. Implementa le formule `Tlocal`, `Tremote` e `T_i`.
 
 **Relazione con la formalizzazione**
 
-Implementa le formule dei tempi T_i(C), rami locale/remoto e latenza comunicativa.
+Implementa le formule dei tempi `T_i(C)`, rami locale/remoto e latenza comunicativa.
 
 **Con chi comunica**
 
@@ -3676,10 +4552,12 @@ Campi dichiarati principali:
 | Metodo | Visibilita' | Spiegazione semplice |
 |---|---:|---|
 | `public OffloadingTimeBreakdown evaluateLocal( TaskInstance task, double localCpu )` | public | Valuta una scelta locale. @param task task da eseguire @param localCpu CPU locale disponibile @return breakdown temporale locale |
-| `public OffloadingTimeBreakdown evaluateRemote( TaskInstance task, NodeCandidate candidate, double localCpu, double offloadingRatio, double allocatedCpu, double allocatedBandwidth )` | public | Valuta una scelta remota o parzialmente remota. @param task task da eseguire @param candidate candidato remoto scelto @param localCpu CPU locale del veicolo sorgente @param offloadingRatio quota remota `p_i` @param allocatedCpu CPU assegnata al ramo remoto @param allocatedBandwidth banda assegnata alla comunicazione remota @return breakdown temporale completo |
+| `public OffloadingTimeBreakdown evaluateRemote( TaskInstance task, NodeCandidate candidate, double localCpu, double offloadingRatio, double allocatedCpu, double allocatedBandwidth )` | public | Valuta una scelta remota o parzialmente remota. Quando `p > 0`, il download usa l'output remoto integrale. Questo riflette l'ipotesi della formalizzazione: il risultato della porzione remota è necessario per ricomporre l'esito complessivo del task. @param task task da eseguire @param candidate candidato remoto scelto @param localCpu CPU locale del veicolo sorgente @param offloadingRatio quota remota `p_i` @param allocatedCpu CPU assegnata al ramo remoto @param allocatedBandwidth banda assegnata alla comunicazione remota @return breakdown temporale completo |
 | `public double estimateLocalOnlyTime( TaskInstance task, VehicleSnapshot sourceVehicle )` | public | Stima il tempo locale puro, cioè il caso `p = 0`. |
 | `public double estimateLocalBranchTime( TaskInstance task, VehicleSnapshot sourceVehicle, double offloadingRatio )` | public | Stima il ramo locale per una quota remota arbitraria. |
-| `public double estimateRemoteLinearTime( TaskInstance task, NodeCandidate candidate )` | public | Stima il costo remoto variabile per `p = 1`, senza latenza base. |
+| `public double estimateRemoteScaledTime( TaskInstance task, NodeCandidate candidate )` | public | Stima la componente del ramo remoto che scala con `p`: upload dell'input ed esecuzione remota. |
+| `public double estimateRemoteFixedTime( TaskInstance task, NodeCandidate candidate )` | public | Stima la componente fissa del ramo remoto per ogni `p > 0`: download integrale dell'output e ritardo di propagazione aggregato. |
+| `public double estimateRemoteLinearTime( TaskInstance task, NodeCandidate candidate )` | public | Mantiene compatibilità con chiamanti precedenti. Restituisce il costo remoto completo per `p = 1`, senza ritardo di propagazione. Non deve essere moltiplicato nuovamente per `p` nelle euristiche del partial offloading. |
 | `public double estimateCompletionWithCandidateCapacity( TaskInstance task, NodeCandidate candidate, VehicleSnapshot sourceVehicle, double offloadingRatio )` | public | Stima il completion time usando la quota remota e le risorse massime del candidato. |
 | `private double safeDivide(double numerator, double denominator)` | private | Esegue un'operazione protetta per evitare valori non finiti o divisioni non valide. |
 | `private double safeNonNegative(double value)` | private | Esegue un'operazione protetta per evitare valori non finiti o divisioni non valide. |
@@ -3701,11 +4579,11 @@ Rappresenta la fotografia del sistema nella finestra corrente.
 
 **Cosa fa, in parole semplici**
 
-Fotografia dello stato del sistema in un istante simulato. Contiene veicoli, task attivi e candidati di esecuzione disponibili per quello specifico tempo. La classe resta mutabile per supportare la deserializzazione e la composizione degli snapshot filtrati. Rappresenta lo stato S_k dato al GA.
+Fotografia dello stato del sistema in un istante simulato. Contiene veicoli, task attivi e candidati di esecuzione disponibili per quello specifico tempo. La classe resta mutabile per supportare la deserializzazione e la composizione degli snapshot filtrati. Rappresenta lo stato `S_k` dato al GA.
 
 **Relazione con la formalizzazione**
 
-Rappresenta parametri osservati nello stato S_k, non variabili decise dal GA.
+Rappresenta parametri osservati nello stato `S_k`, non variabili decise dal GA.
 
 **Con chi comunica**
 
@@ -3737,7 +4615,7 @@ Campi dichiarati principali:
 | `public void setTasks(List<TaskInstance> tasks)` | public | Aggiorna il valore di `Tasks` nell'oggetto. |
 | `public List<NodeCandidate> getCandidateNodes()` | public | Restituisce il valore di `CandidateNodes` senza modificarlo. |
 | `public void setCandidateNodes(List<NodeCandidate> candidateNodes)` | public | Aggiorna il valore di `CandidateNodes` nell'oggetto. |
-| `public String toString()` | public | Converte l'oggetto o i dati in `to string`. |
+| `public String toString()` | public | Converte l'oggetto in una stringa utile per debug e report. |
 
 **Problematiche aperte**
 
@@ -3755,7 +4633,7 @@ Task computazionale generato da un veicolo sorgente. Il task descrive il carico 
 
 **Relazione con la formalizzazione**
 
-Rappresenta parametri osservati nello stato S_k, non variabili decise dal GA.
+Rappresenta parametri osservati nello stato `S_k`, non variabili decise dal GA.
 
 **Con chi comunica**
 
@@ -3790,7 +4668,7 @@ Campi dichiarati principali:
 | `public void setCpuCycles(double cpuCycles)` | public | Aggiorna il valore di `CpuCycles` nell'oggetto. |
 | `public double getDeadlineSeconds()` | public | Restituisce il valore di `DeadlineSeconds` senza modificarlo. |
 | `public void setDeadlineSeconds(double deadlineSeconds)` | public | Aggiorna il valore di `DeadlineSeconds` nell'oggetto. |
-| `public String toString()` | public | Converte l'oggetto o i dati in `to string`. |
+| `public String toString()` | public | Converte l'oggetto in una stringa utile per debug e report. |
 
 **Problematiche aperte**
 
@@ -3808,7 +4686,7 @@ Stato sintetico di un veicolo nello snapshot. La posizione e la velocità alimen
 
 **Relazione con la formalizzazione**
 
-Rappresenta parametri osservati nello stato S_k, non variabili decise dal GA.
+Rappresenta parametri osservati nello stato `S_k`, non variabili decise dal GA.
 
 **Con chi comunica**
 
@@ -3840,7 +4718,7 @@ Campi dichiarati principali:
 | `public void setSpeed(double speed)` | public | Aggiorna il valore di `Speed` nell'oggetto. |
 | `public double getLocalCpu()` | public | Restituisce il valore di `LocalCpu` senza modificarlo. |
 | `public void setLocalCpu(double localCpu)` | public | Aggiorna il valore di `LocalCpu` nell'oggetto. |
-| `public String toString()` | public | Converte l'oggetto o i dati in `to string`. |
+| `public String toString()` | public | Converte l'oggetto in una stringa utile per debug e report. |
 
 **Problematiche aperte**
 
@@ -3848,7 +4726,37 @@ Nessuna specifica nota per questa classe.
 
 ## Package `validation.snapshot`
 
-Valida snapshot grezzi e snapshot gia' mappati nel dominio.
+Valida snapshot grezzi e invarianti necessari al repair.
+
+### `LocalCandidateInvariantValidator`
+
+- File: `src/validation/snapshot/LocalCandidateInvariantValidator.java:23`
+- Tipo: `class`
+- Nome completo: `validation.snapshot.LocalCandidateInvariantValidator`
+
+**Cosa fa, in parole semplici**
+
+Valida l'invariante necessario al fallback locale del MA-GA. Ogni task deve disporre di un candidato `NodeType#LOCAL` valido per il proprio veicolo sorgente. Il repair usa questa alternativa quando una scelta remota non è più sostenibile. Senza tale candidato, un fallback locale rischierebbe di mantenere l'identificativo di un nodo remoto e produrre un gene semanticamente incoerente. La classe è separata dal validator JSON generale perché l'invariante deve poter essere riutilizzato anche da sorgenti future diverse dai file JSON, incluso il bridge MOSAIC. Garantisce che ogni task abbia un fallback locale valido, necessario al repair.
+
+**Relazione con la formalizzazione**
+
+Fornisce o valida lo stato osservato `S_k` prima che il GA possa ragionare.
+
+**Con chi comunica**
+
+Comunica direttamente con: `NodeCandidate`, `NodeType`, `SystemSnapshot`, `TaskInstance`.
+In pratica questa classe riceve questi oggetti, li costruisce oppure li passa allo step successivo del flusso.
+
+**Metodi**
+
+| Metodo | Visibilita' | Spiegazione semplice |
+|---|---:|---|
+| `public void validate(SystemSnapshot snapshot)` | public | Verifica che ogni task abbia il proprio candidato locale. @param snapshot snapshot da validare @throws IllegalArgumentException se almeno un task non dispone del fallback locale richiesto |
+| `private boolean hasLocalCandidate(SystemSnapshot snapshot, TaskInstance task)` | private | Risponde con true/false alla domanda `has local candidate`. |
+
+**Problematiche aperte**
+
+- Ogni sorgente futura, incluso MOSAIC, deve produrre candidati LOCAL coerenti per non rompere il fallback del repair.
 
 ### `SnapshotValidator`
 
@@ -3858,11 +4766,11 @@ Valida snapshot grezzi e snapshot gia' mappati nel dominio.
 
 **Cosa fa, in parole semplici**
 
-Punto unico di validazione degli snapshot. La validazione puo' avvenire prima del mapping, sui DTO grezzi letti dal JSON, oppure sul domain model per compatibilita' con i chiamanti esistenti. Le regole applicate restano le stesse: campi obbligatori, valori numerici, unicita' degli ID, riferimenti e vincoli per tipo di candidato. Controlla coerenza di input grezzi e modello dominio.
+Punto unico di validazione degli snapshot. La validazione puo' avvenire prima del mapping, sui DTO grezzi letti dal JSON, oppure sul domain model per compatibilita' con i chiamanti esistenti. Le regole applicate restano le stesse: campi obbligatori, valori numerici, unicita' degli ID, riferimenti e vincoli per tipo di candidato.
 
 **Relazione con la formalizzazione**
 
-Fornisce o valida lo stato osservato S_k prima che il GA possa ragionare.
+Fornisce o valida lo stato osservato `S_k` prima che il GA possa ragionare.
 
 **Con chi comunica**
 
@@ -3876,12 +4784,12 @@ In pratica questa classe riceve questi oggetti, li costruisce oppure li passa al
 | `public void validate(SnapshotInputDto dto)` | public | Valida lo snapshot grezzo prima della costruzione del domain model. @param dto snapshot letto dal JSON o da un adapter esterno |
 | `public void validate(SystemSnapshot snapshot)` | public | Valida uno snapshot gia' costruito. @param snapshot snapshot da controllare |
 | `private void validateSnapshot( String snapshotId, Double timeSeconds, List<VehicleData> vehicles, List<TaskData> tasks, List<CandidateData> candidates )` | private | Controlla la correttezza di `validate snapshot` e solleva un'eccezione se trova dati incoerenti. |
-| `private List<VehicleData> toVehicleDataFromDto( List<VehicleInputDto> vehicles )` | private | Converte l'oggetto o i dati in `to vehicle data from dto`. |
-| `private List<VehicleData> toVehicleDataFromModel( List<VehicleSnapshot> vehicles )` | private | Converte l'oggetto o i dati in `to vehicle data from model`. |
-| `private List<TaskData> toTaskDataFromDto(List<TaskInputDto> tasks)` | private | Converte l'oggetto o i dati in `to task data from dto`. |
-| `private List<TaskData> toTaskDataFromModel(List<TaskInstance> tasks)` | private | Converte l'oggetto o i dati in `to task data from model`. |
-| `private List<CandidateData> toCandidateDataFromDto( List<NodeCandidateInputDto> candidates )` | private | Converte l'oggetto o i dati in `to candidate data from dto`. |
-| `private List<CandidateData> toCandidateDataFromModel( List<NodeCandidate> candidates )` | private | Converte l'oggetto o i dati in `to candidate data from model`. |
+| `private List<VehicleData> toVehicleDataFromDto( List<VehicleInputDto> vehicles )` | private | Metodo di supporto: realizza il passo `to vehicle data from dto` dentro la responsabilita' della classe. |
+| `private List<VehicleData> toVehicleDataFromModel( List<VehicleSnapshot> vehicles )` | private | Metodo di supporto: realizza il passo `to vehicle data from model` dentro la responsabilita' della classe. |
+| `private List<TaskData> toTaskDataFromDto(List<TaskInputDto> tasks)` | private | Metodo di supporto: realizza il passo `to task data from dto` dentro la responsabilita' della classe. |
+| `private List<TaskData> toTaskDataFromModel(List<TaskInstance> tasks)` | private | Metodo di supporto: realizza il passo `to task data from model` dentro la responsabilita' della classe. |
+| `private List<CandidateData> toCandidateDataFromDto( List<NodeCandidateInputDto> candidates )` | private | Metodo di supporto: realizza il passo `to candidate data from dto` dentro la responsabilita' della classe. |
+| `private List<CandidateData> toCandidateDataFromModel( List<NodeCandidate> candidates )` | private | Metodo di supporto: realizza il passo `to candidate data from model` dentro la responsabilita' della classe. |
 | `private <T> List<T> requireList(List<T> list, String name)` | private | Metodo di supporto: realizza il passo `require list` dentro la responsabilita' della classe. |
 | `private <T> T requireElement(T element, String listName, int index)` | private | Metodo di supporto: realizza il passo `require element` dentro la responsabilita' della classe. |
 | `private void validateVehicleIds(List<VehicleData> vehicles)` | private | Controlla la correttezza di `validate vehicle ids` e solleva un'eccezione se trova dati incoerenti. |
@@ -3926,7 +4834,7 @@ Classe di supporto del progetto MA-GA.
 
 **Relazione con la formalizzazione**
 
-Fornisce o valida lo stato osservato S_k prima che il GA possa ragionare.
+Fornisce o valida lo stato osservato `S_k` prima che il GA possa ragionare.
 
 **Con chi comunica**
 
@@ -3964,7 +4872,7 @@ Classe di supporto del progetto MA-GA.
 
 **Relazione con la formalizzazione**
 
-Fornisce o valida lo stato osservato S_k prima che il GA possa ragionare.
+Fornisce o valida lo stato osservato `S_k` prima che il GA possa ragionare.
 
 **Con chi comunica**
 
@@ -4003,7 +4911,7 @@ Classe di supporto del progetto MA-GA.
 
 **Relazione con la formalizzazione**
 
-Fornisce o valida lo stato osservato S_k prima che il GA possa ragionare.
+Fornisce o valida lo stato osservato `S_k` prima che il GA possa ragionare.
 
 **Con chi comunica**
 
@@ -4044,13 +4952,13 @@ Orchestra il ciclo temporale completo.
 
 ### `TemporalWindowManager`
 
-- File: `src/window/core/TemporalWindowManager.java:43`
+- File: `src/window/core/TemporalWindowManager.java:40`
 - Tipo: `class`
 - Nome completo: `window.core.TemporalWindowManager`
 
 **Cosa fa, in parole semplici**
 
-Orchestratore del ciclo temporale del MA-GA. Il manager non conosce la sorgente concreta degli snapshot. Riceve una `SystemStateSource`, che può essere basata su JSON, MOSAIC o altri adapter. Ogni step risolve un trigger, osserva lo stato del sistema, valuta la dinamicità, decide il riuso della popolazione, calcola la prossima finestra e invoca il MA-GA sullo snapshot corrente. Orchestra il ciclo temporale: trigger, snapshot, dinamicita', riuso, GA.
+Orchestratore del ciclo temporale del MA-GA. Il manager distingue lo snapshot fisico osservato dallo snapshot filtrato destinato all'ottimizzazione. Dinamicità e bounds temporali devono descrivere lo scenario reale. Population adapter e GA lavorano invece sulla vista ridotta dal prefilter.
 
 **Relazione con la formalizzazione**
 
@@ -4058,7 +4966,7 @@ Supporta la traduzione pratica della formalizzazione in codice.
 
 **Con chi comunica**
 
-Comunica direttamente con: `AdaptiveWindowController`, `AdaptiveWindowDecision`, `Chromosome`, `CoverageReferenceCalculator`, `CriticalEventDetector`, `DynamicityBreakdown`, `DynamicityEvaluator`, `MaGaOptimizer`, `MaGaResult`, `MobilityConfig`, `PopulationAdapter`, `PopulationReuseDecision`, `PopulationReuseDecisionPolicy`, `PopulationReuseMode`, ... altri 11.
+Comunica direttamente con: `AdaptiveWindowController`, `AdaptiveWindowDecision`, `Chromosome`, `CoverageReferenceCalculator`, `CriticalEventDetector`, `DynamicityBreakdown`, `DynamicityEvaluator`, `MaGaOptimizer`, `MaGaResult`, `MobilityConfig`, `PopulationAdapter`, `PopulationReuseDecision`, `PopulationReuseDecisionPolicy`, `PopulationReuseMode`, `ReoptimizationTrigger`, `SystemSnapshot`, ... altri 9.
 In pratica questa classe riceve questi oggetti, li costruisce oppure li passa allo step successivo del flusso.
 
 **Campi o valori importanti**
@@ -4082,7 +4990,7 @@ Campi dichiarati principali:
 | `public TemporalWindowManager( TemporalWindowConfig windowConfig, MaGaOptimizer optimizer, DynamicityEvaluator dynamicityEvaluator, PopulationAdapter populationAdapter, PopulationReuseDecisionPolicy reuseDecisionPolicy, AdaptiveWindowController adaptiveWindowController, CriticalEventDetector criticalEventDetector, SystemStateSource systemStateSource, int targetPopulationSize )` | public | Costruttore: crea l'oggetto e controlla che i dati necessari siano validi. |
 | `private static AdaptiveWindowController defaultAdaptiveWindowController( TemporalWindowConfig config, MobilityConfig mobilityConfig )` | private | Metodo di supporto: realizza il passo `default adaptive window controller` dentro la responsabilita' della classe. |
 | `private static MobilityConfig optimizerMobilityConfig(MaGaOptimizer optimizer)` | private | Metodo di supporto: realizza il passo `optimizer mobility config` dentro la responsabilita' della classe. |
-| `public TemporalWindowResult run( double startTimeSeconds, int maxSteps )` | public | Metodo di supporto: realizza il passo `run` dentro la responsabilita' della classe. |
+| `public TemporalWindowResult run(double startTimeSeconds, int maxSteps)` | public | Metodo di supporto: realizza il passo `run` dentro la responsabilita' della classe. |
 | `public TemporalStepResult executeNextStepOrNull(TemporalWindowState state)` | public | Metodo di supporto: realizza il passo `execute next step or null` dentro la responsabilita' della classe. |
 | `private ReoptimizationTrigger resolveTrigger(TemporalWindowState state)` | private | Metodo di supporto: realizza il passo `resolve trigger` dentro la responsabilita' della classe. |
 | `private double computeObservationTime(ReoptimizationTrigger trigger)` | private | Calcola `compute observation time` a partire dai dati ricevuti. |
@@ -4096,8 +5004,8 @@ Campi dichiarati principali:
 
 **Problematiche aperte**
 
-- Misura il runtime reale del GA solo dopo la decisione di finestra corrente, quindi l'osservato alimenta al massimo le finestre successive.
-- La dimensione target della popolazione viene calcolata dal main sul primo snapshot; l'optimizer puo' poi riscalarla internamente per snapshot successivi.
+- Il runtime osservato del GA puo' influenzare solo le finestre successive, perche' e' misurato dopo l'esecuzione corrente.
+- La dimensione target della popolazione viene fissata all'avvio sul primo snapshot filtrato; lo scaling GA interno puo' comunque variare per snapshot.
 
 ## Package `window.dynamicity`
 
@@ -4115,7 +5023,7 @@ Risultato immutabile del confronto tra due snapshot consecutivi. Questa classe n
 
 **Relazione con la formalizzazione**
 
-Realizza l'indice D(k) e le sue componenti Dv, Dt, Dr, Dl.
+Realizza l'indice `D(k)` e le sue componenti `Dv`, `Dt`, `Dr`, `Dl`.
 
 **Con chi comunica**
 
@@ -4161,7 +5069,7 @@ Campi dichiarati principali:
 | `public boolean suggestsColdStart()` | public | @return `true` se il breakdown suggerisce un cold start |
 | `private static void validateFinite(String fieldName, double value)` | private | Valida che un valore numerico sia finito. Questa validazione è usata per campi temporali, che devono essere numeri reali ma non sono metriche normalizzate. |
 | `private static void validateRate(String fieldName, double value)` | private | Valida una metrica normalizzata. Le componenti di dinamicità e l'indice globale devono essere sempre valori finiti nell'intervallo `[0, 1]`. |
-| `public String toString()` | public | Converte l'oggetto o i dati in `to string`. |
+| `public String toString()` | public | Converte l'oggetto in una stringa utile per debug e report. |
 
 **Problematiche aperte**
 
@@ -4175,11 +5083,11 @@ Nessuna specifica nota per questa classe.
 
 **Cosa fa, in parole semplici**
 
-Orchestratore della valutazione di dinamicità tra due snapshot consecutivi. Questa classe rappresenta la formula globale della formalizzazione: D(k) = lambdaVehicles * Dv(k) + lambdaTasks * Dt(k) + lambdaResources * Dr(k) + lambdaLinks * Dl(k) I dettagli delle singole componenti sono delegati ai calculator dedicati. Calcola D(k) combinando Dv, Dt, Dr, Dl.
+Orchestratore della valutazione di dinamicità tra due snapshot consecutivi. Questa classe rappresenta la formula globale della formalizzazione: D(k) = lambdaVehicles * Dv(k) + lambdaTasks * Dt(k) + lambdaResources * Dr(k) + lambdaLinks * Dl(k) I dettagli delle singole componenti sono delegati ai calculator dedicati.
 
 **Relazione con la formalizzazione**
 
-Realizza l'indice D(k) e le sue componenti Dv, Dt, Dr, Dl.
+Realizza l'indice `D(k)` e le sue componenti `Dv`, `Dt`, `Dr`, `Dl`.
 
 **Con chi comunica**
 
@@ -4221,7 +5129,7 @@ Interpretazione qualitativa dell'indice di dinamicità dello scenario. Il valore
 
 **Relazione con la formalizzazione**
 
-Realizza l'indice D(k) e le sue componenti Dv, Dt, Dr, Dl.
+Realizza l'indice `D(k)` e le sue componenti `Dv`, `Dt`, `Dr`, `Dl`.
 
 **Con chi comunica**
 
@@ -4259,7 +5167,7 @@ Calcola Dl(k), cioè la variazione dei link/candidati source-aware. La copertura
 
 **Relazione con la formalizzazione**
 
-Realizza l'indice D(k) e le sue componenti Dv, Dt, Dr, Dl.
+Realizza l'indice `D(k)` e le sue componenti `Dv`, `Dt`, `Dr`, `Dl`.
 
 **Con chi comunica**
 
@@ -4282,7 +5190,7 @@ Campi dichiarati principali:
 
 **Problematiche aperte**
 
-- Dl(k) usa candidateId, banda e latenza, non un q_v radio normalizzato esplicito come nella formalizzazione.
+- `Dl(k)` usa candidateId, banda e latenza; non e' ancora un indicatore radio `q_v(k)` derivato direttamente dal simulatore.
 
 ### `ResourceDynamicityCalculator`
 
@@ -4296,7 +5204,7 @@ Calcola Dr(k), cioè la variazione delle risorse computazionali disponibili. La 
 
 **Relazione con la formalizzazione**
 
-Realizza l'indice D(k) e le sue componenti Dv, Dt, Dr, Dl.
+Realizza l'indice `D(k)` e le sue componenti `Dv`, `Dt`, `Dr`, `Dl`.
 
 **Con chi comunica**
 
@@ -4319,7 +5227,7 @@ Campi dichiarati principali:
 
 **Problematiche aperte**
 
-- Dr(k) include anche CPU locale dei veicoli; la formalizzazione sintetica parla soprattutto di risorse remote.
+- `Dr(k)` include anche CPU locale dei veicoli; va confermato se nella formalizzazione finale le risorse locali devono pesare allo stesso modo delle remote.
 
 ### `TaskDynamicityCalculator`
 
@@ -4333,7 +5241,7 @@ Calcola Dt(k), cioè la variazione dei task attivi tra due snapshot. Il confront
 
 **Relazione con la formalizzazione**
 
-Realizza l'indice D(k) e le sue componenti Dv, Dt, Dr, Dl.
+Realizza l'indice `D(k)` e le sue componenti `Dv`, `Dt`, `Dr`, `Dl`.
 
 **Con chi comunica**
 
@@ -4370,7 +5278,7 @@ Calcola Dv(k), cioè la variazione dei veicoli tra due snapshot. Il confronto no
 
 **Relazione con la formalizzazione**
 
-Realizza l'indice D(k) e le sue componenti Dv, Dt, Dr, Dl.
+Realizza l'indice `D(k)` e le sue componenti `Dv`, `Dt`, `Dr`, `Dl`.
 
 **Con chi comunica**
 
@@ -4411,7 +5319,7 @@ Comparator generico per mappe di metriche confrontabili. Regola: - chiave presen
 
 **Relazione con la formalizzazione**
 
-Realizza l'indice D(k) e le sue componenti Dv, Dt, Dr, Dl.
+Realizza l'indice `D(k)` e le sue componenti `Dv`, `Dt`, `Dr`, `Dl`.
 
 **Con chi comunica**
 
@@ -4440,7 +5348,7 @@ Comparator per mappe numeriche. Usato per Dr(k), dove le metriche sono capacità
 
 **Relazione con la formalizzazione**
 
-Realizza l'indice D(k) e le sue componenti Dv, Dt, Dr, Dl.
+Realizza l'indice `D(k)` e le sue componenti `Dv`, `Dt`, `Dr`, `Dl`.
 
 **Con chi comunica**
 
@@ -4473,7 +5381,7 @@ Utility matematica per il calcolo della dinamicità.
 
 **Relazione con la formalizzazione**
 
-Realizza l'indice D(k) e le sue componenti Dv, Dt, Dr, Dl.
+Realizza l'indice `D(k)` e le sue componenti `Dv`, `Dt`, `Dr`, `Dl`.
 
 **Con chi comunica**
 
@@ -4499,7 +5407,7 @@ Nessuna specifica nota per questa classe.
 
 ## Package `window.dynamicity.metrics`
 
-Rappresenta le metriche confrontabili tra snapshot.
+Rappresenta metriche confrontabili tra snapshot.
 
 ### `ComparableMetric`
 
@@ -4513,7 +5421,7 @@ Contratto per metriche confrontabili tra due snapshot. @param tipo concreto dell
 
 **Relazione con la formalizzazione**
 
-Realizza l'indice D(k) e le sue componenti Dv, Dt, Dr, Dl.
+Realizza l'indice `D(k)` e le sue componenti `Dv`, `Dt`, `Dr`, `Dl`.
 
 **Con chi comunica**
 
@@ -4541,7 +5449,7 @@ Stato confrontabile di un link/candidato source-aware.
 
 **Relazione con la formalizzazione**
 
-Realizza l'indice D(k) e le sue componenti Dv, Dt, Dr, Dl.
+Realizza l'indice `D(k)` e le sue componenti `Dv`, `Dt`, `Dr`, `Dl`.
 
 **Con chi comunica**
 
@@ -4581,7 +5489,7 @@ Stato confrontabile di un task.
 
 **Relazione con la formalizzazione**
 
-Realizza l'indice D(k) e le sue componenti Dv, Dt, Dr, Dl.
+Realizza l'indice `D(k)` e le sue componenti `Dv`, `Dt`, `Dr`, `Dl`.
 
 **Con chi comunica**
 
@@ -4620,7 +5528,7 @@ Stato confrontabile di un veicolo.
 
 **Relazione con la formalizzazione**
 
-Realizza l'indice D(k) e le sue componenti Dv, Dt, Dr, Dl.
+Realizza l'indice `D(k)` e le sue componenti `Dv`, `Dt`, `Dr`, `Dl`.
 
 **Con chi comunica**
 
@@ -4708,7 +5616,7 @@ Campi dichiarati principali:
 | `private static String requireText(String value, String fieldName)` | private | Verifica che una stringa obbligatoria sia valorizzata. @return stringa originale se valida |
 | `private static String normalizeOptionalText(String value)` | private | Normalizza una stringa opzionale. Le stringhe nulle, vuote o composte solo da spazi vengono trattate come assenza del valore e quindi convertite in `null`. |
 | `private static void validateFiniteAndNonNegative( String fieldName, double value )` | private | Valida che un valore numerico sia finito e non negativo. Il tempo simulato dell'evento non può essere infinito, NaN o negativo. |
-| `public String toString()` | public | Converte l'oggetto o i dati in `to string`. |
+| `public String toString()` | public | Converte l'oggetto in una stringa utile per debug e report. |
 
 **Problematiche aperte**
 
@@ -4861,7 +5769,7 @@ Decide e costruisce il riuso della popolazione tra finestre.
 
 **Cosa fa, in parole semplici**
 
-Adatta la popolazione genetica finale di una finestra temporale precedente allo snapshot corrente. È il ponte tra il ciclo temporale e l'ottimizzatore snapshot-based: il gestore temporale sceglie una `PopulationReuseMode`, mentre questo adattatore costruisce la popolazione iniziale `P_init(k)` per la nuova finestra. `FIRST_RUN` e `COLD_START`: genera una popolazione nuova; `WARM_START`: prova a riusare tutta la popolazione precedente; `PARTIAL_RESTART`: conserva una quota dei migliori cromosomi e rigenera il resto. Ogni cromosoma riusato viene copiato, riparato e rivalutato rispetto allo snapshot corrente. La fitness storica non decide quali cromosomi conservare nella nuova finestra. Trasforma la popolazione finale precedente in popolazione iniziale corrente.
+Adatta la popolazione genetica finale di una finestra temporale precedente allo snapshot corrente. È il ponte tra il ciclo temporale e l'ottimizzatore snapshot-based: il gestore temporale sceglie una `PopulationReuseMode`, mentre questo adattatore costruisce la popolazione iniziale `P_init(k)` per la nuova finestra. `FIRST_RUN` e `COLD_START`: genera una popolazione nuova; `WARM_START`: prova a riusare tutta la popolazione precedente; `PARTIAL_RESTART`: conserva una quota dei migliori cromosomi e rigenera il resto. Ogni cromosoma riusato viene copiato, riparato e rivalutato rispetto allo snapshot corrente. La fitness storica non decide quali cromosomi conservare nella nuova finestra.
 
 **Relazione con la formalizzazione**
 
@@ -4945,7 +5853,7 @@ Campi dichiarati principali:
 | `public boolean isSevereComponentSpikeDetected()` | public | Risponde con true/false alla domanda `is severe component spike detected`. |
 | `public boolean isCorrected()` | public | Risponde con true/false alla domanda `is corrected`. |
 | `public String getReason()` | public | Restituisce il valore di `Reason` senza modificarlo. |
-| `public String toString()` | public | Converte l'oggetto o i dati in `to string`. |
+| `public String toString()` | public | Converte l'oggetto in una stringa utile per debug e report. |
 
 **Problematiche aperte**
 
@@ -4959,7 +5867,7 @@ Nessuna specifica nota per questa classe.
 
 **Cosa fa, in parole semplici**
 
-Policy temporale per correggere la modalità di riuso della popolazione. La dinamicità formalizzata resta il punto di partenza, ma la decisione finale considera anche la qualità della finestra precedente e gli spike delle componenti più critiche per l'offloading. La policy non modifica GA, fitness o cromosomi: decide soltanto quanta popolazione precedente riutilizzare. Correzione principale: se una finestra mostra uno spike congiunto forte su task e link, il sistema non resta più in PARTIAL_RESTART solo perché D(k) aggregato è ancora sotto thetaHigh. In quel caso la popolazione precedente è considerata poco rappresentativa. Corregge la scelta di riuso con performance precedente e spike.
+Policy temporale per correggere la modalità di riuso della popolazione. La dinamicità formalizzata resta il punto di partenza, ma la decisione finale considera anche la qualità della finestra precedente e gli spike delle componenti più critiche per l'offloading. La policy non modifica GA, fitness o cromosomi: decide soltanto quanta popolazione precedente riutilizzare. Correzione principale: se una finestra mostra uno spike congiunto forte su task e link, il sistema non resta più in PARTIAL_RESTART solo perché D(k) aggregato è ancora sotto thetaHigh. In quel caso la popolazione precedente è considerata poco rappresentativa.
 
 **Relazione con la formalizzazione**
 
@@ -5008,7 +5916,7 @@ Campi dichiarati principali:
 
 **Problematiche aperte**
 
-- Aggiunge correzioni euristiche basate su performance precedente e spike, oltre alla regola pura D(k)->reuse.
+- Aggiunge correzioni euristiche basate su performance precedente e spike, oltre alla regola pura `D(k) -> reuse`.
 
 ### `PopulationReuseMode`
 
@@ -5169,13 +6077,13 @@ Nessuna specifica nota per questa classe.
 
 ### `CandidatePrefilter`
 
-- File: `src/window/prefilter/CandidatePrefilter.java:31`
+- File: `src/window/prefilter/CandidatePrefilter.java:30`
 - Tipo: `class`
 - Nome completo: `window.prefilter.CandidatePrefilter`
 
 **Cosa fa, in parole semplici**
 
-Prefiltra i candidati prima dell'esecuzione del GA. Il prefilter riduce lo spazio di ricerca eliminando candidati remoti chiaramente non utilizzabili: - CPU o banda non valide; - EDGE/V2V senza copertura sufficiente; - candidati che, anche con una stima ottimistica, non sono competitivi rispetto alle deadline dei task associati al veicolo sorgente. I candidati LOCAL vengono sempre mantenuti. Filtra candidati manifestamente deboli prima del GA.
+Prefiltra i candidati prima dell'esecuzione del GA. Il filtro applica soltanto controlli strutturali. Non elimina candidati raggiungibili perché poco convenienti, vicini al limite di copertura o apparentemente incompatibili con una deadline. Queste valutazioni spettano al repair deadline-aware, alla fitness e alla penalità mobility-aware. I candidati LOCAL vengono sempre mantenuti. I candidati remoti vengono rimossi soltanto se non possono essere utilizzati in modo matematicamente sensato: CPU o banda nulle/non valide, assenza di task per la sorgente, sorgente mancante, EDGE fuori copertura oppure collegamento V2V fuori raggio.
 
 **Relazione con la formalizzazione**
 
@@ -5183,7 +6091,7 @@ Supporta la traduzione pratica della formalizzazione in codice.
 
 **Con chi comunica**
 
-Comunica direttamente con: `NodeCandidate`, `NodeType`, `OffloadingTimeModel`, `SystemSnapshot`, `TaskInstance`, `VehicleSnapshot`.
+Comunica direttamente con: `NodeCandidate`, `NodeType`, `SystemSnapshot`, `TaskInstance`, `VehicleSnapshot`.
 In pratica questa classe riceve questi oggetti, li costruisce oppure li passa allo step successivo del flusso.
 
 **Campi o valori importanti**
@@ -5191,7 +6099,6 @@ In pratica questa classe riceve questi oggetti, li costruisce oppure li passa al
 Campi dichiarati principali:
 - `private static final double EPSILON = 1.0E-9`
 - `private final CandidatePrefilterConfig config`
-- `private final OffloadingTimeModel offloadingTimeModel`
 
 **Metodi**
 
@@ -5199,26 +6106,22 @@ Campi dichiarati principali:
 |---|---:|---|
 | `public CandidatePrefilter()` | public | Costruttore: crea l'oggetto e controlla che i dati necessari siano validi. |
 | `public CandidatePrefilter(CandidatePrefilterConfig config)` | public | Costruttore: crea l'oggetto e controlla che i dati necessari siano validi. |
-| `public CandidateFilteringResult filter(SystemSnapshot snapshot)` | public | Applica il prefilter allo snapshot. @param snapshot snapshot originale @return risultato contenente snapshot filtrato e statistiche |
+| `public CandidateFilteringResult filter(SystemSnapshot snapshot)` | public | Applica il prefilter allo snapshot. @param snapshot snapshot originale osservato dalla sorgente @return risultato contenente snapshot filtrato e statistiche |
 | `private CandidateFilteringResult disabledResult(SystemSnapshot snapshot)` | private | Metodo di supporto: realizza il passo `disabled result` dentro la responsabilita' della classe. |
-| `private CandidateDecision evaluateCandidate( NodeCandidate candidate, List<TaskInstance> sourceTasks, Map<String, VehicleSnapshot> vehicleById )` | private | Metodo di supporto: realizza il passo `evaluate candidate` dentro la responsabilita' della classe. |
-| `private CandidateTaskFeasibility bestTaskFeasibilityForCandidate( NodeCandidate candidate, VehicleSnapshot sourceVehicle, List<TaskInstance> sourceTasks, double coverageSeconds )` | private | Stima se il candidato può essere utile per almeno un task della sorgente. |
-| `private double estimateOptimisticBestCompletionSeconds( TaskInstance task, NodeCandidate candidate, VehicleSnapshot sourceVehicle )` | private | Stima ottimistica del miglior completion ottenibile con candidato remoto. Usa una formula semplificata di split continuo: local(p) = (1-p) * A remote(p) = L + p * B dove: A = tempo locale puro; B = upload + remote execution + download per p=1; L = latenza base. |
-| `private double estimateCoverageSeconds( NodeCandidate candidate, VehicleSnapshot sourceVehicle, Map<String, VehicleSnapshot> vehicleById )` | private | Stima copertura per EDGE, VEHICLE e CLOUD. |
-| `private List<NodeCandidate> restoreFallbackCandidatesIfNeeded( SystemSnapshot snapshot, List<NodeCandidate> keptCandidates, List<FilteredCandidateRecord> records, Map<CandidateRejectionReason, Integer> reasonCounts )` | private | Ripristina almeno un candidato per ogni task, per evitare snapshot non ottimizzabili. |
-| `private NodeCandidate findFallbackCandidate( String sourceVehicleId, List<NodeCandidate> candidates )` | private | Cerca `find fallback candidate` nelle collezioni o nello stato corrente. |
-| `private Map<String, VehicleSnapshot> indexVehicles( SystemSnapshot snapshot )` | private | Prepara una mappa di lookup per trovare rapidamente gli oggetti. |
-| `private Map<String, List<TaskInstance>> indexTasksBySource( SystemSnapshot snapshot )` | private | Prepara una mappa di lookup per trovare rapidamente gli oggetti. |
+| `private CandidateDecision evaluateCandidate( NodeCandidate candidate, Set<String> taskSourceIds, Map<String, VehicleSnapshot> vehicleById )` | private | Valuta `evaluate candidate` e restituisce un risultato o un breakdown. |
+| `private double estimateCoverageSeconds( NodeCandidate candidate, VehicleSnapshot sourceVehicle, Map<String, VehicleSnapshot> vehicleById )` | private | Stima la copertura strutturale corrente per EDGE, VEHICLE e CLOUD. Il tempo residuo non viene confrontato con soglie euristiche. Per il prefilter conta soltanto che il candidato sia raggiungibile nell'istante osservato. La fragilità della scelta resta valutabile dalla penalità mobility-aware. |
+| `private Map<String, VehicleSnapshot> indexVehicles(SystemSnapshot snapshot)` | private | Prepara una mappa di lookup per trovare rapidamente gli oggetti. |
+| `private Set<String> indexTaskSourceIds(SystemSnapshot snapshot)` | private | Prepara una mappa di lookup per trovare rapidamente gli oggetti. |
 | `private double distance( double x1, double y1, double x2, double y2 )` | private | Metodo di supporto: realizza il passo `distance` dentro la responsabilita' della classe. |
 
 **Problematiche aperte**
 
-- Usa lower bound e slack: riduce candidati impossibili, ma non garantisce che il GA rispetti tutte le deadline.
-- Per cloud e V2V usa stime conservative/semplificate che andranno riallineate con dati MOSAIC.
+- Usa lower bound e slack: riduce candidati impossibili o deboli, ma non garantisce che il GA rispetti tutte le deadline.
+- Per cloud e V2V dipende ancora dalle approssimazioni di mobilita' disponibili nello snapshot.
 
 ### `CandidateDecision` (tipo interno di `CandidatePrefilter`)
 
-- File: `src/window/prefilter/CandidatePrefilter.java:575`
+- File: `src/window/prefilter/CandidatePrefilter.java:308`
 - Tipo: `class`
 - Nome completo: `window.prefilter.CandidatePrefilter.CandidateDecision`
 
@@ -5232,7 +6135,7 @@ Supporta la traduzione pratica della formalizzazione in codice.
 
 **Con chi comunica**
 
-Comunica direttamente con: `NodeCandidate`, `NodeType`, `OffloadingTimeModel`, `SystemSnapshot`, `TaskInstance`, `VehicleSnapshot`.
+Comunica direttamente con: `NodeCandidate`, `NodeType`, `SystemSnapshot`, `TaskInstance`, `VehicleSnapshot`.
 In pratica questa classe riceve questi oggetti, li costruisce oppure li passa allo step successivo del flusso.
 
 **Campi o valori importanti**
@@ -5240,7 +6143,6 @@ In pratica questa classe riceve questi oggetti, li costruisce oppure li passa al
 Campi dichiarati principali:
 - `private final boolean keep`
 - `private final CandidateRejectionReason reason`
-- `private final double estimatedBestCompletionSeconds`
 - `private final double estimatedCoverageSeconds`
 - `private final String note`
 
@@ -5248,48 +6150,9 @@ Campi dichiarati principali:
 
 | Metodo | Visibilita' | Spiegazione semplice |
 |---|---:|---|
-| `private CandidateDecision( boolean keep, CandidateRejectionReason reason, double estimatedBestCompletionSeconds, double estimatedCoverageSeconds, String note )` | private | Costruttore: crea l'oggetto e controlla che i dati necessari siano validi. |
-| `private static CandidateDecision keep( double estimatedBestCompletionSeconds, double estimatedCoverageSeconds, String note )` | private | Metodo di supporto: realizza il passo `keep` dentro la responsabilita' della classe. |
-| `private static CandidateDecision reject( CandidateRejectionReason reason, double estimatedBestCompletionSeconds, double estimatedCoverageSeconds, String note )` | private | Metodo di supporto: realizza il passo `reject` dentro la responsabilita' della classe. |
-
-**Problematiche aperte**
-
-Nessuna specifica nota per questa classe.
-
-### `CandidateTaskFeasibility` (tipo interno di `CandidatePrefilter`)
-
-- File: `src/window/prefilter/CandidatePrefilter.java:627`
-- Tipo: `class`
-- Nome completo: `window.prefilter.CandidatePrefilter.CandidateTaskFeasibility`
-
-**Cosa fa, in parole semplici**
-
-Classe di supporto del progetto MA-GA.
-
-**Relazione con la formalizzazione**
-
-Supporta la traduzione pratica della formalizzazione in codice.
-
-**Con chi comunica**
-
-Comunica direttamente con: `NodeCandidate`, `NodeType`, `OffloadingTimeModel`, `SystemSnapshot`, `TaskInstance`, `VehicleSnapshot`.
-In pratica questa classe riceve questi oggetti, li costruisce oppure li passa allo step successivo del flusso.
-
-**Campi o valori importanti**
-
-Campi dichiarati principali:
-- `private final boolean acceptable`
-- `private final CandidateRejectionReason reason`
-- `private final double bestCompletionSeconds`
-- `private final String note`
-
-**Metodi**
-
-| Metodo | Visibilita' | Spiegazione semplice |
-|---|---:|---|
-| `private CandidateTaskFeasibility( boolean acceptable, CandidateRejectionReason reason, double bestCompletionSeconds, String note )` | private | Costruttore: crea l'oggetto e controlla che i dati necessari siano validi. |
-| `private static CandidateTaskFeasibility accept( double bestCompletionSeconds, String note )` | private | Metodo di supporto: realizza il passo `accept` dentro la responsabilita' della classe. |
-| `private static CandidateTaskFeasibility reject( CandidateRejectionReason reason, double bestCompletionSeconds, String note )` | private | Metodo di supporto: realizza il passo `reject` dentro la responsabilita' della classe. |
+| `private CandidateDecision( boolean keep, CandidateRejectionReason reason, double estimatedCoverageSeconds, String note )` | private | Costruttore: crea l'oggetto e controlla che i dati necessari siano validi. |
+| `private static CandidateDecision keep( double estimatedCoverageSeconds, String note )` | private | Metodo di supporto: realizza il passo `keep` dentro la responsabilita' della classe. |
+| `private static CandidateDecision reject( CandidateRejectionReason reason, double estimatedCoverageSeconds, String note )` | private | Metodo di supporto: realizza il passo `reject` dentro la responsabilita' della classe. |
 
 **Problematiche aperte**
 
@@ -5297,13 +6160,13 @@ Nessuna specifica nota per questa classe.
 
 ### `CandidatePrefilterConfig`
 
-- File: `src/window/prefilter/CandidatePrefilterConfig.java:10`
+- File: `src/window/prefilter/CandidatePrefilterConfig.java:11`
 - Tipo: `class`
 - Nome completo: `window.prefilter.CandidatePrefilterConfig`
 
 **Cosa fa, in parole semplici**
 
-Configurazione del prefiltraggio dei candidati. Il prefilter riduce lo spazio di ricerca prima del GA. L'obiettivo non è trovare la soluzione, ma rimuovere candidati chiaramente inutilizzabili o troppo deboli.
+Configurazione del prefiltraggio dei candidati. Il prefilter aderente alla formalizzazione applica soltanto controlli strutturali. Alcuni parametri storici restano esposti per compatibilità con chiamanti precedenti, ma non vengono più usati per eliminare candidati raggiungibili soltanto perché deboli o poco competitivi.
 
 **Relazione con la formalizzazione**
 
@@ -5331,23 +6194,23 @@ Campi dichiarati principali:
 | Metodo | Visibilita' | Spiegazione semplice |
 |---|---:|---|
 | `public CandidatePrefilterConfig( boolean enabled, double minRemoteCpu, double minRemoteBandwidth, double minCoverageSeconds, double coverageSafetyFactor, double deadlineSlackFactor, double v2vCoverageRadiusMeters, double cloudCoverageSeconds, boolean keepAllCloudCandidates )` | public | Costruttore: crea l'oggetto e controlla che i dati necessari siano validi. |
-| `public static CandidatePrefilterConfig defaultConfig()` | public | Configurazione consigliata per test stress. È volutamente prudente: rimuove candidati fuori copertura o chiaramente incompatibili, ma mantiene margine sulla deadline. |
-| `public static CandidatePrefilterConfig disabled()` | public | Configurazione disabilitata. |
+| `public static CandidatePrefilterConfig defaultConfig()` | public | Configurazione predefinita aderente alla formalizzazione. I candidati remoti strutturalmente validi restano valutabili dal GA. CPU, banda e copertura vengono filtrate soltanto quando sono nulle o non valide. Le deadline non vengono usate come criterio di pruning. |
+| `public static CandidatePrefilterConfig disabled()` | public | Configurazione completamente disabilitata. |
 | `public boolean isEnabled()` | public | Risponde con true/false alla domanda `is enabled`. |
-| `public double getMinRemoteCpu()` | public | Restituisce il valore di `MinRemoteCpu` senza modificarlo. |
-| `public double getMinRemoteBandwidth()` | public | Restituisce il valore di `MinRemoteBandwidth` senza modificarlo. |
-| `public double getMinCoverageSeconds()` | public | Restituisce il valore di `MinCoverageSeconds` senza modificarlo. |
-| `public double getCoverageSafetyFactor()` | public | Restituisce il valore di `CoverageSafetyFactor` senza modificarlo. |
-| `public double getDeadlineSlackFactor()` | public | Restituisce il valore di `DeadlineSlackFactor` senza modificarlo. |
+| `public double getMinRemoteCpu()` | public | @deprecated mantenuto soltanto per compatibilità. |
+| `public double getMinRemoteBandwidth()` | public | @deprecated mantenuto soltanto per compatibilità. |
+| `public double getMinCoverageSeconds()` | public | @deprecated mantenuto soltanto per compatibilità. |
+| `public double getCoverageSafetyFactor()` | public | @deprecated mantenuto soltanto per compatibilità. |
+| `public double getDeadlineSlackFactor()` | public | @deprecated mantenuto soltanto per compatibilità. |
 | `public double getV2vCoverageRadiusMeters()` | public | Restituisce il valore di `V2vCoverageRadiusMeters` senza modificarlo. |
 | `public double getCloudCoverageSeconds()` | public | Restituisce il valore di `CloudCoverageSeconds` senza modificarlo. |
-| `public boolean isKeepAllCloudCandidates()` | public | Risponde con true/false alla domanda `is keep all cloud candidates`. |
+| `public boolean isKeepAllCloudCandidates()` | public | @deprecated il cloud è sempre mantenuto finché manca un gateway esplicito. |
 | `private static double validateNonNegative(String fieldName, double value)` | private | Controlla la correttezza di `validate non negative` e solleva un'eccezione se trova dati incoerenti. |
 | `private static double validatePositive(String fieldName, double value)` | private | Controlla la correttezza di `validate positive` e solleva un'eccezione se trova dati incoerenti. |
 
 **Problematiche aperte**
 
-- I parametri deadlineSlackFactor, cloudCoverageSeconds e v2vCoverageRadiusMeters sono sperimentali e vanno calibrati.
+- I parametri di slack, copertura e soglie sono sperimentali e vanno calibrati sullo scenario MOSAIC/SUMO.
 
 ### `CandidateRejectionReason`
 
@@ -5431,21 +6294,21 @@ Nessuna specifica nota per questa classe.
 
 ## Package `window.source`
 
-Astrazione della sorgente di stato: JSON sequence/time e predisposizione MOSAIC.
+Astrazione della sorgente di stato: JSON time, JSON sequence e predisposizione MOSAIC.
 
 ### `FilteringSystemStateSource`
 
-- File: `src/window/source/FilteringSystemStateSource.java:15`
+- File: `src/window/source/FilteringSystemStateSource.java:20`
 - Tipo: `class`
 - Nome completo: `window.source.FilteringSystemStateSource`
 
 **Cosa fa, in parole semplici**
 
-Decorator che applica CandidatePrefilter agli snapshot prodotti da una sorgente. Applica il prefilter dentro il contratto SystemStateSource.
+Decorator che applica CandidatePrefilter agli snapshot prodotti da una sorgente. Lo snapshot osservato resta disponibile al gestore temporale. Il filtro modifica soltanto la vista destinata al GA, evitando che una riduzione dello spazio di ricerca venga interpretata come variazione fisica dello scenario.
 
 **Relazione con la formalizzazione**
 
-Fornisce o valida lo stato osservato S_k prima che il GA possa ragionare.
+Fornisce o valida lo stato osservato `S_k` prima che il GA possa ragionare.
 
 **Con chi comunica**
 
@@ -5486,7 +6349,7 @@ Porta minima verso MOSAIC o verso un adapter equivalente. Questa interfaccia non
 
 **Relazione con la formalizzazione**
 
-Fornisce o valida lo stato osservato S_k prima che il GA possa ragionare.
+Fornisce o valida lo stato osservato `S_k` prima che il GA possa ragionare.
 
 **Con chi comunica**
 
@@ -5502,7 +6365,7 @@ In pratica questa classe riceve questi oggetti, li costruisce oppure li passa al
 
 **Problematiche aperte**
 
-- E' solo un'interfaccia: l'integrazione MOSAIC/SUMO vera non e' implementata.
+- E' solo un'interfaccia: l'integrazione MOSAIC/SUMO vera non e' implementata qui.
 
 ### `MosaicSystemStateSource`
 
@@ -5512,11 +6375,11 @@ In pratica questa classe riceve questi oggetti, li costruisce oppure li passa al
 
 **Cosa fa, in parole semplici**
 
-Sorgente dati per MOSAIC. Il collegamento concreto con MOSAIC verrà implementato nel bridge. Il TemporalWindowManager non cambia: continua a ricevere SystemSnapshot. Adatta un bridge MOSAIC al contratto SystemStateSource.
+Sorgente dati per MOSAIC. Il collegamento concreto con MOSAIC verrà implementato nel bridge. Il TemporalWindowManager non cambia: continua a ricevere SystemSnapshot.
 
 **Relazione con la formalizzazione**
 
-Fornisce o valida lo stato osservato S_k prima che il GA possa ragionare.
+Fornisce o valida lo stato osservato `S_k` prima che il GA possa ragionare.
 
 **Con chi comunica**
 
@@ -5539,7 +6402,7 @@ Campi dichiarati principali:
 
 **Problematiche aperte**
 
-- Dipende da un bridge MOSAIC esterno non ancora implementato.
+- Dipende da un bridge MOSAIC esterno non ancora implementato nel repository.
 
 ### `SequentialSnapshotReplaySource`
 
@@ -5549,11 +6412,11 @@ Campi dichiarati principali:
 
 **Cosa fa, in parole semplici**
 
-Sorgente JSON per test offline sequenziali. Restituisce gli snapshot nell'ordine della lista, indipendentemente dal tempo richiesto dalla finestra adattiva. Questa modalità serve quando gli snapshot sono una successione di fotografie già decisa e vogliamo eseguirle tutte senza saltarne nessuna. Replay JSON ordinale, utile per diagnostica su tutti i file.
+Sorgente JSON per test offline sequenziali. Restituisce gli snapshot nell'ordine della lista, indipendentemente dal tempo richiesto dalla finestra adattiva. Questa modalità serve quando gli snapshot sono una successione di fotografie già decisa e vogliamo eseguirle tutte senza saltarne nessuna. Implementa il replay ordinale diagnostico: consuma tutti i file in sequenza anche se il tempo del manager diverge.
 
 **Relazione con la formalizzazione**
 
-Fornisce o valida lo stato osservato S_k prima che il GA possa ragionare.
+Fornisce o valida lo stato osservato `S_k` prima che il GA possa ragionare.
 
 **Con chi comunica**
 
@@ -5587,17 +6450,17 @@ Nessuna specifica nota per questa classe.
 
 ### `SystemStateObservation`
 
-- File: `src/window/source/SystemStateObservation.java:22`
+- File: `src/window/source/SystemStateObservation.java:19`
 - Tipo: `class`
 - Nome completo: `window.source.SystemStateObservation`
 
 **Cosa fa, in parole semplici**
 
-Osservazione restituita da una sorgente dati. Questa classe separa tre concetti che prima venivano confusi: il tempo richiesto dal TemporalWindowManager; il tempo della sorgente, cioè il tempo salvato nello snapshot; la modalità con cui la sorgente ha prodotto lo snapshot. Nel replay JSON sequenziale il tempo richiesto può essere adattivo, mentre il tempo dello snapshot resta quello scritto nel file. Con MOSAIC, invece, i due valori dovrebbero coincidere o essere molto vicini.
+Osservazione restituita da una sorgente dati. La classe distingue la fotografia fisica osservata dalla vista destinata all'ottimizzazione. All'origine le due viste coincidono. Un decoratore può applicare il prefilter e sostituire soltanto la vista ottimizzabile, senza nascondere al gestore temporale lo stato reale dello scenario. Restano inoltre separati il tempo logico richiesto dal manager, il tempo salvato nella sorgente e la modalità con cui la sorgente ha prodotto lo snapshot.
 
 **Relazione con la formalizzazione**
 
-Fornisce o valida lo stato osservato S_k prima che il GA possa ragionare.
+Fornisce o valida lo stato osservato `S_k` prima che il GA possa ragionare.
 
 **Con chi comunica**
 
@@ -5608,7 +6471,8 @@ In pratica questa classe riceve questi oggetti, li costruisce oppure li passa al
 
 Campi dichiarati principali:
 - `private static final double EPSILON = 1.0E-6`
-- `private final SystemSnapshot snapshot`
+- `private final SystemSnapshot observedSnapshot`
+- `private final SystemSnapshot optimizationSnapshot`
 - `private final double requestedObservationTimeSeconds`
 - `private final double sourceObservationTimeSeconds`
 - `private final SystemStateSourceMode sourceMode`
@@ -5621,17 +6485,22 @@ Campi dichiarati principali:
 | Metodo | Visibilita' | Spiegazione semplice |
 |---|---:|---|
 | `public SystemStateObservation( SystemSnapshot snapshot, double requestedObservationTimeSeconds, double sourceObservationTimeSeconds, SystemStateSourceMode sourceMode, String sourceDescription, int sequenceIndex, boolean exactTimeMatch )` | public | Costruttore: crea l'oggetto e controlla che i dati necessari siano validi. |
-| `public SystemSnapshot getSnapshot()` | public | Restituisce il valore di `Snapshot` senza modificarlo. |
-| `public double getRequestedObservationTimeSeconds()` | public | Tempo chiesto dal TemporalWindowManager. Questo è il tempo logico/adattivo della finestra. |
-| `public double getSourceObservationTimeSeconds()` | public | Tempo associato alla fotografia prodotta dalla sorgente. Nel caso JSON è il valore salvato nel file. Nel caso MOSAIC sarà il tempo di simulazione dello snapshot restituito. |
-| `public double getActualObservationTimeSeconds()` | public | Alias storico per il tempo osservato dalla sorgente. Il nome "actual" indica il tempo della sorgente, non il tempo logico richiesto dal manager. |
+| `private SystemStateObservation( SystemSnapshot observedSnapshot, SystemSnapshot optimizationSnapshot, double requestedObservationTimeSeconds, double sourceObservationTimeSeconds, SystemStateSourceMode sourceMode, String sourceDescription, int sequenceIndex, boolean exactTimeMatch )` | private | Costruttore: crea l'oggetto e controlla che i dati necessari siano validi. |
+| `public SystemSnapshot getSnapshot()` | public | Vista destinata all'ottimizzazione. Il metodo conserva la semantica storica per non rompere i chiamanti esistenti. Il gestore temporale deve usare esplicitamente `#getObservedSnapshot()` per dinamicità e bounds. |
+| `public SystemSnapshot getObservedSnapshot()` | public | Fotografia grezza prodotta dalla sorgente prima del prefilter. |
+| `public SystemSnapshot getOptimizationSnapshot()` | public | Vista filtrata destinata al GA. |
+| `public double getRequestedObservationTimeSeconds()` | public | Restituisce il valore di `RequestedObservationTimeSeconds` senza modificarlo. |
+| `public double getSourceObservationTimeSeconds()` | public | Restituisce il valore di `SourceObservationTimeSeconds` senza modificarlo. |
+| `public double getActualObservationTimeSeconds()` | public | Alias storico per il tempo osservato dalla sorgente. |
 | `public SystemStateSourceMode getSourceMode()` | public | Restituisce il valore di `SourceMode` senza modificarlo. |
 | `public String getSourceDescription()` | public | Restituisce il valore di `SourceDescription` senza modificarlo. |
 | `public int getSequenceIndex()` | public | Restituisce il valore di `SequenceIndex` senza modificarlo. |
 | `public boolean isExactTimeMatch()` | public | Risponde con true/false alla domanda `is exact time match`. |
 | `public boolean isTimeShifted()` | public | Risponde con true/false alla domanda `is time shifted`. |
 | `public double getTimeShiftSeconds()` | public | Restituisce il valore di `TimeShiftSeconds` senza modificarlo. |
-| `public SystemStateObservation withSnapshot(SystemSnapshot updatedSnapshot)` | public | Metodo di supporto: realizza il passo `with snapshot` dentro la responsabilita' della classe. |
+| `public SystemStateObservation withOptimizationSnapshot( SystemSnapshot updatedOptimizationSnapshot )` | public | Restituisce una nuova osservazione mantenendo lo snapshot grezzo e sostituendo soltanto la vista destinata al GA. |
+| `public SystemStateObservation withSnapshot(SystemSnapshot updatedSnapshot)` | public | Alias storico mantenuto per compatibilità. @deprecated usare `#withOptimizationSnapshot(SystemSnapshot)`. |
+| `private void validateSnapshotTime(SystemSnapshot snapshot, String label)` | private | Controlla la correttezza di `validate snapshot time` e solleva un'eccezione se trova dati incoerenti. |
 | `private static void validateFiniteAndNonNegative( String fieldName, double value )` | private | Controlla la correttezza di `validate finite and non negative` e solleva un'eccezione se trova dati incoerenti. |
 
 **Problematiche aperte**
@@ -5650,7 +6519,7 @@ Richiesta di osservazione dello stato del sistema. La richiesta contiene il temp
 
 **Relazione con la formalizzazione**
 
-Fornisce o valida lo stato osservato S_k prima che il GA possa ragionare.
+Fornisce o valida lo stato osservato `S_k` prima che il GA possa ragionare.
 
 **Con chi comunica**
 
@@ -5689,11 +6558,11 @@ Nessuna specifica nota per questa classe.
 
 **Cosa fa, in parole semplici**
 
-Porta di ingresso degli snapshot nel gestore temporale. Il MA-GA e il TemporalWindowManager non devono sapere se lo snapshot arriva da JSON, MOSAIC o da un altro simulatore. Devono ricevere solo una fotografia coerente del sistema. Interfaccia per qualunque sorgente: JSON o MOSAIC.
+Porta di ingresso degli snapshot nel gestore temporale. Il MA-GA e il TemporalWindowManager non devono sapere se lo snapshot arriva da JSON, MOSAIC o da un altro simulatore. Devono ricevere solo una fotografia coerente del sistema.
 
 **Relazione con la formalizzazione**
 
-Fornisce o valida lo stato osservato S_k prima che il GA possa ragionare.
+Fornisce o valida lo stato osservato `S_k` prima che il GA possa ragionare.
 
 **Con chi comunica**
 
@@ -5723,7 +6592,7 @@ Factory per costruire sorgenti dati temporali a partire da una cartella di snaps
 
 **Relazione con la formalizzazione**
 
-Fornisce o valida lo stato osservato S_k prima che il GA possa ragionare.
+Fornisce o valida lo stato osservato `S_k` prima che il GA possa ragionare.
 
 **Con chi comunica**
 
@@ -5736,11 +6605,11 @@ In pratica questa classe riceve questi oggetti, li costruisce oppure li passa al
 |---|---:|---|
 | `private SystemStateSourceFactory()` | private | Costruttore: crea l'oggetto e controlla che i dati necessari siano validi. |
 | `public static SystemStateSource fromJsonFolder( String modeName, String folderPath ) throws Exception` | public | Metodo di supporto: realizza il passo `from json folder` dentro la responsabilita' della classe. |
-| `public static String normalizeMode(String modeName)` | public | Normalizza `normalize mode` per renderlo confrontabile o sicuro. |
+| `public static String normalizeMode(String modeName)` | public | Metodo di supporto: realizza il passo `normalize mode` dentro la responsabilita' della classe. |
 
 **Problematiche aperte**
 
-- La modalita' MOSAIC non e' costruita automaticamente perche' manca il bridge concreto.
+- Costruisce solo sorgenti JSON; MOSAIC richiede un bridge concreto separato.
 
 ### `SystemStateSourceMode`
 
@@ -5754,7 +6623,7 @@ Modalità con cui il sistema ottiene gli snapshot da elaborare.
 
 **Relazione con la formalizzazione**
 
-Fornisce o valida lo stato osservato S_k prima che il GA possa ragionare.
+Fornisce o valida lo stato osservato `S_k` prima che il GA possa ragionare.
 
 **Con chi comunica**
 
@@ -5775,17 +6644,17 @@ Nessuna specifica nota per questa classe.
 
 ### `TimeIndexedSnapshotReplaySource`
 
-- File: `src/window/source/TimeIndexedSnapshotReplaySource.java:18`
+- File: `src/window/source/TimeIndexedSnapshotReplaySource.java:24`
 - Tipo: `class`
 - Nome completo: `window.source.TimeIndexedSnapshotReplaySource`
 
 **Cosa fa, in parole semplici**
 
-Sorgente JSON indicizzata nel tempo. Dato un tempo richiesto, restituisce il primo snapshot disponibile a quel tempo o dopo. Può saltare file se la finestra adattiva produce tempi non allineati agli snapshot salvati. Replay JSON guidato dal tempo richiesto.
+Sorgente JSON indicizzata nel tempo logico del manager. Dato un istante richiesto, restituisce lo snapshot più recente che era già disponibile a quell'istante. Non espone mai snapshot futuri. Se tra due richieste non è diventato disponibile un nuovo file, riutilizza l'ultimo snapshot noto: lo stato osservato resta valido fino all'arrivo di una nuova osservazione. Questa semantica distingue il replay temporale da quello sequenziale: `SequentialSnapshotReplaySource` consuma ordinalmente tutti i file, mentre questa classe rispetta il tempo logico richiesto dal manager. Implementa il replay temporale corretto: usa l'ultimo snapshot disponibile e non espone futuro.
 
 **Relazione con la formalizzazione**
 
-Fornisce o valida lo stato osservato S_k prima che il GA possa ragionare.
+Fornisce o valida lo stato osservato `S_k` prima che il GA possa ragionare.
 
 **Con chi comunica**
 
@@ -5799,7 +6668,6 @@ Campi dichiarati principali:
 - `private final List<SystemSnapshot> snapshots`
 - `private final String description`
 - `private final double timeToleranceSeconds`
-- `private int cursor`
 
 **Metodi**
 
@@ -5808,14 +6676,15 @@ Campi dichiarati principali:
 | `public TimeIndexedSnapshotReplaySource(List<SystemSnapshot> snapshots)` | public | Costruttore: crea l'oggetto e controlla che i dati necessari siano validi. |
 | `public TimeIndexedSnapshotReplaySource( List<SystemSnapshot> snapshots, double timeToleranceSeconds, String description )` | public | Costruttore: crea l'oggetto e controlla che i dati necessari siano validi. |
 | `public Optional<SystemStateObservation> nextObservation(SystemStateRequest request)` | public | Metodo di supporto: realizza il passo `next observation` dentro la responsabilita' della classe. |
+| `private int findLatestSnapshotAtOrBefore(double requestedTime)` | private | Restituisce l'indice dello snapshot più recente non successivo al tempo richiesto. La ricerca binaria mantiene il comportamento corretto anche quando lo stesso snapshot deve essere riutilizzato in finestre diverse. |
 | `public SystemStateSourceMode getMode()` | public | Restituisce il valore di `Mode` senza modificarlo. |
 | `public String getDescription()` | public | Restituisce il valore di `Description` senza modificarlo. |
 | `public List<SystemSnapshot> getSnapshots()` | public | Restituisce il valore di `Snapshots` senza modificarlo. |
-| `private static void validateFiniteAndNonNegative( String fieldName, double value )` | private | Controlla la correttezza di `validate finite and non negative` e solleva un'eccezione se trova dati incoerenti. |
+| `private static void validateFiniteAndNonNegative(String fieldName, double value)` | private | Controlla la correttezza di `validate finite and non negative` e solleva un'eccezione se trova dati incoerenti. |
 
 **Problematiche aperte**
 
-- Restituisce il primo snapshot disponibile a tempo uguale o successivo: in JSON_TIME puo' esporre futuro rispetto al manager.
+Nessuna specifica nota per questa classe.
 
 ## Package `window.state`
 
@@ -5890,7 +6759,7 @@ Campi dichiarati principali:
 | `private static void validateSnapshotConsistency( SystemSnapshot snapshot, MaGaResult maGaResult )` | private | Controlla la correttezza di `validate snapshot consistency` e solleva un'eccezione se trova dati incoerenti. |
 | `private static void validateSourceObservationConsistency( SystemSnapshot snapshot, SystemStateObservation observation, double logicalObservationTimeSeconds )` | private | Controlla la correttezza di `validate source observation consistency` e solleva un'eccezione se trova dati incoerenti. |
 | `private static void validateFiniteAndNonNegative( String fieldName, double value )` | private | Controlla la correttezza di `validate finite and non negative` e solleva un'eccezione se trova dati incoerenti. |
-| `public String toString()` | public | Converte l'oggetto o i dati in `to string`. |
+| `public String toString()` | public | Converte l'oggetto in una stringa utile per debug e report. |
 
 **Problematiche aperte**
 
@@ -5935,7 +6804,7 @@ Campi dichiarati principali:
 | `public long countPopulationReuseSteps()` | public | @return numero di finestre che hanno riutilizzato popolazione precedente |
 | `public Optional<Double> getBestFinalFitness()` | public | @return migliore fitness finale osservata nella sequenza |
 | `public TemporalWindowResult append(TemporalStepResult step)` | public | Restituisce un nuovo risultato con uno step aggiunto. L'oggetto corrente resta invariato. Questa scelta rende il risultato aggregato semplice da passare tra metodi senza effetti collaterali. @param step nuovo step da aggiungere @return nuovo TemporalWindowResult immutabile |
-| `public String toString()` | public | Converte l'oggetto o i dati in `to string`. |
+| `public String toString()` | public | Converte l'oggetto in una stringa utile per debug e report. |
 
 **Problematiche aperte**
 
@@ -5993,7 +6862,7 @@ Campi dichiarati principali:
 | `public boolean hasReusablePopulation()` | public | Risponde con true/false alla domanda `has reusable population`. |
 | `private static void validateFiniteAndNonNegative( String fieldName, double value )` | private | Controlla la correttezza di `validate finite and non negative` e solleva un'eccezione se trova dati incoerenti. |
 | `private static void validatePositive(String fieldName, double value)` | private | Controlla la correttezza di `validate positive` e solleva un'eccezione se trova dati incoerenti. |
-| `public String toString()` | public | Converte l'oggetto o i dati in `to string`. |
+| `public String toString()` | public | Converte l'oggetto in una stringa utile per debug e report. |
 
 **Problematiche aperte**
 
@@ -6015,7 +6884,7 @@ Controller della finestra adattiva. Non modifica il GA. Decide solo la durata de
 
 **Relazione con la formalizzazione**
 
-Realizza i limiti DeltaT_min, DeltaT_max e la scelta della finestra temporale.
+Realizza i limiti `DeltaT_min`, `DeltaT_max` e la scelta della finestra temporale.
 
 **Con chi comunica**
 
@@ -6053,7 +6922,7 @@ Decisione prodotta dal controller della finestra adattiva.
 
 **Relazione con la formalizzazione**
 
-Realizza i limiti DeltaT_min, DeltaT_max e la scelta della finestra temporale.
+Realizza i limiti `DeltaT_min`, `DeltaT_max` e la scelta della finestra temporale.
 
 **Con chi comunica**
 
@@ -6084,7 +6953,7 @@ Campi dichiarati principali:
 | `public Action getAction()` | public | Restituisce il valore di `Action` senza modificarlo. |
 | `public String getReason()` | public | Restituisce il valore di `Reason` senza modificarlo. |
 | `private static double validatePositive(String fieldName, double value)` | private | Controlla la correttezza di `validate positive` e solleva un'eccezione se trova dati incoerenti. |
-| `public String toString()` | public | Converte l'oggetto o i dati in `to string`. |
+| `public String toString()` | public | Converte l'oggetto in una stringa utile per debug e report. |
 
 **Problematiche aperte**
 
@@ -6102,7 +6971,7 @@ Enum: rappresenta un insieme chiuso di valori usati per rendere esplicite le sce
 
 **Relazione con la formalizzazione**
 
-Realizza i limiti DeltaT_min, DeltaT_max e la scelta della finestra temporale.
+Realizza i limiti `DeltaT_min`, `DeltaT_max` e la scelta della finestra temporale.
 
 **Con chi comunica**
 
@@ -6124,17 +6993,17 @@ Nessuna specifica nota per questa classe.
 
 ### `CoverageReferenceCalculator`
 
-- File: `src/window/timing/CoverageReferenceCalculator.java:20`
+- File: `src/window/timing/CoverageReferenceCalculator.java:28`
 - Tipo: `class`
 - Nome completo: `window.timing.CoverageReferenceCalculator`
 
 **Cosa fa, in parole semplici**
 
-Calcola il tempo di copertura di riferimento della finestra corrente. Il valore viene calcolato solo sui candidati remoti con copertura fisica: EDGE e VEHICLE. LOCAL e CLOUD sono esclusi perché avrebbero tempi convenzionali troppo alti e falserebbero il limite massimo della finestra.
+Calcola il tempo di copertura di riferimento della finestra corrente. La formalizzazione richiede una sola stima per ciascun veicolo osservato, non una stima per ogni candidato computazionale. Nella versione standalone non esiste ancora un modello esplicito del collegamento di accesso radio. Come correzione minima, questa classe usa quindi il migliore candidato EDGE raggiungibile di ciascun veicolo come proxy del relativo nodo infrastrutturale o di accesso. I candidati VEHICLE sono esclusi: descrivono alternative V2V utili al GA, ma non il collegamento infrastrutturale di riferimento del veicolo. LOCAL e CLOUD restano esclusi perché usano tempi convenzionali e falserebbero il bound massimo della finestra.
 
 **Relazione con la formalizzazione**
 
-Implementa la parte mobility-aware: tempo di copertura, rischio di copertura e limiti della finestra.
+Implementa la parte mobility-aware: tempo di copertura, instabilita' link, rischio handover e limiti temporali collegati alla copertura.
 
 **Con chi comunica**
 
@@ -6151,18 +7020,15 @@ Campi dichiarati principali:
 | Metodo | Visibilita' | Spiegazione semplice |
 |---|---:|---|
 | `public CoverageReferenceCalculator(MobilityConfig mobilityConfig)` | public | Costruttore: crea l'oggetto e controlla che i dati necessari siano validi. |
-| `public double computeReferenceCoverageSeconds(SystemSnapshot snapshot)` | public | Calcola la media dei tempi di copertura positivi e finiti. La media è meno aggressiva del minimo. È adatta a questa fase perché vogliamo una finestra adattiva prudente, ma non troppo instabile. |
+| `public double computeReferenceCoverageSeconds(SystemSnapshot snapshot)` | public | Calcola la media dei migliori tempi di copertura EDGE, una sola volta per ciascun veicolo per il quale è disponibile una proxy infrastrutturale. Se un veicolo dispone di più candidati EDGE, viene usato quello con maggiore copertura residua. In questo modo il numero delle alternative computazionali non modifica artificialmente il peso del veicolo nella media. |
 | `public boolean hasReferenceCoverage(SystemSnapshot snapshot)` | public | Risponde con true/false alla domanda `has reference coverage`. |
-| `private double estimateCoverageSeconds( NodeCandidate candidate, Map<String, VehicleSnapshot> vehiclesById )` | private | Metodo di supporto: realizza il passo `estimate coverage seconds` dentro la responsabilita' della classe. |
-| `private double estimateEdgeCoverage( NodeCandidate candidate, VehicleSnapshot source )` | private | Metodo di supporto: realizza il passo `estimate edge coverage` dentro la responsabilita' della classe. |
-| `private double estimateV2vCoverage( VehicleSnapshot source, VehicleSnapshot target )` | private | Metodo di supporto: realizza il passo `estimate v2v coverage` dentro la responsabilita' della classe. |
+| `private double estimateEdgeCoverage( NodeCandidate candidate, VehicleSnapshot source )` | private | Stima `estimate edge coverage` senza modificare lo stato principale. |
 | `private Map<String, VehicleSnapshot> indexVehicles(SystemSnapshot snapshot)` | private | Prepara una mappa di lookup per trovare rapidamente gli oggetti. |
 | `private double euclideanDistance( double x1, double y1, double x2, double y2 )` | private | Metodo di supporto: realizza il passo `euclidean distance` dentro la responsabilita' della classe. |
 
 **Problematiche aperte**
 
-- Esclude il cloud dal riferimento di copertura e usa una media dei candidati fisici; e' coerente col prototipo, ma e' una scelta operativa.
-- La copertura V2V usa una stima semplificata basata su velocita' scalari.
+- Il riferimento di copertura e' una scelta aggregata operativa; va verificato rispetto alla definizione finale di `T_ref_coverage(k)`.
 
 ### `TemporalOperationalMetrics`
 
@@ -6176,7 +7042,7 @@ Tempi operativi usati per calcolare il limite minimo della finestra. Formalmente
 
 **Relazione con la formalizzazione**
 
-Realizza i limiti DeltaT_min, DeltaT_max e la scelta della finestra temporale.
+Realizza i limiti `DeltaT_min`, `DeltaT_max` e la scelta della finestra temporale.
 
 **Con chi comunica**
 
@@ -6197,7 +7063,7 @@ Campi dichiarati principali:
 |---|---:|---|
 | `public TemporalOperationalMetrics( double dataCollectionSeconds, double gaRuntimeEstimateSeconds, double strategyApplicationSeconds, double epsilonSeconds )` | public | Costruttore: crea l'oggetto e controlla che i dati necessari siano validi. |
 | `public TemporalOperationalMetrics( double dataCollectionSeconds, double gaRuntimeEstimateSeconds, double strategyApplicationSeconds, double epsilonSeconds, double observedGaRuntimeSeconds )` | public | Costruttore: crea l'oggetto e controlla che i dati necessari siano validi. |
-| `public static TemporalOperationalMetrics estimated( double dataCollectionSeconds, double defaultGaRuntimeEstimateSeconds, double strategyApplicationSeconds, double epsilonSeconds )` | public | Metodo di supporto: realizza il passo `estimated` dentro la responsabilita' della classe. |
+| `public static TemporalOperationalMetrics estimated( double dataCollectionSeconds, double defaultGaRuntimeEstimateSeconds, double strategyApplicationSeconds, double epsilonSeconds )` | public | Stima `estimated` senza modificare lo stato principale. |
 | `public static TemporalOperationalMetrics observed( double dataCollectionSeconds, double observedGaRuntimeSeconds, double strategyApplicationSeconds, double epsilonSeconds )` | public | Metodo di supporto: realizza il passo `observed` dentro la responsabilita' della classe. |
 | `public TemporalOperationalMetrics withGaRuntimeEstimateSeconds( double newGaRuntimeEstimateSeconds )` | public | Metodo di supporto: realizza il passo `with ga runtime estimate seconds` dentro la responsabilita' della classe. |
 | `public double getDataCollectionSeconds()` | public | Restituisce il valore di `DataCollectionSeconds` senza modificarlo. |
@@ -6207,11 +7073,11 @@ Campi dichiarati principali:
 | `public double getObservedGaRuntimeSeconds()` | public | Restituisce il valore di `ObservedGaRuntimeSeconds` senza modificarlo. |
 | `public double getMinimumWindowSeconds()` | public | Restituisce il valore di `MinimumWindowSeconds` senza modificarlo. |
 | `private static double validateFiniteAndNonNegative( String fieldName, double value )` | private | Controlla la correttezza di `validate finite and non negative` e solleva un'eccezione se trova dati incoerenti. |
-| `public String toString()` | public | Converte l'oggetto o i dati in `to string`. |
+| `public String toString()` | public | Converte l'oggetto in una stringa utile per debug e report. |
 
 **Problematiche aperte**
 
-- Conserva runtime osservato e stimato separati: bisogna decidere quale usare negli esperimenti operativi.
+Nessuna specifica nota per questa classe.
 
 ### `TemporalWindowBounds`
 
@@ -6225,7 +7091,7 @@ Limiti della prossima finestra temporale.
 
 **Relazione con la formalizzazione**
 
-Realizza i limiti DeltaT_min, DeltaT_max e la scelta della finestra temporale.
+Realizza i limiti `DeltaT_min`, `DeltaT_max` e la scelta della finestra temporale.
 
 **Con chi comunica**
 
@@ -6267,7 +7133,7 @@ Campi dichiarati principali:
 | `public double clamp(double value)` | public | Limita un valore dentro un intervallo ammesso. |
 | `private static double validatePositive(String fieldName, double value)` | private | Controlla la correttezza di `validate positive` e solleva un'eccezione se trova dati incoerenti. |
 | `private static double validateFiniteAndNonNegative( String fieldName, double value )` | private | Controlla la correttezza di `validate finite and non negative` e solleva un'eccezione se trova dati incoerenti. |
-| `public String toString()` | public | Converte l'oggetto o i dati in `to string`. |
+| `public String toString()` | public | Converte l'oggetto in una stringa utile per debug e report. |
 
 **Problematiche aperte**
 
@@ -6281,11 +7147,11 @@ Nessuna specifica nota per questa classe.
 
 **Cosa fa, in parole semplici**
 
-Calcola DeltaT_min(k) e DeltaT_max(k). La formula resta quella formalizzata: DeltaT_min(k) = T_s(k) + T_GA_est(k) + T_apply(k) + epsilon_T DeltaT_max(k) = alpha_T * T_coverage_ref(k) Le modalità servono solo a decidere se T_GA_est(k) e il limite massimo vengono stimati da valori configurati o da valori adattivi. Il calcolo di T_coverage_ref(k) non viene cambiato.
+Calcola DeltaT_min(k) e DeltaT_max(k). La formula resta quella formalizzata: DeltaT_min(k) = T_s(k) + T_GA_est(k) + T_apply(k) + epsilon_T DeltaT_max(k) = alpha_T * T_coverage_ref(k) Le modalità servono solo a decidere se T_GA_est(k) e il limite massimo vengono stimati da valori configurati o da valori adattivi. Il calcolo di T_coverage_ref(k) non viene cambiato. Applica le formule di `DeltaT_min` e `DeltaT_max` usando il profilo runtime scelto.
 
 **Relazione con la formalizzazione**
 
-Realizza i limiti DeltaT_min, DeltaT_max e la scelta della finestra temporale.
+Realizza i limiti `DeltaT_min`, `DeltaT_max` e la scelta della finestra temporale.
 
 **Con chi comunica**
 
@@ -6304,13 +7170,13 @@ Campi dichiarati principali:
 |---|---:|---|
 | `public TemporalWindowBoundsCalculator( TemporalWindowConfig config, CoverageReferenceCalculator coverageReferenceCalculator )` | public | Costruttore: crea l'oggetto e controlla che i dati necessari siano validi. |
 | `public TemporalWindowBounds compute( SystemSnapshot snapshot, TemporalOperationalMetrics operationalMetrics, double fallbackWindowSeconds )` | public | Calcola `compute` a partire dai dati ricevuti. |
-| `private TemporalOperationalMetrics selectMetricsForMinimum( TemporalOperationalMetrics operationalMetrics )` | private | Metodo di supporto: realizza il passo `select metrics for minimum` dentro la responsabilita' della classe. |
-| `private double selectMaximum( double adaptiveMaximum, double configuredMaximum, double fallbackWindowSeconds, boolean hasReferenceCoverage )` | private | Metodo di supporto: realizza il passo `select maximum` dentro la responsabilita' della classe. |
+| `private TemporalOperationalMetrics selectMetricsForMinimum( TemporalOperationalMetrics operationalMetrics )` | private | Seleziona `select metrics for minimum` tra alternative disponibili. |
+| `private double selectMaximum( double adaptiveMaximum, double configuredMaximum, double fallbackWindowSeconds, boolean hasReferenceCoverage )` | private | Seleziona `select maximum` tra alternative disponibili. |
 | `private static void validatePositive(String fieldName, double value)` | private | Controlla la correttezza di `validate positive` e solleva un'eccezione se trova dati incoerenti. |
 
 **Problematiche aperte**
 
-- Supporta sia CONFIGURED_GA_ESTIMATE sia OBSERVED_GA_RUNTIME; il main default usa ancora la stima configurata.
+- Se `DeltaT_max < DeltaT_min`, il codice rialza il massimo al minimo e lo segnala; la formalizzazione puo' richiedere invece fallback o riduzione del carico.
 
 ## Package `window.trigger`
 
@@ -6358,7 +7224,7 @@ Campi dichiarati principali:
 | `public boolean isFirstRun()` | public | Restituisce true se il trigger rappresenta la prima esecuzione. @return `true` se il trigger è la prima esecuzione |
 | `private static void validateCriticalEventConsistency( TriggerReason reason, CriticalEvent criticalEvent )` | private | Controlla la coerenza tra reason e criticalEvent. Questa validazione serve a evitare oggetti semanticamente inconsistenti e concentra in un solo punto l'invariante tra motivo e payload opzionale. |
 | `private static void validateFiniteAndNonNegative( String fieldName, double value )` | private | Valida che un tempo simulato sia finito e non negativo. |
-| `public String toString()` | public | Converte l'oggetto o i dati in `to string`. |
+| `public String toString()` | public | Converte l'oggetto in una stringa utile per debug e report. |
 
 **Problematiche aperte**
 
@@ -6398,17 +7264,16 @@ Valori enum principali:
 
 Nessuna specifica nota per questa classe.
 
-## 7. Percorso consigliato di studio
+## 8. Percorso consigliato di studio
 
-Per capire il codice con meno fatica, segui questo ordine:
-1. `model.snapshot`, `model.node`, `model.genetic`: prima capisci i dati.
-2. `model.offloading` e `model.mobility`: poi capisci le formule temporali e di copertura.
-3. `ga.fitness`: capisci come il codice valuta una soluzione.
-4. `ga.operators`: capisci come il GA crea, cambia e ripara soluzioni.
-5. `ga.core.MaGaOptimizer`: segui il ciclo evolutivo completo.
-6. `window.source`, `window.prefilter`, `window.core`: capisci il ciclo temporale.
-7. `io.reporting` e `io.reporting.diagnostics.deadline`: usa i report per leggere i risultati.
+1. Parti da `model.snapshot`, `model.node`, `model.genetic`: capisci i dati.
+2. Leggi `model.offloading` e `model.mobility`: capisci tempi, copertura e instabilita'.
+3. Passa a `ga.constraints` e `ga.operators.RepairOperator`: capisci come il codice prova a rispettare deadline e copertura.
+4. Leggi `ga.fitness.FitnessEvaluator`: capisci come viene calcolata `J(C)`.
+5. Studia `ga.core.MaGaOptimizer`: vedi il ciclo evolutivo e il repair incrementale.
+6. Poi passa a `window.source`, `window.prefilter`, `window.core`: capisci il ciclo temporale.
+7. Infine usa `io.reporting`: i report spiegano dove nascono costi, saturazioni e fallback.
 
-## 8. Sintesi finale
+## 9. Sintesi finale
 
-Il codice e' organizzato in modo coerente con la formalizzazione: snapshot come stato, gene come decisione elementare, cromosoma come strategia, fitness come funzione obiettivo, dynamicity come misura del cambiamento temporale. Le principali differenze sono scelte operative del prototipo: deadline soft, banda per-link, runtime GA configurato, cloud coverage convenzionale e bridge MOSAIC ancora assente. Queste differenze sono state segnalate nelle schede delle classi coinvolte.
+La versione corrente e' piu' vicina alla formalizzazione rispetto alla precedente: deadline, latenza e mobilita' sono trattate in modo piu' esplicito e diagnosticabile. Le principali differenze residue sono concentrate su banda globale, modello di mobilita' semplificato, bridge MOSAIC assente e gestione operativa dei casi in cui i bounds temporali entrano in conflitto.
