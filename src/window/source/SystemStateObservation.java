@@ -7,23 +7,21 @@ import java.util.Objects;
 /**
  * Osservazione restituita da una sorgente dati.
  *
- * <p>Questa classe separa tre concetti che prima venivano confusi:</p>
+ * <p>La classe distingue la fotografia fisica osservata dalla vista destinata
+ * all'ottimizzazione. All'origine le due viste coincidono. Un decoratore può
+ * applicare il prefilter e sostituire soltanto la vista ottimizzabile, senza
+ * nascondere al gestore temporale lo stato reale dello scenario.</p>
  *
- * <ul>
- *     <li>il tempo richiesto dal TemporalWindowManager;</li>
- *     <li>il tempo della sorgente, cioè il tempo salvato nello snapshot;</li>
- *     <li>la modalità con cui la sorgente ha prodotto lo snapshot.</li>
- * </ul>
- *
- * <p>Nel replay JSON sequenziale il tempo richiesto può essere adattivo, mentre
- * il tempo dello snapshot resta quello scritto nel file. Con MOSAIC, invece,
- * i due valori dovrebbero coincidere o essere molto vicini.</p>
+ * <p>Restano inoltre separati il tempo logico richiesto dal manager, il tempo
+ * salvato nella sorgente e la modalità con cui la sorgente ha prodotto lo
+ * snapshot.</p>
  */
 public final class SystemStateObservation {
 
     private static final double EPSILON = 1.0E-6;
 
-    private final SystemSnapshot snapshot;
+    private final SystemSnapshot observedSnapshot;
+    private final SystemSnapshot optimizationSnapshot;
     private final double requestedObservationTimeSeconds;
     private final double sourceObservationTimeSeconds;
     private final SystemStateSourceMode sourceMode;
@@ -40,7 +38,36 @@ public final class SystemStateObservation {
             int sequenceIndex,
             boolean exactTimeMatch
     ) {
-        this.snapshot = Objects.requireNonNull(snapshot, "snapshot must not be null.");
+        this(
+                snapshot,
+                snapshot,
+                requestedObservationTimeSeconds,
+                sourceObservationTimeSeconds,
+                sourceMode,
+                sourceDescription,
+                sequenceIndex,
+                exactTimeMatch
+        );
+    }
+
+    private SystemStateObservation(
+            SystemSnapshot observedSnapshot,
+            SystemSnapshot optimizationSnapshot,
+            double requestedObservationTimeSeconds,
+            double sourceObservationTimeSeconds,
+            SystemStateSourceMode sourceMode,
+            String sourceDescription,
+            int sequenceIndex,
+            boolean exactTimeMatch
+    ) {
+        this.observedSnapshot = Objects.requireNonNull(
+                observedSnapshot,
+                "observedSnapshot must not be null."
+        );
+        this.optimizationSnapshot = Objects.requireNonNull(
+                optimizationSnapshot,
+                "optimizationSnapshot must not be null."
+        );
         validateFiniteAndNonNegative(
                 "requestedObservationTimeSeconds",
                 requestedObservationTimeSeconds
@@ -49,50 +76,55 @@ public final class SystemStateObservation {
                 "sourceObservationTimeSeconds",
                 sourceObservationTimeSeconds
         );
-
         this.requestedObservationTimeSeconds = requestedObservationTimeSeconds;
         this.sourceObservationTimeSeconds = sourceObservationTimeSeconds;
-        this.sourceMode = Objects.requireNonNull(sourceMode, "sourceMode must not be null.");
+        this.sourceMode = Objects.requireNonNull(
+                sourceMode,
+                "sourceMode must not be null."
+        );
         this.sourceDescription = sourceDescription == null ? "" : sourceDescription;
         this.sequenceIndex = sequenceIndex;
         this.exactTimeMatch = exactTimeMatch;
 
-        if (Math.abs(snapshot.getTimeSeconds() - sourceObservationTimeSeconds) > EPSILON) {
+        validateSnapshotTime(observedSnapshot, "observed snapshot");
+        validateSnapshotTime(optimizationSnapshot, "optimization snapshot");
+        if (!observedSnapshot.getSnapshotId().equals(optimizationSnapshot.getSnapshotId())) {
             throw new IllegalArgumentException(
-                    "snapshot.timeSeconds must match sourceObservationTimeSeconds."
+                    "observedSnapshot and optimizationSnapshot must refer to the same snapshotId."
             );
         }
     }
 
+    /**
+     * Vista destinata all'ottimizzazione.
+     *
+     * <p>Il metodo conserva la semantica storica per non rompere i chiamanti
+     * esistenti. Il gestore temporale deve usare esplicitamente
+     * {@link #getObservedSnapshot()} per dinamicità e bounds.</p>
+     */
     public SystemSnapshot getSnapshot() {
-        return snapshot;
+        return optimizationSnapshot;
     }
 
-    /**
-     * Tempo chiesto dal TemporalWindowManager.
-     *
-     * <p>Questo è il tempo logico/adattivo della finestra.</p>
-     */
+    /** Fotografia grezza prodotta dalla sorgente prima del prefilter. */
+    public SystemSnapshot getObservedSnapshot() {
+        return observedSnapshot;
+    }
+
+    /** Vista filtrata destinata al GA. */
+    public SystemSnapshot getOptimizationSnapshot() {
+        return optimizationSnapshot;
+    }
+
     public double getRequestedObservationTimeSeconds() {
         return requestedObservationTimeSeconds;
     }
 
-    /**
-     * Tempo associato alla fotografia prodotta dalla sorgente.
-     *
-     * <p>Nel caso JSON è il valore salvato nel file. Nel caso MOSAIC sarà il
-     * tempo di simulazione dello snapshot restituito.</p>
-     */
     public double getSourceObservationTimeSeconds() {
         return sourceObservationTimeSeconds;
     }
 
-    /**
-     * Alias storico per il tempo osservato dalla sorgente.
-     *
-     * <p>Il nome "actual" indica il tempo della sorgente, non il tempo logico
-     * richiesto dal manager.</p>
-     */
+    /** Alias storico per il tempo osservato dalla sorgente. */
     public double getActualObservationTimeSeconds() {
         return sourceObservationTimeSeconds;
     }
@@ -114,24 +146,29 @@ public final class SystemStateObservation {
     }
 
     public boolean isTimeShifted() {
-        return Math.abs(requestedObservationTimeSeconds - sourceObservationTimeSeconds) > EPSILON;
+        return Math.abs(
+                requestedObservationTimeSeconds - sourceObservationTimeSeconds
+        ) > EPSILON;
     }
 
     public double getTimeShiftSeconds() {
         return sourceObservationTimeSeconds - requestedObservationTimeSeconds;
     }
 
-    public SystemStateObservation withSnapshot(SystemSnapshot updatedSnapshot) {
-        Objects.requireNonNull(updatedSnapshot, "updatedSnapshot must not be null.");
-
-        if (Math.abs(updatedSnapshot.getTimeSeconds() - sourceObservationTimeSeconds) > EPSILON) {
-            throw new IllegalArgumentException(
-                    "filtered snapshot must preserve the original source time."
-            );
-        }
-
+    /**
+     * Restituisce una nuova osservazione mantenendo lo snapshot grezzo e
+     * sostituendo soltanto la vista destinata al GA.
+     */
+    public SystemStateObservation withOptimizationSnapshot(
+            SystemSnapshot updatedOptimizationSnapshot
+    ) {
+        Objects.requireNonNull(
+                updatedOptimizationSnapshot,
+                "updatedOptimizationSnapshot must not be null."
+        );
         return new SystemStateObservation(
-                updatedSnapshot,
+                observedSnapshot,
+                updatedOptimizationSnapshot,
                 requestedObservationTimeSeconds,
                 sourceObservationTimeSeconds,
                 sourceMode,
@@ -139,6 +176,24 @@ public final class SystemStateObservation {
                 sequenceIndex,
                 exactTimeMatch
         );
+    }
+
+    /**
+     * Alias storico mantenuto per compatibilità.
+     *
+     * @deprecated usare {@link #withOptimizationSnapshot(SystemSnapshot)}.
+     */
+    @Deprecated
+    public SystemStateObservation withSnapshot(SystemSnapshot updatedSnapshot) {
+        return withOptimizationSnapshot(updatedSnapshot);
+    }
+
+    private void validateSnapshotTime(SystemSnapshot snapshot, String label) {
+        if (Math.abs(snapshot.getTimeSeconds() - sourceObservationTimeSeconds) > EPSILON) {
+            throw new IllegalArgumentException(
+                    label + ".timeSeconds must match sourceObservationTimeSeconds."
+            );
+        }
     }
 
     private static void validateFiniteAndNonNegative(

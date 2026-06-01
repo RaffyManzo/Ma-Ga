@@ -10,7 +10,12 @@ import java.util.List;
 import java.util.Optional;
 
 /**
- * Decorator che applica CandidatePrefilter agli snapshot prodotti da una sorgente.
+ * Decorator che applica CandidatePrefilter agli snapshot prodotti da una
+ * sorgente.
+ *
+ * <p>Lo snapshot osservato resta disponibile al gestore temporale. Il filtro
+ * modifica soltanto la vista destinata al GA, evitando che una riduzione dello
+ * spazio di ricerca venga interpretata come variazione fisica dello scenario.</p>
  */
 public final class FilteringSystemStateSource implements SystemStateSource {
 
@@ -35,8 +40,7 @@ public final class FilteringSystemStateSource implements SystemStateSource {
 
     @Override
     public Optional<SystemStateObservation> nextObservation(SystemStateRequest request) {
-        return delegate.nextObservation(request)
-                .map(this::filterObservation);
+        return delegate.nextObservation(request).map(this::filterObservation);
     }
 
     @Override
@@ -50,11 +54,12 @@ public final class FilteringSystemStateSource implements SystemStateSource {
     }
 
     private SystemStateObservation filterObservation(SystemStateObservation observation) {
-        CandidateFilteringResult result = prefilter.filter(observation.getSnapshot());
+        CandidateFilteringResult result = prefilter.filter(
+                observation.getObservedSnapshot()
+        );
         filteringResults.add(result);
-
         SystemSnapshot filteredSnapshot = result.getFilteredSnapshot();
-        return observation.withSnapshot(filteredSnapshot);
+        return observation.withOptimizationSnapshot(filteredSnapshot);
     }
 
     public List<CandidateFilteringResult> getFilteringResults() {

@@ -32,13 +32,10 @@ import java.util.Objects;
 /**
  * Orchestratore del ciclo temporale del MA-GA.
  *
- * <p>Il manager non conosce la sorgente concreta degli snapshot. Riceve una
- * {@link SystemStateSource}, che può essere basata su JSON, MOSAIC o altri
- * adapter.</p>
- *
- * <p>Ogni step risolve un trigger, osserva lo stato del sistema, valuta la
- * dinamicità, decide il riuso della popolazione, calcola la prossima finestra
- * e invoca il MA-GA sullo snapshot corrente.</p>
+ * <p>Il manager distingue lo snapshot fisico osservato dallo snapshot filtrato
+ * destinato all'ottimizzazione. Dinamicità e bounds temporali devono descrivere
+ * lo scenario reale. Population adapter e GA lavorano invece sulla vista
+ * ridotta dal prefilter.</p>
  */
 public final class TemporalWindowManager {
 
@@ -133,10 +130,7 @@ public final class TemporalWindowManager {
         CoverageReferenceCalculator coverageReferenceCalculator =
                 new CoverageReferenceCalculator(mobilityConfig);
         TemporalWindowBoundsCalculator boundsCalculator =
-                new TemporalWindowBoundsCalculator(
-                        config,
-                        coverageReferenceCalculator
-                );
+                new TemporalWindowBoundsCalculator(config, coverageReferenceCalculator);
         return new AdaptiveWindowController(config, boundsCalculator);
     }
 
@@ -147,10 +141,7 @@ public final class TemporalWindowManager {
         ).getMobilityConfig();
     }
 
-    public TemporalWindowResult run(
-            double startTimeSeconds,
-            int maxSteps
-    ) {
+    public TemporalWindowResult run(double startTimeSeconds, int maxSteps) {
         validateFiniteAndNonNegative("startTimeSeconds", startTimeSeconds);
         if (maxSteps < 1) {
             throw new IllegalArgumentException("maxSteps must be >= 1.");
@@ -162,103 +153,87 @@ public final class TemporalWindowManager {
                 windowConfig.getInitialWindowSeconds(),
                 initialMetrics
         );
-
         TemporalWindowResult result = TemporalWindowResult.empty();
 
-        // Il ciclo termina quando la sorgente dati non produce più osservazioni.
         for (int i = 0; i < maxSteps; i++) {
             TemporalStepResult stepResult = executeNextStepOrNull(state);
-
             if (stepResult == null) {
                 break;
             }
-
             result = result.append(stepResult);
             state = TemporalWindowState.afterStep(stepResult);
         }
-
         return result;
     }
 
     public TemporalStepResult executeNextStepOrNull(TemporalWindowState state) {
         Objects.requireNonNull(state, "state must not be null.");
 
-        // Trigger e osservazione definiscono il punto temporale della finestra corrente.
         ReoptimizationTrigger plannedTrigger = resolveTrigger(state);
         double requestedObservationTimeSeconds = computeObservationTime(plannedTrigger);
-
         SystemStateRequest request = new SystemStateRequest(
                 state.getWindowIndex(),
                 plannedTrigger,
                 requestedObservationTimeSeconds,
                 state.getCurrentWindowDurationSeconds()
         );
-
         SystemStateObservation observation = systemStateSource
                 .nextObservation(request)
                 .orElse(null);
-
         if (observation == null) {
             return null;
         }
 
-        SystemSnapshot currentSnapshot = observation.getSnapshot();
-
+        SystemSnapshot observedSnapshot = observation.getObservedSnapshot();
+        SystemSnapshot optimizationSnapshot = observation.getOptimizationSnapshot();
         ReoptimizationTrigger effectiveTrigger = plannedTrigger;
-
         double observationTimeSeconds = request.getRequestedObservationTimeSeconds();
 
-        // La dinamicità guida sia il riuso della popolazione sia la durata della prossima finestra.
+        // La dinamicità e i bounds devono descrivere il sistema fisico osservato,
+        // non la vista ridotta dal prefilter per accelerare il GA.
         DynamicityBreakdown dynamicityBreakdown = dynamicityEvaluator.evaluate(
                 state.getLastSnapshot(),
-                currentSnapshot
+                observedSnapshot
         );
-
         PopulationReuseDecision reuseDecision = reuseDecisionPolicy.decide(
                 dynamicityBreakdown,
                 state.getLastResult(),
                 state.hasReusablePopulation(),
                 effectiveTrigger.isCriticalEventTrigger()
         );
-
         TemporalOperationalMetrics metricsForDecision = metricsForDecision(state);
-
         AdaptiveWindowDecision adaptiveWindowDecision =
                 adaptiveWindowController.decideNextWindow(
                         state.getCurrentWindowDurationSeconds(),
                         dynamicityBreakdown,
-                        currentSnapshot,
+                        observedSnapshot,
                         metricsForDecision
                 );
 
         PopulationReuseMode reuseMode = reuseDecision.getAppliedMode();
-
-        // La popolazione iniziale incapsula cold start, warm start e partial restart.
         List<Chromosome> initialPopulation = populationAdapter.adaptPopulation(
                 state.getLastFinalPopulation(),
-                currentSnapshot,
+                optimizationSnapshot,
                 reuseMode,
                 targetPopulationSize
         );
 
         long startNs = System.nanoTime();
         MaGaResult maGaResult = optimizer.optimizeDetailed(
-                currentSnapshot,
+                optimizationSnapshot,
                 initialPopulation
         );
         long elapsedNs = System.nanoTime() - startNs;
+        TemporalOperationalMetrics observedMetrics = observedOperationalMetrics(elapsedNs);
 
-        // Il tempo osservato del GA può alimentare le decisioni delle finestre successive.
-        TemporalOperationalMetrics observedMetrics = observedOperationalMetrics(
-                elapsedNs
-        );
-
+        // TemporalStepResult conserva lo snapshot grezzo: lo stato della finestra
+        // successiva deve confrontare osservazioni fisiche, non candidati filtrati.
         return new TemporalStepResult(
                 state.getWindowIndex(),
                 effectiveTrigger,
                 windowConfig.getDataCollectionDelaySeconds(),
                 observationTimeSeconds,
-                currentSnapshot,
+                observedSnapshot,
                 observation,
                 dynamicityBreakdown,
                 reuseDecision,
@@ -272,22 +247,16 @@ public final class TemporalWindowManager {
 
     private ReoptimizationTrigger resolveTrigger(TemporalWindowState state) {
         if (!state.hasPreviousExecution()) {
-            return ReoptimizationTrigger.firstRun(
-                    state.getCurrentTimeSeconds()
-            );
+            return ReoptimizationTrigger.firstRun(state.getCurrentTimeSeconds());
         }
-
         double currentTimeSeconds = state.getCurrentTimeSeconds();
         double scheduledTimeSeconds = state.getNextScheduledTimeSeconds();
-
         return criticalEventDetector
                 .findNextCriticalEvent(currentTimeSeconds, scheduledTimeSeconds)
                 .map(ReoptimizationTrigger::criticalEvent)
-                .orElseGet(
-                        () -> ReoptimizationTrigger.scheduledExpiration(
-                                scheduledTimeSeconds
-                        )
-                );
+                .orElseGet(() -> ReoptimizationTrigger.scheduledExpiration(
+                        scheduledTimeSeconds
+                ));
     }
 
     private double computeObservationTime(ReoptimizationTrigger trigger) {
@@ -312,7 +281,10 @@ public final class TemporalWindowManager {
     }
 
     private TemporalOperationalMetrics observedOperationalMetrics(long elapsedNs) {
-        double gaRuntimeSeconds = Math.max(0.0, elapsedNs / 1_000_000_000.0);
+        double gaRuntimeSeconds = Math.max(
+                0.0,
+                elapsedNs / 1_000_000_000.0
+        );
         return TemporalOperationalMetrics.observed(
                 windowConfig.getDataCollectionDelaySeconds(),
                 gaRuntimeSeconds,
