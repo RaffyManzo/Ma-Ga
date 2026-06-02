@@ -290,7 +290,8 @@
       "type": "VEHICLE",
       "availableCpu": 687500000,
       "availableBandwidth": 15500000,
-      "baseLatencySeconds": 0.012
+      "baseLatencySeconds": 0.012,
+      "bandwidthPoolId": "pool_v2v_alpha_delta"
     },
     {
       "candidateId": "vehicle_delta_v2v_for_vehicle_bravo",
@@ -299,7 +300,8 @@
       "type": "VEHICLE",
       "availableCpu": 687500000,
       "availableBandwidth": 14000000,
-      "baseLatencySeconds": 0.014
+      "baseLatencySeconds": 0.014,
+      "bandwidthPoolId": "pool_v2v_bravo_delta"
     },
     {
       "candidateId": "vehicle_bravo_v2v_for_vehicle_charlie",
@@ -308,7 +310,8 @@
       "type": "VEHICLE",
       "availableCpu": 506000000,
       "availableBandwidth": 12500000,
-      "baseLatencySeconds": 0.016
+      "baseLatencySeconds": 0.016,
+      "bandwidthPoolId": "pool_v2v_bravo_charlie"
     }
   ],
   "accessGateways": [
@@ -317,21 +320,24 @@
       "gatewayType": "RSU",
       "x": 360,
       "y": 0,
-      "coverageRadiusMeters": 520
+      "coverageRadiusMeters": 520,
+      "bandwidthPoolId": "pool_rsu_north"
     },
     {
       "gatewayId": "rsu_south",
       "gatewayType": "RSU",
       "x": 900,
       "y": -20,
-      "coverageRadiusMeters": 520
+      "coverageRadiusMeters": 520,
+      "bandwidthPoolId": "pool_rsu_south"
     },
     {
       "gatewayId": "rsu_micro",
       "gatewayType": "RSU",
       "x": 540,
       "y": 18,
-      "coverageRadiusMeters": 220
+      "coverageRadiusMeters": 220,
+      "bandwidthPoolId": "pool_rsu_micro"
     }
   ],
   "accessLinks": [
@@ -418,6 +424,53 @@
       "gatewayId": "rsu_micro",
       "active": true,
       "available": true
+    }
+  ],
+  "bandwidthPools": [
+    {
+      "poolId": "pool_rsu_north",
+      "poolType": "GATEWAY",
+      "availableBandwidth": 130000000
+    },
+    {
+      "poolId": "pool_rsu_south",
+      "poolType": "GATEWAY",
+      "availableBandwidth": 100000000
+    },
+    {
+      "poolId": "pool_rsu_micro",
+      "poolType": "GATEWAY",
+      "availableBandwidth": 90000000
+    },
+    {
+      "poolId": "pool_v2v_alpha_bravo",
+      "poolType": "DIRECT_V2V",
+      "availableBandwidth": 13200000
+    },
+    {
+      "poolId": "pool_v2v_alpha_delta",
+      "poolType": "DIRECT_V2V",
+      "availableBandwidth": 15500000
+    },
+    {
+      "poolId": "pool_v2v_bravo_charlie",
+      "poolType": "DIRECT_V2V",
+      "availableBandwidth": 12500000
+    },
+    {
+      "poolId": "pool_v2v_bravo_delta",
+      "poolType": "DIRECT_V2V",
+      "availableBandwidth": 14000000
+    },
+    {
+      "poolId": "pool_v2v_bravo_foxtrot",
+      "poolType": "DIRECT_V2V",
+      "availableBandwidth": 11000000
+    },
+    {
+      "poolId": "pool_v2v_delta_echo",
+      "poolType": "DIRECT_V2V",
+      "availableBandwidth": 13000000
     }
   ]
 }
