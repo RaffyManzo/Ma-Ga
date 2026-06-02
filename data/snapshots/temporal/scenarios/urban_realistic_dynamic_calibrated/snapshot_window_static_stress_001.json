@@ -1,39 +1,39 @@
 {
   "snapshotId": "urban_realistic_dynamic_calibrated_001",
-  "timeSeconds": 5.0,
+  "timeSeconds": 5,
   "vehicles": [
     {
       "vehicleId": "vehicle_001",
       "x": 2343.854,
-      "y": 0.0,
+      "y": 0,
       "speed": 15.484,
       "localCpu": 913867644.324
     },
     {
       "vehicleId": "vehicle_002",
       "x": 1630.786,
-      "y": 0.0,
+      "y": 0,
       "speed": 11.752,
       "localCpu": 1459160223.777
     },
     {
       "vehicleId": "vehicle_003",
       "x": 1475.171,
-      "y": 0.0,
+      "y": 0,
       "speed": 7.636,
       "localCpu": 1099375657.159
     },
     {
       "vehicleId": "vehicle_004",
       "x": 1326.032,
-      "y": 7.0,
+      "y": 7,
       "speed": 7.906,
       "localCpu": 750474808.344
     },
     {
       "vehicleId": "vehicle_005",
       "x": 2166.935,
-      "y": 0.0,
+      "y": 0,
       "speed": 13.554,
       "localCpu": 1380162767.627
     },
@@ -47,63 +47,63 @@
     {
       "vehicleId": "vehicle_007",
       "x": 222.997,
-      "y": 0.0,
+      "y": 0,
       "speed": 7.792,
       "localCpu": 1537424912.994
     },
     {
       "vehicleId": "vehicle_008",
       "x": 2286.176,
-      "y": 7.0,
+      "y": 7,
       "speed": 9.123,
       "localCpu": 1133912274.727
     },
     {
       "vehicleId": "vehicle_009",
       "x": 1794.227,
-      "y": 7.0,
+      "y": 7,
       "speed": 9.755,
       "localCpu": 992469803.822
     },
     {
       "vehicleId": "vehicle_010",
       "x": 186.725,
-      "y": 0.0,
+      "y": 0,
       "speed": 11.217,
       "localCpu": 931449412.56
     },
     {
       "vehicleId": "vehicle_011",
       "x": 1595.547,
-      "y": 0.0,
+      "y": 0,
       "speed": 15.084,
       "localCpu": 1315021447.657
     },
     {
       "vehicleId": "vehicle_012",
       "x": 1520.19,
-      "y": 0.0,
+      "y": 0,
       "speed": 8.872,
       "localCpu": 1139920195.821
     },
     {
       "vehicleId": "vehicle_013",
       "x": 566.35,
-      "y": 0.0,
+      "y": 0,
       "speed": 14.769,
       "localCpu": 1315523990.201
     },
     {
       "vehicleId": "vehicle_014",
       "x": 337.512,
-      "y": 0.0,
+      "y": 0,
       "speed": 9.359,
       "localCpu": 968725389.457
     },
     {
       "vehicleId": "vehicle_015",
       "x": 1114.737,
-      "y": 0.0,
+      "y": 0,
       "speed": 17.752,
       "localCpu": 1236418876.138
     },
@@ -117,21 +117,21 @@
     {
       "vehicleId": "vehicle_017",
       "x": 2363.15,
-      "y": 7.0,
+      "y": 7,
       "speed": 10.65,
       "localCpu": 1404749199.804
     },
     {
       "vehicleId": "vehicle_018",
       "x": 1949.781,
-      "y": 7.0,
+      "y": 7,
       "speed": 16.236,
       "localCpu": 993211401.495
     },
     {
       "vehicleId": "vehicle_019",
       "x": 149.043,
-      "y": 7.0,
+      "y": 7,
       "speed": 10.145,
       "localCpu": 1140520328.618
     },
@@ -152,7 +152,7 @@
     {
       "vehicleId": "vehicle_022",
       "x": 891.528,
-      "y": 0.0,
+      "y": 0,
       "speed": 10.84,
       "localCpu": 900420848.615
     },
@@ -173,28 +173,28 @@
     {
       "vehicleId": "vehicle_025",
       "x": 599.773,
-      "y": 7.0,
+      "y": 7,
       "speed": 19.624,
       "localCpu": 1373808412.648
     },
     {
       "vehicleId": "vehicle_026",
       "x": 2349.296,
-      "y": 7.0,
+      "y": 7,
       "speed": 14.416,
       "localCpu": 1196608418.186
     },
     {
       "vehicleId": "vehicle_027",
       "x": 923.5,
-      "y": 7.0,
+      "y": 7,
       "speed": 9.678,
       "localCpu": 1347251036.893
     },
     {
       "vehicleId": "vehicle_028",
       "x": 1060.676,
-      "y": 7.0,
+      "y": 7,
       "speed": 14.786,
       "localCpu": 911747541.592
     },
@@ -208,21 +208,21 @@
     {
       "vehicleId": "vehicle_030",
       "x": 1038.077,
-      "y": 7.0,
+      "y": 7,
       "speed": 11.223,
       "localCpu": 886583134.452
     },
     {
       "vehicleId": "vehicle_031",
       "x": 360.536,
-      "y": 7.0,
+      "y": 7,
       "speed": 11.543,
       "localCpu": 1373866048.886
     },
     {
       "vehicleId": "vehicle_032",
       "x": 1685.803,
-      "y": 0.0,
+      "y": 0,
       "speed": 10.72,
       "localCpu": 987486346.299
     },
@@ -243,28 +243,28 @@
     {
       "vehicleId": "vehicle_035",
       "x": 688.68,
-      "y": 7.0,
+      "y": 7,
       "speed": 18.059,
       "localCpu": 1168871594.62
     },
     {
       "vehicleId": "vehicle_036",
       "x": 1460.884,
-      "y": 0.0,
+      "y": 0,
       "speed": 11.207,
       "localCpu": 1518610713.685
     },
     {
       "vehicleId": "vehicle_037",
       "x": 384.589,
-      "y": 7.0,
+      "y": 7,
       "speed": 17.982,
       "localCpu": 1102611404.19
     },
     {
       "vehicleId": "vehicle_038",
       "x": 2122.061,
-      "y": 0.0,
+      "y": 0,
       "speed": 17.331,
       "localCpu": 1102954328.4
     },
@@ -278,21 +278,21 @@
     {
       "vehicleId": "vehicle_042",
       "x": 242.285,
-      "y": 7.0,
+      "y": 7,
       "speed": 8.048,
       "localCpu": 1383858718.386
     },
     {
       "vehicleId": "vehicle_043",
       "x": 1059.753,
-      "y": 7.0,
+      "y": 7,
       "speed": 12.321,
       "localCpu": 771243732.56
     },
     {
       "vehicleId": "vehicle_044",
       "x": 271.911,
-      "y": 7.0,
+      "y": 7,
       "speed": 8.104,
       "localCpu": 1251172319.502
     },
@@ -334,7 +334,7 @@
     {
       "vehicleId": "vehicle_050",
       "x": 861.96,
-      "y": 0.0,
+      "y": 0,
       "speed": 8.657,
       "localCpu": 819466150.8
     },
@@ -348,7 +348,7 @@
     {
       "vehicleId": "vehicle_052",
       "x": 478.748,
-      "y": 7.0,
+      "y": 7,
       "speed": 15.044,
       "localCpu": 1103690955.483
     },
@@ -369,7 +369,7 @@
     {
       "vehicleId": "vehicle_056",
       "x": 434.834,
-      "y": 7.0,
+      "y": 7,
       "speed": 13.823,
       "localCpu": 768266980.27
     },
@@ -390,7 +390,7 @@
     {
       "vehicleId": "vehicle_059",
       "x": 1128.805,
-      "y": 7.0,
+      "y": 7,
       "speed": 14.924,
       "localCpu": 924770116.629
     },
@@ -411,21 +411,21 @@
     {
       "vehicleId": "vehicle_062",
       "x": 2311.88,
-      "y": 7.0,
+      "y": 7,
       "speed": 11.904,
       "localCpu": 1430083523.003
     },
     {
       "vehicleId": "vehicle_063",
       "x": 2389.137,
-      "y": 0.0,
+      "y": 0,
       "speed": 11.696,
       "localCpu": 1008682184.645
     },
     {
       "vehicleId": "vehicle_064",
       "x": 1425.633,
-      "y": 0.0,
+      "y": 0,
       "speed": 10.794,
       "localCpu": 1250087915.952
     },
@@ -439,7 +439,7 @@
     {
       "vehicleId": "vehicle_066",
       "x": 528.575,
-      "y": 0.0,
+      "y": 0,
       "speed": 14.082,
       "localCpu": 1391988708.196
     },
@@ -453,7 +453,7 @@
     {
       "vehicleId": "vehicle_068",
       "x": 631.41,
-      "y": 0.0,
+      "y": 0,
       "speed": 17.068,
       "localCpu": 1527092106.153
     },
@@ -467,14 +467,14 @@
     {
       "vehicleId": "vehicle_071",
       "x": 2189.657,
-      "y": 0.0,
+      "y": 0,
       "speed": 17.72,
       "localCpu": 1499874164.181
     },
     {
       "vehicleId": "vehicle_072",
       "x": 658.274,
-      "y": 0.0,
+      "y": 0,
       "speed": 10.795,
       "localCpu": 1268397120.546
     },
@@ -488,7 +488,7 @@
     {
       "vehicleId": "vehicle_074",
       "x": 1526.442,
-      "y": 0.0,
+      "y": 0,
       "speed": 10.543,
       "localCpu": 861968587.203
     },
@@ -509,21 +509,21 @@
     {
       "vehicleId": "vehicle_077",
       "x": 1514.92,
-      "y": 7.0,
+      "y": 7,
       "speed": 14.164,
       "localCpu": 1417087941.03
     },
     {
       "vehicleId": "vehicle_078",
       "x": 1639.25,
-      "y": 7.0,
+      "y": 7,
       "speed": 10.252,
       "localCpu": 854695850.694
     },
     {
       "vehicleId": "vehicle_079",
       "x": 997.246,
-      "y": 0.0,
+      "y": 0,
       "speed": 12.96,
       "localCpu": 1244528507.202
     },
@@ -564,15 +564,15 @@
     },
     {
       "vehicleId": "vehicle_085",
-      "x": 2055.0,
-      "y": 7.0,
+      "x": 2055,
+      "y": 7,
       "speed": 15.927,
       "localCpu": 1308049251.578
     },
     {
       "vehicleId": "vehicle_086",
       "x": 420.025,
-      "y": 7.0,
+      "y": 7,
       "speed": 13.164,
       "localCpu": 1170430388.273
     },
@@ -593,7 +593,7 @@
     {
       "vehicleId": "vehicle_089",
       "x": 2158.229,
-      "y": 0.0,
+      "y": 0,
       "speed": 12.772,
       "localCpu": 1135491318.982
     },
@@ -628,7 +628,7 @@
     {
       "vehicleId": "vehicle_094",
       "x": 1710.641,
-      "y": 0.0,
+      "y": 0,
       "speed": 8.91,
       "localCpu": 846852970.378
     },
@@ -642,7 +642,7 @@
     {
       "vehicleId": "vehicle_098",
       "x": -28.58,
-      "y": 0.0,
+      "y": 0,
       "speed": 7.805,
       "localCpu": 1501023718.874
     },
@@ -666,7 +666,7 @@
       "taskId": "task_001",
       "sourceVehicleId": "vehicle_022",
       "inputSizeBits": 1734246.391,
-      "outputSizeBits": 100000.0,
+      "outputSizeBits": 100000,
       "cpuCycles": 310047074.019,
       "deadlineSeconds": 3.248
     },
@@ -974,8 +974,8 @@
       "executionNodeId": "vehicle_022",
       "type": "LOCAL",
       "availableCpu": 900420848.615,
-      "availableBandwidth": 0.0,
-      "baseLatencySeconds": 0.0,
+      "availableBandwidth": 0,
+      "baseLatencySeconds": 0,
       "nodeX": null,
       "nodeY": null,
       "coverageRadiusMeters": null
@@ -988,9 +988,9 @@
       "availableCpu": 7155937420.291,
       "availableBandwidth": 18602277.401,
       "baseLatencySeconds": 0.016157,
-      "nodeX": 420.0,
-      "nodeY": 0.0,
-      "coverageRadiusMeters": 520.0
+      "nodeX": 420,
+      "nodeY": 0,
+      "coverageRadiusMeters": 520
     },
     {
       "candidateId": "edge_center_for_vehicle_022",
@@ -1000,9 +1000,9 @@
       "availableCpu": 7258110719.042,
       "availableBandwidth": 38417219.057,
       "baseLatencySeconds": 0.017853,
-      "nodeX": 1220.0,
-      "nodeY": 0.0,
-      "coverageRadiusMeters": 560.0
+      "nodeX": 1220,
+      "nodeY": 0,
+      "coverageRadiusMeters": 560
     },
     {
       "candidateId": "cloud_001_for_vehicle_022",
@@ -1026,7 +1026,8 @@
       "baseLatencySeconds": 0.006095,
       "nodeX": null,
       "nodeY": null,
-      "coverageRadiusMeters": null
+      "coverageRadiusMeters": null,
+      "bandwidthPoolId": "pool_v2v_vehicle_022_vehicle_027"
     },
     {
       "candidateId": "vehicle_050_v2v_for_vehicle_022",
@@ -1038,7 +1039,8 @@
       "baseLatencySeconds": 0.005932,
       "nodeX": null,
       "nodeY": null,
-      "coverageRadiusMeters": null
+      "coverageRadiusMeters": null,
+      "bandwidthPoolId": "pool_v2v_vehicle_022_vehicle_050"
     },
     {
       "candidateId": "local_for_vehicle_043",
@@ -1046,8 +1048,8 @@
       "executionNodeId": "vehicle_043",
       "type": "LOCAL",
       "availableCpu": 771243732.56,
-      "availableBandwidth": 0.0,
-      "baseLatencySeconds": 0.0,
+      "availableBandwidth": 0,
+      "baseLatencySeconds": 0,
       "nodeX": null,
       "nodeY": null,
       "coverageRadiusMeters": null
@@ -1060,9 +1062,9 @@
       "availableCpu": 5679623280.919,
       "availableBandwidth": 6859349.117,
       "baseLatencySeconds": 0.017479,
-      "nodeX": 420.0,
-      "nodeY": 0.0,
-      "coverageRadiusMeters": 520.0
+      "nodeX": 420,
+      "nodeY": 0,
+      "coverageRadiusMeters": 520
     },
     {
       "candidateId": "edge_center_for_vehicle_043",
@@ -1072,9 +1074,9 @@
       "availableCpu": 7029089962.344,
       "availableBandwidth": 21914288.882,
       "baseLatencySeconds": 0.027621,
-      "nodeX": 1220.0,
-      "nodeY": 0.0,
-      "coverageRadiusMeters": 560.0
+      "nodeX": 1220,
+      "nodeY": 0,
+      "coverageRadiusMeters": 560
     },
     {
       "candidateId": "cloud_001_for_vehicle_043",
@@ -1098,7 +1100,8 @@
       "baseLatencySeconds": 0.005069,
       "nodeX": null,
       "nodeY": null,
-      "coverageRadiusMeters": null
+      "coverageRadiusMeters": null,
+      "bandwidthPoolId": "pool_v2v_vehicle_028_vehicle_043"
     },
     {
       "candidateId": "vehicle_065_v2v_for_vehicle_043",
@@ -1110,7 +1113,8 @@
       "baseLatencySeconds": 0.011891,
       "nodeX": null,
       "nodeY": null,
-      "coverageRadiusMeters": null
+      "coverageRadiusMeters": null,
+      "bandwidthPoolId": "pool_v2v_vehicle_043_vehicle_065"
     },
     {
       "candidateId": "local_for_vehicle_011",
@@ -1118,8 +1122,8 @@
       "executionNodeId": "vehicle_011",
       "type": "LOCAL",
       "availableCpu": 1315021447.657,
-      "availableBandwidth": 0.0,
-      "baseLatencySeconds": 0.0,
+      "availableBandwidth": 0,
+      "baseLatencySeconds": 0,
       "nodeX": null,
       "nodeY": null,
       "coverageRadiusMeters": null
@@ -1132,9 +1136,9 @@
       "availableCpu": 6249417000.949,
       "availableBandwidth": 20552651.862,
       "baseLatencySeconds": 0.019256,
-      "nodeX": 1220.0,
-      "nodeY": 0.0,
-      "coverageRadiusMeters": 560.0
+      "nodeX": 1220,
+      "nodeY": 0,
+      "coverageRadiusMeters": 560
     },
     {
       "candidateId": "edge_east_for_vehicle_011",
@@ -1144,9 +1148,9 @@
       "availableCpu": 7274589211.299,
       "availableBandwidth": 22255865.144,
       "baseLatencySeconds": 0.022336,
-      "nodeX": 2020.0,
-      "nodeY": 0.0,
-      "coverageRadiusMeters": 520.0
+      "nodeX": 2020,
+      "nodeY": 0,
+      "coverageRadiusMeters": 520
     },
     {
       "candidateId": "cloud_001_for_vehicle_011",
@@ -1170,7 +1174,8 @@
       "baseLatencySeconds": 0.010751,
       "nodeX": null,
       "nodeY": null,
-      "coverageRadiusMeters": null
+      "coverageRadiusMeters": null,
+      "bandwidthPoolId": "pool_v2v_vehicle_011_vehicle_016"
     },
     {
       "candidateId": "vehicle_002_v2v_for_vehicle_011",
@@ -1182,7 +1187,8 @@
       "baseLatencySeconds": 0.015551,
       "nodeX": null,
       "nodeY": null,
-      "coverageRadiusMeters": null
+      "coverageRadiusMeters": null,
+      "bandwidthPoolId": "pool_v2v_vehicle_002_vehicle_011"
     },
     {
       "candidateId": "local_for_vehicle_077",
@@ -1190,8 +1196,8 @@
       "executionNodeId": "vehicle_077",
       "type": "LOCAL",
       "availableCpu": 1417087941.03,
-      "availableBandwidth": 0.0,
-      "baseLatencySeconds": 0.0,
+      "availableBandwidth": 0,
+      "baseLatencySeconds": 0,
       "nodeX": null,
       "nodeY": null,
       "coverageRadiusMeters": null
@@ -1204,9 +1210,9 @@
       "availableCpu": 8081160226.358,
       "availableBandwidth": 36789447.235,
       "baseLatencySeconds": 0.011135,
-      "nodeX": 1220.0,
-      "nodeY": 0.0,
-      "coverageRadiusMeters": 560.0
+      "nodeX": 1220,
+      "nodeY": 0,
+      "coverageRadiusMeters": 560
     },
     {
       "candidateId": "edge_east_for_vehicle_077",
@@ -1216,9 +1222,9 @@
       "availableCpu": 5968532300.072,
       "availableBandwidth": 18929330.904,
       "baseLatencySeconds": 0.017222,
-      "nodeX": 2020.0,
-      "nodeY": 0.0,
-      "coverageRadiusMeters": 520.0
+      "nodeX": 2020,
+      "nodeY": 0,
+      "coverageRadiusMeters": 520
     },
     {
       "candidateId": "cloud_001_for_vehicle_077",
@@ -1242,7 +1248,8 @@
       "baseLatencySeconds": 0.011618,
       "nodeX": null,
       "nodeY": null,
-      "coverageRadiusMeters": null
+      "coverageRadiusMeters": null,
+      "bandwidthPoolId": "pool_v2v_vehicle_012_vehicle_077"
     },
     {
       "candidateId": "vehicle_074_v2v_for_vehicle_077",
@@ -1254,7 +1261,8 @@
       "baseLatencySeconds": 0.008133,
       "nodeX": null,
       "nodeY": null,
-      "coverageRadiusMeters": null
+      "coverageRadiusMeters": null,
+      "bandwidthPoolId": "pool_v2v_vehicle_074_vehicle_077"
     },
     {
       "candidateId": "local_for_vehicle_035",
@@ -1262,8 +1270,8 @@
       "executionNodeId": "vehicle_035",
       "type": "LOCAL",
       "availableCpu": 1168871594.62,
-      "availableBandwidth": 0.0,
-      "baseLatencySeconds": 0.0,
+      "availableBandwidth": 0,
+      "baseLatencySeconds": 0,
       "nodeX": null,
       "nodeY": null,
       "coverageRadiusMeters": null
@@ -1276,9 +1284,9 @@
       "availableCpu": 5867367391.718,
       "availableBandwidth": 37646552.695,
       "baseLatencySeconds": 0.014584,
-      "nodeX": 420.0,
-      "nodeY": 0.0,
-      "coverageRadiusMeters": 520.0
+      "nodeX": 420,
+      "nodeY": 0,
+      "coverageRadiusMeters": 520
     },
     {
       "candidateId": "edge_center_for_vehicle_035",
@@ -1288,9 +1296,9 @@
       "availableCpu": 9459389736.71,
       "availableBandwidth": 17700709.046,
       "baseLatencySeconds": 0.023536,
-      "nodeX": 1220.0,
-      "nodeY": 0.0,
-      "coverageRadiusMeters": 560.0
+      "nodeX": 1220,
+      "nodeY": 0,
+      "coverageRadiusMeters": 560
     },
     {
       "candidateId": "cloud_001_for_vehicle_035",
@@ -1314,7 +1322,8 @@
       "baseLatencySeconds": 0.01185,
       "nodeX": null,
       "nodeY": null,
-      "coverageRadiusMeters": null
+      "coverageRadiusMeters": null,
+      "bandwidthPoolId": "pool_v2v_vehicle_035_vehicle_072"
     },
     {
       "candidateId": "vehicle_045_v2v_for_vehicle_035",
@@ -1326,7 +1335,8 @@
       "baseLatencySeconds": 0.005966,
       "nodeX": null,
       "nodeY": null,
-      "coverageRadiusMeters": null
+      "coverageRadiusMeters": null,
+      "bandwidthPoolId": "pool_v2v_vehicle_035_vehicle_045"
     },
     {
       "candidateId": "local_for_vehicle_090",
@@ -1334,8 +1344,8 @@
       "executionNodeId": "vehicle_090",
       "type": "LOCAL",
       "availableCpu": 1359776455.219,
-      "availableBandwidth": 0.0,
-      "baseLatencySeconds": 0.0,
+      "availableBandwidth": 0,
+      "baseLatencySeconds": 0,
       "nodeX": null,
       "nodeY": null,
       "coverageRadiusMeters": null
@@ -1348,9 +1358,9 @@
       "availableCpu": 6454073997.297,
       "availableBandwidth": 17284586.982,
       "baseLatencySeconds": 0.025345,
-      "nodeX": 1220.0,
-      "nodeY": 0.0,
-      "coverageRadiusMeters": 560.0
+      "nodeX": 1220,
+      "nodeY": 0,
+      "coverageRadiusMeters": 560
     },
     {
       "candidateId": "edge_east_for_vehicle_090",
@@ -1360,9 +1370,9 @@
       "availableCpu": 6732368146.942,
       "availableBandwidth": 16232634.086,
       "baseLatencySeconds": 0.021031,
-      "nodeX": 2020.0,
-      "nodeY": 0.0,
-      "coverageRadiusMeters": 520.0
+      "nodeX": 2020,
+      "nodeY": 0,
+      "coverageRadiusMeters": 520
     },
     {
       "candidateId": "cloud_001_for_vehicle_090",
@@ -1386,7 +1396,8 @@
       "baseLatencySeconds": 0.005392,
       "nodeX": null,
       "nodeY": null,
-      "coverageRadiusMeters": null
+      "coverageRadiusMeters": null,
+      "bandwidthPoolId": "pool_v2v_vehicle_067_vehicle_090"
     },
     {
       "candidateId": "vehicle_002_v2v_for_vehicle_090",
@@ -1398,7 +1409,8 @@
       "baseLatencySeconds": 0.00867,
       "nodeX": null,
       "nodeY": null,
-      "coverageRadiusMeters": null
+      "coverageRadiusMeters": null,
+      "bandwidthPoolId": "pool_v2v_vehicle_002_vehicle_090"
     },
     {
       "candidateId": "local_for_vehicle_044",
@@ -1406,8 +1418,8 @@
       "executionNodeId": "vehicle_044",
       "type": "LOCAL",
       "availableCpu": 1251172319.502,
-      "availableBandwidth": 0.0,
-      "baseLatencySeconds": 0.0,
+      "availableBandwidth": 0,
+      "baseLatencySeconds": 0,
       "nodeX": null,
       "nodeY": null,
       "coverageRadiusMeters": null
@@ -1420,9 +1432,9 @@
       "availableCpu": 8008707270.97,
       "availableBandwidth": 20242722.158,
       "baseLatencySeconds": 0.016867,
-      "nodeX": 420.0,
-      "nodeY": 0.0,
-      "coverageRadiusMeters": 520.0
+      "nodeX": 420,
+      "nodeY": 0,
+      "coverageRadiusMeters": 520
     },
     {
       "candidateId": "cloud_001_for_vehicle_044",
@@ -1446,7 +1458,8 @@
       "baseLatencySeconds": 0.007522,
       "nodeX": null,
       "nodeY": null,
-      "coverageRadiusMeters": null
+      "coverageRadiusMeters": null,
+      "bandwidthPoolId": "pool_v2v_vehicle_042_vehicle_044"
     },
     {
       "candidateId": "vehicle_007_v2v_for_vehicle_044",
@@ -1458,7 +1471,8 @@
       "baseLatencySeconds": 0.010509,
       "nodeX": null,
       "nodeY": null,
-      "coverageRadiusMeters": null
+      "coverageRadiusMeters": null,
+      "bandwidthPoolId": "pool_v2v_vehicle_007_vehicle_044"
     },
     {
       "candidateId": "local_for_vehicle_084",
@@ -1466,8 +1480,8 @@
       "executionNodeId": "vehicle_084",
       "type": "LOCAL",
       "availableCpu": 1477107844.868,
-      "availableBandwidth": 0.0,
-      "baseLatencySeconds": 0.0,
+      "availableBandwidth": 0,
+      "baseLatencySeconds": 0,
       "nodeX": null,
       "nodeY": null,
       "coverageRadiusMeters": null
@@ -1480,9 +1494,9 @@
       "availableCpu": 7649557866.017,
       "availableBandwidth": 25527710.92,
       "baseLatencySeconds": 0.013104,
-      "nodeX": 2020.0,
-      "nodeY": 0.0,
-      "coverageRadiusMeters": 520.0
+      "nodeX": 2020,
+      "nodeY": 0,
+      "coverageRadiusMeters": 520
     },
     {
       "candidateId": "cloud_001_for_vehicle_084",
@@ -1506,7 +1520,8 @@
       "baseLatencySeconds": 0.006476,
       "nodeX": null,
       "nodeY": null,
-      "coverageRadiusMeters": null
+      "coverageRadiusMeters": null,
+      "bandwidthPoolId": "pool_v2v_vehicle_083_vehicle_084"
     },
     {
       "candidateId": "vehicle_008_v2v_for_vehicle_084",
@@ -1518,7 +1533,8 @@
       "baseLatencySeconds": 0.007197,
       "nodeX": null,
       "nodeY": null,
-      "coverageRadiusMeters": null
+      "coverageRadiusMeters": null,
+      "bandwidthPoolId": "pool_v2v_vehicle_008_vehicle_084"
     },
     {
       "candidateId": "local_for_vehicle_036",
@@ -1526,8 +1542,8 @@
       "executionNodeId": "vehicle_036",
       "type": "LOCAL",
       "availableCpu": 1518610713.685,
-      "availableBandwidth": 0.0,
-      "baseLatencySeconds": 0.0,
+      "availableBandwidth": 0,
+      "baseLatencySeconds": 0,
       "nodeX": null,
       "nodeY": null,
       "coverageRadiusMeters": null
@@ -1540,9 +1556,9 @@
       "availableCpu": 6837622967.613,
       "availableBandwidth": 36420781.811,
       "baseLatencySeconds": 0.026532,
-      "nodeX": 1220.0,
-      "nodeY": 0.0,
-      "coverageRadiusMeters": 560.0
+      "nodeX": 1220,
+      "nodeY": 0,
+      "coverageRadiusMeters": 560
     },
     {
       "candidateId": "edge_east_for_vehicle_036",
@@ -1552,9 +1568,9 @@
       "availableCpu": 8077474908.437,
       "availableBandwidth": 10106906.405,
       "baseLatencySeconds": 0.018119,
-      "nodeX": 2020.0,
-      "nodeY": 0.0,
-      "coverageRadiusMeters": 520.0
+      "nodeX": 2020,
+      "nodeY": 0,
+      "coverageRadiusMeters": 520
     },
     {
       "candidateId": "cloud_001_for_vehicle_036",
@@ -1578,7 +1594,8 @@
       "baseLatencySeconds": 0.013313,
       "nodeX": null,
       "nodeY": null,
-      "coverageRadiusMeters": null
+      "coverageRadiusMeters": null,
+      "bandwidthPoolId": "pool_v2v_vehicle_003_vehicle_036"
     },
     {
       "candidateId": "vehicle_064_v2v_for_vehicle_036",
@@ -1590,7 +1607,8 @@
       "baseLatencySeconds": 0.013808,
       "nodeX": null,
       "nodeY": null,
-      "coverageRadiusMeters": null
+      "coverageRadiusMeters": null,
+      "bandwidthPoolId": "pool_v2v_vehicle_036_vehicle_064"
     },
     {
       "candidateId": "local_for_vehicle_091",
@@ -1598,8 +1616,8 @@
       "executionNodeId": "vehicle_091",
       "type": "LOCAL",
       "availableCpu": 842133742.196,
-      "availableBandwidth": 0.0,
-      "baseLatencySeconds": 0.0,
+      "availableBandwidth": 0,
+      "baseLatencySeconds": 0,
       "nodeX": null,
       "nodeY": null,
       "coverageRadiusMeters": null
@@ -1612,9 +1630,9 @@
       "availableCpu": 7466911677.911,
       "availableBandwidth": 27889066.638,
       "baseLatencySeconds": 0.013478,
-      "nodeX": 2020.0,
-      "nodeY": 0.0,
-      "coverageRadiusMeters": 520.0
+      "nodeX": 2020,
+      "nodeY": 0,
+      "coverageRadiusMeters": 520
     },
     {
       "candidateId": "cloud_001_for_vehicle_091",
@@ -1638,7 +1656,8 @@
       "baseLatencySeconds": 0.010394,
       "nodeX": null,
       "nodeY": null,
-      "coverageRadiusMeters": null
+      "coverageRadiusMeters": null,
+      "bandwidthPoolId": "pool_v2v_vehicle_005_vehicle_091"
     },
     {
       "candidateId": "vehicle_071_v2v_for_vehicle_091",
@@ -1650,7 +1669,8 @@
       "baseLatencySeconds": 0.012393,
       "nodeX": null,
       "nodeY": null,
-      "coverageRadiusMeters": null
+      "coverageRadiusMeters": null,
+      "bandwidthPoolId": "pool_v2v_vehicle_071_vehicle_091"
     },
     {
       "candidateId": "local_for_vehicle_076",
@@ -1658,8 +1678,8 @@
       "executionNodeId": "vehicle_076",
       "type": "LOCAL",
       "availableCpu": 811575047.159,
-      "availableBandwidth": 0.0,
-      "baseLatencySeconds": 0.0,
+      "availableBandwidth": 0,
+      "baseLatencySeconds": 0,
       "nodeX": null,
       "nodeY": null,
       "coverageRadiusMeters": null
@@ -1672,9 +1692,9 @@
       "availableCpu": 6938386504.058,
       "availableBandwidth": 7109805.343,
       "baseLatencySeconds": 0.019795,
-      "nodeX": 420.0,
-      "nodeY": 0.0,
-      "coverageRadiusMeters": 520.0
+      "nodeX": 420,
+      "nodeY": 0,
+      "coverageRadiusMeters": 520
     },
     {
       "candidateId": "edge_center_for_vehicle_076",
@@ -1684,9 +1704,9 @@
       "availableCpu": 7744520986.149,
       "availableBandwidth": 33651523.756,
       "baseLatencySeconds": 0.02484,
-      "nodeX": 1220.0,
-      "nodeY": 0.0,
-      "coverageRadiusMeters": 560.0
+      "nodeX": 1220,
+      "nodeY": 0,
+      "coverageRadiusMeters": 560
     },
     {
       "candidateId": "cloud_001_for_vehicle_076",
@@ -1710,7 +1730,8 @@
       "baseLatencySeconds": 0.0129,
       "nodeX": null,
       "nodeY": null,
-      "coverageRadiusMeters": null
+      "coverageRadiusMeters": null,
+      "bandwidthPoolId": "pool_v2v_vehicle_070_vehicle_076"
     },
     {
       "candidateId": "vehicle_006_v2v_for_vehicle_076",
@@ -1722,7 +1743,8 @@
       "baseLatencySeconds": 0.005676,
       "nodeX": null,
       "nodeY": null,
-      "coverageRadiusMeters": null
+      "coverageRadiusMeters": null,
+      "bandwidthPoolId": "pool_v2v_vehicle_006_vehicle_076"
     },
     {
       "candidateId": "local_for_vehicle_068",
@@ -1730,8 +1752,8 @@
       "executionNodeId": "vehicle_068",
       "type": "LOCAL",
       "availableCpu": 1527092106.153,
-      "availableBandwidth": 0.0,
-      "baseLatencySeconds": 0.0,
+      "availableBandwidth": 0,
+      "baseLatencySeconds": 0,
       "nodeX": null,
       "nodeY": null,
       "coverageRadiusMeters": null
@@ -1744,9 +1766,9 @@
       "availableCpu": 5805433950.735,
       "availableBandwidth": 26466402.508,
       "baseLatencySeconds": 0.013986,
-      "nodeX": 420.0,
-      "nodeY": 0.0,
-      "coverageRadiusMeters": 520.0
+      "nodeX": 420,
+      "nodeY": 0,
+      "coverageRadiusMeters": 520
     },
     {
       "candidateId": "edge_center_for_vehicle_068",
@@ -1756,9 +1778,9 @@
       "availableCpu": 7116145189.59,
       "availableBandwidth": 9113909.248,
       "baseLatencySeconds": 0.025911,
-      "nodeX": 1220.0,
-      "nodeY": 0.0,
-      "coverageRadiusMeters": 560.0
+      "nodeX": 1220,
+      "nodeY": 0,
+      "coverageRadiusMeters": 560
     },
     {
       "candidateId": "cloud_001_for_vehicle_068",
@@ -1782,7 +1804,8 @@
       "baseLatencySeconds": 0.010502,
       "nodeX": null,
       "nodeY": null,
-      "coverageRadiusMeters": null
+      "coverageRadiusMeters": null,
+      "bandwidthPoolId": "pool_v2v_vehicle_060_vehicle_068"
     },
     {
       "candidateId": "vehicle_093_v2v_for_vehicle_068",
@@ -1794,7 +1817,8 @@
       "baseLatencySeconds": 0.014263,
       "nodeX": null,
       "nodeY": null,
-      "coverageRadiusMeters": null
+      "coverageRadiusMeters": null,
+      "bandwidthPoolId": "pool_v2v_vehicle_068_vehicle_093"
     },
     {
       "candidateId": "local_for_vehicle_045",
@@ -1802,8 +1826,8 @@
       "executionNodeId": "vehicle_045",
       "type": "LOCAL",
       "availableCpu": 1534415338.351,
-      "availableBandwidth": 0.0,
-      "baseLatencySeconds": 0.0,
+      "availableBandwidth": 0,
+      "baseLatencySeconds": 0,
       "nodeX": null,
       "nodeY": null,
       "coverageRadiusMeters": null
@@ -1816,9 +1840,9 @@
       "availableCpu": 5519120767.895,
       "availableBandwidth": 19164459.006,
       "baseLatencySeconds": 0.017161,
-      "nodeX": 420.0,
-      "nodeY": 0.0,
-      "coverageRadiusMeters": 520.0
+      "nodeX": 420,
+      "nodeY": 0,
+      "coverageRadiusMeters": 520
     },
     {
       "candidateId": "edge_center_for_vehicle_045",
@@ -1828,9 +1852,9 @@
       "availableCpu": 6776155720.667,
       "availableBandwidth": 15538153.307,
       "baseLatencySeconds": 0.03032,
-      "nodeX": 1220.0,
-      "nodeY": 0.0,
-      "coverageRadiusMeters": 560.0
+      "nodeX": 1220,
+      "nodeY": 0,
+      "coverageRadiusMeters": 560
     },
     {
       "candidateId": "cloud_001_for_vehicle_045",
@@ -1854,7 +1878,8 @@
       "baseLatencySeconds": 0.006785,
       "nodeX": null,
       "nodeY": null,
-      "coverageRadiusMeters": null
+      "coverageRadiusMeters": null,
+      "bandwidthPoolId": "pool_v2v_vehicle_045_vehicle_054"
     },
     {
       "candidateId": "vehicle_035_v2v_for_vehicle_045",
@@ -1866,7 +1891,8 @@
       "baseLatencySeconds": 0.006027,
       "nodeX": null,
       "nodeY": null,
-      "coverageRadiusMeters": null
+      "coverageRadiusMeters": null,
+      "bandwidthPoolId": "pool_v2v_vehicle_035_vehicle_045"
     },
     {
       "candidateId": "local_for_vehicle_050",
@@ -1874,8 +1900,8 @@
       "executionNodeId": "vehicle_050",
       "type": "LOCAL",
       "availableCpu": 819466150.8,
-      "availableBandwidth": 0.0,
-      "baseLatencySeconds": 0.0,
+      "availableBandwidth": 0,
+      "baseLatencySeconds": 0,
       "nodeX": null,
       "nodeY": null,
       "coverageRadiusMeters": null
@@ -1888,9 +1914,9 @@
       "availableCpu": 6941972906.58,
       "availableBandwidth": 21639872.709,
       "baseLatencySeconds": 0.016487,
-      "nodeX": 420.0,
-      "nodeY": 0.0,
-      "coverageRadiusMeters": 520.0
+      "nodeX": 420,
+      "nodeY": 0,
+      "coverageRadiusMeters": 520
     },
     {
       "candidateId": "edge_center_for_vehicle_050",
@@ -1900,9 +1926,9 @@
       "availableCpu": 7042743957.559,
       "availableBandwidth": 15082018.109,
       "baseLatencySeconds": 0.027871,
-      "nodeX": 1220.0,
-      "nodeY": 0.0,
-      "coverageRadiusMeters": 560.0
+      "nodeX": 1220,
+      "nodeY": 0,
+      "coverageRadiusMeters": 560
     },
     {
       "candidateId": "cloud_001_for_vehicle_050",
@@ -1926,7 +1952,8 @@
       "baseLatencySeconds": 0.005408,
       "nodeX": null,
       "nodeY": null,
-      "coverageRadiusMeters": null
+      "coverageRadiusMeters": null,
+      "bandwidthPoolId": "pool_v2v_vehicle_022_vehicle_050"
     },
     {
       "candidateId": "vehicle_027_v2v_for_vehicle_050",
@@ -1938,7 +1965,8 @@
       "baseLatencySeconds": 0.008588,
       "nodeX": null,
       "nodeY": null,
-      "coverageRadiusMeters": null
+      "coverageRadiusMeters": null,
+      "bandwidthPoolId": "pool_v2v_vehicle_027_vehicle_050"
     },
     {
       "candidateId": "local_for_vehicle_051",
@@ -1946,8 +1974,8 @@
       "executionNodeId": "vehicle_051",
       "type": "LOCAL",
       "availableCpu": 1332610246.292,
-      "availableBandwidth": 0.0,
-      "baseLatencySeconds": 0.0,
+      "availableBandwidth": 0,
+      "baseLatencySeconds": 0,
       "nodeX": null,
       "nodeY": null,
       "coverageRadiusMeters": null
@@ -1960,9 +1988,9 @@
       "availableCpu": 6178782588.769,
       "availableBandwidth": 21836041.473,
       "baseLatencySeconds": 0.021711,
-      "nodeX": 2020.0,
-      "nodeY": 0.0,
-      "coverageRadiusMeters": 520.0
+      "nodeX": 2020,
+      "nodeY": 0,
+      "coverageRadiusMeters": 520
     },
     {
       "candidateId": "cloud_001_for_vehicle_051",
@@ -1986,7 +2014,8 @@
       "baseLatencySeconds": 0.011098,
       "nodeX": null,
       "nodeY": null,
-      "coverageRadiusMeters": null
+      "coverageRadiusMeters": null,
+      "bandwidthPoolId": "pool_v2v_vehicle_051_vehicle_095"
     },
     {
       "candidateId": "vehicle_038_v2v_for_vehicle_051",
@@ -1998,7 +2027,8 @@
       "baseLatencySeconds": 0.012843,
       "nodeX": null,
       "nodeY": null,
-      "coverageRadiusMeters": null
+      "coverageRadiusMeters": null,
+      "bandwidthPoolId": "pool_v2v_vehicle_038_vehicle_051"
     },
     {
       "candidateId": "local_for_vehicle_093",
@@ -2006,8 +2036,8 @@
       "executionNodeId": "vehicle_093",
       "type": "LOCAL",
       "availableCpu": 787770765.378,
-      "availableBandwidth": 0.0,
-      "baseLatencySeconds": 0.0,
+      "availableBandwidth": 0,
+      "baseLatencySeconds": 0,
       "nodeX": null,
       "nodeY": null,
       "coverageRadiusMeters": null
@@ -2020,9 +2050,9 @@
       "availableCpu": 7543792051.915,
       "availableBandwidth": 25349198.571,
       "baseLatencySeconds": 0.016242,
-      "nodeX": 420.0,
-      "nodeY": 0.0,
-      "coverageRadiusMeters": 520.0
+      "nodeX": 420,
+      "nodeY": 0,
+      "coverageRadiusMeters": 520
     },
     {
       "candidateId": "edge_center_for_vehicle_093",
@@ -2032,9 +2062,9 @@
       "availableCpu": 6823145132.915,
       "availableBandwidth": 8758947.725,
       "baseLatencySeconds": 0.027913,
-      "nodeX": 1220.0,
-      "nodeY": 0.0,
-      "coverageRadiusMeters": 560.0
+      "nodeX": 1220,
+      "nodeY": 0,
+      "coverageRadiusMeters": 560
     },
     {
       "candidateId": "cloud_001_for_vehicle_093",
@@ -2058,7 +2088,8 @@
       "baseLatencySeconds": 0.014152,
       "nodeX": null,
       "nodeY": null,
-      "coverageRadiusMeters": null
+      "coverageRadiusMeters": null,
+      "bandwidthPoolId": "pool_v2v_vehicle_068_vehicle_093"
     },
     {
       "candidateId": "vehicle_060_v2v_for_vehicle_093",
@@ -2070,7 +2101,8 @@
       "baseLatencySeconds": 0.014315,
       "nodeX": null,
       "nodeY": null,
-      "coverageRadiusMeters": null
+      "coverageRadiusMeters": null,
+      "bandwidthPoolId": "pool_v2v_vehicle_060_vehicle_093"
     },
     {
       "candidateId": "local_for_vehicle_059",
@@ -2078,8 +2110,8 @@
       "executionNodeId": "vehicle_059",
       "type": "LOCAL",
       "availableCpu": 924770116.629,
-      "availableBandwidth": 0.0,
-      "baseLatencySeconds": 0.0,
+      "availableBandwidth": 0,
+      "baseLatencySeconds": 0,
       "nodeX": null,
       "nodeY": null,
       "coverageRadiusMeters": null
@@ -2092,9 +2124,9 @@
       "availableCpu": 5693319063.11,
       "availableBandwidth": 10685292.77,
       "baseLatencySeconds": 0.026545,
-      "nodeX": 420.0,
-      "nodeY": 0.0,
-      "coverageRadiusMeters": 520.0
+      "nodeX": 420,
+      "nodeY": 0,
+      "coverageRadiusMeters": 520
     },
     {
       "candidateId": "edge_center_for_vehicle_059",
@@ -2104,9 +2136,9 @@
       "availableCpu": 7465098133.77,
       "availableBandwidth": 19002699.834,
       "baseLatencySeconds": 0.019786,
-      "nodeX": 1220.0,
-      "nodeY": 0.0,
-      "coverageRadiusMeters": 560.0
+      "nodeX": 1220,
+      "nodeY": 0,
+      "coverageRadiusMeters": 560
     },
     {
       "candidateId": "cloud_001_for_vehicle_059",
@@ -2130,7 +2162,8 @@
       "baseLatencySeconds": 0.005819,
       "nodeX": null,
       "nodeY": null,
-      "coverageRadiusMeters": null
+      "coverageRadiusMeters": null,
+      "bandwidthPoolId": "pool_v2v_vehicle_015_vehicle_059"
     },
     {
       "candidateId": "vehicle_070_v2v_for_vehicle_059",
@@ -2142,7 +2175,8 @@
       "baseLatencySeconds": 0.005876,
       "nodeX": null,
       "nodeY": null,
-      "coverageRadiusMeters": null
+      "coverageRadiusMeters": null,
+      "bandwidthPoolId": "pool_v2v_vehicle_059_vehicle_070"
     },
     {
       "candidateId": "local_for_vehicle_070",
@@ -2150,8 +2184,8 @@
       "executionNodeId": "vehicle_070",
       "type": "LOCAL",
       "availableCpu": 1488922019.669,
-      "availableBandwidth": 0.0,
-      "baseLatencySeconds": 0.0,
+      "availableBandwidth": 0,
+      "baseLatencySeconds": 0,
       "nodeX": null,
       "nodeY": null,
       "coverageRadiusMeters": null
@@ -2164,9 +2198,9 @@
       "availableCpu": 7727078851.572,
       "availableBandwidth": 7305727.969,
       "baseLatencySeconds": 0.030708,
-      "nodeX": 420.0,
-      "nodeY": 0.0,
-      "coverageRadiusMeters": 520.0
+      "nodeX": 420,
+      "nodeY": 0,
+      "coverageRadiusMeters": 520
     },
     {
       "candidateId": "edge_center_for_vehicle_070",
@@ -2176,9 +2210,9 @@
       "availableCpu": 6350620860.417,
       "availableBandwidth": 33806272.578,
       "baseLatencySeconds": 0.01122,
-      "nodeX": 1220.0,
-      "nodeY": 0.0,
-      "coverageRadiusMeters": 560.0
+      "nodeX": 1220,
+      "nodeY": 0,
+      "coverageRadiusMeters": 560
     },
     {
       "candidateId": "cloud_001_for_vehicle_070",
@@ -2202,7 +2236,8 @@
       "baseLatencySeconds": 0.005194,
       "nodeX": null,
       "nodeY": null,
-      "coverageRadiusMeters": null
+      "coverageRadiusMeters": null,
+      "bandwidthPoolId": "pool_v2v_vehicle_070_vehicle_076"
     },
     {
       "candidateId": "vehicle_006_v2v_for_vehicle_070",
@@ -2214,7 +2249,8 @@
       "baseLatencySeconds": 0.009663,
       "nodeX": null,
       "nodeY": null,
-      "coverageRadiusMeters": null
+      "coverageRadiusMeters": null,
+      "bandwidthPoolId": "pool_v2v_vehicle_006_vehicle_070"
     },
     {
       "candidateId": "local_for_vehicle_003",
@@ -2222,8 +2258,8 @@
       "executionNodeId": "vehicle_003",
       "type": "LOCAL",
       "availableCpu": 1099375657.159,
-      "availableBandwidth": 0.0,
-      "baseLatencySeconds": 0.0,
+      "availableBandwidth": 0,
+      "baseLatencySeconds": 0,
       "nodeX": null,
       "nodeY": null,
       "coverageRadiusMeters": null
@@ -2236,9 +2272,9 @@
       "availableCpu": 7684431472.751,
       "availableBandwidth": 28159636.3,
       "baseLatencySeconds": 0.019809,
-      "nodeX": 1220.0,
-      "nodeY": 0.0,
-      "coverageRadiusMeters": 560.0
+      "nodeX": 1220,
+      "nodeY": 0,
+      "coverageRadiusMeters": 560
     },
     {
       "candidateId": "edge_east_for_vehicle_003",
@@ -2248,9 +2284,9 @@
       "availableCpu": 5842269989.183,
       "availableBandwidth": 12295745.753,
       "baseLatencySeconds": 0.025967,
-      "nodeX": 2020.0,
-      "nodeY": 0.0,
-      "coverageRadiusMeters": 520.0
+      "nodeX": 2020,
+      "nodeY": 0,
+      "coverageRadiusMeters": 520
     },
     {
       "candidateId": "cloud_001_for_vehicle_003",
@@ -2274,7 +2310,8 @@
       "baseLatencySeconds": 0.011366,
       "nodeX": null,
       "nodeY": null,
-      "coverageRadiusMeters": null
+      "coverageRadiusMeters": null,
+      "bandwidthPoolId": "pool_v2v_vehicle_003_vehicle_036"
     },
     {
       "candidateId": "vehicle_077_v2v_for_vehicle_003",
@@ -2286,7 +2323,8 @@
       "baseLatencySeconds": 0.014536,
       "nodeX": null,
       "nodeY": null,
-      "coverageRadiusMeters": null
+      "coverageRadiusMeters": null,
+      "bandwidthPoolId": "pool_v2v_vehicle_003_vehicle_077"
     },
     {
       "candidateId": "local_for_vehicle_062",
@@ -2294,8 +2332,8 @@
       "executionNodeId": "vehicle_062",
       "type": "LOCAL",
       "availableCpu": 1430083523.003,
-      "availableBandwidth": 0.0,
-      "baseLatencySeconds": 0.0,
+      "availableBandwidth": 0,
+      "baseLatencySeconds": 0,
       "nodeX": null,
       "nodeY": null,
       "coverageRadiusMeters": null
@@ -2308,9 +2346,9 @@
       "availableCpu": 5726610981.218,
       "availableBandwidth": 28858235.174,
       "baseLatencySeconds": 0.015113,
-      "nodeX": 2020.0,
-      "nodeY": 0.0,
-      "coverageRadiusMeters": 520.0
+      "nodeX": 2020,
+      "nodeY": 0,
+      "coverageRadiusMeters": 520
     },
     {
       "candidateId": "cloud_001_for_vehicle_062",
@@ -2334,7 +2372,8 @@
       "baseLatencySeconds": 0.005037,
       "nodeX": null,
       "nodeY": null,
-      "coverageRadiusMeters": null
+      "coverageRadiusMeters": null,
+      "bandwidthPoolId": "pool_v2v_vehicle_062_vehicle_083"
     },
     {
       "candidateId": "vehicle_084_v2v_for_vehicle_062",
@@ -2346,7 +2385,8 @@
       "baseLatencySeconds": 0.013365,
       "nodeX": null,
       "nodeY": null,
-      "coverageRadiusMeters": null
+      "coverageRadiusMeters": null,
+      "bandwidthPoolId": "pool_v2v_vehicle_062_vehicle_084"
     },
     {
       "candidateId": "local_for_vehicle_086",
@@ -2354,8 +2394,8 @@
       "executionNodeId": "vehicle_086",
       "type": "LOCAL",
       "availableCpu": 1170430388.273,
-      "availableBandwidth": 0.0,
-      "baseLatencySeconds": 0.0,
+      "availableBandwidth": 0,
+      "baseLatencySeconds": 0,
       "nodeX": null,
       "nodeY": null,
       "coverageRadiusMeters": null
@@ -2368,9 +2408,9 @@
       "availableCpu": 7975993706.003,
       "availableBandwidth": 22533546.041,
       "baseLatencySeconds": 0.022844,
-      "nodeX": 420.0,
-      "nodeY": 0.0,
-      "coverageRadiusMeters": 520.0
+      "nodeX": 420,
+      "nodeY": 0,
+      "coverageRadiusMeters": 520
     },
     {
       "candidateId": "edge_center_for_vehicle_086",
@@ -2380,9 +2420,9 @@
       "availableCpu": 9191975831.625,
       "availableBandwidth": 11647926.573,
       "baseLatencySeconds": 0.015562,
-      "nodeX": 1220.0,
-      "nodeY": 0.0,
-      "coverageRadiusMeters": 560.0
+      "nodeX": 1220,
+      "nodeY": 0,
+      "coverageRadiusMeters": 560
     },
     {
       "candidateId": "cloud_001_for_vehicle_086",
@@ -2406,7 +2446,8 @@
       "baseLatencySeconds": 0.012371,
       "nodeX": null,
       "nodeY": null,
-      "coverageRadiusMeters": null
+      "coverageRadiusMeters": null,
+      "bandwidthPoolId": "pool_v2v_vehicle_046_vehicle_086"
     },
     {
       "candidateId": "vehicle_056_v2v_for_vehicle_086",
@@ -2418,7 +2459,8 @@
       "baseLatencySeconds": 0.014912,
       "nodeX": null,
       "nodeY": null,
-      "coverageRadiusMeters": null
+      "coverageRadiusMeters": null,
+      "bandwidthPoolId": "pool_v2v_vehicle_056_vehicle_086"
     },
     {
       "candidateId": "local_for_vehicle_030",
@@ -2426,8 +2468,8 @@
       "executionNodeId": "vehicle_030",
       "type": "LOCAL",
       "availableCpu": 886583134.452,
-      "availableBandwidth": 0.0,
-      "baseLatencySeconds": 0.0,
+      "availableBandwidth": 0,
+      "baseLatencySeconds": 0,
       "nodeX": null,
       "nodeY": null,
       "coverageRadiusMeters": null
@@ -2440,9 +2482,9 @@
       "availableCpu": 7117593191.769,
       "availableBandwidth": 11263607.269,
       "baseLatencySeconds": 0.026908,
-      "nodeX": 420.0,
-      "nodeY": 0.0,
-      "coverageRadiusMeters": 520.0
+      "nodeX": 420,
+      "nodeY": 0,
+      "coverageRadiusMeters": 520
     },
     {
       "candidateId": "edge_center_for_vehicle_030",
@@ -2452,9 +2494,9 @@
       "availableCpu": 6619487034.343,
       "availableBandwidth": 36078156.005,
       "baseLatencySeconds": 0.018903,
-      "nodeX": 1220.0,
-      "nodeY": 0.0,
-      "coverageRadiusMeters": 560.0
+      "nodeX": 1220,
+      "nodeY": 0,
+      "coverageRadiusMeters": 560
     },
     {
       "candidateId": "cloud_001_for_vehicle_030",
@@ -2478,7 +2520,8 @@
       "baseLatencySeconds": 0.015152,
       "nodeX": null,
       "nodeY": null,
-      "coverageRadiusMeters": null
+      "coverageRadiusMeters": null,
+      "bandwidthPoolId": "pool_v2v_vehicle_029_vehicle_030"
     },
     {
       "candidateId": "vehicle_028_v2v_for_vehicle_030",
@@ -2490,7 +2533,8 @@
       "baseLatencySeconds": 0.00874,
       "nodeX": null,
       "nodeY": null,
-      "coverageRadiusMeters": null
+      "coverageRadiusMeters": null,
+      "bandwidthPoolId": "pool_v2v_vehicle_028_vehicle_030"
     },
     {
       "candidateId": "local_for_vehicle_074",
@@ -2498,8 +2542,8 @@
       "executionNodeId": "vehicle_074",
       "type": "LOCAL",
       "availableCpu": 861968587.203,
-      "availableBandwidth": 0.0,
-      "baseLatencySeconds": 0.0,
+      "availableBandwidth": 0,
+      "baseLatencySeconds": 0,
       "nodeX": null,
       "nodeY": null,
       "coverageRadiusMeters": null
@@ -2512,9 +2556,9 @@
       "availableCpu": 7890575176.296,
       "availableBandwidth": 23427625.664,
       "baseLatencySeconds": 0.020882,
-      "nodeX": 1220.0,
-      "nodeY": 0.0,
-      "coverageRadiusMeters": 560.0
+      "nodeX": 1220,
+      "nodeY": 0,
+      "coverageRadiusMeters": 560
     },
     {
       "candidateId": "edge_east_for_vehicle_074",
@@ -2524,9 +2568,9 @@
       "availableCpu": 7479951489.53,
       "availableBandwidth": 22366902.668,
       "baseLatencySeconds": 0.015963,
-      "nodeX": 2020.0,
-      "nodeY": 0.0,
-      "coverageRadiusMeters": 520.0
+      "nodeX": 2020,
+      "nodeY": 0,
+      "coverageRadiusMeters": 520
     },
     {
       "candidateId": "cloud_001_for_vehicle_074",
@@ -2550,7 +2594,8 @@
       "baseLatencySeconds": 0.015512,
       "nodeX": null,
       "nodeY": null,
-      "coverageRadiusMeters": null
+      "coverageRadiusMeters": null,
+      "bandwidthPoolId": "pool_v2v_vehicle_074_vehicle_077"
     },
     {
       "candidateId": "vehicle_012_v2v_for_vehicle_074",
@@ -2562,7 +2607,8 @@
       "baseLatencySeconds": 0.008385,
       "nodeX": null,
       "nodeY": null,
-      "coverageRadiusMeters": null
+      "coverageRadiusMeters": null,
+      "bandwidthPoolId": "pool_v2v_vehicle_012_vehicle_074"
     },
     {
       "candidateId": "local_for_vehicle_024",
@@ -2570,8 +2616,8 @@
       "executionNodeId": "vehicle_024",
       "type": "LOCAL",
       "availableCpu": 792127658.887,
-      "availableBandwidth": 0.0,
-      "baseLatencySeconds": 0.0,
+      "availableBandwidth": 0,
+      "baseLatencySeconds": 0,
       "nodeX": null,
       "nodeY": null,
       "coverageRadiusMeters": null
@@ -2584,9 +2630,9 @@
       "availableCpu": 9209716983.514,
       "availableBandwidth": 26985180.5,
       "baseLatencySeconds": 0.016279,
-      "nodeX": 1220.0,
-      "nodeY": 0.0,
-      "coverageRadiusMeters": 560.0
+      "nodeX": 1220,
+      "nodeY": 0,
+      "coverageRadiusMeters": 560
     },
     {
       "candidateId": "edge_east_for_vehicle_024",
@@ -2596,9 +2642,9 @@
       "availableCpu": 8125268358.993,
       "availableBandwidth": 13326195.477,
       "baseLatencySeconds": 0.018744,
-      "nodeX": 2020.0,
-      "nodeY": 0.0,
-      "coverageRadiusMeters": 520.0
+      "nodeX": 2020,
+      "nodeY": 0,
+      "coverageRadiusMeters": 520
     },
     {
       "candidateId": "cloud_001_for_vehicle_024",
@@ -2622,7 +2668,8 @@
       "baseLatencySeconds": 0.011998,
       "nodeX": null,
       "nodeY": null,
-      "coverageRadiusMeters": null
+      "coverageRadiusMeters": null,
+      "bandwidthPoolId": "pool_v2v_vehicle_002_vehicle_024"
     },
     {
       "candidateId": "vehicle_075_v2v_for_vehicle_024",
@@ -2634,7 +2681,8 @@
       "baseLatencySeconds": 0.008779,
       "nodeX": null,
       "nodeY": null,
-      "coverageRadiusMeters": null
+      "coverageRadiusMeters": null,
+      "bandwidthPoolId": "pool_v2v_vehicle_024_vehicle_075"
     },
     {
       "candidateId": "local_for_vehicle_081",
@@ -2642,8 +2690,8 @@
       "executionNodeId": "vehicle_081",
       "type": "LOCAL",
       "availableCpu": 1043912362.772,
-      "availableBandwidth": 0.0,
-      "baseLatencySeconds": 0.0,
+      "availableBandwidth": 0,
+      "baseLatencySeconds": 0,
       "nodeX": null,
       "nodeY": null,
       "coverageRadiusMeters": null
@@ -2656,9 +2704,9 @@
       "availableCpu": 7142073144.017,
       "availableBandwidth": 15382776.322,
       "baseLatencySeconds": 0.016179,
-      "nodeX": 1220.0,
-      "nodeY": 0.0,
-      "coverageRadiusMeters": 560.0
+      "nodeX": 1220,
+      "nodeY": 0,
+      "coverageRadiusMeters": 560
     },
     {
       "candidateId": "edge_east_for_vehicle_081",
@@ -2668,9 +2716,9 @@
       "availableCpu": 7062576686.28,
       "availableBandwidth": 17145122.454,
       "baseLatencySeconds": 0.015023,
-      "nodeX": 2020.0,
-      "nodeY": 0.0,
-      "coverageRadiusMeters": 520.0
+      "nodeX": 2020,
+      "nodeY": 0,
+      "coverageRadiusMeters": 520
     },
     {
       "candidateId": "cloud_001_for_vehicle_081",
@@ -2694,7 +2742,8 @@
       "baseLatencySeconds": 0.0115,
       "nodeX": null,
       "nodeY": null,
-      "coverageRadiusMeters": null
+      "coverageRadiusMeters": null,
+      "bandwidthPoolId": "pool_v2v_vehicle_032_vehicle_081"
     },
     {
       "candidateId": "vehicle_082_v2v_for_vehicle_081",
@@ -2706,7 +2755,8 @@
       "baseLatencySeconds": 0.005934,
       "nodeX": null,
       "nodeY": null,
-      "coverageRadiusMeters": null
+      "coverageRadiusMeters": null,
+      "bandwidthPoolId": "pool_v2v_vehicle_081_vehicle_082"
     },
     {
       "candidateId": "local_for_vehicle_001",
@@ -2714,8 +2764,8 @@
       "executionNodeId": "vehicle_001",
       "type": "LOCAL",
       "availableCpu": 913867644.324,
-      "availableBandwidth": 0.0,
-      "baseLatencySeconds": 0.0,
+      "availableBandwidth": 0,
+      "baseLatencySeconds": 0,
       "nodeX": null,
       "nodeY": null,
       "coverageRadiusMeters": null
@@ -2728,9 +2778,9 @@
       "availableCpu": 5942318251.202,
       "availableBandwidth": 20042478.935,
       "baseLatencySeconds": 0.027523,
-      "nodeX": 2020.0,
-      "nodeY": 0.0,
-      "coverageRadiusMeters": 520.0
+      "nodeX": 2020,
+      "nodeY": 0,
+      "coverageRadiusMeters": 520
     },
     {
       "candidateId": "cloud_001_for_vehicle_001",
@@ -2754,7 +2804,8 @@
       "baseLatencySeconds": 0.010776,
       "nodeX": null,
       "nodeY": null,
-      "coverageRadiusMeters": null
+      "coverageRadiusMeters": null,
+      "bandwidthPoolId": "pool_v2v_vehicle_001_vehicle_026"
     },
     {
       "candidateId": "vehicle_087_v2v_for_vehicle_001",
@@ -2766,7 +2817,8 @@
       "baseLatencySeconds": 0.00609,
       "nodeX": null,
       "nodeY": null,
-      "coverageRadiusMeters": null
+      "coverageRadiusMeters": null,
+      "bandwidthPoolId": "pool_v2v_vehicle_001_vehicle_087"
     },
     {
       "candidateId": "local_for_vehicle_057",
@@ -2774,8 +2826,8 @@
       "executionNodeId": "vehicle_057",
       "type": "LOCAL",
       "availableCpu": 1087119569.198,
-      "availableBandwidth": 0.0,
-      "baseLatencySeconds": 0.0,
+      "availableBandwidth": 0,
+      "baseLatencySeconds": 0,
       "nodeX": null,
       "nodeY": null,
       "coverageRadiusMeters": null
@@ -2788,9 +2840,9 @@
       "availableCpu": 7563057217.932,
       "availableBandwidth": 15983230.472,
       "baseLatencySeconds": 0.025903,
-      "nodeX": 1220.0,
-      "nodeY": 0.0,
-      "coverageRadiusMeters": 560.0
+      "nodeX": 1220,
+      "nodeY": 0,
+      "coverageRadiusMeters": 560
     },
     {
       "candidateId": "edge_east_for_vehicle_057",
@@ -2800,9 +2852,9 @@
       "availableCpu": 7919505247.846,
       "availableBandwidth": 34600704.702,
       "baseLatencySeconds": 0.022851,
-      "nodeX": 2020.0,
-      "nodeY": 0.0,
-      "coverageRadiusMeters": 520.0
+      "nodeX": 2020,
+      "nodeY": 0,
+      "coverageRadiusMeters": 520
     },
     {
       "candidateId": "cloud_001_for_vehicle_057",
@@ -2826,7 +2878,8 @@
       "baseLatencySeconds": 0.00671,
       "nodeX": null,
       "nodeY": null,
-      "coverageRadiusMeters": null
+      "coverageRadiusMeters": null,
+      "bandwidthPoolId": "pool_v2v_vehicle_018_vehicle_057"
     },
     {
       "candidateId": "vehicle_049_v2v_for_vehicle_057",
@@ -2838,7 +2891,8 @@
       "baseLatencySeconds": 0.010649,
       "nodeX": null,
       "nodeY": null,
-      "coverageRadiusMeters": null
+      "coverageRadiusMeters": null,
+      "bandwidthPoolId": "pool_v2v_vehicle_049_vehicle_057"
     },
     {
       "candidateId": "local_for_vehicle_008",
@@ -2846,8 +2900,8 @@
       "executionNodeId": "vehicle_008",
       "type": "LOCAL",
       "availableCpu": 1133912274.727,
-      "availableBandwidth": 0.0,
-      "baseLatencySeconds": 0.0,
+      "availableBandwidth": 0,
+      "baseLatencySeconds": 0,
       "nodeX": null,
       "nodeY": null,
       "coverageRadiusMeters": null
@@ -2860,9 +2914,9 @@
       "availableCpu": 8265473131.511,
       "availableBandwidth": 35144394.326,
       "baseLatencySeconds": 0.017761,
-      "nodeX": 2020.0,
-      "nodeY": 0.0,
-      "coverageRadiusMeters": 520.0
+      "nodeX": 2020,
+      "nodeY": 0,
+      "coverageRadiusMeters": 520
     },
     {
       "candidateId": "cloud_001_for_vehicle_008",
@@ -2886,7 +2940,8 @@
       "baseLatencySeconds": 0.010661,
       "nodeX": null,
       "nodeY": null,
-      "coverageRadiusMeters": null
+      "coverageRadiusMeters": null,
+      "bandwidthPoolId": "pool_v2v_vehicle_008_vehicle_084"
     },
     {
       "candidateId": "vehicle_083_v2v_for_vehicle_008",
@@ -2898,7 +2953,8 @@
       "baseLatencySeconds": 0.007716,
       "nodeX": null,
       "nodeY": null,
-      "coverageRadiusMeters": null
+      "coverageRadiusMeters": null,
+      "bandwidthPoolId": "pool_v2v_vehicle_008_vehicle_083"
     },
     {
       "candidateId": "local_for_vehicle_087",
@@ -2906,8 +2962,8 @@
       "executionNodeId": "vehicle_087",
       "type": "LOCAL",
       "availableCpu": 1018322548.428,
-      "availableBandwidth": 0.0,
-      "baseLatencySeconds": 0.0,
+      "availableBandwidth": 0,
+      "baseLatencySeconds": 0,
       "nodeX": null,
       "nodeY": null,
       "coverageRadiusMeters": null
@@ -2920,9 +2976,9 @@
       "availableCpu": 8659365051.868,
       "availableBandwidth": 24506274.21,
       "baseLatencySeconds": 0.027243,
-      "nodeX": 2020.0,
-      "nodeY": 0.0,
-      "coverageRadiusMeters": 520.0
+      "nodeX": 2020,
+      "nodeY": 0,
+      "coverageRadiusMeters": 520
     },
     {
       "candidateId": "cloud_001_for_vehicle_087",
@@ -2946,7 +3002,8 @@
       "baseLatencySeconds": 0.007368,
       "nodeX": null,
       "nodeY": null,
-      "coverageRadiusMeters": null
+      "coverageRadiusMeters": null,
+      "bandwidthPoolId": "pool_v2v_vehicle_026_vehicle_087"
     },
     {
       "candidateId": "vehicle_001_v2v_for_vehicle_087",
@@ -2958,7 +3015,8 @@
       "baseLatencySeconds": 0.006737,
       "nodeX": null,
       "nodeY": null,
-      "coverageRadiusMeters": null
+      "coverageRadiusMeters": null,
+      "bandwidthPoolId": "pool_v2v_vehicle_001_vehicle_087"
     },
     {
       "candidateId": "local_for_vehicle_061",
@@ -2966,8 +3024,8 @@
       "executionNodeId": "vehicle_061",
       "type": "LOCAL",
       "availableCpu": 1132085884.309,
-      "availableBandwidth": 0.0,
-      "baseLatencySeconds": 0.0,
+      "availableBandwidth": 0,
+      "baseLatencySeconds": 0,
       "nodeX": null,
       "nodeY": null,
       "coverageRadiusMeters": null
@@ -2980,9 +3038,9 @@
       "availableCpu": 6286980464.026,
       "availableBandwidth": 15510115.106,
       "baseLatencySeconds": 0.032351,
-      "nodeX": 420.0,
-      "nodeY": 0.0,
-      "coverageRadiusMeters": 520.0
+      "nodeX": 420,
+      "nodeY": 0,
+      "coverageRadiusMeters": 520
     },
     {
       "candidateId": "edge_center_for_vehicle_061",
@@ -2992,9 +3050,9 @@
       "availableCpu": 7031475422.79,
       "availableBandwidth": 30193609.375,
       "baseLatencySeconds": 0.010583,
-      "nodeX": 1220.0,
-      "nodeY": 0.0,
-      "coverageRadiusMeters": 560.0
+      "nodeX": 1220,
+      "nodeY": 0,
+      "coverageRadiusMeters": 560
     },
     {
       "candidateId": "cloud_001_for_vehicle_061",
@@ -3018,7 +3076,8 @@
       "baseLatencySeconds": 0.009165,
       "nodeX": null,
       "nodeY": null,
-      "coverageRadiusMeters": null
+      "coverageRadiusMeters": null,
+      "bandwidthPoolId": "pool_v2v_vehicle_061_vehicle_079"
     },
     {
       "candidateId": "vehicle_029_v2v_for_vehicle_061",
@@ -3030,7 +3089,8 @@
       "baseLatencySeconds": 0.010313,
       "nodeX": null,
       "nodeY": null,
-      "coverageRadiusMeters": null
+      "coverageRadiusMeters": null,
+      "bandwidthPoolId": "pool_v2v_vehicle_029_vehicle_061"
     },
     {
       "candidateId": "local_for_vehicle_056",
@@ -3038,8 +3098,8 @@
       "executionNodeId": "vehicle_056",
       "type": "LOCAL",
       "availableCpu": 768266980.27,
-      "availableBandwidth": 0.0,
-      "baseLatencySeconds": 0.0,
+      "availableBandwidth": 0,
+      "baseLatencySeconds": 0,
       "nodeX": null,
       "nodeY": null,
       "coverageRadiusMeters": null
@@ -3052,9 +3112,9 @@
       "availableCpu": 6982399631.231,
       "availableBandwidth": 16429064.726,
       "baseLatencySeconds": 0.014332,
-      "nodeX": 420.0,
-      "nodeY": 0.0,
-      "coverageRadiusMeters": 520.0
+      "nodeX": 420,
+      "nodeY": 0,
+      "coverageRadiusMeters": 520
     },
     {
       "candidateId": "edge_center_for_vehicle_056",
@@ -3064,9 +3124,9 @@
       "availableCpu": 9381419500.156,
       "availableBandwidth": 13080926.405,
       "baseLatencySeconds": 0.022686,
-      "nodeX": 1220.0,
-      "nodeY": 0.0,
-      "coverageRadiusMeters": 560.0
+      "nodeX": 1220,
+      "nodeY": 0,
+      "coverageRadiusMeters": 560
     },
     {
       "candidateId": "cloud_001_for_vehicle_056",
@@ -3090,7 +3150,8 @@
       "baseLatencySeconds": 0.015814,
       "nodeX": null,
       "nodeY": null,
-      "coverageRadiusMeters": null
+      "coverageRadiusMeters": null,
+      "bandwidthPoolId": "pool_v2v_vehicle_056_vehicle_086"
     },
     {
       "candidateId": "vehicle_046_v2v_for_vehicle_056",
@@ -3102,7 +3163,8 @@
       "baseLatencySeconds": 0.015655,
       "nodeX": null,
       "nodeY": null,
-      "coverageRadiusMeters": null
+      "coverageRadiusMeters": null,
+      "bandwidthPoolId": "pool_v2v_vehicle_046_vehicle_056"
     },
     {
       "candidateId": "local_for_vehicle_026",
@@ -3110,8 +3172,8 @@
       "executionNodeId": "vehicle_026",
       "type": "LOCAL",
       "availableCpu": 1196608418.186,
-      "availableBandwidth": 0.0,
-      "baseLatencySeconds": 0.0,
+      "availableBandwidth": 0,
+      "baseLatencySeconds": 0,
       "nodeX": null,
       "nodeY": null,
       "coverageRadiusMeters": null
@@ -3124,9 +3186,9 @@
       "availableCpu": 7931713420.973,
       "availableBandwidth": 15954098.279,
       "baseLatencySeconds": 0.027228,
-      "nodeX": 2020.0,
-      "nodeY": 0.0,
-      "coverageRadiusMeters": 520.0
+      "nodeX": 2020,
+      "nodeY": 0,
+      "coverageRadiusMeters": 520
     },
     {
       "candidateId": "cloud_001_for_vehicle_026",
@@ -3150,7 +3212,8 @@
       "baseLatencySeconds": 0.005559,
       "nodeX": null,
       "nodeY": null,
-      "coverageRadiusMeters": null
+      "coverageRadiusMeters": null,
+      "bandwidthPoolId": "pool_v2v_vehicle_017_vehicle_026"
     },
     {
       "candidateId": "vehicle_087_v2v_for_vehicle_026",
@@ -3162,7 +3225,8 @@
       "baseLatencySeconds": 0.006673,
       "nodeX": null,
       "nodeY": null,
-      "coverageRadiusMeters": null
+      "coverageRadiusMeters": null,
+      "bandwidthPoolId": "pool_v2v_vehicle_026_vehicle_087"
     },
     {
       "candidateId": "local_for_vehicle_082",
@@ -3170,8 +3234,8 @@
       "executionNodeId": "vehicle_082",
       "type": "LOCAL",
       "availableCpu": 1231525648.721,
-      "availableBandwidth": 0.0,
-      "baseLatencySeconds": 0.0,
+      "availableBandwidth": 0,
+      "baseLatencySeconds": 0,
       "nodeX": null,
       "nodeY": null,
       "coverageRadiusMeters": null
@@ -3184,9 +3248,9 @@
       "availableCpu": 9390191524.458,
       "availableBandwidth": 21156968.186,
       "baseLatencySeconds": 0.027741,
-      "nodeX": 1220.0,
-      "nodeY": 0.0,
-      "coverageRadiusMeters": 560.0
+      "nodeX": 1220,
+      "nodeY": 0,
+      "coverageRadiusMeters": 560
     },
     {
       "candidateId": "edge_east_for_vehicle_082",
@@ -3196,9 +3260,9 @@
       "availableCpu": 7702271493.173,
       "availableBandwidth": 18837022.141,
       "baseLatencySeconds": 0.021462,
-      "nodeX": 2020.0,
-      "nodeY": 0.0,
-      "coverageRadiusMeters": 520.0
+      "nodeX": 2020,
+      "nodeY": 0,
+      "coverageRadiusMeters": 520
     },
     {
       "candidateId": "cloud_001_for_vehicle_082",
@@ -3222,7 +3286,8 @@
       "baseLatencySeconds": 0.00842,
       "nodeX": null,
       "nodeY": null,
-      "coverageRadiusMeters": null
+      "coverageRadiusMeters": null,
+      "bandwidthPoolId": "pool_v2v_vehicle_082_vehicle_094"
     },
     {
       "candidateId": "vehicle_081_v2v_for_vehicle_082",
@@ -3234,7 +3299,8 @@
       "baseLatencySeconds": 0.009312,
       "nodeX": null,
       "nodeY": null,
-      "coverageRadiusMeters": null
+      "coverageRadiusMeters": null,
+      "bandwidthPoolId": "pool_v2v_vehicle_081_vehicle_082"
     },
     {
       "candidateId": "local_for_vehicle_016",
@@ -3242,8 +3308,8 @@
       "executionNodeId": "vehicle_016",
       "type": "LOCAL",
       "availableCpu": 1456283683.312,
-      "availableBandwidth": 0.0,
-      "baseLatencySeconds": 0.0,
+      "availableBandwidth": 0,
+      "baseLatencySeconds": 0,
       "nodeX": null,
       "nodeY": null,
       "coverageRadiusMeters": null
@@ -3256,9 +3322,9 @@
       "availableCpu": 8008646467.363,
       "availableBandwidth": 34162598.953,
       "baseLatencySeconds": 0.01613,
-      "nodeX": 1220.0,
-      "nodeY": 0.0,
-      "coverageRadiusMeters": 560.0
+      "nodeX": 1220,
+      "nodeY": 0,
+      "coverageRadiusMeters": 560
     },
     {
       "candidateId": "edge_east_for_vehicle_016",
@@ -3268,9 +3334,9 @@
       "availableCpu": 6151255110.441,
       "availableBandwidth": 10138602.371,
       "baseLatencySeconds": 0.022129,
-      "nodeX": 2020.0,
-      "nodeY": 0.0,
-      "coverageRadiusMeters": 520.0
+      "nodeX": 2020,
+      "nodeY": 0,
+      "coverageRadiusMeters": 520
     },
     {
       "candidateId": "cloud_001_for_vehicle_016",
@@ -3294,7 +3360,8 @@
       "baseLatencySeconds": 0.010264,
       "nodeX": null,
       "nodeY": null,
-      "coverageRadiusMeters": null
+      "coverageRadiusMeters": null,
+      "bandwidthPoolId": "pool_v2v_vehicle_011_vehicle_016"
     },
     {
       "candidateId": "vehicle_077_v2v_for_vehicle_016",
@@ -3306,7 +3373,8 @@
       "baseLatencySeconds": 0.005789,
       "nodeX": null,
       "nodeY": null,
-      "coverageRadiusMeters": null
+      "coverageRadiusMeters": null,
+      "bandwidthPoolId": "pool_v2v_vehicle_016_vehicle_077"
     },
     {
       "candidateId": "local_for_vehicle_049",
@@ -3314,8 +3382,8 @@
       "executionNodeId": "vehicle_049",
       "type": "LOCAL",
       "availableCpu": 1262296776.988,
-      "availableBandwidth": 0.0,
-      "baseLatencySeconds": 0.0,
+      "availableBandwidth": 0,
+      "baseLatencySeconds": 0,
       "nodeX": null,
       "nodeY": null,
       "coverageRadiusMeters": null
@@ -3328,9 +3396,9 @@
       "availableCpu": 7990902191.958,
       "availableBandwidth": 15331124.637,
       "baseLatencySeconds": 0.02671,
-      "nodeX": 1220.0,
-      "nodeY": 0.0,
-      "coverageRadiusMeters": 560.0
+      "nodeX": 1220,
+      "nodeY": 0,
+      "coverageRadiusMeters": 560
     },
     {
       "candidateId": "edge_east_for_vehicle_049",
@@ -3340,9 +3408,9 @@
       "availableCpu": 6902954447.646,
       "availableBandwidth": 19933996.766,
       "baseLatencySeconds": 0.023415,
-      "nodeX": 2020.0,
-      "nodeY": 0.0,
-      "coverageRadiusMeters": 520.0
+      "nodeX": 2020,
+      "nodeY": 0,
+      "coverageRadiusMeters": 520
     },
     {
       "candidateId": "cloud_001_for_vehicle_049",
@@ -3366,7 +3434,8 @@
       "baseLatencySeconds": 0.012717,
       "nodeX": null,
       "nodeY": null,
-      "coverageRadiusMeters": null
+      "coverageRadiusMeters": null,
+      "bandwidthPoolId": "pool_v2v_vehicle_047_vehicle_049"
     },
     {
       "candidateId": "vehicle_085_v2v_for_vehicle_049",
@@ -3378,7 +3447,8 @@
       "baseLatencySeconds": 0.009273,
       "nodeX": null,
       "nodeY": null,
-      "coverageRadiusMeters": null
+      "coverageRadiusMeters": null,
+      "bandwidthPoolId": "pool_v2v_vehicle_049_vehicle_085"
     },
     {
       "candidateId": "local_for_vehicle_010",
@@ -3386,8 +3456,8 @@
       "executionNodeId": "vehicle_010",
       "type": "LOCAL",
       "availableCpu": 931449412.56,
-      "availableBandwidth": 0.0,
-      "baseLatencySeconds": 0.0,
+      "availableBandwidth": 0,
+      "baseLatencySeconds": 0,
       "nodeX": null,
       "nodeY": null,
       "coverageRadiusMeters": null
@@ -3400,9 +3470,9 @@
       "availableCpu": 7478739553.316,
       "availableBandwidth": 33829316.274,
       "baseLatencySeconds": 0.027638,
-      "nodeX": 420.0,
-      "nodeY": 0.0,
-      "coverageRadiusMeters": 520.0
+      "nodeX": 420,
+      "nodeY": 0,
+      "coverageRadiusMeters": 520
     },
     {
       "candidateId": "cloud_001_for_vehicle_010",
@@ -3426,7 +3496,8 @@
       "baseLatencySeconds": 0.010725,
       "nodeX": null,
       "nodeY": null,
-      "coverageRadiusMeters": null
+      "coverageRadiusMeters": null,
+      "bandwidthPoolId": "pool_v2v_vehicle_010_vehicle_023"
     },
     {
       "candidateId": "vehicle_007_v2v_for_vehicle_010",
@@ -3438,7 +3509,8 @@
       "baseLatencySeconds": 0.007286,
       "nodeX": null,
       "nodeY": null,
-      "coverageRadiusMeters": null
+      "coverageRadiusMeters": null,
+      "bandwidthPoolId": "pool_v2v_vehicle_007_vehicle_010"
     },
     {
       "candidateId": "local_for_vehicle_054",
@@ -3446,8 +3518,8 @@
       "executionNodeId": "vehicle_054",
       "type": "LOCAL",
       "availableCpu": 1516612081.72,
-      "availableBandwidth": 0.0,
-      "baseLatencySeconds": 0.0,
+      "availableBandwidth": 0,
+      "baseLatencySeconds": 0,
       "nodeX": null,
       "nodeY": null,
       "coverageRadiusMeters": null
@@ -3460,9 +3532,9 @@
       "availableCpu": 8062708711.505,
       "availableBandwidth": 31123085.687,
       "baseLatencySeconds": 0.012279,
-      "nodeX": 420.0,
-      "nodeY": 0.0,
-      "coverageRadiusMeters": 520.0
+      "nodeX": 420,
+      "nodeY": 0,
+      "coverageRadiusMeters": 520
     },
     {
       "candidateId": "edge_center_for_vehicle_054",
@@ -3472,9 +3544,9 @@
       "availableCpu": 8399927837.623,
       "availableBandwidth": 12150138.437,
       "baseLatencySeconds": 0.019783,
-      "nodeX": 1220.0,
-      "nodeY": 0.0,
-      "coverageRadiusMeters": 560.0
+      "nodeX": 1220,
+      "nodeY": 0,
+      "coverageRadiusMeters": 560
     },
     {
       "candidateId": "cloud_001_for_vehicle_054",
@@ -3498,7 +3570,8 @@
       "baseLatencySeconds": 0.01143,
       "nodeX": null,
       "nodeY": null,
-      "coverageRadiusMeters": null
+      "coverageRadiusMeters": null,
+      "bandwidthPoolId": "pool_v2v_vehicle_045_vehicle_054"
     },
     {
       "candidateId": "vehicle_035_v2v_for_vehicle_054",
@@ -3510,7 +3583,8 @@
       "baseLatencySeconds": 0.010571,
       "nodeX": null,
       "nodeY": null,
-      "coverageRadiusMeters": null
+      "coverageRadiusMeters": null,
+      "bandwidthPoolId": "pool_v2v_vehicle_035_vehicle_054"
     },
     {
       "candidateId": "local_for_vehicle_041",
@@ -3518,8 +3592,8 @@
       "executionNodeId": "vehicle_041",
       "type": "LOCAL",
       "availableCpu": 1126250555.322,
-      "availableBandwidth": 0.0,
-      "baseLatencySeconds": 0.0,
+      "availableBandwidth": 0,
+      "baseLatencySeconds": 0,
       "nodeX": null,
       "nodeY": null,
       "coverageRadiusMeters": null
@@ -3532,9 +3606,9 @@
       "availableCpu": 8210941091.908,
       "availableBandwidth": 12058766.882,
       "baseLatencySeconds": 0.029833,
-      "nodeX": 1220.0,
-      "nodeY": 0.0,
-      "coverageRadiusMeters": 560.0
+      "nodeX": 1220,
+      "nodeY": 0,
+      "coverageRadiusMeters": 560
     },
     {
       "candidateId": "edge_east_for_vehicle_041",
@@ -3544,9 +3618,9 @@
       "availableCpu": 8656639281.081,
       "availableBandwidth": 34895809.809,
       "baseLatencySeconds": 0.023825,
-      "nodeX": 2020.0,
-      "nodeY": 0.0,
-      "coverageRadiusMeters": 520.0
+      "nodeX": 2020,
+      "nodeY": 0,
+      "coverageRadiusMeters": 520
     },
     {
       "candidateId": "cloud_001_for_vehicle_041",
@@ -3570,7 +3644,8 @@
       "baseLatencySeconds": 0.011657,
       "nodeX": null,
       "nodeY": null,
-      "coverageRadiusMeters": null
+      "coverageRadiusMeters": null,
+      "bandwidthPoolId": "pool_v2v_vehicle_041_vehicle_092"
     },
     {
       "candidateId": "vehicle_009_v2v_for_vehicle_041",
@@ -3582,7 +3657,2342 @@
       "baseLatencySeconds": 0.009224,
       "nodeX": null,
       "nodeY": null,
-      "coverageRadiusMeters": null
+      "coverageRadiusMeters": null,
+      "bandwidthPoolId": "pool_v2v_vehicle_009_vehicle_041"
+    }
+  ],
+  "accessGateways": [
+    {
+      "gatewayId": "rsu_west",
+      "gatewayType": "RSU",
+      "x": 420,
+      "y": 0,
+      "coverageRadiusMeters": 520,
+      "bandwidthPoolId": "pool_rsu_west"
+    },
+    {
+      "gatewayId": "rsu_center",
+      "gatewayType": "RSU",
+      "x": 1220,
+      "y": 0,
+      "coverageRadiusMeters": 560,
+      "bandwidthPoolId": "pool_rsu_center"
+    },
+    {
+      "gatewayId": "rsu_east",
+      "gatewayType": "RSU",
+      "x": 2020,
+      "y": 0,
+      "coverageRadiusMeters": 520,
+      "bandwidthPoolId": "pool_rsu_east"
+    }
+  ],
+  "accessLinks": [
+    {
+      "accessLinkId": "access_vehicle_001_rsu_east",
+      "vehicleId": "vehicle_001",
+      "gatewayId": "rsu_east",
+      "active": true,
+      "available": true
+    },
+    {
+      "accessLinkId": "access_vehicle_001_rsu_center",
+      "vehicleId": "vehicle_001",
+      "gatewayId": "rsu_center",
+      "active": false,
+      "available": false
+    },
+    {
+      "accessLinkId": "access_vehicle_001_rsu_west",
+      "vehicleId": "vehicle_001",
+      "gatewayId": "rsu_west",
+      "active": false,
+      "available": false
+    },
+    {
+      "accessLinkId": "access_vehicle_002_rsu_east",
+      "vehicleId": "vehicle_002",
+      "gatewayId": "rsu_east",
+      "active": true,
+      "available": true
+    },
+    {
+      "accessLinkId": "access_vehicle_002_rsu_center",
+      "vehicleId": "vehicle_002",
+      "gatewayId": "rsu_center",
+      "active": false,
+      "available": true
+    },
+    {
+      "accessLinkId": "access_vehicle_002_rsu_west",
+      "vehicleId": "vehicle_002",
+      "gatewayId": "rsu_west",
+      "active": false,
+      "available": false
+    },
+    {
+      "accessLinkId": "access_vehicle_003_rsu_center",
+      "vehicleId": "vehicle_003",
+      "gatewayId": "rsu_center",
+      "active": true,
+      "available": true
+    },
+    {
+      "accessLinkId": "access_vehicle_003_rsu_east",
+      "vehicleId": "vehicle_003",
+      "gatewayId": "rsu_east",
+      "active": false,
+      "available": false
+    },
+    {
+      "accessLinkId": "access_vehicle_003_rsu_west",
+      "vehicleId": "vehicle_003",
+      "gatewayId": "rsu_west",
+      "active": false,
+      "available": false
+    },
+    {
+      "accessLinkId": "access_vehicle_004_rsu_center",
+      "vehicleId": "vehicle_004",
+      "gatewayId": "rsu_center",
+      "active": true,
+      "available": true
+    },
+    {
+      "accessLinkId": "access_vehicle_004_rsu_east",
+      "vehicleId": "vehicle_004",
+      "gatewayId": "rsu_east",
+      "active": false,
+      "available": false
+    },
+    {
+      "accessLinkId": "access_vehicle_004_rsu_west",
+      "vehicleId": "vehicle_004",
+      "gatewayId": "rsu_west",
+      "active": false,
+      "available": false
+    },
+    {
+      "accessLinkId": "access_vehicle_005_rsu_east",
+      "vehicleId": "vehicle_005",
+      "gatewayId": "rsu_east",
+      "active": true,
+      "available": true
+    },
+    {
+      "accessLinkId": "access_vehicle_005_rsu_center",
+      "vehicleId": "vehicle_005",
+      "gatewayId": "rsu_center",
+      "active": false,
+      "available": false
+    },
+    {
+      "accessLinkId": "access_vehicle_005_rsu_west",
+      "vehicleId": "vehicle_005",
+      "gatewayId": "rsu_west",
+      "active": false,
+      "available": false
+    },
+    {
+      "accessLinkId": "access_vehicle_006_rsu_center",
+      "vehicleId": "vehicle_006",
+      "gatewayId": "rsu_center",
+      "active": true,
+      "available": true
+    },
+    {
+      "accessLinkId": "access_vehicle_006_rsu_west",
+      "vehicleId": "vehicle_006",
+      "gatewayId": "rsu_west",
+      "active": false,
+      "available": false
+    },
+    {
+      "accessLinkId": "access_vehicle_006_rsu_east",
+      "vehicleId": "vehicle_006",
+      "gatewayId": "rsu_east",
+      "active": false,
+      "available": false
+    },
+    {
+      "accessLinkId": "access_vehicle_007_rsu_west",
+      "vehicleId": "vehicle_007",
+      "gatewayId": "rsu_west",
+      "active": true,
+      "available": true
+    },
+    {
+      "accessLinkId": "access_vehicle_007_rsu_center",
+      "vehicleId": "vehicle_007",
+      "gatewayId": "rsu_center",
+      "active": false,
+      "available": false
+    },
+    {
+      "accessLinkId": "access_vehicle_007_rsu_east",
+      "vehicleId": "vehicle_007",
+      "gatewayId": "rsu_east",
+      "active": false,
+      "available": false
+    },
+    {
+      "accessLinkId": "access_vehicle_008_rsu_east",
+      "vehicleId": "vehicle_008",
+      "gatewayId": "rsu_east",
+      "active": true,
+      "available": true
+    },
+    {
+      "accessLinkId": "access_vehicle_008_rsu_center",
+      "vehicleId": "vehicle_008",
+      "gatewayId": "rsu_center",
+      "active": false,
+      "available": false
+    },
+    {
+      "accessLinkId": "access_vehicle_008_rsu_west",
+      "vehicleId": "vehicle_008",
+      "gatewayId": "rsu_west",
+      "active": false,
+      "available": false
+    },
+    {
+      "accessLinkId": "access_vehicle_009_rsu_east",
+      "vehicleId": "vehicle_009",
+      "gatewayId": "rsu_east",
+      "active": true,
+      "available": true
+    },
+    {
+      "accessLinkId": "access_vehicle_009_rsu_center",
+      "vehicleId": "vehicle_009",
+      "gatewayId": "rsu_center",
+      "active": false,
+      "available": false
+    },
+    {
+      "accessLinkId": "access_vehicle_009_rsu_west",
+      "vehicleId": "vehicle_009",
+      "gatewayId": "rsu_west",
+      "active": false,
+      "available": false
+    },
+    {
+      "accessLinkId": "access_vehicle_010_rsu_west",
+      "vehicleId": "vehicle_010",
+      "gatewayId": "rsu_west",
+      "active": true,
+      "available": true
+    },
+    {
+      "accessLinkId": "access_vehicle_010_rsu_center",
+      "vehicleId": "vehicle_010",
+      "gatewayId": "rsu_center",
+      "active": false,
+      "available": false
+    },
+    {
+      "accessLinkId": "access_vehicle_010_rsu_east",
+      "vehicleId": "vehicle_010",
+      "gatewayId": "rsu_east",
+      "active": false,
+      "available": false
+    },
+    {
+      "accessLinkId": "access_vehicle_011_rsu_center",
+      "vehicleId": "vehicle_011",
+      "gatewayId": "rsu_center",
+      "active": true,
+      "available": true
+    },
+    {
+      "accessLinkId": "access_vehicle_011_rsu_east",
+      "vehicleId": "vehicle_011",
+      "gatewayId": "rsu_east",
+      "active": false,
+      "available": true
+    },
+    {
+      "accessLinkId": "access_vehicle_011_rsu_west",
+      "vehicleId": "vehicle_011",
+      "gatewayId": "rsu_west",
+      "active": false,
+      "available": false
+    },
+    {
+      "accessLinkId": "access_vehicle_012_rsu_center",
+      "vehicleId": "vehicle_012",
+      "gatewayId": "rsu_center",
+      "active": true,
+      "available": true
+    },
+    {
+      "accessLinkId": "access_vehicle_012_rsu_east",
+      "vehicleId": "vehicle_012",
+      "gatewayId": "rsu_east",
+      "active": false,
+      "available": true
+    },
+    {
+      "accessLinkId": "access_vehicle_012_rsu_west",
+      "vehicleId": "vehicle_012",
+      "gatewayId": "rsu_west",
+      "active": false,
+      "available": false
+    },
+    {
+      "accessLinkId": "access_vehicle_013_rsu_west",
+      "vehicleId": "vehicle_013",
+      "gatewayId": "rsu_west",
+      "active": true,
+      "available": true
+    },
+    {
+      "accessLinkId": "access_vehicle_013_rsu_center",
+      "vehicleId": "vehicle_013",
+      "gatewayId": "rsu_center",
+      "active": false,
+      "available": false
+    },
+    {
+      "accessLinkId": "access_vehicle_013_rsu_east",
+      "vehicleId": "vehicle_013",
+      "gatewayId": "rsu_east",
+      "active": false,
+      "available": false
+    },
+    {
+      "accessLinkId": "access_vehicle_014_rsu_west",
+      "vehicleId": "vehicle_014",
+      "gatewayId": "rsu_west",
+      "active": true,
+      "available": true
+    },
+    {
+      "accessLinkId": "access_vehicle_014_rsu_center",
+      "vehicleId": "vehicle_014",
+      "gatewayId": "rsu_center",
+      "active": false,
+      "available": false
+    },
+    {
+      "accessLinkId": "access_vehicle_014_rsu_east",
+      "vehicleId": "vehicle_014",
+      "gatewayId": "rsu_east",
+      "active": false,
+      "available": false
+    },
+    {
+      "accessLinkId": "access_vehicle_015_rsu_center",
+      "vehicleId": "vehicle_015",
+      "gatewayId": "rsu_center",
+      "active": true,
+      "available": true
+    },
+    {
+      "accessLinkId": "access_vehicle_015_rsu_west",
+      "vehicleId": "vehicle_015",
+      "gatewayId": "rsu_west",
+      "active": false,
+      "available": false
+    },
+    {
+      "accessLinkId": "access_vehicle_015_rsu_east",
+      "vehicleId": "vehicle_015",
+      "gatewayId": "rsu_east",
+      "active": false,
+      "available": false
+    },
+    {
+      "accessLinkId": "access_vehicle_016_rsu_center",
+      "vehicleId": "vehicle_016",
+      "gatewayId": "rsu_center",
+      "active": true,
+      "available": true
+    },
+    {
+      "accessLinkId": "access_vehicle_016_rsu_east",
+      "vehicleId": "vehicle_016",
+      "gatewayId": "rsu_east",
+      "active": false,
+      "available": true
+    },
+    {
+      "accessLinkId": "access_vehicle_016_rsu_west",
+      "vehicleId": "vehicle_016",
+      "gatewayId": "rsu_west",
+      "active": false,
+      "available": false
+    },
+    {
+      "accessLinkId": "access_vehicle_017_rsu_east",
+      "vehicleId": "vehicle_017",
+      "gatewayId": "rsu_east",
+      "active": true,
+      "available": true
+    },
+    {
+      "accessLinkId": "access_vehicle_017_rsu_center",
+      "vehicleId": "vehicle_017",
+      "gatewayId": "rsu_center",
+      "active": false,
+      "available": false
+    },
+    {
+      "accessLinkId": "access_vehicle_017_rsu_west",
+      "vehicleId": "vehicle_017",
+      "gatewayId": "rsu_west",
+      "active": false,
+      "available": false
+    },
+    {
+      "accessLinkId": "access_vehicle_018_rsu_east",
+      "vehicleId": "vehicle_018",
+      "gatewayId": "rsu_east",
+      "active": true,
+      "available": true
+    },
+    {
+      "accessLinkId": "access_vehicle_018_rsu_center",
+      "vehicleId": "vehicle_018",
+      "gatewayId": "rsu_center",
+      "active": false,
+      "available": false
+    },
+    {
+      "accessLinkId": "access_vehicle_018_rsu_west",
+      "vehicleId": "vehicle_018",
+      "gatewayId": "rsu_west",
+      "active": false,
+      "available": false
+    },
+    {
+      "accessLinkId": "access_vehicle_019_rsu_west",
+      "vehicleId": "vehicle_019",
+      "gatewayId": "rsu_west",
+      "active": true,
+      "available": true
+    },
+    {
+      "accessLinkId": "access_vehicle_019_rsu_center",
+      "vehicleId": "vehicle_019",
+      "gatewayId": "rsu_center",
+      "active": false,
+      "available": false
+    },
+    {
+      "accessLinkId": "access_vehicle_019_rsu_east",
+      "vehicleId": "vehicle_019",
+      "gatewayId": "rsu_east",
+      "active": false,
+      "available": false
+    },
+    {
+      "accessLinkId": "access_vehicle_020_rsu_east",
+      "vehicleId": "vehicle_020",
+      "gatewayId": "rsu_east",
+      "active": true,
+      "available": true
+    },
+    {
+      "accessLinkId": "access_vehicle_020_rsu_center",
+      "vehicleId": "vehicle_020",
+      "gatewayId": "rsu_center",
+      "active": false,
+      "available": false
+    },
+    {
+      "accessLinkId": "access_vehicle_020_rsu_west",
+      "vehicleId": "vehicle_020",
+      "gatewayId": "rsu_west",
+      "active": false,
+      "available": false
+    },
+    {
+      "accessLinkId": "access_vehicle_021_rsu_east",
+      "vehicleId": "vehicle_021",
+      "gatewayId": "rsu_east",
+      "active": true,
+      "available": true
+    },
+    {
+      "accessLinkId": "access_vehicle_021_rsu_center",
+      "vehicleId": "vehicle_021",
+      "gatewayId": "rsu_center",
+      "active": false,
+      "available": false
+    },
+    {
+      "accessLinkId": "access_vehicle_021_rsu_west",
+      "vehicleId": "vehicle_021",
+      "gatewayId": "rsu_west",
+      "active": false,
+      "available": false
+    },
+    {
+      "accessLinkId": "access_vehicle_022_rsu_center",
+      "vehicleId": "vehicle_022",
+      "gatewayId": "rsu_center",
+      "active": true,
+      "available": true
+    },
+    {
+      "accessLinkId": "access_vehicle_022_rsu_west",
+      "vehicleId": "vehicle_022",
+      "gatewayId": "rsu_west",
+      "active": false,
+      "available": true
+    },
+    {
+      "accessLinkId": "access_vehicle_022_rsu_east",
+      "vehicleId": "vehicle_022",
+      "gatewayId": "rsu_east",
+      "active": false,
+      "available": false
+    },
+    {
+      "accessLinkId": "access_vehicle_023_rsu_west",
+      "vehicleId": "vehicle_023",
+      "gatewayId": "rsu_west",
+      "active": true,
+      "available": true
+    },
+    {
+      "accessLinkId": "access_vehicle_023_rsu_center",
+      "vehicleId": "vehicle_023",
+      "gatewayId": "rsu_center",
+      "active": false,
+      "available": false
+    },
+    {
+      "accessLinkId": "access_vehicle_023_rsu_east",
+      "vehicleId": "vehicle_023",
+      "gatewayId": "rsu_east",
+      "active": false,
+      "available": false
+    },
+    {
+      "accessLinkId": "access_vehicle_024_rsu_east",
+      "vehicleId": "vehicle_024",
+      "gatewayId": "rsu_east",
+      "active": true,
+      "available": true
+    },
+    {
+      "accessLinkId": "access_vehicle_024_rsu_center",
+      "vehicleId": "vehicle_024",
+      "gatewayId": "rsu_center",
+      "active": false,
+      "available": true
+    },
+    {
+      "accessLinkId": "access_vehicle_024_rsu_west",
+      "vehicleId": "vehicle_024",
+      "gatewayId": "rsu_west",
+      "active": false,
+      "available": false
+    },
+    {
+      "accessLinkId": "access_vehicle_025_rsu_west",
+      "vehicleId": "vehicle_025",
+      "gatewayId": "rsu_west",
+      "active": true,
+      "available": true
+    },
+    {
+      "accessLinkId": "access_vehicle_025_rsu_center",
+      "vehicleId": "vehicle_025",
+      "gatewayId": "rsu_center",
+      "active": false,
+      "available": false
+    },
+    {
+      "accessLinkId": "access_vehicle_025_rsu_east",
+      "vehicleId": "vehicle_025",
+      "gatewayId": "rsu_east",
+      "active": false,
+      "available": false
+    },
+    {
+      "accessLinkId": "access_vehicle_026_rsu_east",
+      "vehicleId": "vehicle_026",
+      "gatewayId": "rsu_east",
+      "active": true,
+      "available": true
+    },
+    {
+      "accessLinkId": "access_vehicle_026_rsu_center",
+      "vehicleId": "vehicle_026",
+      "gatewayId": "rsu_center",
+      "active": false,
+      "available": false
+    },
+    {
+      "accessLinkId": "access_vehicle_026_rsu_west",
+      "vehicleId": "vehicle_026",
+      "gatewayId": "rsu_west",
+      "active": false,
+      "available": false
+    },
+    {
+      "accessLinkId": "access_vehicle_027_rsu_center",
+      "vehicleId": "vehicle_027",
+      "gatewayId": "rsu_center",
+      "active": true,
+      "available": true
+    },
+    {
+      "accessLinkId": "access_vehicle_027_rsu_west",
+      "vehicleId": "vehicle_027",
+      "gatewayId": "rsu_west",
+      "active": false,
+      "available": true
+    },
+    {
+      "accessLinkId": "access_vehicle_027_rsu_east",
+      "vehicleId": "vehicle_027",
+      "gatewayId": "rsu_east",
+      "active": false,
+      "available": false
+    },
+    {
+      "accessLinkId": "access_vehicle_028_rsu_center",
+      "vehicleId": "vehicle_028",
+      "gatewayId": "rsu_center",
+      "active": true,
+      "available": true
+    },
+    {
+      "accessLinkId": "access_vehicle_028_rsu_west",
+      "vehicleId": "vehicle_028",
+      "gatewayId": "rsu_west",
+      "active": false,
+      "available": false
+    },
+    {
+      "accessLinkId": "access_vehicle_028_rsu_east",
+      "vehicleId": "vehicle_028",
+      "gatewayId": "rsu_east",
+      "active": false,
+      "available": false
+    },
+    {
+      "accessLinkId": "access_vehicle_029_rsu_center",
+      "vehicleId": "vehicle_029",
+      "gatewayId": "rsu_center",
+      "active": true,
+      "available": true
+    },
+    {
+      "accessLinkId": "access_vehicle_029_rsu_west",
+      "vehicleId": "vehicle_029",
+      "gatewayId": "rsu_west",
+      "active": false,
+      "available": false
+    },
+    {
+      "accessLinkId": "access_vehicle_029_rsu_east",
+      "vehicleId": "vehicle_029",
+      "gatewayId": "rsu_east",
+      "active": false,
+      "available": false
+    },
+    {
+      "accessLinkId": "access_vehicle_030_rsu_center",
+      "vehicleId": "vehicle_030",
+      "gatewayId": "rsu_center",
+      "active": true,
+      "available": true
+    },
+    {
+      "accessLinkId": "access_vehicle_030_rsu_west",
+      "vehicleId": "vehicle_030",
+      "gatewayId": "rsu_west",
+      "active": false,
+      "available": false
+    },
+    {
+      "accessLinkId": "access_vehicle_030_rsu_east",
+      "vehicleId": "vehicle_030",
+      "gatewayId": "rsu_east",
+      "active": false,
+      "available": false
+    },
+    {
+      "accessLinkId": "access_vehicle_031_rsu_west",
+      "vehicleId": "vehicle_031",
+      "gatewayId": "rsu_west",
+      "active": true,
+      "available": true
+    },
+    {
+      "accessLinkId": "access_vehicle_031_rsu_center",
+      "vehicleId": "vehicle_031",
+      "gatewayId": "rsu_center",
+      "active": false,
+      "available": false
+    },
+    {
+      "accessLinkId": "access_vehicle_031_rsu_east",
+      "vehicleId": "vehicle_031",
+      "gatewayId": "rsu_east",
+      "active": false,
+      "available": false
+    },
+    {
+      "accessLinkId": "access_vehicle_032_rsu_east",
+      "vehicleId": "vehicle_032",
+      "gatewayId": "rsu_east",
+      "active": true,
+      "available": true
+    },
+    {
+      "accessLinkId": "access_vehicle_032_rsu_center",
+      "vehicleId": "vehicle_032",
+      "gatewayId": "rsu_center",
+      "active": false,
+      "available": true
+    },
+    {
+      "accessLinkId": "access_vehicle_032_rsu_west",
+      "vehicleId": "vehicle_032",
+      "gatewayId": "rsu_west",
+      "active": false,
+      "available": false
+    },
+    {
+      "accessLinkId": "access_vehicle_033_rsu_east",
+      "vehicleId": "vehicle_033",
+      "gatewayId": "rsu_east",
+      "active": true,
+      "available": true
+    },
+    {
+      "accessLinkId": "access_vehicle_033_rsu_center",
+      "vehicleId": "vehicle_033",
+      "gatewayId": "rsu_center",
+      "active": false,
+      "available": false
+    },
+    {
+      "accessLinkId": "access_vehicle_033_rsu_west",
+      "vehicleId": "vehicle_033",
+      "gatewayId": "rsu_west",
+      "active": false,
+      "available": false
+    },
+    {
+      "accessLinkId": "access_vehicle_034_rsu_east",
+      "vehicleId": "vehicle_034",
+      "gatewayId": "rsu_east",
+      "active": true,
+      "available": true
+    },
+    {
+      "accessLinkId": "access_vehicle_034_rsu_center",
+      "vehicleId": "vehicle_034",
+      "gatewayId": "rsu_center",
+      "active": false,
+      "available": false
+    },
+    {
+      "accessLinkId": "access_vehicle_034_rsu_west",
+      "vehicleId": "vehicle_034",
+      "gatewayId": "rsu_west",
+      "active": false,
+      "available": false
+    },
+    {
+      "accessLinkId": "access_vehicle_035_rsu_west",
+      "vehicleId": "vehicle_035",
+      "gatewayId": "rsu_west",
+      "active": true,
+      "available": true
+    },
+    {
+      "accessLinkId": "access_vehicle_035_rsu_center",
+      "vehicleId": "vehicle_035",
+      "gatewayId": "rsu_center",
+      "active": false,
+      "available": true
+    },
+    {
+      "accessLinkId": "access_vehicle_035_rsu_east",
+      "vehicleId": "vehicle_035",
+      "gatewayId": "rsu_east",
+      "active": false,
+      "available": false
+    },
+    {
+      "accessLinkId": "access_vehicle_036_rsu_center",
+      "vehicleId": "vehicle_036",
+      "gatewayId": "rsu_center",
+      "active": true,
+      "available": true
+    },
+    {
+      "accessLinkId": "access_vehicle_036_rsu_east",
+      "vehicleId": "vehicle_036",
+      "gatewayId": "rsu_east",
+      "active": false,
+      "available": false
+    },
+    {
+      "accessLinkId": "access_vehicle_036_rsu_west",
+      "vehicleId": "vehicle_036",
+      "gatewayId": "rsu_west",
+      "active": false,
+      "available": false
+    },
+    {
+      "accessLinkId": "access_vehicle_037_rsu_west",
+      "vehicleId": "vehicle_037",
+      "gatewayId": "rsu_west",
+      "active": true,
+      "available": true
+    },
+    {
+      "accessLinkId": "access_vehicle_037_rsu_center",
+      "vehicleId": "vehicle_037",
+      "gatewayId": "rsu_center",
+      "active": false,
+      "available": false
+    },
+    {
+      "accessLinkId": "access_vehicle_037_rsu_east",
+      "vehicleId": "vehicle_037",
+      "gatewayId": "rsu_east",
+      "active": false,
+      "available": false
+    },
+    {
+      "accessLinkId": "access_vehicle_038_rsu_east",
+      "vehicleId": "vehicle_038",
+      "gatewayId": "rsu_east",
+      "active": true,
+      "available": true
+    },
+    {
+      "accessLinkId": "access_vehicle_038_rsu_center",
+      "vehicleId": "vehicle_038",
+      "gatewayId": "rsu_center",
+      "active": false,
+      "available": false
+    },
+    {
+      "accessLinkId": "access_vehicle_038_rsu_west",
+      "vehicleId": "vehicle_038",
+      "gatewayId": "rsu_west",
+      "active": false,
+      "available": false
+    },
+    {
+      "accessLinkId": "access_vehicle_041_rsu_east",
+      "vehicleId": "vehicle_041",
+      "gatewayId": "rsu_east",
+      "active": true,
+      "available": true
+    },
+    {
+      "accessLinkId": "access_vehicle_041_rsu_center",
+      "vehicleId": "vehicle_041",
+      "gatewayId": "rsu_center",
+      "active": false,
+      "available": false
+    },
+    {
+      "accessLinkId": "access_vehicle_041_rsu_west",
+      "vehicleId": "vehicle_041",
+      "gatewayId": "rsu_west",
+      "active": false,
+      "available": false
+    },
+    {
+      "accessLinkId": "access_vehicle_042_rsu_west",
+      "vehicleId": "vehicle_042",
+      "gatewayId": "rsu_west",
+      "active": true,
+      "available": true
+    },
+    {
+      "accessLinkId": "access_vehicle_042_rsu_center",
+      "vehicleId": "vehicle_042",
+      "gatewayId": "rsu_center",
+      "active": false,
+      "available": false
+    },
+    {
+      "accessLinkId": "access_vehicle_042_rsu_east",
+      "vehicleId": "vehicle_042",
+      "gatewayId": "rsu_east",
+      "active": false,
+      "available": false
+    },
+    {
+      "accessLinkId": "access_vehicle_043_rsu_center",
+      "vehicleId": "vehicle_043",
+      "gatewayId": "rsu_center",
+      "active": true,
+      "available": true
+    },
+    {
+      "accessLinkId": "access_vehicle_043_rsu_west",
+      "vehicleId": "vehicle_043",
+      "gatewayId": "rsu_west",
+      "active": false,
+      "available": false
+    },
+    {
+      "accessLinkId": "access_vehicle_043_rsu_east",
+      "vehicleId": "vehicle_043",
+      "gatewayId": "rsu_east",
+      "active": false,
+      "available": false
+    },
+    {
+      "accessLinkId": "access_vehicle_044_rsu_west",
+      "vehicleId": "vehicle_044",
+      "gatewayId": "rsu_west",
+      "active": true,
+      "available": true
+    },
+    {
+      "accessLinkId": "access_vehicle_044_rsu_center",
+      "vehicleId": "vehicle_044",
+      "gatewayId": "rsu_center",
+      "active": false,
+      "available": false
+    },
+    {
+      "accessLinkId": "access_vehicle_044_rsu_east",
+      "vehicleId": "vehicle_044",
+      "gatewayId": "rsu_east",
+      "active": false,
+      "available": false
+    },
+    {
+      "accessLinkId": "access_vehicle_045_rsu_west",
+      "vehicleId": "vehicle_045",
+      "gatewayId": "rsu_west",
+      "active": true,
+      "available": true
+    },
+    {
+      "accessLinkId": "access_vehicle_045_rsu_center",
+      "vehicleId": "vehicle_045",
+      "gatewayId": "rsu_center",
+      "active": false,
+      "available": true
+    },
+    {
+      "accessLinkId": "access_vehicle_045_rsu_east",
+      "vehicleId": "vehicle_045",
+      "gatewayId": "rsu_east",
+      "active": false,
+      "available": false
+    },
+    {
+      "accessLinkId": "access_vehicle_046_rsu_west",
+      "vehicleId": "vehicle_046",
+      "gatewayId": "rsu_west",
+      "active": true,
+      "available": true
+    },
+    {
+      "accessLinkId": "access_vehicle_046_rsu_center",
+      "vehicleId": "vehicle_046",
+      "gatewayId": "rsu_center",
+      "active": false,
+      "available": false
+    },
+    {
+      "accessLinkId": "access_vehicle_046_rsu_east",
+      "vehicleId": "vehicle_046",
+      "gatewayId": "rsu_east",
+      "active": false,
+      "available": false
+    },
+    {
+      "accessLinkId": "access_vehicle_047_rsu_east",
+      "vehicleId": "vehicle_047",
+      "gatewayId": "rsu_east",
+      "active": true,
+      "available": true
+    },
+    {
+      "accessLinkId": "access_vehicle_047_rsu_center",
+      "vehicleId": "vehicle_047",
+      "gatewayId": "rsu_center",
+      "active": false,
+      "available": false
+    },
+    {
+      "accessLinkId": "access_vehicle_047_rsu_west",
+      "vehicleId": "vehicle_047",
+      "gatewayId": "rsu_west",
+      "active": false,
+      "available": false
+    },
+    {
+      "accessLinkId": "access_vehicle_048_rsu_east",
+      "vehicleId": "vehicle_048",
+      "gatewayId": "rsu_east",
+      "active": true,
+      "available": true
+    },
+    {
+      "accessLinkId": "access_vehicle_048_rsu_center",
+      "vehicleId": "vehicle_048",
+      "gatewayId": "rsu_center",
+      "active": false,
+      "available": false
+    },
+    {
+      "accessLinkId": "access_vehicle_048_rsu_west",
+      "vehicleId": "vehicle_048",
+      "gatewayId": "rsu_west",
+      "active": false,
+      "available": false
+    },
+    {
+      "accessLinkId": "access_vehicle_049_rsu_east",
+      "vehicleId": "vehicle_049",
+      "gatewayId": "rsu_east",
+      "active": true,
+      "available": true
+    },
+    {
+      "accessLinkId": "access_vehicle_049_rsu_center",
+      "vehicleId": "vehicle_049",
+      "gatewayId": "rsu_center",
+      "active": false,
+      "available": false
+    },
+    {
+      "accessLinkId": "access_vehicle_049_rsu_west",
+      "vehicleId": "vehicle_049",
+      "gatewayId": "rsu_west",
+      "active": false,
+      "available": false
+    },
+    {
+      "accessLinkId": "access_vehicle_050_rsu_center",
+      "vehicleId": "vehicle_050",
+      "gatewayId": "rsu_center",
+      "active": true,
+      "available": true
+    },
+    {
+      "accessLinkId": "access_vehicle_050_rsu_west",
+      "vehicleId": "vehicle_050",
+      "gatewayId": "rsu_west",
+      "active": false,
+      "available": true
+    },
+    {
+      "accessLinkId": "access_vehicle_050_rsu_east",
+      "vehicleId": "vehicle_050",
+      "gatewayId": "rsu_east",
+      "active": false,
+      "available": false
+    },
+    {
+      "accessLinkId": "access_vehicle_051_rsu_east",
+      "vehicleId": "vehicle_051",
+      "gatewayId": "rsu_east",
+      "active": true,
+      "available": true
+    },
+    {
+      "accessLinkId": "access_vehicle_051_rsu_center",
+      "vehicleId": "vehicle_051",
+      "gatewayId": "rsu_center",
+      "active": false,
+      "available": false
+    },
+    {
+      "accessLinkId": "access_vehicle_051_rsu_west",
+      "vehicleId": "vehicle_051",
+      "gatewayId": "rsu_west",
+      "active": false,
+      "available": false
+    },
+    {
+      "accessLinkId": "access_vehicle_052_rsu_west",
+      "vehicleId": "vehicle_052",
+      "gatewayId": "rsu_west",
+      "active": true,
+      "available": true
+    },
+    {
+      "accessLinkId": "access_vehicle_052_rsu_center",
+      "vehicleId": "vehicle_052",
+      "gatewayId": "rsu_center",
+      "active": false,
+      "available": false
+    },
+    {
+      "accessLinkId": "access_vehicle_052_rsu_east",
+      "vehicleId": "vehicle_052",
+      "gatewayId": "rsu_east",
+      "active": false,
+      "available": false
+    },
+    {
+      "accessLinkId": "access_vehicle_053_rsu_east",
+      "vehicleId": "vehicle_053",
+      "gatewayId": "rsu_east",
+      "active": true,
+      "available": true
+    },
+    {
+      "accessLinkId": "access_vehicle_053_rsu_center",
+      "vehicleId": "vehicle_053",
+      "gatewayId": "rsu_center",
+      "active": false,
+      "available": false
+    },
+    {
+      "accessLinkId": "access_vehicle_053_rsu_west",
+      "vehicleId": "vehicle_053",
+      "gatewayId": "rsu_west",
+      "active": false,
+      "available": false
+    },
+    {
+      "accessLinkId": "access_vehicle_054_rsu_west",
+      "vehicleId": "vehicle_054",
+      "gatewayId": "rsu_west",
+      "active": true,
+      "available": true
+    },
+    {
+      "accessLinkId": "access_vehicle_054_rsu_center",
+      "vehicleId": "vehicle_054",
+      "gatewayId": "rsu_center",
+      "active": false,
+      "available": true
+    },
+    {
+      "accessLinkId": "access_vehicle_054_rsu_east",
+      "vehicleId": "vehicle_054",
+      "gatewayId": "rsu_east",
+      "active": false,
+      "available": false
+    },
+    {
+      "accessLinkId": "access_vehicle_056_rsu_west",
+      "vehicleId": "vehicle_056",
+      "gatewayId": "rsu_west",
+      "active": true,
+      "available": true
+    },
+    {
+      "accessLinkId": "access_vehicle_056_rsu_center",
+      "vehicleId": "vehicle_056",
+      "gatewayId": "rsu_center",
+      "active": false,
+      "available": false
+    },
+    {
+      "accessLinkId": "access_vehicle_056_rsu_east",
+      "vehicleId": "vehicle_056",
+      "gatewayId": "rsu_east",
+      "active": false,
+      "available": false
+    },
+    {
+      "accessLinkId": "access_vehicle_057_rsu_east",
+      "vehicleId": "vehicle_057",
+      "gatewayId": "rsu_east",
+      "active": true,
+      "available": true
+    },
+    {
+      "accessLinkId": "access_vehicle_057_rsu_center",
+      "vehicleId": "vehicle_057",
+      "gatewayId": "rsu_center",
+      "active": false,
+      "available": false
+    },
+    {
+      "accessLinkId": "access_vehicle_057_rsu_west",
+      "vehicleId": "vehicle_057",
+      "gatewayId": "rsu_west",
+      "active": false,
+      "available": false
+    },
+    {
+      "accessLinkId": "access_vehicle_058_rsu_east",
+      "vehicleId": "vehicle_058",
+      "gatewayId": "rsu_east",
+      "active": true,
+      "available": true
+    },
+    {
+      "accessLinkId": "access_vehicle_058_rsu_center",
+      "vehicleId": "vehicle_058",
+      "gatewayId": "rsu_center",
+      "active": false,
+      "available": false
+    },
+    {
+      "accessLinkId": "access_vehicle_058_rsu_west",
+      "vehicleId": "vehicle_058",
+      "gatewayId": "rsu_west",
+      "active": false,
+      "available": false
+    },
+    {
+      "accessLinkId": "access_vehicle_059_rsu_center",
+      "vehicleId": "vehicle_059",
+      "gatewayId": "rsu_center",
+      "active": true,
+      "available": true
+    },
+    {
+      "accessLinkId": "access_vehicle_059_rsu_west",
+      "vehicleId": "vehicle_059",
+      "gatewayId": "rsu_west",
+      "active": false,
+      "available": false
+    },
+    {
+      "accessLinkId": "access_vehicle_059_rsu_east",
+      "vehicleId": "vehicle_059",
+      "gatewayId": "rsu_east",
+      "active": false,
+      "available": false
+    },
+    {
+      "accessLinkId": "access_vehicle_060_rsu_west",
+      "vehicleId": "vehicle_060",
+      "gatewayId": "rsu_west",
+      "active": true,
+      "available": true
+    },
+    {
+      "accessLinkId": "access_vehicle_060_rsu_center",
+      "vehicleId": "vehicle_060",
+      "gatewayId": "rsu_center",
+      "active": false,
+      "available": false
+    },
+    {
+      "accessLinkId": "access_vehicle_060_rsu_east",
+      "vehicleId": "vehicle_060",
+      "gatewayId": "rsu_east",
+      "active": false,
+      "available": false
+    },
+    {
+      "accessLinkId": "access_vehicle_061_rsu_center",
+      "vehicleId": "vehicle_061",
+      "gatewayId": "rsu_center",
+      "active": true,
+      "available": true
+    },
+    {
+      "accessLinkId": "access_vehicle_061_rsu_west",
+      "vehicleId": "vehicle_061",
+      "gatewayId": "rsu_west",
+      "active": false,
+      "available": false
+    },
+    {
+      "accessLinkId": "access_vehicle_061_rsu_east",
+      "vehicleId": "vehicle_061",
+      "gatewayId": "rsu_east",
+      "active": false,
+      "available": false
+    },
+    {
+      "accessLinkId": "access_vehicle_062_rsu_east",
+      "vehicleId": "vehicle_062",
+      "gatewayId": "rsu_east",
+      "active": true,
+      "available": true
+    },
+    {
+      "accessLinkId": "access_vehicle_062_rsu_center",
+      "vehicleId": "vehicle_062",
+      "gatewayId": "rsu_center",
+      "active": false,
+      "available": false
+    },
+    {
+      "accessLinkId": "access_vehicle_062_rsu_west",
+      "vehicleId": "vehicle_062",
+      "gatewayId": "rsu_west",
+      "active": false,
+      "available": false
+    },
+    {
+      "accessLinkId": "access_vehicle_063_rsu_east",
+      "vehicleId": "vehicle_063",
+      "gatewayId": "rsu_east",
+      "active": true,
+      "available": true
+    },
+    {
+      "accessLinkId": "access_vehicle_063_rsu_center",
+      "vehicleId": "vehicle_063",
+      "gatewayId": "rsu_center",
+      "active": false,
+      "available": false
+    },
+    {
+      "accessLinkId": "access_vehicle_063_rsu_west",
+      "vehicleId": "vehicle_063",
+      "gatewayId": "rsu_west",
+      "active": false,
+      "available": false
+    },
+    {
+      "accessLinkId": "access_vehicle_064_rsu_center",
+      "vehicleId": "vehicle_064",
+      "gatewayId": "rsu_center",
+      "active": true,
+      "available": true
+    },
+    {
+      "accessLinkId": "access_vehicle_064_rsu_east",
+      "vehicleId": "vehicle_064",
+      "gatewayId": "rsu_east",
+      "active": false,
+      "available": false
+    },
+    {
+      "accessLinkId": "access_vehicle_064_rsu_west",
+      "vehicleId": "vehicle_064",
+      "gatewayId": "rsu_west",
+      "active": false,
+      "available": false
+    },
+    {
+      "accessLinkId": "access_vehicle_065_rsu_center",
+      "vehicleId": "vehicle_065",
+      "gatewayId": "rsu_center",
+      "active": true,
+      "available": true
+    },
+    {
+      "accessLinkId": "access_vehicle_065_rsu_west",
+      "vehicleId": "vehicle_065",
+      "gatewayId": "rsu_west",
+      "active": false,
+      "available": false
+    },
+    {
+      "accessLinkId": "access_vehicle_065_rsu_east",
+      "vehicleId": "vehicle_065",
+      "gatewayId": "rsu_east",
+      "active": false,
+      "available": false
+    },
+    {
+      "accessLinkId": "access_vehicle_066_rsu_west",
+      "vehicleId": "vehicle_066",
+      "gatewayId": "rsu_west",
+      "active": true,
+      "available": true
+    },
+    {
+      "accessLinkId": "access_vehicle_066_rsu_center",
+      "vehicleId": "vehicle_066",
+      "gatewayId": "rsu_center",
+      "active": false,
+      "available": false
+    },
+    {
+      "accessLinkId": "access_vehicle_066_rsu_east",
+      "vehicleId": "vehicle_066",
+      "gatewayId": "rsu_east",
+      "active": false,
+      "available": false
+    },
+    {
+      "accessLinkId": "access_vehicle_067_rsu_east",
+      "vehicleId": "vehicle_067",
+      "gatewayId": "rsu_east",
+      "active": true,
+      "available": true
+    },
+    {
+      "accessLinkId": "access_vehicle_067_rsu_center",
+      "vehicleId": "vehicle_067",
+      "gatewayId": "rsu_center",
+      "active": false,
+      "available": true
+    },
+    {
+      "accessLinkId": "access_vehicle_067_rsu_west",
+      "vehicleId": "vehicle_067",
+      "gatewayId": "rsu_west",
+      "active": false,
+      "available": false
+    },
+    {
+      "accessLinkId": "access_vehicle_068_rsu_west",
+      "vehicleId": "vehicle_068",
+      "gatewayId": "rsu_west",
+      "active": true,
+      "available": true
+    },
+    {
+      "accessLinkId": "access_vehicle_068_rsu_center",
+      "vehicleId": "vehicle_068",
+      "gatewayId": "rsu_center",
+      "active": false,
+      "available": false
+    },
+    {
+      "accessLinkId": "access_vehicle_068_rsu_east",
+      "vehicleId": "vehicle_068",
+      "gatewayId": "rsu_east",
+      "active": false,
+      "available": false
+    },
+    {
+      "accessLinkId": "access_vehicle_070_rsu_center",
+      "vehicleId": "vehicle_070",
+      "gatewayId": "rsu_center",
+      "active": true,
+      "available": true
+    },
+    {
+      "accessLinkId": "access_vehicle_070_rsu_west",
+      "vehicleId": "vehicle_070",
+      "gatewayId": "rsu_west",
+      "active": false,
+      "available": false
+    },
+    {
+      "accessLinkId": "access_vehicle_070_rsu_east",
+      "vehicleId": "vehicle_070",
+      "gatewayId": "rsu_east",
+      "active": false,
+      "available": false
+    },
+    {
+      "accessLinkId": "access_vehicle_071_rsu_east",
+      "vehicleId": "vehicle_071",
+      "gatewayId": "rsu_east",
+      "active": true,
+      "available": true
+    },
+    {
+      "accessLinkId": "access_vehicle_071_rsu_center",
+      "vehicleId": "vehicle_071",
+      "gatewayId": "rsu_center",
+      "active": false,
+      "available": false
+    },
+    {
+      "accessLinkId": "access_vehicle_071_rsu_west",
+      "vehicleId": "vehicle_071",
+      "gatewayId": "rsu_west",
+      "active": false,
+      "available": false
+    },
+    {
+      "accessLinkId": "access_vehicle_072_rsu_west",
+      "vehicleId": "vehicle_072",
+      "gatewayId": "rsu_west",
+      "active": true,
+      "available": true
+    },
+    {
+      "accessLinkId": "access_vehicle_072_rsu_center",
+      "vehicleId": "vehicle_072",
+      "gatewayId": "rsu_center",
+      "active": false,
+      "available": false
+    },
+    {
+      "accessLinkId": "access_vehicle_072_rsu_east",
+      "vehicleId": "vehicle_072",
+      "gatewayId": "rsu_east",
+      "active": false,
+      "available": false
+    },
+    {
+      "accessLinkId": "access_vehicle_073_rsu_east",
+      "vehicleId": "vehicle_073",
+      "gatewayId": "rsu_east",
+      "active": true,
+      "available": true
+    },
+    {
+      "accessLinkId": "access_vehicle_073_rsu_center",
+      "vehicleId": "vehicle_073",
+      "gatewayId": "rsu_center",
+      "active": false,
+      "available": false
+    },
+    {
+      "accessLinkId": "access_vehicle_073_rsu_west",
+      "vehicleId": "vehicle_073",
+      "gatewayId": "rsu_west",
+      "active": false,
+      "available": false
+    },
+    {
+      "accessLinkId": "access_vehicle_074_rsu_center",
+      "vehicleId": "vehicle_074",
+      "gatewayId": "rsu_center",
+      "active": true,
+      "available": true
+    },
+    {
+      "accessLinkId": "access_vehicle_074_rsu_east",
+      "vehicleId": "vehicle_074",
+      "gatewayId": "rsu_east",
+      "active": false,
+      "available": true
+    },
+    {
+      "accessLinkId": "access_vehicle_074_rsu_west",
+      "vehicleId": "vehicle_074",
+      "gatewayId": "rsu_west",
+      "active": false,
+      "available": false
+    },
+    {
+      "accessLinkId": "access_vehicle_075_rsu_east",
+      "vehicleId": "vehicle_075",
+      "gatewayId": "rsu_east",
+      "active": true,
+      "available": true
+    },
+    {
+      "accessLinkId": "access_vehicle_075_rsu_center",
+      "vehicleId": "vehicle_075",
+      "gatewayId": "rsu_center",
+      "active": false,
+      "available": true
+    },
+    {
+      "accessLinkId": "access_vehicle_075_rsu_west",
+      "vehicleId": "vehicle_075",
+      "gatewayId": "rsu_west",
+      "active": false,
+      "available": false
+    },
+    {
+      "accessLinkId": "access_vehicle_076_rsu_center",
+      "vehicleId": "vehicle_076",
+      "gatewayId": "rsu_center",
+      "active": true,
+      "available": true
+    },
+    {
+      "accessLinkId": "access_vehicle_076_rsu_west",
+      "vehicleId": "vehicle_076",
+      "gatewayId": "rsu_west",
+      "active": false,
+      "available": false
+    },
+    {
+      "accessLinkId": "access_vehicle_076_rsu_east",
+      "vehicleId": "vehicle_076",
+      "gatewayId": "rsu_east",
+      "active": false,
+      "available": false
+    },
+    {
+      "accessLinkId": "access_vehicle_077_rsu_center",
+      "vehicleId": "vehicle_077",
+      "gatewayId": "rsu_center",
+      "active": true,
+      "available": true
+    },
+    {
+      "accessLinkId": "access_vehicle_077_rsu_east",
+      "vehicleId": "vehicle_077",
+      "gatewayId": "rsu_east",
+      "active": false,
+      "available": true
+    },
+    {
+      "accessLinkId": "access_vehicle_077_rsu_west",
+      "vehicleId": "vehicle_077",
+      "gatewayId": "rsu_west",
+      "active": false,
+      "available": false
+    },
+    {
+      "accessLinkId": "access_vehicle_078_rsu_east",
+      "vehicleId": "vehicle_078",
+      "gatewayId": "rsu_east",
+      "active": true,
+      "available": true
+    },
+    {
+      "accessLinkId": "access_vehicle_078_rsu_center",
+      "vehicleId": "vehicle_078",
+      "gatewayId": "rsu_center",
+      "active": false,
+      "available": true
+    },
+    {
+      "accessLinkId": "access_vehicle_078_rsu_west",
+      "vehicleId": "vehicle_078",
+      "gatewayId": "rsu_west",
+      "active": false,
+      "available": false
+    },
+    {
+      "accessLinkId": "access_vehicle_079_rsu_center",
+      "vehicleId": "vehicle_079",
+      "gatewayId": "rsu_center",
+      "active": true,
+      "available": true
+    },
+    {
+      "accessLinkId": "access_vehicle_079_rsu_west",
+      "vehicleId": "vehicle_079",
+      "gatewayId": "rsu_west",
+      "active": false,
+      "available": false
+    },
+    {
+      "accessLinkId": "access_vehicle_079_rsu_east",
+      "vehicleId": "vehicle_079",
+      "gatewayId": "rsu_east",
+      "active": false,
+      "available": false
+    },
+    {
+      "accessLinkId": "access_vehicle_080_rsu_center",
+      "vehicleId": "vehicle_080",
+      "gatewayId": "rsu_center",
+      "active": true,
+      "available": true
+    },
+    {
+      "accessLinkId": "access_vehicle_080_rsu_east",
+      "vehicleId": "vehicle_080",
+      "gatewayId": "rsu_east",
+      "active": false,
+      "available": false
+    },
+    {
+      "accessLinkId": "access_vehicle_080_rsu_west",
+      "vehicleId": "vehicle_080",
+      "gatewayId": "rsu_west",
+      "active": false,
+      "available": false
+    },
+    {
+      "accessLinkId": "access_vehicle_081_rsu_east",
+      "vehicleId": "vehicle_081",
+      "gatewayId": "rsu_east",
+      "active": true,
+      "available": true
+    },
+    {
+      "accessLinkId": "access_vehicle_081_rsu_center",
+      "vehicleId": "vehicle_081",
+      "gatewayId": "rsu_center",
+      "active": false,
+      "available": true
+    },
+    {
+      "accessLinkId": "access_vehicle_081_rsu_west",
+      "vehicleId": "vehicle_081",
+      "gatewayId": "rsu_west",
+      "active": false,
+      "available": false
+    },
+    {
+      "accessLinkId": "access_vehicle_082_rsu_east",
+      "vehicleId": "vehicle_082",
+      "gatewayId": "rsu_east",
+      "active": true,
+      "available": true
+    },
+    {
+      "accessLinkId": "access_vehicle_082_rsu_center",
+      "vehicleId": "vehicle_082",
+      "gatewayId": "rsu_center",
+      "active": false,
+      "available": true
+    },
+    {
+      "accessLinkId": "access_vehicle_082_rsu_west",
+      "vehicleId": "vehicle_082",
+      "gatewayId": "rsu_west",
+      "active": false,
+      "available": false
+    },
+    {
+      "accessLinkId": "access_vehicle_083_rsu_east",
+      "vehicleId": "vehicle_083",
+      "gatewayId": "rsu_east",
+      "active": true,
+      "available": true
+    },
+    {
+      "accessLinkId": "access_vehicle_083_rsu_center",
+      "vehicleId": "vehicle_083",
+      "gatewayId": "rsu_center",
+      "active": false,
+      "available": false
+    },
+    {
+      "accessLinkId": "access_vehicle_083_rsu_west",
+      "vehicleId": "vehicle_083",
+      "gatewayId": "rsu_west",
+      "active": false,
+      "available": false
+    },
+    {
+      "accessLinkId": "access_vehicle_084_rsu_east",
+      "vehicleId": "vehicle_084",
+      "gatewayId": "rsu_east",
+      "active": true,
+      "available": true
+    },
+    {
+      "accessLinkId": "access_vehicle_084_rsu_center",
+      "vehicleId": "vehicle_084",
+      "gatewayId": "rsu_center",
+      "active": false,
+      "available": false
+    },
+    {
+      "accessLinkId": "access_vehicle_084_rsu_west",
+      "vehicleId": "vehicle_084",
+      "gatewayId": "rsu_west",
+      "active": false,
+      "available": false
+    },
+    {
+      "accessLinkId": "access_vehicle_085_rsu_east",
+      "vehicleId": "vehicle_085",
+      "gatewayId": "rsu_east",
+      "active": true,
+      "available": true
+    },
+    {
+      "accessLinkId": "access_vehicle_085_rsu_center",
+      "vehicleId": "vehicle_085",
+      "gatewayId": "rsu_center",
+      "active": false,
+      "available": false
+    },
+    {
+      "accessLinkId": "access_vehicle_085_rsu_west",
+      "vehicleId": "vehicle_085",
+      "gatewayId": "rsu_west",
+      "active": false,
+      "available": false
+    },
+    {
+      "accessLinkId": "access_vehicle_086_rsu_west",
+      "vehicleId": "vehicle_086",
+      "gatewayId": "rsu_west",
+      "active": true,
+      "available": true
+    },
+    {
+      "accessLinkId": "access_vehicle_086_rsu_center",
+      "vehicleId": "vehicle_086",
+      "gatewayId": "rsu_center",
+      "active": false,
+      "available": false
+    },
+    {
+      "accessLinkId": "access_vehicle_086_rsu_east",
+      "vehicleId": "vehicle_086",
+      "gatewayId": "rsu_east",
+      "active": false,
+      "available": false
+    },
+    {
+      "accessLinkId": "access_vehicle_087_rsu_east",
+      "vehicleId": "vehicle_087",
+      "gatewayId": "rsu_east",
+      "active": true,
+      "available": true
+    },
+    {
+      "accessLinkId": "access_vehicle_087_rsu_center",
+      "vehicleId": "vehicle_087",
+      "gatewayId": "rsu_center",
+      "active": false,
+      "available": false
+    },
+    {
+      "accessLinkId": "access_vehicle_087_rsu_west",
+      "vehicleId": "vehicle_087",
+      "gatewayId": "rsu_west",
+      "active": false,
+      "available": false
+    },
+    {
+      "accessLinkId": "access_vehicle_088_rsu_center",
+      "vehicleId": "vehicle_088",
+      "gatewayId": "rsu_center",
+      "active": true,
+      "available": true
+    },
+    {
+      "accessLinkId": "access_vehicle_088_rsu_east",
+      "vehicleId": "vehicle_088",
+      "gatewayId": "rsu_east",
+      "active": false,
+      "available": false
+    },
+    {
+      "accessLinkId": "access_vehicle_088_rsu_west",
+      "vehicleId": "vehicle_088",
+      "gatewayId": "rsu_west",
+      "active": false,
+      "available": false
+    },
+    {
+      "accessLinkId": "access_vehicle_089_rsu_east",
+      "vehicleId": "vehicle_089",
+      "gatewayId": "rsu_east",
+      "active": true,
+      "available": true
+    },
+    {
+      "accessLinkId": "access_vehicle_089_rsu_center",
+      "vehicleId": "vehicle_089",
+      "gatewayId": "rsu_center",
+      "active": false,
+      "available": false
+    },
+    {
+      "accessLinkId": "access_vehicle_089_rsu_west",
+      "vehicleId": "vehicle_089",
+      "gatewayId": "rsu_west",
+      "active": false,
+      "available": false
+    },
+    {
+      "accessLinkId": "access_vehicle_090_rsu_east",
+      "vehicleId": "vehicle_090",
+      "gatewayId": "rsu_east",
+      "active": true,
+      "available": true
+    },
+    {
+      "accessLinkId": "access_vehicle_090_rsu_center",
+      "vehicleId": "vehicle_090",
+      "gatewayId": "rsu_center",
+      "active": false,
+      "available": true
+    },
+    {
+      "accessLinkId": "access_vehicle_090_rsu_west",
+      "vehicleId": "vehicle_090",
+      "gatewayId": "rsu_west",
+      "active": false,
+      "available": false
+    },
+    {
+      "accessLinkId": "access_vehicle_091_rsu_east",
+      "vehicleId": "vehicle_091",
+      "gatewayId": "rsu_east",
+      "active": true,
+      "available": true
+    },
+    {
+      "accessLinkId": "access_vehicle_091_rsu_center",
+      "vehicleId": "vehicle_091",
+      "gatewayId": "rsu_center",
+      "active": false,
+      "available": false
+    },
+    {
+      "accessLinkId": "access_vehicle_091_rsu_west",
+      "vehicleId": "vehicle_091",
+      "gatewayId": "rsu_west",
+      "active": false,
+      "available": false
+    },
+    {
+      "accessLinkId": "access_vehicle_092_rsu_east",
+      "vehicleId": "vehicle_092",
+      "gatewayId": "rsu_east",
+      "active": true,
+      "available": true
+    },
+    {
+      "accessLinkId": "access_vehicle_092_rsu_center",
+      "vehicleId": "vehicle_092",
+      "gatewayId": "rsu_center",
+      "active": false,
+      "available": false
+    },
+    {
+      "accessLinkId": "access_vehicle_092_rsu_west",
+      "vehicleId": "vehicle_092",
+      "gatewayId": "rsu_west",
+      "active": false,
+      "available": false
+    },
+    {
+      "accessLinkId": "access_vehicle_093_rsu_west",
+      "vehicleId": "vehicle_093",
+      "gatewayId": "rsu_west",
+      "active": true,
+      "available": true
+    },
+    {
+      "accessLinkId": "access_vehicle_093_rsu_center",
+      "vehicleId": "vehicle_093",
+      "gatewayId": "rsu_center",
+      "active": false,
+      "available": false
+    },
+    {
+      "accessLinkId": "access_vehicle_093_rsu_east",
+      "vehicleId": "vehicle_093",
+      "gatewayId": "rsu_east",
+      "active": false,
+      "available": false
+    },
+    {
+      "accessLinkId": "access_vehicle_094_rsu_east",
+      "vehicleId": "vehicle_094",
+      "gatewayId": "rsu_east",
+      "active": true,
+      "available": true
+    },
+    {
+      "accessLinkId": "access_vehicle_094_rsu_center",
+      "vehicleId": "vehicle_094",
+      "gatewayId": "rsu_center",
+      "active": false,
+      "available": true
+    },
+    {
+      "accessLinkId": "access_vehicle_094_rsu_west",
+      "vehicleId": "vehicle_094",
+      "gatewayId": "rsu_west",
+      "active": false,
+      "available": false
+    },
+    {
+      "accessLinkId": "access_vehicle_095_rsu_east",
+      "vehicleId": "vehicle_095",
+      "gatewayId": "rsu_east",
+      "active": true,
+      "available": true
+    },
+    {
+      "accessLinkId": "access_vehicle_095_rsu_center",
+      "vehicleId": "vehicle_095",
+      "gatewayId": "rsu_center",
+      "active": false,
+      "available": false
+    },
+    {
+      "accessLinkId": "access_vehicle_095_rsu_west",
+      "vehicleId": "vehicle_095",
+      "gatewayId": "rsu_west",
+      "active": false,
+      "available": false
+    },
+    {
+      "accessLinkId": "access_vehicle_098_rsu_west",
+      "vehicleId": "vehicle_098",
+      "gatewayId": "rsu_west",
+      "active": true,
+      "available": true
+    },
+    {
+      "accessLinkId": "access_vehicle_098_rsu_center",
+      "vehicleId": "vehicle_098",
+      "gatewayId": "rsu_center",
+      "active": false,
+      "available": false
+    },
+    {
+      "accessLinkId": "access_vehicle_098_rsu_east",
+      "vehicleId": "vehicle_098",
+      "gatewayId": "rsu_east",
+      "active": false,
+      "available": false
+    },
+    {
+      "accessLinkId": "access_vehicle_114_rsu_west",
+      "vehicleId": "vehicle_114",
+      "gatewayId": "rsu_west",
+      "active": true,
+      "available": true
+    },
+    {
+      "accessLinkId": "access_vehicle_114_rsu_center",
+      "vehicleId": "vehicle_114",
+      "gatewayId": "rsu_center",
+      "active": false,
+      "available": false
+    },
+    {
+      "accessLinkId": "access_vehicle_114_rsu_east",
+      "vehicleId": "vehicle_114",
+      "gatewayId": "rsu_east",
+      "active": false,
+      "available": false
+    },
+    {
+      "accessLinkId": "access_vehicle_128_rsu_west",
+      "vehicleId": "vehicle_128",
+      "gatewayId": "rsu_west",
+      "active": true,
+      "available": true
+    },
+    {
+      "accessLinkId": "access_vehicle_128_rsu_center",
+      "vehicleId": "vehicle_128",
+      "gatewayId": "rsu_center",
+      "active": false,
+      "available": false
+    },
+    {
+      "accessLinkId": "access_vehicle_128_rsu_east",
+      "vehicleId": "vehicle_128",
+      "gatewayId": "rsu_east",
+      "active": false,
+      "available": false
+    }
+  ],
+  "bandwidthPools": [
+    {
+      "poolId": "pool_rsu_west",
+      "poolType": "GATEWAY",
+      "availableBandwidth": 180000000
+    },
+    {
+      "poolId": "pool_rsu_center",
+      "poolType": "GATEWAY",
+      "availableBandwidth": 220000000
+    },
+    {
+      "poolId": "pool_rsu_east",
+      "poolType": "GATEWAY",
+      "availableBandwidth": 180000000
+    },
+    {
+      "poolId": "pool_v2v_vehicle_001_vehicle_026",
+      "poolType": "DIRECT_V2V",
+      "availableBandwidth": 43962665.781
+    },
+    {
+      "poolId": "pool_v2v_vehicle_001_vehicle_087",
+      "poolType": "DIRECT_V2V",
+      "availableBandwidth": 31241485.198
+    },
+    {
+      "poolId": "pool_v2v_vehicle_002_vehicle_011",
+      "poolType": "DIRECT_V2V",
+      "availableBandwidth": 28593805.926
+    },
+    {
+      "poolId": "pool_v2v_vehicle_002_vehicle_024",
+      "poolType": "DIRECT_V2V",
+      "availableBandwidth": 26461580.965
+    },
+    {
+      "poolId": "pool_v2v_vehicle_002_vehicle_090",
+      "poolType": "DIRECT_V2V",
+      "availableBandwidth": 19984194.26
+    },
+    {
+      "poolId": "pool_v2v_vehicle_003_vehicle_036",
+      "poolType": "DIRECT_V2V",
+      "availableBandwidth": 34807681.479
+    },
+    {
+      "poolId": "pool_v2v_vehicle_003_vehicle_077",
+      "poolType": "DIRECT_V2V",
+      "availableBandwidth": 20895998.763
+    },
+    {
+      "poolId": "pool_v2v_vehicle_005_vehicle_091",
+      "poolType": "DIRECT_V2V",
+      "availableBandwidth": 25423390.214
+    },
+    {
+      "poolId": "pool_v2v_vehicle_006_vehicle_070",
+      "poolType": "DIRECT_V2V",
+      "availableBandwidth": 40936160.778
+    },
+    {
+      "poolId": "pool_v2v_vehicle_006_vehicle_076",
+      "poolType": "DIRECT_V2V",
+      "availableBandwidth": 21842342.42
+    },
+    {
+      "poolId": "pool_v2v_vehicle_007_vehicle_010",
+      "poolType": "DIRECT_V2V",
+      "availableBandwidth": 32546306.66
+    },
+    {
+      "poolId": "pool_v2v_vehicle_007_vehicle_044",
+      "poolType": "DIRECT_V2V",
+      "availableBandwidth": 37198342.375
+    },
+    {
+      "poolId": "pool_v2v_vehicle_008_vehicle_083",
+      "poolType": "DIRECT_V2V",
+      "availableBandwidth": 20357293.827
+    },
+    {
+      "poolId": "pool_v2v_vehicle_008_vehicle_084",
+      "poolType": "DIRECT_V2V",
+      "availableBandwidth": 32595061.431
+    },
+    {
+      "poolId": "pool_v2v_vehicle_009_vehicle_041",
+      "poolType": "DIRECT_V2V",
+      "availableBandwidth": 33244393.597
+    },
+    {
+      "poolId": "pool_v2v_vehicle_010_vehicle_023",
+      "poolType": "DIRECT_V2V",
+      "availableBandwidth": 27086950.077
+    },
+    {
+      "poolId": "pool_v2v_vehicle_011_vehicle_016",
+      "poolType": "DIRECT_V2V",
+      "availableBandwidth": 40119404.913
+    },
+    {
+      "poolId": "pool_v2v_vehicle_012_vehicle_074",
+      "poolType": "DIRECT_V2V",
+      "availableBandwidth": 31473679.337
+    },
+    {
+      "poolId": "pool_v2v_vehicle_012_vehicle_077",
+      "poolType": "DIRECT_V2V",
+      "availableBandwidth": 40846824.639
+    },
+    {
+      "poolId": "pool_v2v_vehicle_015_vehicle_059",
+      "poolType": "DIRECT_V2V",
+      "availableBandwidth": 25911840.79
+    },
+    {
+      "poolId": "pool_v2v_vehicle_016_vehicle_077",
+      "poolType": "DIRECT_V2V",
+      "availableBandwidth": 20818615.792
+    },
+    {
+      "poolId": "pool_v2v_vehicle_017_vehicle_026",
+      "poolType": "DIRECT_V2V",
+      "availableBandwidth": 27703899.14
+    },
+    {
+      "poolId": "pool_v2v_vehicle_018_vehicle_057",
+      "poolType": "DIRECT_V2V",
+      "availableBandwidth": 20027622.525
+    },
+    {
+      "poolId": "pool_v2v_vehicle_022_vehicle_027",
+      "poolType": "DIRECT_V2V",
+      "availableBandwidth": 18138099.011
+    },
+    {
+      "poolId": "pool_v2v_vehicle_022_vehicle_050",
+      "poolType": "DIRECT_V2V",
+      "availableBandwidth": 43706151.719
+    },
+    {
+      "poolId": "pool_v2v_vehicle_024_vehicle_075",
+      "poolType": "DIRECT_V2V",
+      "availableBandwidth": 27131464.476
+    },
+    {
+      "poolId": "pool_v2v_vehicle_026_vehicle_087",
+      "poolType": "DIRECT_V2V",
+      "availableBandwidth": 34472980.906
+    },
+    {
+      "poolId": "pool_v2v_vehicle_027_vehicle_050",
+      "poolType": "DIRECT_V2V",
+      "availableBandwidth": 41565459.932
+    },
+    {
+      "poolId": "pool_v2v_vehicle_028_vehicle_030",
+      "poolType": "DIRECT_V2V",
+      "availableBandwidth": 24043252.928
+    },
+    {
+      "poolId": "pool_v2v_vehicle_028_vehicle_043",
+      "poolType": "DIRECT_V2V",
+      "availableBandwidth": 17960269.707
+    },
+    {
+      "poolId": "pool_v2v_vehicle_029_vehicle_030",
+      "poolType": "DIRECT_V2V",
+      "availableBandwidth": 38644246.644
+    },
+    {
+      "poolId": "pool_v2v_vehicle_029_vehicle_061",
+      "poolType": "DIRECT_V2V",
+      "availableBandwidth": 23073655.453
+    },
+    {
+      "poolId": "pool_v2v_vehicle_032_vehicle_081",
+      "poolType": "DIRECT_V2V",
+      "availableBandwidth": 18257586.494
+    },
+    {
+      "poolId": "pool_v2v_vehicle_035_vehicle_045",
+      "poolType": "DIRECT_V2V",
+      "availableBandwidth": 36240191.001
+    },
+    {
+      "poolId": "pool_v2v_vehicle_035_vehicle_054",
+      "poolType": "DIRECT_V2V",
+      "availableBandwidth": 22768946.379
+    },
+    {
+      "poolId": "pool_v2v_vehicle_035_vehicle_072",
+      "poolType": "DIRECT_V2V",
+      "availableBandwidth": 35119527.518
+    },
+    {
+      "poolId": "pool_v2v_vehicle_036_vehicle_064",
+      "poolType": "DIRECT_V2V",
+      "availableBandwidth": 30798801.627
+    },
+    {
+      "poolId": "pool_v2v_vehicle_038_vehicle_051",
+      "poolType": "DIRECT_V2V",
+      "availableBandwidth": 38794411.067
+    },
+    {
+      "poolId": "pool_v2v_vehicle_041_vehicle_092",
+      "poolType": "DIRECT_V2V",
+      "availableBandwidth": 23045713.513
+    },
+    {
+      "poolId": "pool_v2v_vehicle_042_vehicle_044",
+      "poolType": "DIRECT_V2V",
+      "availableBandwidth": 26320769.575
+    },
+    {
+      "poolId": "pool_v2v_vehicle_043_vehicle_065",
+      "poolType": "DIRECT_V2V",
+      "availableBandwidth": 19646314.699
+    },
+    {
+      "poolId": "pool_v2v_vehicle_045_vehicle_054",
+      "poolType": "DIRECT_V2V",
+      "availableBandwidth": 20949664.594
+    },
+    {
+      "poolId": "pool_v2v_vehicle_046_vehicle_056",
+      "poolType": "DIRECT_V2V",
+      "availableBandwidth": 24049067.236
+    },
+    {
+      "poolId": "pool_v2v_vehicle_046_vehicle_086",
+      "poolType": "DIRECT_V2V",
+      "availableBandwidth": 37205673.735
+    },
+    {
+      "poolId": "pool_v2v_vehicle_047_vehicle_049",
+      "poolType": "DIRECT_V2V",
+      "availableBandwidth": 43443530.822
+    },
+    {
+      "poolId": "pool_v2v_vehicle_049_vehicle_057",
+      "poolType": "DIRECT_V2V",
+      "availableBandwidth": 26613387.858
+    },
+    {
+      "poolId": "pool_v2v_vehicle_049_vehicle_085",
+      "poolType": "DIRECT_V2V",
+      "availableBandwidth": 36034833.481
+    },
+    {
+      "poolId": "pool_v2v_vehicle_051_vehicle_095",
+      "poolType": "DIRECT_V2V",
+      "availableBandwidth": 32596907.931
+    },
+    {
+      "poolId": "pool_v2v_vehicle_056_vehicle_086",
+      "poolType": "DIRECT_V2V",
+      "availableBandwidth": 34030004.674
+    },
+    {
+      "poolId": "pool_v2v_vehicle_059_vehicle_070",
+      "poolType": "DIRECT_V2V",
+      "availableBandwidth": 39859007.158
+    },
+    {
+      "poolId": "pool_v2v_vehicle_060_vehicle_068",
+      "poolType": "DIRECT_V2V",
+      "availableBandwidth": 19716519.95
+    },
+    {
+      "poolId": "pool_v2v_vehicle_060_vehicle_093",
+      "poolType": "DIRECT_V2V",
+      "availableBandwidth": 25909192.899
+    },
+    {
+      "poolId": "pool_v2v_vehicle_061_vehicle_079",
+      "poolType": "DIRECT_V2V",
+      "availableBandwidth": 41581537.807
+    },
+    {
+      "poolId": "pool_v2v_vehicle_062_vehicle_083",
+      "poolType": "DIRECT_V2V",
+      "availableBandwidth": 35957480.765
+    },
+    {
+      "poolId": "pool_v2v_vehicle_062_vehicle_084",
+      "poolType": "DIRECT_V2V",
+      "availableBandwidth": 42947495.833
+    },
+    {
+      "poolId": "pool_v2v_vehicle_067_vehicle_090",
+      "poolType": "DIRECT_V2V",
+      "availableBandwidth": 43957814.307
+    },
+    {
+      "poolId": "pool_v2v_vehicle_068_vehicle_093",
+      "poolType": "DIRECT_V2V",
+      "availableBandwidth": 34012207.334
+    },
+    {
+      "poolId": "pool_v2v_vehicle_070_vehicle_076",
+      "poolType": "DIRECT_V2V",
+      "availableBandwidth": 41068810.719
+    },
+    {
+      "poolId": "pool_v2v_vehicle_071_vehicle_091",
+      "poolType": "DIRECT_V2V",
+      "availableBandwidth": 34052339.335
+    },
+    {
+      "poolId": "pool_v2v_vehicle_074_vehicle_077",
+      "poolType": "DIRECT_V2V",
+      "availableBandwidth": 36221899.818
+    },
+    {
+      "poolId": "pool_v2v_vehicle_081_vehicle_082",
+      "poolType": "DIRECT_V2V",
+      "availableBandwidth": 29349561.034
+    },
+    {
+      "poolId": "pool_v2v_vehicle_082_vehicle_094",
+      "poolType": "DIRECT_V2V",
+      "availableBandwidth": 41428711.29
+    },
+    {
+      "poolId": "pool_v2v_vehicle_083_vehicle_084",
+      "poolType": "DIRECT_V2V",
+      "availableBandwidth": 28659519.208
     }
   ]
 }
