@@ -35,7 +35,7 @@
       "x": 983,
       "y": -8,
       "speed": 7.4,
-      "localCpu": 1100000000
+      "localCpu": 450000000
     }
   ],
   "tasks": [
@@ -66,10 +66,10 @@
     {
       "taskId": "task_cloud_gateway_echo",
       "sourceVehicleId": "vehicle_echo",
-      "inputSizeBits": 14000000,
-      "outputSizeBits": 1100000,
-      "cpuCycles": 1950000000,
-      "deadlineSeconds": 2.45
+      "inputSizeBits": 3000000,
+      "outputSizeBits": 250000,
+      "cpuCycles": 4000000000,
+      "deadlineSeconds": 0.8
     }
   ],
   "candidateNodes": [
@@ -105,7 +105,7 @@
       "sourceVehicleId": "vehicle_echo",
       "executionNodeId": "vehicle_echo",
       "type": "LOCAL",
-      "availableCpu": 1100000000,
+      "availableCpu": 450000000,
       "availableBandwidth": 0,
       "baseLatencySeconds": 0
     },
@@ -204,9 +204,9 @@
       "sourceVehicleId": "vehicle_echo",
       "executionNodeId": "edge_north",
       "type": "EDGE",
-      "availableCpu": 1600000000,
-      "availableBandwidth": 4500000,
-      "baseLatencySeconds": 0.09,
+      "availableCpu": 900000000,
+      "availableBandwidth": 2500000,
+      "baseLatencySeconds": 0.16,
       "nodeX": 360,
       "nodeY": 0,
       "coverageRadiusMeters": 520
@@ -216,18 +216,18 @@
       "sourceVehicleId": "vehicle_echo",
       "executionNodeId": "cloud_regional",
       "type": "CLOUD",
-      "availableCpu": 18000000000,
-      "availableBandwidth": 24000000,
-      "baseLatencySeconds": 0.085
+      "availableCpu": 80000000000,
+      "availableBandwidth": 100000000,
+      "baseLatencySeconds": 0.03
     },
     {
       "candidateId": "cloud_core_for_vehicle_echo",
       "sourceVehicleId": "vehicle_echo",
       "executionNodeId": "cloud_core",
       "type": "CLOUD",
-      "availableCpu": 32000000000,
-      "availableBandwidth": 17000000,
-      "baseLatencySeconds": 0.16
+      "availableCpu": 42000000000,
+      "availableBandwidth": 45000000,
+      "baseLatencySeconds": 0.11
     },
     {
       "candidateId": "vehicle_delta_v2v_for_vehicle_alpha",
