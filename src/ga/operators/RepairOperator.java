@@ -45,10 +45,14 @@ import java.util.Set;
  * introducono nuove variabili decisionali e non sostituiscono selezione,
  * crossover, mutazione o fitness del Genetic Algorithm.</p>
  *
- * <p>Il repair aggregato della banda raggruppa temporaneamente per
- * {@code candidateId}. Questa scelta chiude il bug operativo della issue #18
- * sulla semantica corrente. La futura introduzione dei pool radio sostituirà
- * il raggruppamento per candidato con il raggruppamento per {@code poolId}.</p>
+ * <p>La banda viene verificata su due livelli gerarchici distinti:</p>
+ *
+ * <ul>
+ *     <li>{@code candidateId}: capacità del singolo link source-aware;</li>
+ *     <li>{@code poolId}: capacità radio condivisa della RSU o del link V2V.</li>
+ * </ul>
+ *
+ * <p>Il pool non sostituisce il limite del link: lo contiene.</p>
  */
 public final class RepairOperator {
     private static final double EPSILON = 1.0E-9;
@@ -67,6 +71,7 @@ public final class RepairOperator {
 
     private final CpuAggregateRepairOperator cpuAggregateRepairOperator;
     private final BandwidthAggregateRepairOperator bandwidthAggregateRepairOperator;
+    private final BandwidthPoolAggregateRepairOperator bandwidthPoolAggregateRepairOperator;
     private final CoverageEstimator coverageEstimator;
     private final OffloadingTimeModel offloadingTimeModel;
     private final OffloadingRatioPolicy offloadingRatioPolicy;
@@ -90,6 +95,8 @@ public final class RepairOperator {
         this.cpuAggregateRepairOperator = new CpuAggregateRepairOperator();
         this.bandwidthAggregateRepairOperator =
                 new BandwidthAggregateRepairOperator();
+        this.bandwidthPoolAggregateRepairOperator =
+                new BandwidthPoolAggregateRepairOperator();
         this.coverageEstimator = new CoverageEstimator(mobilityConfig);
         this.offloadingTimeModel = new OffloadingTimeModel();
         this.offloadingRatioPolicy = new OffloadingRatioPolicy();
@@ -195,8 +202,18 @@ public final class RepairOperator {
                     );
             current = bandwidthAggregateResult.getChromosome();
 
+            BandwidthPoolAggregateRepairResult bandwidthPoolAggregateResult =
+                    bandwidthPoolAggregateRepairOperator
+                            .repairChromosomeDetailed(
+                                    current,
+                                    snapshot,
+                                    context
+                            );
+            current = bandwidthPoolAggregateResult.getChromosome();
+
             if (!cpuAggregateResult.isChanged()
-                    && !bandwidthAggregateResult.isChanged()) {
+                    && !bandwidthAggregateResult.isChanged()
+                    && !bandwidthPoolAggregateResult.isChanged()) {
                 return current;
             }
 
@@ -204,6 +221,9 @@ public final class RepairOperator {
             targetedTaskIds.addAll(cpuAggregateResult.getAffectedTaskIds());
             targetedTaskIds.addAll(
                     bandwidthAggregateResult.getAffectedTaskIds()
+            );
+            targetedTaskIds.addAll(
+                    bandwidthPoolAggregateResult.getAffectedTaskIds()
             );
 
             if (targetedTaskIds.isEmpty()) {

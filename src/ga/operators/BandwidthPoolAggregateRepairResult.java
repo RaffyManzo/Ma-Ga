@@ -7,27 +7,31 @@ import java.util.LinkedHashSet;
 import java.util.Objects;
 import java.util.Set;
 
-/** Esito dettagliato del repair aggregato della banda per candidateId. */
-public final class BandwidthAggregateRepairResult {
+/** Esito dettagliato del repair aggregato della banda per poolId. */
+public final class BandwidthPoolAggregateRepairResult {
     private final Chromosome chromosome;
     private final boolean changed;
-    private final Set<String> affectedCandidateIds;
+    private final Set<String> affectedBandwidthPoolIds;
     private final Set<String> affectedTaskIds;
 
-    private BandwidthAggregateRepairResult(
+    private BandwidthPoolAggregateRepairResult(
             Chromosome chromosome,
             boolean changed,
-            Set<String> affectedCandidateIds,
+            Set<String> affectedBandwidthPoolIds,
             Set<String> affectedTaskIds
     ) {
         this.chromosome = chromosome;
         this.changed = changed;
-        this.affectedCandidateIds = immutableCopy(affectedCandidateIds);
+        this.affectedBandwidthPoolIds = immutableCopy(
+                affectedBandwidthPoolIds
+        );
         this.affectedTaskIds = immutableCopy(affectedTaskIds);
     }
 
-    public static BandwidthAggregateRepairResult unchanged(Chromosome chromosome) {
-        return new BandwidthAggregateRepairResult(
+    public static BandwidthPoolAggregateRepairResult unchanged(
+            Chromosome chromosome
+    ) {
+        return new BandwidthPoolAggregateRepairResult(
                 chromosome,
                 false,
                 Set.of(),
@@ -35,25 +39,27 @@ public final class BandwidthAggregateRepairResult {
         );
     }
 
-    public static BandwidthAggregateRepairResult changed(
+    public static BandwidthPoolAggregateRepairResult changed(
             Chromosome chromosome,
-            Set<String> affectedCandidateIds,
+            Set<String> affectedBandwidthPoolIds,
             Set<String> affectedTaskIds
     ) {
-        return new BandwidthAggregateRepairResult(
+        return new BandwidthPoolAggregateRepairResult(
                 Objects.requireNonNull(
                         chromosome,
                         "chromosome must not be null."
                 ),
                 true,
-                affectedCandidateIds,
+                affectedBandwidthPoolIds,
                 affectedTaskIds
         );
     }
 
     public Chromosome getChromosome() { return chromosome; }
     public boolean isChanged() { return changed; }
-    public Set<String> getAffectedCandidateIds() { return affectedCandidateIds; }
+    public Set<String> getAffectedBandwidthPoolIds() {
+        return affectedBandwidthPoolIds;
+    }
     public Set<String> getAffectedTaskIds() { return affectedTaskIds; }
 
     private static Set<String> immutableCopy(Set<String> source) {
