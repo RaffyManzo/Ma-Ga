@@ -1,10 +1,12 @@
 package ga.operators;
 
 import ga.constraints.SnapshotRepairContext;
+import model.bandwidth.BandwidthPoolResolver;
 import model.genetic.Chromosome;
 import model.genetic.Gene;
 import model.node.NodeCandidate;
 import model.node.NodeType;
+import model.snapshot.BandwidthPoolSnapshot;
 import model.snapshot.SystemSnapshot;
 
 import java.util.ArrayList;
@@ -14,40 +16,24 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-/**
- * Ripara l'allocazione aggregata della banda sui link source-aware già
- * modellati nel prototipo.
- *
- * <p>Il repair gene-level limita già la banda del singolo gene rispetto al
- * candidato selezionato. Questo operatore controlla invece la somma delle
- * bande assegnate allo stesso {@code candidateId}. Il raggruppamento per
- * candidateId è volutamente temporaneo: rappresenta la semantica corrente e
- * chiude il bug operativo della issue #18 senza anticipare la modellazione dei
- * pool radio.</p>
- */
+/** Ridimensiona proporzionalmente la banda aggregata per pool radio. */
 public final class BandwidthAggregateRepairOperator {
     private static final double EPSILON = 1.0E-9;
+    private final BandwidthPoolResolver poolResolver;
 
-    /** Adapter compatibile con chiamanti esterni e test manuali. */
-    public Chromosome repairChromosome(
-            Chromosome chromosome,
-            SystemSnapshot snapshot
-    ) {
-        return repairChromosomeDetailed(
-                chromosome,
-                snapshot,
-                new SnapshotRepairContext(snapshot)
-        ).getChromosome();
+    public BandwidthAggregateRepairOperator() {
+        this(new BandwidthPoolResolver());
     }
 
-    /**
-     * Ridimensiona proporzionalmente la banda dei geni remoti quando la somma
-     * assegnata allo stesso candidateId supera la banda disponibile.
-     *
-     * <p>L'esito dettagliato consente al chiamante di rivalutare soltanto i
-     * task modificati. La rivalutazione è necessaria perché una banda ridotta
-     * può peggiorare la latenza e la sostenibilità rispetto alla deadline.</p>
-     */
+    public BandwidthAggregateRepairOperator(BandwidthPoolResolver poolResolver) {
+        if (poolResolver == null) { throw new IllegalArgumentException("poolResolver must not be null."); }
+        this.poolResolver = poolResolver;
+    }
+
+    public Chromosome repairChromosome(Chromosome chromosome, SystemSnapshot snapshot) {
+        return repairChromosomeDetailed(chromosome, snapshot, new SnapshotRepairContext(snapshot)).getChromosome();
+    }
+
     public BandwidthAggregateRepairResult repairChromosomeDetailed(
             Chromosome chromosome,
             SystemSnapshot snapshot,
@@ -56,46 +42,55 @@ public final class BandwidthAggregateRepairOperator {
         if (chromosome == null || chromosome.getGenes() == null) {
             return BandwidthAggregateRepairResult.unchanged(chromosome);
         }
-        if (snapshot == null) {
-            throw new IllegalArgumentException("snapshot must not be null.");
-        }
+        if (snapshot == null) { throw new IllegalArgumentException("snapshot must not be null."); }
         if (context == null || !context.isFor(snapshot)) {
-            throw new IllegalArgumentException(
-                    "context must refer to the supplied snapshot."
-            );
+            throw new IllegalArgumentException("context must refer to the supplied snapshot.");
         }
 
-        Map<String, Double> usedBandwidthByCandidate =
-                computeUsedBandwidthByCandidate(chromosome, context);
-        Map<String, Double> scaleFactorByCandidate =
-                computeScaleFactorByCandidate(
-                        usedBandwidthByCandidate,
-                        context
-                );
+        Map<String, Double> usedByPool = new HashMap<>();
+        Map<String, BandwidthPoolSnapshot> poolById = new HashMap<>();
+        for (Gene gene : chromosome.getGenes()) {
+            NodeCandidate candidate = context.getCandidateById(gene.getSelectedCandidateId());
+            if (candidate == null || candidate.getType() == NodeType.LOCAL) { continue; }
+            BandwidthPoolSnapshot pool = poolResolver.resolve(snapshot, candidate);
+            poolById.put(pool.getPoolId(), pool);
+            double value = gene.getAllocatedBandwidth();
+            if (Double.isFinite(value) && value > 0.0) {
+                usedByPool.merge(pool.getPoolId(), value, Double::sum);
+            }
+        }
 
-        if (scaleFactorByCandidate.isEmpty()) {
+        Map<String, Double> scaleByPool = new HashMap<>();
+        for (Map.Entry<String, Double> entry : usedByPool.entrySet()) {
+            BandwidthPoolSnapshot pool = poolById.get(entry.getKey());
+            double available = pool == null ? 0.0 : pool.getAvailableBandwidth();
+            double used = entry.getValue();
+            if (!Double.isFinite(available) || available <= EPSILON) {
+                scaleByPool.put(entry.getKey(), 0.0);
+            } else if (used > available + EPSILON) {
+                scaleByPool.put(entry.getKey(), available / used);
+            }
+        }
+
+        if (scaleByPool.isEmpty()) {
             return BandwidthAggregateRepairResult.unchanged(chromosome);
         }
 
         List<Gene> repairedGenes = new ArrayList<>();
-        Set<String> affectedTaskIds = new LinkedHashSet<>();
-
+        Set<String> affectedTasks = new LinkedHashSet<>();
         for (Gene gene : chromosome.getGenes()) {
-            NodeCandidate candidate = context.getCandidateById(
-                    gene.getSelectedCandidateId()
-            );
+            NodeCandidate candidate = context.getCandidateById(gene.getSelectedCandidateId());
             if (candidate == null || candidate.getType() == NodeType.LOCAL) {
                 repairedGenes.add(gene);
                 continue;
             }
-
-            Double factor = scaleFactorByCandidate.get(candidate.getCandidateId());
+            String poolId = poolResolver.resolve(snapshot, candidate).getPoolId();
+            Double factor = scaleByPool.get(poolId);
             if (factor == null) {
                 repairedGenes.add(gene);
                 continue;
             }
-
-            affectedTaskIds.add(gene.getTaskId());
+            affectedTasks.add(gene.getTaskId());
             repairedGenes.add(new Gene(
                     gene.getTaskId(),
                     gene.getSelectedCandidateId(),
@@ -107,64 +102,6 @@ public final class BandwidthAggregateRepairOperator {
 
         Chromosome repaired = new Chromosome(repairedGenes);
         repaired.setFitness(chromosome.getFitness());
-        return BandwidthAggregateRepairResult.changed(
-                repaired,
-                scaleFactorByCandidate.keySet(),
-                affectedTaskIds
-        );
-    }
-
-    /** Calcola la banda totale richiesta per candidateId. */
-    private Map<String, Double> computeUsedBandwidthByCandidate(
-            Chromosome chromosome,
-            SnapshotRepairContext context
-    ) {
-        Map<String, Double> result = new HashMap<>();
-        for (Gene gene : chromosome.getGenes()) {
-            NodeCandidate candidate = context.getCandidateById(
-                    gene.getSelectedCandidateId()
-            );
-            if (candidate == null || candidate.getType() == NodeType.LOCAL) {
-                continue;
-            }
-            double allocatedBandwidth = gene.getAllocatedBandwidth();
-            if (!Double.isFinite(allocatedBandwidth)
-                    || allocatedBandwidth <= 0.0) {
-                continue;
-            }
-            result.merge(
-                    candidate.getCandidateId(),
-                    allocatedBandwidth,
-                    Double::sum
-            );
-        }
-        return result;
-    }
-
-    /** Calcola il fattore di riduzione per i candidateId sovra-allocati. */
-    private Map<String, Double> computeScaleFactorByCandidate(
-            Map<String, Double> usedBandwidthByCandidate,
-            SnapshotRepairContext context
-    ) {
-        Map<String, Double> result = new HashMap<>();
-        for (Map.Entry<String, Double> entry
-                : usedBandwidthByCandidate.entrySet()) {
-            String candidateId = entry.getKey();
-            double usedBandwidth = entry.getValue();
-            NodeCandidate candidate = context.getCandidateById(candidateId);
-            double availableBandwidth = candidate == null
-                    ? 0.0
-                    : candidate.getAvailableBandwidth();
-
-            if (!Double.isFinite(availableBandwidth)
-                    || availableBandwidth <= EPSILON) {
-                result.put(candidateId, 0.0);
-                continue;
-            }
-            if (usedBandwidth > availableBandwidth + EPSILON) {
-                result.put(candidateId, availableBandwidth / usedBandwidth);
-            }
-        }
-        return result;
+        return BandwidthAggregateRepairResult.changed(repaired, scaleByPool.keySet(), affectedTasks);
     }
 }

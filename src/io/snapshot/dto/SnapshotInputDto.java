@@ -2,13 +2,7 @@ package io.snapshot.dto;
 
 import java.util.List;
 
-/**
- * DTO grezzo dello snapshot letto da JSON o da un adapter esterno.
- *
- * <p>Non contiene logica di dominio: rappresenta solo la forma dell'input.
- * La validazione avviene in {@code SnapshotValidator} prima del mapping verso
- * il modello interno.</p>
- */
+/** DTO grezzo dello snapshot letto da JSON o da un adapter esterno. */
 public final class SnapshotInputDto {
     public String snapshotId;
     public Double timeSeconds;
@@ -17,4 +11,5 @@ public final class SnapshotInputDto {
     public List<NodeCandidateInputDto> candidateNodes;
     public List<AccessGatewayInputDto> accessGateways;
     public List<AccessLinkInputDto> accessLinks;
+    public List<BandwidthPoolInputDto> bandwidthPools;
 }

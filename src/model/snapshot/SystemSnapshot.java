@@ -6,14 +6,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-/**
- * Fotografia del sistema osservato in una finestra temporale.
- *
- * <p>Oltre a veicoli, task e candidati computazionali, lo snapshot espone
- * gateway e collegamenti radio di accesso. Queste strutture descrivono come
- * un veicolo raggiunge l'infrastruttura e non introducono nuove variabili
- * decisionali nel cromosoma.</p>
- */
+/** Fotografia del sistema osservato in una finestra temporale. */
 public class SystemSnapshot {
     private String snapshotId;
     private double timeSeconds;
@@ -22,6 +15,7 @@ public class SystemSnapshot {
     private List<NodeCandidate> candidateNodes;
     private List<AccessGatewaySnapshot> accessGateways;
     private List<AccessLinkSnapshot> accessLinks;
+    private List<BandwidthPoolSnapshot> bandwidthPools;
 
     public SystemSnapshot() {
         this.vehicles = new ArrayList<>();
@@ -29,15 +23,10 @@ public class SystemSnapshot {
         this.candidateNodes = new ArrayList<>();
         this.accessGateways = new ArrayList<>();
         this.accessLinks = new ArrayList<>();
+        this.bandwidthPools = new ArrayList<>();
     }
 
-    /**
-     * Costruttore storico mantenuto per compatibilità con chiamanti legacy.
-     *
-     * <p>Uno snapshot costruito così non contiene access link. Può essere usato
-     * soltanto in test privi di candidati CLOUD oppure deve essere migrato prima
-     * della validazione gateway-aware.</p>
-     */
+    /** Costruttore storico privo di gateway e pool. */
     public SystemSnapshot(
             String snapshotId,
             double timeSeconds,
@@ -45,17 +34,11 @@ public class SystemSnapshot {
             List<TaskInstance> tasks,
             List<NodeCandidate> candidateNodes
     ) {
-        this(
-                snapshotId,
-                timeSeconds,
-                vehicles,
-                tasks,
-                candidateNodes,
-                Collections.emptyList(),
-                Collections.emptyList()
-        );
+        this(snapshotId, timeSeconds, vehicles, tasks, candidateNodes,
+                Collections.emptyList(), Collections.emptyList(), Collections.emptyList());
     }
 
+    /** Costruttore gateway-aware precedente ai pool di banda. */
     public SystemSnapshot(
             String snapshotId,
             double timeSeconds,
@@ -65,6 +48,21 @@ public class SystemSnapshot {
             List<AccessGatewaySnapshot> accessGateways,
             List<AccessLinkSnapshot> accessLinks
     ) {
+        this(snapshotId, timeSeconds, vehicles, tasks, candidateNodes,
+                accessGateways, accessLinks, Collections.emptyList());
+    }
+
+    /** Costruttore completo con pool radio condivisi. */
+    public SystemSnapshot(
+            String snapshotId,
+            double timeSeconds,
+            List<VehicleSnapshot> vehicles,
+            List<TaskInstance> tasks,
+            List<NodeCandidate> candidateNodes,
+            List<AccessGatewaySnapshot> accessGateways,
+            List<AccessLinkSnapshot> accessLinks,
+            List<BandwidthPoolSnapshot> bandwidthPools
+    ) {
         this.snapshotId = snapshotId;
         this.timeSeconds = timeSeconds;
         this.vehicles = copyOrEmpty(vehicles);
@@ -72,6 +70,7 @@ public class SystemSnapshot {
         this.candidateNodes = copyOrEmpty(candidateNodes);
         this.accessGateways = copyOrEmpty(accessGateways);
         this.accessLinks = copyOrEmpty(accessLinks);
+        this.bandwidthPools = copyOrEmpty(bandwidthPools);
     }
 
     public String getSnapshotId() { return snapshotId; }
@@ -88,6 +87,8 @@ public class SystemSnapshot {
     public void setAccessGateways(List<AccessGatewaySnapshot> accessGateways) { this.accessGateways = copyOrEmpty(accessGateways); }
     public List<AccessLinkSnapshot> getAccessLinks() { return accessLinks; }
     public void setAccessLinks(List<AccessLinkSnapshot> accessLinks) { this.accessLinks = copyOrEmpty(accessLinks); }
+    public List<BandwidthPoolSnapshot> getBandwidthPools() { return bandwidthPools; }
+    public void setBandwidthPools(List<BandwidthPoolSnapshot> bandwidthPools) { this.bandwidthPools = copyOrEmpty(bandwidthPools); }
 
     private static <T> List<T> copyOrEmpty(List<T> values) {
         return values == null ? new ArrayList<>() : new ArrayList<>(values);
@@ -103,6 +104,7 @@ public class SystemSnapshot {
                 ", candidateNodes=" + candidateNodes +
                 ", accessGateways=" + accessGateways +
                 ", accessLinks=" + accessLinks +
+                ", bandwidthPools=" + bandwidthPools +
                 '}';
     }
 }
