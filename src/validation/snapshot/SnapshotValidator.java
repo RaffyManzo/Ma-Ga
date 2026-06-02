@@ -1,70 +1,21 @@
 package validation.snapshot;
 
-import model.bandwidth.BandwidthPoolType;
+import model.bandwidth.BandwidthPoolResolver;
 import model.node.NodeCandidate;
 import model.node.NodeType;
-import model.snapshot.AccessGatewaySnapshot;
-import model.snapshot.AccessLinkSnapshot;
-import model.snapshot.BandwidthPoolSnapshot;
-import model.snapshot.SystemSnapshot;
-import model.snapshot.TaskInstance;
-import model.snapshot.VehicleSnapshot;
+import model.snapshot.*;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 
-/** Validazione strutturale dello snapshot nel livello 18.2. */
+/** Validazione strutturale finale per pool globali, gateway e V2V. */
 public final class SnapshotValidator {
-    public void validate(SystemSnapshot snapshot) {
-        Objects.requireNonNull(snapshot, "snapshot must not be null.");
-        requireText(snapshot.getSnapshotId(), "snapshotId");
-        List<VehicleSnapshot> vehicles = requireList(snapshot.getVehicles(), "vehicles");
-        List<TaskInstance> tasks = requireList(snapshot.getTasks(), "tasks");
-        List<NodeCandidate> candidates = requireList(snapshot.getCandidateNodes(), "candidateNodes");
-        List<AccessGatewaySnapshot> gateways = requireList(snapshot.getAccessGateways(), "accessGateways");
-        List<AccessLinkSnapshot> links = requireList(snapshot.getAccessLinks(), "accessLinks");
-        List<BandwidthPoolSnapshot> pools = requireList(snapshot.getBandwidthPools(), "bandwidthPools");
-
-        Set<String> vehicleIds = uniqueVehicleIds(vehicles);
-        uniqueTaskIds(tasks);
-        uniqueCandidateIds(candidates);
-        Set<String> gatewayIds = uniqueGatewayIds(gateways);
-        Set<String> poolIds = uniquePoolIds(pools);
-        validateSingleGlobalPool(pools);
-        validateAccessLinks(links, vehicleIds, gatewayIds);
-        validateTasks(tasks, vehicleIds, candidates);
-        validateCandidates(candidates, vehicleIds);
-        if (poolIds.isEmpty()) { throw new IllegalArgumentException("At least one bandwidth pool is required."); }
-    }
-
-    private void validateSingleGlobalPool(List<BandwidthPoolSnapshot> pools) {
-        long count = pools.stream().filter(p -> p.getPoolType() == BandwidthPoolType.GLOBAL).count();
-        if (count != 1 || pools.size() != 1) {
-            throw new IllegalArgumentException("Level 18.2 requires exactly one GLOBAL bandwidth pool.");
-        }
-    }
-    private Set<String> uniqueVehicleIds(List<VehicleSnapshot> values) { Set<String> s=new HashSet<>(); for (VehicleSnapshot v:values) addUnique(s,v.getVehicleId(),"vehicleId"); return s; }
-    private void uniqueTaskIds(List<TaskInstance> values) { Set<String>s=new HashSet<>(); for(TaskInstance v:values)addUnique(s,v.getTaskId(),"taskId"); }
-    private void uniqueCandidateIds(List<NodeCandidate> values) { Set<String>s=new HashSet<>(); for(NodeCandidate v:values)addUnique(s,v.getCandidateId(),"candidateId"); }
-    private Set<String> uniqueGatewayIds(List<AccessGatewaySnapshot> values) { Set<String>s=new HashSet<>(); for(AccessGatewaySnapshot v:values)addUnique(s,v.getGatewayId(),"gatewayId"); return s; }
-    private Set<String> uniquePoolIds(List<BandwidthPoolSnapshot> values) { Set<String>s=new HashSet<>(); for(BandwidthPoolSnapshot v:values)addUnique(s,v.getPoolId(),"poolId"); return s; }
-    private void validateAccessLinks(List<AccessLinkSnapshot> links, Set<String> vehicles, Set<String> gateways) {
-        Set<String> ids=new HashSet<>(); Map<String,Integer> active=new HashMap<>();
-        for(AccessLinkSnapshot l:links){ addUnique(ids,l.getAccessLinkId(),"accessLinkId"); requireRef(vehicles,l.getVehicleId(),"vehicle"); requireRef(gateways,l.getGatewayId(),"gateway"); if(l.isActive())active.merge(l.getVehicleId(),1,Integer::sum); }
-        for(String vehicle:vehicles) if(active.getOrDefault(vehicle,0)!=1) throw new IllegalArgumentException("Vehicle "+vehicle+" must have exactly one active access link.");
-    }
-    private void validateTasks(List<TaskInstance> tasks, Set<String> vehicles, List<NodeCandidate> candidates) {
-        for(TaskInstance t:tasks){ requireRef(vehicles,t.getSourceVehicleId(),"task source vehicle"); boolean local=false; for(NodeCandidate c:candidates) if(c.isValidForSourceVehicle(t.getSourceVehicleId())&&c.getType()==NodeType.LOCAL)local=true; if(!local)throw new IllegalArgumentException("Task "+t.getTaskId()+" has no LOCAL candidate."); }
-    }
-    private void validateCandidates(List<NodeCandidate> candidates, Set<String> vehicles) {
-        for(NodeCandidate c:candidates){ requireRef(vehicles,c.getSourceVehicleId(),"candidate source vehicle"); if(c.getType()==NodeType.LOCAL&&!c.getSourceVehicleId().equals(c.getExecutionNodeId()))throw new IllegalArgumentException("Invalid LOCAL candidate: "+c.getCandidateId()); if(c.getType()==NodeType.VEHICLE&&c.getSourceVehicleId().equals(c.getExecutionNodeId()))throw new IllegalArgumentException("Invalid VEHICLE candidate: "+c.getCandidateId()); }
-    }
-    private <T> List<T> requireList(List<T> list,String name){ if(list==null)throw new IllegalArgumentException("snapshot."+name+" must not be null."); return list; }
-    private void addUnique(Set<String>s,String value,String field){ requireText(value,field); if(!s.add(value))throw new IllegalArgumentException("Duplicated "+field+": "+value); }
-    private void requireRef(Set<String>s,String value,String label){ requireText(value,label); if(!s.contains(value))throw new IllegalArgumentException("Missing "+label+": "+value); }
-    private void requireText(String value,String field){ if(value==null||value.isBlank())throw new IllegalArgumentException(field+" must not be null or blank."); }
+    public void validate(SystemSnapshot s){Objects.requireNonNull(s,"snapshot must not be null."); requireText(s.getSnapshotId(),"snapshotId");
+        Set<String>vehicles=idsVehicles(req(s.getVehicles(),"vehicles")); List<TaskInstance>tasks=req(s.getTasks(),"tasks"); List<NodeCandidate>candidates=req(s.getCandidateNodes(),"candidateNodes"); Set<String>gateways=idsGateways(req(s.getAccessGateways(),"accessGateways")); Set<String>pools=idsPools(req(s.getBandwidthPools(),"bandwidthPools"));
+        uniqueTasks(tasks); uniqueCandidates(candidates); links(req(s.getAccessLinks(),"accessLinks"),vehicles,gateways); gatewayPools(s.getAccessGateways(),pools); tasks(tasks,vehicles,candidates); candidates(s,candidates,vehicles); }
+    private void gatewayPools(List<AccessGatewaySnapshot> g,Set<String>p){for(AccessGatewaySnapshot x:g)if(x.getBandwidthPoolId()!=null&&!p.contains(x.getBandwidthPoolId()))throw new IllegalArgumentException("Gateway "+x.getGatewayId()+" references missing bandwidth pool "+x.getBandwidthPoolId());}
+    private void candidates(SystemSnapshot s,List<NodeCandidate>cs,Set<String>vehicles){BandwidthPoolResolver r=new BandwidthPoolResolver();for(NodeCandidate c:cs){ref(vehicles,c.getSourceVehicleId(),"candidate source vehicle");if(c.getType()==NodeType.LOCAL){if(!c.getSourceVehicleId().equals(c.getExecutionNodeId()))throw new IllegalArgumentException("Invalid LOCAL candidate: "+c.getCandidateId());continue;}if(c.getType()==NodeType.VEHICLE&&c.getSourceVehicleId().equals(c.getExecutionNodeId()))throw new IllegalArgumentException("Invalid VEHICLE candidate: "+c.getCandidateId());r.resolve(s,c);}}
+    private void tasks(List<TaskInstance>ts,Set<String>vehicles,List<NodeCandidate>cs){for(TaskInstance t:ts){ref(vehicles,t.getSourceVehicleId(),"task source vehicle");boolean local=false;for(NodeCandidate c:cs)if(c.isValidForSourceVehicle(t.getSourceVehicleId())&&c.getType()==NodeType.LOCAL)local=true;if(!local)throw new IllegalArgumentException("Task "+t.getTaskId()+" has no LOCAL candidate.");}}
+    private void links(List<AccessLinkSnapshot>ls,Set<String>vehicles,Set<String>gateways){Set<String>ids=new HashSet<>();Map<String,Integer>a=new HashMap<>();for(AccessLinkSnapshot l:ls){add(ids,l.getAccessLinkId(),"accessLinkId");ref(vehicles,l.getVehicleId(),"vehicle");ref(gateways,l.getGatewayId(),"gateway");if(l.isActive())a.merge(l.getVehicleId(),1,Integer::sum);}for(String v:vehicles)if(a.getOrDefault(v,0)!=1)throw new IllegalArgumentException("Vehicle "+v+" must have exactly one active access link.");}
+    private Set<String>idsVehicles(List<VehicleSnapshot>x){Set<String>s=new HashSet<>();for(VehicleSnapshot v:x)add(s,v.getVehicleId(),"vehicleId");return s;} private Set<String>idsGateways(List<AccessGatewaySnapshot>x){Set<String>s=new HashSet<>();for(AccessGatewaySnapshot v:x)add(s,v.getGatewayId(),"gatewayId");return s;} private Set<String>idsPools(List<BandwidthPoolSnapshot>x){Set<String>s=new HashSet<>();for(BandwidthPoolSnapshot v:x)add(s,v.getPoolId(),"poolId");if(s.isEmpty())throw new IllegalArgumentException("At least one bandwidth pool is required.");return s;} private void uniqueTasks(List<TaskInstance>x){Set<String>s=new HashSet<>();for(TaskInstance v:x)add(s,v.getTaskId(),"taskId");} private void uniqueCandidates(List<NodeCandidate>x){Set<String>s=new HashSet<>();for(NodeCandidate v:x)add(s,v.getCandidateId(),"candidateId");}
+    private <T>List<T>req(List<T>x,String n){if(x==null)throw new IllegalArgumentException("snapshot."+n+" must not be null.");return x;} private void add(Set<String>s,String v,String f){requireText(v,f);if(!s.add(v))throw new IllegalArgumentException("Duplicated "+f+": "+v);} private void ref(Set<String>s,String v,String l){requireText(v,l);if(!s.contains(v))throw new IllegalArgumentException("Missing "+l+": "+v);} private void requireText(String v,String f){if(v==null||v.isBlank())throw new IllegalArgumentException(f+" must not be null or blank.");}
 }
