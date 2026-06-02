@@ -1,179 +1,419 @@
 {
   "snapshotId": "phase_11_bandwidth_pressure",
-  "timeSeconds": 55.0,
+  "timeSeconds": 55,
   "vehicles": [
     {
-      "vehicleId": "vehicle_a",
-      "x": 100.0,
-      "y": 0.0,
-      "speed": 10.0,
-      "localCpu": 300.0
+      "vehicleId": "vehicle_alpha",
+      "x": 494,
+      "y": 2,
+      "speed": 6.8,
+      "localCpu": 820000000
     },
     {
-      "vehicleId": "vehicle_b",
-      "x": 200.0,
-      "y": 0.0,
-      "speed": 10.0,
-      "localCpu": 350.0
+      "vehicleId": "vehicle_bravo",
+      "x": 537.5,
+      "y": -4,
+      "speed": 6.5,
+      "localCpu": 920000000
     },
     {
-      "vehicleId": "vehicle_peer",
-      "x": 150.0,
-      "y": 0.0,
-      "speed": 10.2,
-      "localCpu": 1400.0
+      "vehicleId": "vehicle_charlie",
+      "x": 601,
+      "y": 7,
+      "speed": 6.2,
+      "localCpu": 740000000
     },
     {
-      "vehicleId": "vehicle_bw_a",
-      "x": 60.0,
-      "y": 0.0,
-      "speed": 10.0,
-      "localCpu": 100.0
+      "vehicleId": "vehicle_delta",
+      "x": 524.5,
+      "y": 5,
+      "speed": 6.9,
+      "localCpu": 1250000000
     },
     {
-      "vehicleId": "vehicle_bw_b",
-      "x": 70.0,
-      "y": 0.0,
-      "speed": 10.0,
-      "localCpu": 100.0
+      "vehicleId": "vehicle_echo",
+      "x": 502,
+      "y": -8,
+      "speed": 7.4,
+      "localCpu": 1100000000
     }
   ],
   "tasks": [
     {
-      "taskId": "task_a_base",
-      "sourceVehicleId": "vehicle_a",
-      "inputSizeBits": 150.0,
-      "outputSizeBits": 15.0,
-      "cpuCycles": 1000.0,
-      "deadlineSeconds": 4.0
+      "taskId": "task_perception_alpha",
+      "sourceVehicleId": "vehicle_alpha",
+      "inputSizeBits": 8200000,
+      "outputSizeBits": 900000,
+      "cpuCycles": 1350000000,
+      "deadlineSeconds": 3.2
     },
     {
-      "taskId": "task_b_base",
-      "sourceVehicleId": "vehicle_b",
-      "inputSizeBits": 180.0,
-      "outputSizeBits": 15.0,
-      "cpuCycles": 1200.0,
-      "deadlineSeconds": 4.0
+      "taskId": "task_planning_bravo",
+      "sourceVehicleId": "vehicle_bravo",
+      "inputSizeBits": 11500000,
+      "outputSizeBits": 1200000,
+      "cpuCycles": 1650000000,
+      "deadlineSeconds": 3.6
     },
     {
-      "taskId": "task_bw_a",
-      "sourceVehicleId": "vehicle_bw_a",
-      "inputSizeBits": 1500.0,
-      "outputSizeBits": 150.0,
-      "cpuCycles": 900.0,
-      "deadlineSeconds": 3.0
+      "taskId": "task_fusion_charlie",
+      "sourceVehicleId": "vehicle_charlie",
+      "inputSizeBits": 6800000,
+      "outputSizeBits": 750000,
+      "cpuCycles": 1150000000,
+      "deadlineSeconds": 2.9
     },
     {
-      "taskId": "task_bw_b",
-      "sourceVehicleId": "vehicle_bw_b",
-      "inputSizeBits": 1500.0,
-      "outputSizeBits": 150.0,
-      "cpuCycles": 900.0,
-      "deadlineSeconds": 3.0
+      "taskId": "task_bandwidth_burst_01",
+      "sourceVehicleId": "vehicle_alpha",
+      "inputSizeBits": 22000000,
+      "outputSizeBits": 700000,
+      "cpuCycles": 1050000000,
+      "deadlineSeconds": 2.6
+    },
+    {
+      "taskId": "task_bandwidth_burst_02",
+      "sourceVehicleId": "vehicle_bravo",
+      "inputSizeBits": 23700000,
+      "outputSizeBits": 950000,
+      "cpuCycles": 1330000000,
+      "deadlineSeconds": 2.85
+    },
+    {
+      "taskId": "task_bandwidth_burst_03",
+      "sourceVehicleId": "vehicle_charlie",
+      "inputSizeBits": 25400000,
+      "outputSizeBits": 700000,
+      "cpuCycles": 1610000000,
+      "deadlineSeconds": 3.1
+    },
+    {
+      "taskId": "task_bandwidth_burst_04",
+      "sourceVehicleId": "vehicle_alpha",
+      "inputSizeBits": 22000000,
+      "outputSizeBits": 950000,
+      "cpuCycles": 1890000000,
+      "deadlineSeconds": 2.6
+    },
+    {
+      "taskId": "task_bandwidth_burst_05",
+      "sourceVehicleId": "vehicle_bravo",
+      "inputSizeBits": 23700000,
+      "outputSizeBits": 700000,
+      "cpuCycles": 1050000000,
+      "deadlineSeconds": 2.85
     }
   ],
   "candidateNodes": [
     {
-      "candidateId": "local_vehicle_a",
-      "sourceVehicleId": "vehicle_a",
-      "executionNodeId": "vehicle_a",
+      "candidateId": "local_vehicle_alpha",
+      "sourceVehicleId": "vehicle_alpha",
+      "executionNodeId": "vehicle_alpha",
       "type": "LOCAL",
-      "availableCpu": 300.0,
-      "availableBandwidth": 0.0,
-      "baseLatencySeconds": 0.0
+      "availableCpu": 820000000,
+      "availableBandwidth": 0,
+      "baseLatencySeconds": 0
     },
     {
-      "candidateId": "edge_center_for_vehicle_a",
-      "sourceVehicleId": "vehicle_a",
-      "executionNodeId": "edge_center",
+      "candidateId": "local_vehicle_bravo",
+      "sourceVehicleId": "vehicle_bravo",
+      "executionNodeId": "vehicle_bravo",
+      "type": "LOCAL",
+      "availableCpu": 920000000,
+      "availableBandwidth": 0,
+      "baseLatencySeconds": 0
+    },
+    {
+      "candidateId": "local_vehicle_charlie",
+      "sourceVehicleId": "vehicle_charlie",
+      "executionNodeId": "vehicle_charlie",
+      "type": "LOCAL",
+      "availableCpu": 740000000,
+      "availableBandwidth": 0,
+      "baseLatencySeconds": 0
+    },
+    {
+      "candidateId": "edge_north_for_vehicle_alpha",
+      "sourceVehicleId": "vehicle_alpha",
+      "executionNodeId": "edge_north",
       "type": "EDGE",
-      "availableCpu": 4500.0,
-      "availableBandwidth": 450.0,
-      "baseLatencySeconds": 0.02,
-      "nodeX": 0.0,
-      "nodeY": 0.0,
-      "coverageRadiusMeters": 500.0
+      "availableCpu": 6500000000,
+      "availableBandwidth": 6120000,
+      "baseLatencySeconds": 0.045,
+      "nodeX": 360,
+      "nodeY": 0,
+      "coverageRadiusMeters": 520
     },
     {
-      "candidateId": "cloud_001_for_vehicle_a",
-      "sourceVehicleId": "vehicle_a",
-      "executionNodeId": "cloud_001",
+      "candidateId": "edge_south_for_vehicle_alpha",
+      "sourceVehicleId": "vehicle_alpha",
+      "executionNodeId": "edge_south",
+      "type": "EDGE",
+      "availableCpu": 5200000000,
+      "availableBandwidth": 3420000,
+      "baseLatencySeconds": 0.06,
+      "nodeX": 900,
+      "nodeY": -20,
+      "coverageRadiusMeters": 520
+    },
+    {
+      "candidateId": "cloud_regional_for_vehicle_alpha",
+      "sourceVehicleId": "vehicle_alpha",
+      "executionNodeId": "cloud_regional",
       "type": "CLOUD",
-      "availableCpu": 12000.0,
-      "availableBandwidth": 700.0,
+      "availableCpu": 14000000000,
+      "availableBandwidth": 3740000,
       "baseLatencySeconds": 0.18
     },
     {
-      "candidateId": "local_vehicle_b",
-      "sourceVehicleId": "vehicle_b",
-      "executionNodeId": "vehicle_b",
-      "type": "LOCAL",
-      "availableCpu": 350.0,
-      "availableBandwidth": 0.0,
-      "baseLatencySeconds": 0.0
-    },
-    {
-      "candidateId": "edge_center_for_vehicle_b",
-      "sourceVehicleId": "vehicle_b",
-      "executionNodeId": "edge_center",
-      "type": "EDGE",
-      "availableCpu": 4500.0,
-      "availableBandwidth": 450.0,
-      "baseLatencySeconds": 0.02,
-      "nodeX": 0.0,
-      "nodeY": 0.0,
-      "coverageRadiusMeters": 500.0
-    },
-    {
-      "candidateId": "cloud_001_for_vehicle_b",
-      "sourceVehicleId": "vehicle_b",
-      "executionNodeId": "cloud_001",
+      "candidateId": "cloud_core_for_vehicle_alpha",
+      "sourceVehicleId": "vehicle_alpha",
+      "executionNodeId": "cloud_core",
       "type": "CLOUD",
-      "availableCpu": 12000.0,
-      "availableBandwidth": 700.0,
+      "availableCpu": 28000000000,
+      "availableBandwidth": 2200000,
+      "baseLatencySeconds": 0.27
+    },
+    {
+      "candidateId": "edge_north_for_vehicle_bravo",
+      "sourceVehicleId": "vehicle_bravo",
+      "executionNodeId": "edge_north",
+      "type": "EDGE",
+      "availableCpu": 6500000000,
+      "availableBandwidth": 5580000,
+      "baseLatencySeconds": 0.045,
+      "nodeX": 360,
+      "nodeY": 0,
+      "coverageRadiusMeters": 520
+    },
+    {
+      "candidateId": "edge_south_for_vehicle_bravo",
+      "sourceVehicleId": "vehicle_bravo",
+      "executionNodeId": "edge_south",
+      "type": "EDGE",
+      "availableCpu": 5200000000,
+      "availableBandwidth": 3960000,
+      "baseLatencySeconds": 0.06,
+      "nodeX": 900,
+      "nodeY": -20,
+      "coverageRadiusMeters": 520
+    },
+    {
+      "candidateId": "cloud_regional_for_vehicle_bravo",
+      "sourceVehicleId": "vehicle_bravo",
+      "executionNodeId": "cloud_regional",
+      "type": "CLOUD",
+      "availableCpu": 14000000000,
+      "availableBandwidth": 3740000,
       "baseLatencySeconds": 0.18
     },
     {
-      "candidateId": "local_vehicle_bw_a",
-      "sourceVehicleId": "vehicle_bw_a",
-      "executionNodeId": "vehicle_bw_a",
-      "type": "LOCAL",
-      "availableCpu": 100.0,
-      "availableBandwidth": 0.0,
-      "baseLatencySeconds": 0.0
+      "candidateId": "cloud_core_for_vehicle_bravo",
+      "sourceVehicleId": "vehicle_bravo",
+      "executionNodeId": "cloud_core",
+      "type": "CLOUD",
+      "availableCpu": 28000000000,
+      "availableBandwidth": 2200000,
+      "baseLatencySeconds": 0.27
     },
     {
-      "candidateId": "edge_shared_bw_for_vehicle_bw_a",
-      "sourceVehicleId": "vehicle_bw_a",
-      "executionNodeId": "edge_shared_bw",
+      "candidateId": "edge_north_for_vehicle_charlie",
+      "sourceVehicleId": "vehicle_charlie",
+      "executionNodeId": "edge_north",
       "type": "EDGE",
-      "availableCpu": 8000.0,
-      "availableBandwidth": 40.0,
-      "baseLatencySeconds": 0.01,
-      "nodeX": 0.0,
-      "nodeY": 0.0,
-      "coverageRadiusMeters": 500.0
+      "availableCpu": 6500000000,
+      "availableBandwidth": 4680000,
+      "baseLatencySeconds": 0.045,
+      "nodeX": 360,
+      "nodeY": 0,
+      "coverageRadiusMeters": 520
     },
     {
-      "candidateId": "local_vehicle_bw_b",
-      "sourceVehicleId": "vehicle_bw_b",
-      "executionNodeId": "vehicle_bw_b",
-      "type": "LOCAL",
-      "availableCpu": 100.0,
-      "availableBandwidth": 0.0,
-      "baseLatencySeconds": 0.0
-    },
-    {
-      "candidateId": "edge_shared_bw_for_vehicle_bw_b",
-      "sourceVehicleId": "vehicle_bw_b",
-      "executionNodeId": "edge_shared_bw",
+      "candidateId": "edge_south_for_vehicle_charlie",
+      "sourceVehicleId": "vehicle_charlie",
+      "executionNodeId": "edge_south",
       "type": "EDGE",
-      "availableCpu": 8000.0,
-      "availableBandwidth": 40.0,
-      "baseLatencySeconds": 0.01,
-      "nodeX": 0.0,
-      "nodeY": 0.0,
-      "coverageRadiusMeters": 500.0
+      "availableCpu": 5200000000,
+      "availableBandwidth": 5040000,
+      "baseLatencySeconds": 0.06,
+      "nodeX": 900,
+      "nodeY": -20,
+      "coverageRadiusMeters": 520
+    },
+    {
+      "candidateId": "cloud_regional_for_vehicle_charlie",
+      "sourceVehicleId": "vehicle_charlie",
+      "executionNodeId": "cloud_regional",
+      "type": "CLOUD",
+      "availableCpu": 14000000000,
+      "availableBandwidth": 3740000,
+      "baseLatencySeconds": 0.18
+    },
+    {
+      "candidateId": "cloud_core_for_vehicle_charlie",
+      "sourceVehicleId": "vehicle_charlie",
+      "executionNodeId": "cloud_core",
+      "type": "CLOUD",
+      "availableCpu": 28000000000,
+      "availableBandwidth": 2200000,
+      "baseLatencySeconds": 0.27
+    },
+    {
+      "candidateId": "vehicle_delta_v2v_for_vehicle_alpha",
+      "sourceVehicleId": "vehicle_alpha",
+      "executionNodeId": "vehicle_delta",
+      "type": "VEHICLE",
+      "availableCpu": 687500000,
+      "availableBandwidth": 15500000,
+      "baseLatencySeconds": 0.012
+    },
+    {
+      "candidateId": "vehicle_delta_v2v_for_vehicle_bravo",
+      "sourceVehicleId": "vehicle_bravo",
+      "executionNodeId": "vehicle_delta",
+      "type": "VEHICLE",
+      "availableCpu": 687500000,
+      "availableBandwidth": 14000000,
+      "baseLatencySeconds": 0.014
+    },
+    {
+      "candidateId": "vehicle_bravo_v2v_for_vehicle_charlie",
+      "sourceVehicleId": "vehicle_charlie",
+      "executionNodeId": "vehicle_bravo",
+      "type": "VEHICLE",
+      "availableCpu": 506000000,
+      "availableBandwidth": 12500000,
+      "baseLatencySeconds": 0.016
+    }
+  ],
+  "accessGateways": [
+    {
+      "gatewayId": "rsu_north",
+      "gatewayType": "RSU",
+      "x": 360,
+      "y": 0,
+      "coverageRadiusMeters": 520
+    },
+    {
+      "gatewayId": "rsu_south",
+      "gatewayType": "RSU",
+      "x": 900,
+      "y": -20,
+      "coverageRadiusMeters": 520
+    },
+    {
+      "gatewayId": "rsu_micro",
+      "gatewayType": "RSU",
+      "x": 540,
+      "y": 18,
+      "coverageRadiusMeters": 220
+    }
+  ],
+  "accessLinks": [
+    {
+      "accessLinkId": "access_vehicle_alpha_rsu_north",
+      "vehicleId": "vehicle_alpha",
+      "gatewayId": "rsu_north",
+      "active": false,
+      "available": true
+    },
+    {
+      "accessLinkId": "access_vehicle_alpha_rsu_south",
+      "vehicleId": "vehicle_alpha",
+      "gatewayId": "rsu_south",
+      "active": false,
+      "available": true
+    },
+    {
+      "accessLinkId": "access_vehicle_alpha_rsu_micro",
+      "vehicleId": "vehicle_alpha",
+      "gatewayId": "rsu_micro",
+      "active": true,
+      "available": true
+    },
+    {
+      "accessLinkId": "access_vehicle_bravo_rsu_north",
+      "vehicleId": "vehicle_bravo",
+      "gatewayId": "rsu_north",
+      "active": false,
+      "available": true
+    },
+    {
+      "accessLinkId": "access_vehicle_bravo_rsu_south",
+      "vehicleId": "vehicle_bravo",
+      "gatewayId": "rsu_south",
+      "active": false,
+      "available": true
+    },
+    {
+      "accessLinkId": "access_vehicle_bravo_rsu_micro",
+      "vehicleId": "vehicle_bravo",
+      "gatewayId": "rsu_micro",
+      "active": true,
+      "available": true
+    },
+    {
+      "accessLinkId": "access_vehicle_charlie_rsu_north",
+      "vehicleId": "vehicle_charlie",
+      "gatewayId": "rsu_north",
+      "active": false,
+      "available": true
+    },
+    {
+      "accessLinkId": "access_vehicle_charlie_rsu_south",
+      "vehicleId": "vehicle_charlie",
+      "gatewayId": "rsu_south",
+      "active": false,
+      "available": true
+    },
+    {
+      "accessLinkId": "access_vehicle_charlie_rsu_micro",
+      "vehicleId": "vehicle_charlie",
+      "gatewayId": "rsu_micro",
+      "active": true,
+      "available": true
+    },
+    {
+      "accessLinkId": "access_vehicle_delta_rsu_north",
+      "vehicleId": "vehicle_delta",
+      "gatewayId": "rsu_north",
+      "active": false,
+      "available": true
+    },
+    {
+      "accessLinkId": "access_vehicle_delta_rsu_south",
+      "vehicleId": "vehicle_delta",
+      "gatewayId": "rsu_south",
+      "active": false,
+      "available": true
+    },
+    {
+      "accessLinkId": "access_vehicle_delta_rsu_micro",
+      "vehicleId": "vehicle_delta",
+      "gatewayId": "rsu_micro",
+      "active": true,
+      "available": true
+    },
+    {
+      "accessLinkId": "access_vehicle_echo_rsu_north",
+      "vehicleId": "vehicle_echo",
+      "gatewayId": "rsu_north",
+      "active": false,
+      "available": true
+    },
+    {
+      "accessLinkId": "access_vehicle_echo_rsu_south",
+      "vehicleId": "vehicle_echo",
+      "gatewayId": "rsu_south",
+      "active": false,
+      "available": true
+    },
+    {
+      "accessLinkId": "access_vehicle_echo_rsu_micro",
+      "vehicleId": "vehicle_echo",
+      "gatewayId": "rsu_micro",
+      "active": true,
+      "available": true
     }
   ]
 }
