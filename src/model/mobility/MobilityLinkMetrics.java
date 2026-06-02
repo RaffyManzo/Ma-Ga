@@ -99,7 +99,7 @@ public final class MobilityLinkMetrics {
         );
     }
 
-    /** @deprecated il cloud gateway-aware non usa più il placeholder stabile. */
+    /** @deprecated mantenuto solo per compatibilita' con il modello CLOUD storico. */
     @Deprecated
     public static MobilityLinkMetrics cloud(double coverageTimeSeconds) {
         return new MobilityLinkMetrics(

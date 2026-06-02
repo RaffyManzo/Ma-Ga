@@ -217,13 +217,13 @@ Istante o finestra $k$ &
 \cls{TemporalWindowManager} esegue uno step. Lo step usa un tempo di trigger e un tempo di osservazione. \\
 \addlinespace
 Stato $S_k$ &
-\cls{SystemSnapshot}. Contiene veicoli, task e candidati disponibili nello stesso istante. \\
+\cls{SystemSnapshot}. Contiene veicoli, task, candidati, gateway radio, access link e pool di banda disponibili nello stesso istante. \\
 \addlinespace
 Task $i$ &
 \cls{TaskInstance}. Porta id, veicolo sorgente, input, output, cicli CPU e deadline. \\
 \addlinespace
 Nodo candidato $j$ &
-\cls{NodeCandidate}. Descrive nodo locale, veicolo remoto, edge o cloud. Include CPU, banda, latenza e compatibilita' con il sorgente. \\
+\cls{NodeCandidate}. Descrive nodo locale, veicolo remoto, edge o cloud. Include CPU, banda, latenza, compatibilita' con il sorgente e binding opzionale al pool di banda. \\
 \addlinespace
 Decisione $x_{ij}$ &
 Nel codice e' \cls{Gene.selectedCandidateId}. Un gene assegna un task a un candidato. \\
@@ -254,12 +254,15 @@ importante: il GA e le policy devono leggere lo stato, non modificarlo.
 
 \subsection{Snapshot}
 
-\cls{SystemSnapshot} e' il contenitore dello stato. Ha tre liste principali:
+\cls{SystemSnapshot} e' il contenitore dello stato. Ha sei liste principali:
 
 \begin{itemize}[leftmargin=*,nosep]
     \item veicoli, tramite \cls{VehicleSnapshot};
     \item task, tramite \cls{TaskInstance};
-    \item candidati, tramite \cls{NodeCandidate}.
+    \item candidati, tramite \cls{NodeCandidate};
+    \item gateway radio, tramite \cls{AccessGatewaySnapshot};
+    \item access link veicolo-gateway, tramite \cls{AccessLinkSnapshot};
+    \item pool di banda condivisa, tramite \cls{BandwidthPoolSnapshot}.
 \end{itemize}
 
 Il GA riceve sempre uno \cls{SystemSnapshot}. Questo evita dipendenze dirette da
@@ -280,8 +283,14 @@ Descrive un veicolo: posizione, velocita', CPU locale e nodo associato. Serve an
 Descrive il lavoro da eseguire: sorgente, dimensione input, dimensione output, cicli CPU e deadline. \\
 \clsb{NodeCandidate} &
 Descrive una possibile destinazione. Puo' essere locale, V2V, edge o cloud. Dice anche se e' valida per il veicolo sorgente. \\
+\clsb{AccessGatewaySnapshot} &
+Descrive un gateway radio osservato, con posizione, raggio e pool di banda opzionale. \\
+\clsb{AccessLinkSnapshot} &
+Associa veicolo e gateway; indica il link attivo e la disponibilita' dichiarata. \\
+\clsb{BandwidthPoolSnapshot} &
+Descrive il budget di banda condiviso: globale, per gateway o diretto V2V. \\
 \clsb{CoverageEstimator} &
-Stima per quanto tempo il sorgente resta coperto dal candidato. La fitness usa questa stima per la penalita' di mobilita'. \\
+Stima per quanto tempo il sorgente resta coperto dal candidato. Per CLOUD usa l'access gateway attivo. La fitness usa questa stima per la penalita' di mobilita'. \\
 \bottomrule
 \end{tabularx}
 \caption{Dati letti dal GA.}
@@ -323,8 +332,10 @@ partizionamento del task e allocazione di risorse.
 
 \section{Caricamento e sorgenti}
 
-\cls{SnapshotLoader} legge gli snapshot dai file. \cls{SnapshotValidator}
-controlla che lo scenario sia coerente prima di darlo al resto del sistema.
+\cls{SnapshotLoader} legge gli snapshot dai file. Prima mappa il JSON nel
+domain model completo e poi \cls{SnapshotValidator} controlla che lo scenario
+sia coerente: ID univoci, riferimenti validi, fallback locale per task, almeno
+un pool di banda e un solo access link attivo per veicolo.
 
 Il gestore temporale non conosce i file. Dipende solo da \cls{SystemStateSource}.
 Questa interfaccia espone un solo metodo:
@@ -507,14 +518,18 @@ Corregge:
     \item gene locale, che deve avere $p_i=0$ e banda $0$.
 \end{itemize}
 
-Dopo il repair del singolo gene entra \cls{CpuAggregateRepairOperator}. Questa
-classe ridimensiona la CPU aggregata per nodo fisico remoto. Serve per evitare
-che piu' candidati legati allo stesso nodo sommino piu' CPU di quella
-disponibile.
+Dopo il repair del singolo gene entrano i repair aggregati. La sequenza corrente
+controlla:
 
-La banda aggregata resta una parte aperta: il codice la limita sul singolo
-candidato e la penalizza in fitness, ma non ha ancora un repair aggregato
-simmetrico alla CPU.
+\begin{itemize}[leftmargin=*,nosep]
+    \item CPU aggregata per \code{executionNodeId}, tramite \cls{CpuAggregateRepairOperator};
+    \item banda aggregata per singolo link \code{candidateId}, tramite \cls{BandwidthAggregateRepairOperator};
+    \item banda aggregata per pool condiviso \code{poolId}, tramite \cls{BandwidthPoolAggregateRepairOperator}.
+\end{itemize}
+
+La banda non e' piu' una parte aperta del repair. Resta da validare
+sperimentalmente quanto il ridimensionamento proporzionale link+pool sia
+competitivo rispetto a policy piu' sofisticate.
 
 \section{Fitness}
 
@@ -601,16 +616,18 @@ Quindi:
 L(C)=\frac{1}{|T|}\sum_i L_i
 \]
 
-La mobilita' usa due parti attive: rischio di copertura e rischio di handover.
-Nel codice attuale \code{linkInstability} vale $0.0$. E' quindi un segnaposto,
-non una componente misurata.
+La mobilita' usa rischio di copertura, instabilita' del link e rischio di
+handover. Per CLOUD copertura e \code{phi\_link} derivano dall'access gateway
+attivo; \code{CLOUD\_STABLE\_PLACEHOLDER} resta solo come compatibilita'
+storica e non e' usato in modalita' \code{STRICT\_GATEWAY}.
 
 \subsection{Risorse}
 
 La CPU remota viene aggregata per \code{executionNodeId}. La banda viene
-aggregata per \code{candidateId}. Questo dettaglio conta: piu' candidati possono
-riferirsi allo stesso nodo fisico per la CPU, mentre la banda resta legata al
-link candidato.
+controllata su due livelli: per \code{candidateId}, cioe' il link source-aware,
+e per \code{poolId}, cioe' il budget condiviso risolto da
+\cls{BandwidthPoolResolver}. Un pool \code{GLOBAL} riproduce il $B_{max}$ unico;
+pool \code{GATEWAY} e \code{DIRECT\_V2V} specializzano domini radio separati.
 
 \section{Ciclo del GA}
 
@@ -672,6 +689,12 @@ Il trigger puo' avere tre motivi:
 Nel codice attuale l'intervallo programmato usa
 \meth{windowConfig.getFixedIntervalSeconds}. La dinamicita' non cambia ancora la
 durata della finestra. Cambia invece il riuso della popolazione.
+
+Le componenti di dinamicita' sono state riallineate alla formalizzazione:
+\code{Dv(k)} misura solo il churn dei veicoli, mentre \code{Dl(k)} misura la
+variazione media della qualita' degli access link attivi,
+$q_v(k)=1-\phi_{link}(v,gatewayAttivo)$, sui veicoli presenti in due finestre
+consecutive.
 
 \section{Eventi critici}
 
@@ -845,7 +868,7 @@ Latenza &
 La formalizzazione puo' leggerla come somma. Il codice usa la media sui task. \\
 \addlinespace
 Instabilita' link &
-La variabile esiste nella formula della mobilita', ma nel codice attuale vale $0.0$. \\
+La variabile e' calcolata dalle metriche di mobilita'. Per CLOUD deriva dall'access gateway attivo; per V2V resta una stima scalare senza vettori di traiettoria. \\
 \addlinespace
 Intervallo temporale &
 Il manager usa un intervallo fisso. La dinamicita' influisce sul riuso della popolazione, non sulla durata della finestra. \\
@@ -857,7 +880,7 @@ Quote e risorse &
 \cls{OffloadingRatioPolicy} e \cls{ResourceAllocationPolicy} guidano il campionamento. La fitness resta il giudice finale. \\
 \addlinespace
 Banda aggregata &
-La fitness la penalizza. Il repair aggregato simmetrico alla CPU non e' ancora implementato. \\
+La fitness e il repair la trattano su due livelli: link \code{candidateId} e pool condiviso \code{poolId}. \\
 \bottomrule
 \end{tabularx}
 \caption{Punti in cui il codice va letto con attenzione.}
@@ -868,14 +891,14 @@ La fitness la penalizza. Il repair aggregato simmetrico alla CPU non e' ancora i
 Per capire il progetto senza perdersi, conviene seguire questo ordine:
 
 \begin{enumerate}[leftmargin=*]
-    \item \cls{SystemSnapshot}, \cls{TaskInstance}, \cls{VehicleSnapshot}, \cls{NodeCandidate}.
+    \item \cls{SystemSnapshot}, \cls{TaskInstance}, \cls{VehicleSnapshot}, \cls{NodeCandidate}, \cls{AccessGatewaySnapshot}, \cls{AccessLinkSnapshot}, \cls{BandwidthPoolSnapshot}.
     \item \cls{Gene} e \cls{Chromosome}.
     \item \cls{FitnessEvaluator}, leggendo anche \cls{EvaluationBreakdown}.
     \item \cls{OffloadingRatioPolicy} e \cls{ResourceAllocationPolicy}.
     \item \cls{PopulationInitializer}, \cls{MutationOperator} e \cls{RepairOperator}.
     \item \cls{MaGaOptimizer}.
     \item \cls{TemporalWindowManager}, \cls{DynamicityEvaluator} e \cls{PopulationAdapter}.
-    \item \cls{CandidatePrefilter} e \cls{DeadlineViolationAnalyzer}.
+    \item \cls{CandidatePrefilter}, \cls{BandwidthPoolResolver} e \cls{DeadlineViolationAnalyzer}.
 \end{enumerate}
 
 Questo ordine parte dai dati, passa per una singola soluzione, poi arriva al GA
@@ -891,8 +914,10 @@ cromosoma migliore. Il livello temporale decide quando ripetere il processo e
 quanto riusare della popolazione precedente.
 
 Le correzioni recenti rendono il sistema piu' coerente. La sorgente filtrata ora
-rispetta il contratto unico di \cls{SystemStateSource}. Le nuove policy di quota
-e risorse evitano molte scelte casuali deboli senza togliere esplorazione al GA.
+rispetta il contratto unico di \cls{SystemStateSource} e propaga anche gateway,
+access link e pool di banda. Le nuove policy di quota e risorse evitano molte
+scelte casuali deboli senza togliere esplorazione al GA. Il repair aggregato
+copre CPU, banda per link e banda per pool condiviso.
 La decisione finale resta comunque nella fitness e nella selezione genetica.
 
 \end{document}

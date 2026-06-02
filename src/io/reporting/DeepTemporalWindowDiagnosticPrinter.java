@@ -482,9 +482,10 @@ public final class DeepTemporalWindowDiagnosticPrinter {
         }
 
         if (global.bandwidthViolations == 0) {
-            out.println("- Bandwidth repair can remain OpenIssue for now: no bandwidth violations were observed.");
+            out.println("- Hierarchical bandwidth repair appears effective: no link-level bandwidth violations were observed.");
+            out.println("- Use the bandwidth pool diagnostic report to inspect shared pool saturation and unresolved pool bindings.");
         } else {
-            out.println("- Bandwidth violations exist: promote bandwidth repair from OpenIssue to implementation task.");
+            out.println("- Bandwidth violations persist: inspect link-level and pool-level aggregate repair.");
         }
 
         if (global.deadlineViolations > 0) {

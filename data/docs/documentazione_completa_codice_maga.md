@@ -2,7 +2,7 @@
 
 Questa documentazione descrive lo stato attuale del repository `maga-core` e sostituisce le parti superate dalla riscrittura recente. Il linguaggio e' volutamente semplice: prima spiega il progetto nel suo insieme, poi entra in ogni classe e in ogni metodo rilevato.
 
-Inventario generato dal codice sorgente: **132 file/classi top-level**, **155 tipi totali includendo tipi interni**, **1302 metodi o costruttori rilevati**.
+Inventario riallineato al codice corrente: **147 tipi top-level Java rilevati nel sorgente**, piu' record e tipi interni usati dai report. I commit piu' utili per il riallineamento sono quelli successivi a `4089f77`, in particolare la serie su gateway cloud, access link e repair gerarchico della banda (`c5dbc50` ... `34aab0c`).
 
 > Nota: le sezioni 'Problematiche aperte' segnalano discrepanze o decisioni operative emerse dal confronto con la formalizzazione e dalle issue aperte. Non tutte sono bug: alcune sono scelte di prototipo da dichiarare negli esperimenti.
 
@@ -26,12 +26,16 @@ La formalizzazione usa questi concetti:
 ## 2. Cosa e' cambiato nella versione corrente
 
 - Il vincolo di deadline e' stato rafforzato: ora ci sono `DeadlineConstraintEvaluator`, `DeadlineRepairCatalog`, `DeadlineEvaluation` e una penalita' hard in `FitnessEvaluator`.
-- Il repair e' piu' strutturato: lavora su candidati validi, copertura, deadline, CPU aggregata e usa un percorso incrementale quando conosce i task mutati.
-- La mobilita' non e' piu' solo tempo di copertura: ora `MobilityLinkMetrics` e `MobilityPenaltyBreakdown` rendono espliciti copertura, instabilita' link e handover risk.
+- Il repair e' piu' strutturato: lavora su candidati validi, copertura, deadline, CPU aggregata, banda per link e banda per pool condiviso; usa un percorso incrementale quando conosce i task mutati.
+- La banda e' diventata gerarchica: `BandwidthAggregateRepairOperator` controlla il limite del singolo `candidateId`, mentre `BandwidthPoolAggregateRepairOperator` controlla il limite del `poolId` condiviso. `BandwidthPoolResolver` collega EDGE/CLOUD al gateway attivo e V2V al pool diretto esplicito.
+- Gli snapshot ora includono `AccessGatewaySnapshot`, `AccessLinkSnapshot` e `BandwidthPoolSnapshot`. I DTO JSON corrispondenti sono `AccessGatewayInputDto`, `AccessLinkInputDto` e `BandwidthPoolInputDto`.
+- La mobilita' cloud e' gateway-aware: `CoverageEstimator` deriva copertura e instabilita' CLOUD dall'access gateway attivo tramite `AccessLinkMetricsEstimator`.
+- `Dv(k)` misura il churn dei veicoli; `Dl(k)` misura la variazione della qualita' degli access link attivi, non il cambiamento dei candidati computazionali.
+- `CoverageReferenceCalculator` calcola il riferimento di copertura dagli access link attivi, uno per veicolo.
 - La latenza comunicativa e' allineata alla formalizzazione come somma `L(C) = sum_i L_i`, non media per task.
-- `AdaptiveWindowMain` espone il profilo runtime e usa di default `OBSERVED_RUNTIME`; `CONFIGURED_RUNTIME` resta disponibile per replay astratti.
+- `AdaptiveWindowMain` e' gateway-aware: compone prefilter, dynamicity evaluator, coverage reference e report usando la stessa `MobilityConfig`.
 - `TimeIndexedSnapshotReplaySource` non guarda piu' nel futuro: sceglie l'ultimo snapshot disponibile al tempo richiesto.
-- Sono stati aggiunti report specifici per latenza, mobilita' e best-effort deadline.
+- Sono stati aggiunti report specifici per latenza, mobilita', access link dynamicity, cloud gateway, pool di banda e best-effort deadline.
 
 ## 3. Come comunicano le classi
 
@@ -50,7 +54,7 @@ MaGaOptimizer
 
 MaGaOptimizer -> PopulationInitializer/Selection/Crossover/MutationResult/Repair/Fitness
 RepairOperator ->
-SnapshotRepairContext/DeadlineRepairCatalog/CpuAggregateRepairOperator
+SnapshotRepairContext/DeadlineRepairCatalog/CpuAggregateRepairOperator/BandwidthAggregateRepairOperator/BandwidthPoolAggregateRepairOperator
 FitnessEvaluator ->
 EvaluationBreakdown ->
 Report/Diagnostics
@@ -63,6 +67,8 @@ Le classi `model` rappresentano dati e formule. Le classi `ga` cercano una buona
 | Formalizzazione | Classe o package | Spiegazione semplice |
 |---|---|---|
 | Stato `S_k` | `SystemSnapshot` | Fotografia del mondo: veicoli, task e candidati. |
+| Gateway/access link | `AccessGatewaySnapshot`, `AccessLinkSnapshot` | Collegamento radio attivo usato da cloud, reference coverage e `Dl(k)`. |
+| Banda condivisa `Bmax` | `BandwidthPoolSnapshot`, `BandwidthPoolResolver` | Pool globale, gateway o V2V che limita la somma della banda. |
 | Task `i` | `TaskInstance` | Lavoro da eseguire, con input, output, cicli CPU e deadline. |
 | Veicolo `v` | `VehicleSnapshot` | Posizione, velocita' e CPU locale di un veicolo. |
 | Nodo candidato `n_i` | `NodeCandidate` | Possibile destinazione: local, vehicle, edge, cloud. |
@@ -70,7 +76,7 @@ Le classi `model` rappresentano dati e formule. Le classi `ga` cercano una buona
 | Cromosoma `C` | `Chromosome` | Lista di geni, quindi strategia completa. |
 | Tempo `T_i(C)` | `OffloadingTimeModel` | Calcola locale, remoto e partial offloading. |
 | Deadline `T_i <= D_i` | `ga.constraints` + `FitnessEvaluator` | Il repair prova a renderla ammissibile; la fitness penalizza duramente violazioni residue. |
-| Copertura e mobilita' | `CoverageEstimator`, `MobilityLinkMetrics` | Stimano copertura, distanza, velocita' relativa e instabilita'. |
+| Copertura e mobilita' | `CoverageEstimator`, `AccessLinkMetricsEstimator`, `MobilityLinkMetrics` | Stimano copertura, distanza, velocita' relativa, gateway attivo e instabilita'. |
 | Penalita' `Pmob` | `MobilityPenaltyBreakdown` | Scompone coverage risk, link instability e handover risk. |
 | Latenza `L(C)` | `OffloadingTimeModel`, `LatencyDiagnosticPrinter` | Usa la somma delle latenze comunicative. |
 | Fitness `J(C)` | `FitnessEvaluator` | Combina tempo, latenza, mobilita', risorse e penalita' hard. |
@@ -78,13 +84,14 @@ Le classi `model` rappresentano dati e formule. Le classi `ga` cercano una buona
 | Riuso popolazione | `PopulationAdapter` | Decide quanto della popolazione precedente tenere. |
 | Finestra temporale | `window.timing` | Calcola limiti e prossima durata della finestra. |
 
-## 5. Problematiche aperte principali
+## 5. Stato e limiti ancora da dichiarare
 
-- **Banda globale aggregata**: il codice resta per-link/candidateId. Se la formalizzazione mantiene un unico `Bmax`, questa e' ancora una discrepanza.
-- **Repair banda**: esiste repair aggregato CPU, ma non un repair aggregato banda/gateway.
+- **Banda aggregata**: il codice ora applica due vincoli: link `candidateId` e pool `poolId`. Un pool `GLOBAL` riproduce `Bmax`; pool `GATEWAY` e `DIRECT_V2V` specializzano il vincolo quando lo scenario contiene piu' domini radio.
+- **Repair banda**: il repair aggregato e' implementato su link e pool. Rimane da validare sperimentalmente quanto il ridimensionamento proporzionale link+pool sia competitivo rispetto a policy piu' sofisticate.
 - **Deadline**: molto migliorata rispetto alla versione precedente, ma il best-effort degradato non prova infeasibilita' globale.
 - **Runtime GA**: ora il default operativo e' osservato, ma i risultati vanno sempre letti sapendo se si usa `OBSERVED_RUNTIME` o `CONFIGURED_RUNTIME`.
-- **Mobilita' cloud/V2V**: cloud e' ancora placeholder stabile; V2V usa velocita' relativa scalare; edge non usa heading.
+- **Mobilita' cloud/V2V**: cloud e' gateway-aware in `STRICT_GATEWAY`; V2V usa ancora velocita' relativa scalare e non vettori direzionali completi.
+- **Report storico**: i risultati numerici precedenti al commit `34aab0c` non vanno letti come stato finale del codice, perche' precedono gateway, access link e repair gerarchico della banda.
 - **`DeltaT_max < DeltaT_min`**: il codice rialza il massimo al minimo e lo segnala; la formalizzazione puo' richiedere una policy di fallback esplicita.
 - **MOSAIC/SUMO**: ci sono interfacce e sorgenti predisposte, ma manca un bridge concreto nel repository.
 
@@ -156,9 +163,13 @@ Rappresenta gli oggetti grezzi letti dal JSON prima della validazione.
 
 Rappresenta cromosomi e geni, cioe' la forma concreta delle soluzioni del GA.
 
+### `model.bandwidth`
+
+Risolve i pool radio condivisi e distingue il caso `GLOBAL` dal pool di gateway e dal pool V2V diretto.
+
 ### `model.mobility`
 
-Stima metriche mobility-aware: copertura, distanza, velocita' relativa e instabilita' del link.
+Stima metriche mobility-aware: copertura, distanza, velocita' relativa, access gateway attivo e instabilita' del link.
 
 ### `model.node`
 
@@ -170,7 +181,7 @@ Implementa le formule temporali di esecuzione locale, remota e parziale.
 
 ### `model.snapshot`
 
-Rappresenta la fotografia del sistema nella finestra corrente.
+Rappresenta la fotografia del sistema nella finestra corrente: veicoli, task, candidati, gateway, access link e pool di banda.
 
 ### `validation.snapshot`
 
@@ -1652,7 +1663,7 @@ Nessuna specifica nota per questa classe.
 
 **Cosa fa, in parole semplici**
 
-Valuta un cromosoma MA-GA rispetto a uno snapshot del sistema. La valutazione combina quattro famiglie di costo: tempo massimo di completamento dei task; latenza comunicativa complessivamente introdotta dalle decisioni remote; rischio mobility-aware legato alla copertura e alla stabilità del link; penalità di vincolo e sovrauso risorse. Il tempo di copertura e l'instabilità del collegamento vengono calcolati tramite `CoverageEstimator`, così il modello non dipende da valori precomputati dentro `NodeCandidate`. Il vincolo di deadline mantiene la penalità proporzionale già usata nel breakdown, ma introduce anche una penalità rigida indipendente dai pesi configurabili. In questo modo un cromosoma tardivo non può essere preferito a un cromosoma ammissibile soltanto perché `wR` è basso o nullo. Implementa `J(C)`, ora con latenza sommata, breakdown di mobilita' e penalita' hard per deadline violate.
+Valuta un cromosoma MA-GA rispetto a uno snapshot del sistema. La valutazione combina tempo massimo di completamento, latenza comunicativa totale, penalita' mobility-aware, vincoli strutturali e sovrauso delle risorse. La banda viene osservata su due livelli: per `candidateId`, cioe' il singolo link source-aware, e per `poolId`, cioe' la capacita' radio condivisa di gateway o V2V. `BandwidthPoolResolver` risolve il pool consumato da ogni candidato remoto. Il vincolo di deadline mantiene una penalita' proporzionale nel breakdown, ma aggiunge anche una penalita' hard indipendente dai pesi configurabili. Implementa `J(C)`, ora con latenza sommata, cloud gateway-aware, breakdown di mobilita' e penalita' hard per deadline violate.
 
 **Relazione con la formalizzazione**
 
@@ -1672,6 +1683,7 @@ Campi dichiarati principali:
 - `private final MaGaConfig config`
 - `private final CoverageEstimator coverageEstimator`
 - `private final OffloadingTimeModel offloadingTimeModel`
+- `private final BandwidthPoolResolver bandwidthPoolResolver`
 
 **Metodi**
 
@@ -1684,8 +1696,9 @@ Campi dichiarati principali:
 | `private GeneEvaluationBreakdown evaluateGene( SystemSnapshot snapshot, TaskInstance task, Gene gene, NodeCandidate candidate, VehicleSnapshot sourceVehicle )` | private | Valuta `evaluate gene` e restituisce un risultato o un breakdown. |
 | `private Map<String, ExecutionNodeResourceUsageBreakdown> initializeExecutionNodeCpuUsage(List<NodeCandidate> candidates)` | private | Metodo di supporto: realizza il passo `initialize execution node cpu usage` dentro la responsabilita' della classe. |
 | `private Map<String, LinkBandwidthUsageBreakdown> initializeLinkBandwidthUsage(List<NodeCandidate> candidates)` | private | Metodo di supporto: realizza il passo `initialize link bandwidth usage` dentro la responsabilita' della classe. |
+| `private Map<String, BandwidthPoolUsageBreakdown> initializeBandwidthPoolUsage(SystemSnapshot snapshot)` | private | Prepara il breakdown di uso banda per `poolId`. |
 | `private Map<String, LocalResourceUsageBreakdown> initializeLocalUsage(List<VehicleSnapshot> vehicles)` | private | Metodo di supporto: realizza il passo `initialize local usage` dentro la responsabilita' della classe. |
-| `private double computeResourcePenalty( Map<String, ExecutionNodeResourceUsageBreakdown> cpuUsageByExecutionNode, Map<String, LinkBandwidthUsageBreakdown> bandwidthUsageByCandidate )` | private | Calcola `compute resource penalty` a partire dai dati ricevuti. |
+| `private double computeResourcePenalty( Map<String, ExecutionNodeResourceUsageBreakdown> cpuUsageByExecutionNode, Map<String, LinkBandwidthUsageBreakdown> bandwidthUsageByCandidate, Map<String, BandwidthPoolUsageBreakdown> bandwidthUsageByPool )` | private | Somma penalita' CPU, banda per link e banda per pool condiviso. |
 | `private MobilityPenaltyBreakdown computeMobilityPenaltyBreakdown( NodeCandidate candidate, MobilityLinkMetrics linkMetrics, double completionTimeSeconds, PenaltyConfig penalties )` | private | Calcola la penalità mobility-aware e conserva il breakdown diagnostico. |
 | `private double computeDeadlinePenalty( double completionTimeSeconds, double deadlineSeconds, PenaltyConfig penalties )` | private | Calcola `compute deadline penalty` a partire dai dati ricevuti. |
 | `private double computeHardDeadlinePenalty( List<GeneEvaluationBreakdown> geneBreakdowns )` | private | Penalità rigida applicata direttamente alla fitness. La parte costante rende ogni violazione nettamente peggiore rispetto a una strategia interamente ammissibile. La parte proporzionale mantiene un ordinamento utile anche quando tutte le alternative disponibili sono degradate. |
@@ -1704,12 +1717,52 @@ Campi dichiarati principali:
 **Problematiche aperte**
 
 - La deadline non e' piu' soltanto soft: esiste una penalita' hard indipendente da `wR`. Restano pero' possibili soluzioni degradate se il repair non trova alternative ammissibili.
-- La banda e' ancora penalizzata per candidato/link source-aware, non come unico vincolo globale `Bmax`.
+- La banda e' penalizzata sia per link source-aware sia per pool condiviso. Se lo scenario usa un solo pool `GLOBAL`, quel pool rappresenta direttamente `Bmax`.
+- `EvaluationBreakdown` conserva ancora solo la lista per-link; la diagnostica completa dei pool viene ricostruita dai printer usando snapshot e cromosoma finale.
 - La saturazione sotto il limite resta diagnostica: diventa penalita' solo oltre il limite.
 
 ## Package `ga.fitness.breakdown`
 
 Conserva dettagli diagnostici della fitness, inclusi risorse, latenza e mobilita'.
+
+### `BandwidthPoolUsageBreakdown`
+
+- File: `src/ga/fitness/breakdown/BandwidthPoolUsageBreakdown.java:6`
+- Tipo: `class`
+- Nome completo: `ga.fitness.breakdown.BandwidthPoolUsageBreakdown`
+
+**Cosa fa, in parole semplici**
+
+Misura quanta banda remota e' stata richiesta a un pool condiviso. Il pool puo' essere `GLOBAL`, `GATEWAY` o `DIRECT_V2V`. La classe accumula la banda assegnata ai geni remoti, calcola percentuale di uso, overflow e saturazione.
+
+**Relazione con la formalizzazione**
+
+Rappresenta il vincolo aggregato `sum_i b_i <= Bmax_pool`. Nel caso di pool `GLOBAL`, `Bmax_pool` coincide con il `Bmax` unico della formalizzazione.
+
+**Con chi comunica**
+
+E' costruita da `FitnessEvaluator` a partire da `BandwidthPoolSnapshot` ed e' usata per calcolare la penalita' di sovrauso del pool.
+
+**Campi o valori importanti**
+
+- `poolId`
+- `poolType`
+- `availableBandwidth`
+- `usedBandwidth`
+
+**Metodi**
+
+| Metodo | Visibilita' | Spiegazione semplice |
+|---|---:|---|
+| `public void addBandwidth(double value)` | public | Accumula banda non negativa richiesta al pool. |
+| `public double getBandwidthUsagePercent()` | public | Restituisce la percentuale di uso rispetto alla capacita'. |
+| `public double getBandwidthOverflowRatio()` | public | Restituisce solo la parte oltre capacita', normalizzata sulla capacita'. |
+| `public boolean hasBandwidthViolation()` | public | Indica se la banda usata supera quella disponibile. |
+| `public boolean isBandwidthSaturated(double thresholdPercent)` | public | Indica saturazione diagnostica sotto soglia di violazione. |
+
+**Problematiche aperte**
+
+Nessuna specifica nota per questa classe.
 
 ### `EvaluationBreakdown`
 
@@ -1950,7 +2003,7 @@ Campi dichiarati principali:
 
 **Problematiche aperte**
 
-- Il vincolo di banda e' per link/candidateId. Se la formalizzazione resta con `Bmax` globale, questa classe rappresenta una scelta diversa.
+- Questa classe copre il livello per-link/candidateId. Il livello `Bmax` globale o condiviso e' rappresentato da `BandwidthPoolUsageBreakdown`.
 - La saturazione al 95-100% e' diagnostica: diventa penalita' solo se supera il limite.
 
 ### `LocalResourceUsageBreakdown`
@@ -2053,6 +2106,108 @@ Nessuna specifica nota per questa classe.
 
 Contiene inizializzazione, selezione, crossover, mutazione, repair e policy di allocazione.
 
+### `BandwidthAggregateRepairOperator`
+
+- File: `src/ga/operators/BandwidthAggregateRepairOperator.java:30`
+- Tipo: `class`
+- Nome completo: `ga.operators.BandwidthAggregateRepairOperator`
+
+**Cosa fa, in parole semplici**
+
+Ridimensiona proporzionalmente la banda assegnata ai geni che usano lo stesso `candidateId`. Questo e' il vincolo del singolo link source-aware: la somma delle `allocatedBandwidth` dei task che scelgono quel candidato non deve superare `NodeCandidate.availableBandwidth`.
+
+**Relazione con la formalizzazione**
+
+Implementa il vincolo `sum_i b_i <= Bmax_link(candidateId)`. Non sostituisce il vincolo di pool condiviso: lo precede.
+
+**Con chi comunica**
+
+Usa `SnapshotRepairContext` per risolvere i candidateId del cromosoma e restituisce un `BandwidthAggregateRepairResult` con cromosoma riparato, candidateId ridimensionati e task coinvolti.
+
+**Metodi principali**
+
+| Metodo | Visibilita' | Spiegazione semplice |
+|---|---:|---|
+| `public Chromosome repairChromosome(Chromosome chromosome, SystemSnapshot snapshot)` | public | Adapter semplice che restituisce solo il cromosoma. |
+| `public BandwidthAggregateRepairResult repairChromosomeDetailed(Chromosome chromosome, SystemSnapshot snapshot, SnapshotRepairContext context)` | public | Calcola uso per candidateId, fattori di scala e task toccati. |
+
+**Problematiche aperte**
+
+Il ridimensionamento e' proporzionale: non cerca una redistribuzione ottima tra task.
+
+### `BandwidthAggregateRepairResult`
+
+- File: `src/ga/operators/BandwidthAggregateRepairResult.java:11`
+- Tipo: `class`
+- Nome completo: `ga.operators.BandwidthAggregateRepairResult`
+
+**Cosa fa, in parole semplici**
+
+Trasporta l'esito del repair banda per `candidateId`: cromosoma risultante, flag `changed`, candidateId coinvolti e task da rivalutare nel passaggio successivo.
+
+**Metodi principali**
+
+| Metodo | Visibilita' | Spiegazione semplice |
+|---|---:|---|
+| `public static BandwidthAggregateRepairResult unchanged(Chromosome chromosome)` | public | Crea un esito senza cambiamenti. |
+| `public static BandwidthAggregateRepairResult changed(Chromosome chromosome, Set<String> affectedCandidateIds, Set<String> affectedTaskIds)` | public | Crea un esito con cambiamenti e insiemi immutabili. |
+| `public boolean isChanged()` | public | Dice se il repair ha modificato almeno un gene. |
+
+**Problematiche aperte**
+
+Nessuna specifica nota per questa classe.
+
+### `BandwidthPoolAggregateRepairOperator`
+
+- File: `src/ga/operators/BandwidthPoolAggregateRepairOperator.java:31`
+- Tipo: `class`
+- Nome completo: `ga.operators.BandwidthPoolAggregateRepairOperator`
+
+**Cosa fa, in parole semplici**
+
+Ridimensiona proporzionalmente la banda assegnata ai geni che consumano lo stesso pool radio condiviso. Dopo il limite per-link, questo operatore applica il limite superiore per `poolId`: gateway, pool globale o V2V diretto.
+
+**Relazione con la formalizzazione**
+
+Implementa `sum_i b_i <= Bmax_pool(poolId)`. Con un pool `GLOBAL` riproduce il `Bmax` unico; con pool `GATEWAY` e `DIRECT_V2V` modella domini radio separati.
+
+**Con chi comunica**
+
+Usa `BandwidthPoolResolver` per associare ogni candidato remoto al proprio `BandwidthPoolSnapshot` e restituisce `BandwidthPoolAggregateRepairResult`.
+
+**Metodi principali**
+
+| Metodo | Visibilita' | Spiegazione semplice |
+|---|---:|---|
+| `public Chromosome repairChromosome(Chromosome chromosome, SystemSnapshot snapshot)` | public | Adapter semplice che restituisce solo il cromosoma. |
+| `public BandwidthPoolAggregateRepairResult repairChromosomeDetailed(Chromosome chromosome, SystemSnapshot snapshot, SnapshotRepairContext context)` | public | Calcola uso per poolId, fattori di scala e task toccati. |
+
+**Problematiche aperte**
+
+Il ridimensionamento e' proporzionale e non distingue priorita' o lateness dei task.
+
+### `BandwidthPoolAggregateRepairResult`
+
+- File: `src/ga/operators/BandwidthPoolAggregateRepairResult.java:11`
+- Tipo: `class`
+- Nome completo: `ga.operators.BandwidthPoolAggregateRepairResult`
+
+**Cosa fa, in parole semplici**
+
+Trasporta l'esito del repair banda per `poolId`: cromosoma risultante, flag `changed`, pool coinvolti e task da rivalutare.
+
+**Metodi principali**
+
+| Metodo | Visibilita' | Spiegazione semplice |
+|---|---:|---|
+| `public static BandwidthPoolAggregateRepairResult unchanged(Chromosome chromosome)` | public | Crea un esito senza cambiamenti. |
+| `public static BandwidthPoolAggregateRepairResult changed(Chromosome chromosome, Set<String> affectedBandwidthPoolIds, Set<String> affectedTaskIds)` | public | Crea un esito con pool e task toccati. |
+| `public Set<String> getAffectedBandwidthPoolIds()` | public | Restituisce i pool ridimensionati. |
+
+**Problematiche aperte**
+
+Nessuna specifica nota per questa classe.
+
 ### `CpuAggregateRepairOperator`
 
 - File: `src/ga/operators/CpuAggregateRepairOperator.java:26`
@@ -2061,7 +2216,7 @@ Contiene inizializzazione, selezione, crossover, mutazione, repair e policy di a
 
 **Cosa fa, in parole semplici**
 
-Ripara l'allocazione CPU aggregata sui nodi fisici remoti. Il RepairOperator limita già la CPU del singolo gene rispetto al candidato scelto. Questo operatore controlla invece la somma delle CPU assegnate allo stesso `executionNodeId`. La banda non viene modificata: il repair della banda resta una OpenIssue. Riduce la CPU assegnata quando piu' geni sovraccaricano lo stesso nodo fisico.
+Ripara l'allocazione CPU aggregata sui nodi fisici remoti. Il `RepairOperator` limita gia' la CPU del singolo gene rispetto al candidato scelto; questo operatore controlla invece la somma delle CPU assegnate allo stesso `executionNodeId`. La banda non e' compito di questa classe: viene gestita subito dopo dagli operatori `BandwidthAggregateRepairOperator` e `BandwidthPoolAggregateRepairOperator`.
 
 **Relazione con la formalizzazione**
 
@@ -2088,7 +2243,7 @@ Campi dichiarati principali:
 
 **Problematiche aperte**
 
-- Ridimensiona la CPU aggregata per executionNodeId, ma non modifica la banda: il repair banda resta OpenIssue.
+- Ridimensiona solo la CPU aggregata per `executionNodeId`; la banda e' demandata agli operatori dedicati.
 
 ### `CpuAggregateRepairResult`
 
@@ -2448,7 +2603,7 @@ Nessuna specifica nota per questa classe.
 
 **Cosa fa, in parole semplici**
 
-Ripara cromosomi e geni incoerenti. Nel modello source-aware, un gene è valido solo se il candidato scelto è compatibile con il veicolo sorgente del task. La riparazione avviene su quattro livelli: livello gene: corregge candidato, quota di offloading, CPU e banda; livello mobilità: evita candidati remoti con copertura insufficiente; livello deadline: prova una correzione limitata e aderente al modello; livello cromosoma: ridimensiona la CPU aggregata sui nodi fisici remoti. Gli indici e il catalogo lazy sono ottimizzazioni implementative. Non introducono nuove variabili decisionali e non sostituiscono selezione, crossover, mutazione o fitness del Genetic Algorithm. Corregge cromosomi su candidati, mobilita', deadline e CPU aggregata, con fallback best-effort quando necessario.
+Ripara cromosomi e geni incoerenti. Nel modello source-aware, un gene e' valido solo se il candidato scelto e' compatibile con il veicolo sorgente del task. La riparazione avviene su livelli successivi: correzione del singolo gene, sostenibilita' di mobilita', deadline, CPU aggregata per `executionNodeId`, banda aggregata per `candidateId` e banda aggregata per `poolId`. Gli indici e il catalogo lazy sono ottimizzazioni implementative: non introducono nuove variabili decisionali e non sostituiscono selezione, crossover, mutazione o fitness del Genetic Algorithm. Se nessuna alternativa ordinaria rispetta la deadline, sceglie un best-effort degradato.
 
 **Relazione con la formalizzazione**
 
@@ -2467,6 +2622,8 @@ Campi dichiarati principali:
 - `private static final double MIN_RESOURCE_FRACTION = 0.05`
 - `private static final int MAX_REPAIR_PASSES = 2`
 - `private final CpuAggregateRepairOperator cpuAggregateRepairOperator`
+- `private final BandwidthAggregateRepairOperator bandwidthAggregateRepairOperator`
+- `private final BandwidthPoolAggregateRepairOperator bandwidthPoolAggregateRepairOperator`
 - `private final CoverageEstimator coverageEstimator`
 - `private final OffloadingTimeModel offloadingTimeModel`
 - `private final OffloadingRatioPolicy offloadingRatioPolicy`
@@ -2481,9 +2638,9 @@ Campi dichiarati principali:
 | `public RepairOperator()` | public | Costruttore compatibile con il codice precedente. |
 | `public RepairOperator(MobilityConfig mobilityConfig)` | public | Costruisce il repair operator con configurazione di mobilità esplicita. |
 | `public Chromosome repairChromosome(Chromosome chromosome, SystemSnapshot snapshot)` | public | Ripara integralmente un cromosoma rispetto allo snapshot corrente. Questo percorso resta obbligatorio per popolazioni appena create, cromosomi provenienti da una finestra precedente e chiamanti esterni che non dispongono dell'elenco dei geni modificati. |
-| `public Chromosome repairChromosomeIncremental( Chromosome chromosome, SystemSnapshot snapshot, Set<String> dirtyTaskIds )` | public | Ripara incrementalmente un figlio prodotto durante l'evoluzione nello stesso snapshot. I genitori della generazione corrente sono già stati riparati. Un gene ereditato senza modifiche resta quindi individualmente valido. Il metodo rivaluta soltanto i task indicati come dirty, ma esegue sempre il repair CPU aggregato sull'intero cromosoma: il crossover può infatti combinare geni validi singolarmente e creare una nuova contesa collettiva. Se la struttura del cromosoma non rispetta l'insieme dei task dello snapshot, il metodo effettua automaticamente un repair completo. @param chromosome figlio da riparare @param snapshot snapshot corrente @param dirtyTaskIds task realmente modificati dalla mutazione @return cromosoma riparato |
-| `private Chromosome repairChromosomeInternal( Chromosome chromosome, SystemSnapshot snapshot, Set<String> initialTargetedTaskIds )` | private | Implementazione condivisa dai percorsi completo e incrementale. `initialTargetedTaskIds == null` indica il repair completo del primo passaggio. Un insieme vuoto indica invece che nessun gene necessita di repair individuale prima del controllo CPU aggregato globale. |
-| `private Chromosome repairGenes( Chromosome chromosome, SystemSnapshot snapshot, SnapshotRepairContext context, DeadlineRepairCatalog catalog, Set<String> targetedTaskIds )` | private | Ripara tutti i geni nel primo passaggio e soltanto i geni indicati nei passaggi successivi. I geni non coinvolti dal ridimensionamento CPU aggregato vengono conservati senza una rivalutazione ridondante. |
+| `public Chromosome repairChromosomeIncremental( Chromosome chromosome, SystemSnapshot snapshot, Set<String> dirtyTaskIds )` | public | Rivaluta solo i task dirty a livello gene, ma esegue sempre i repair aggregati CPU, banda per link e banda per pool sull'intero cromosoma. |
+| `private Chromosome repairChromosomeInternal( Chromosome chromosome, SystemSnapshot snapshot, Set<String> initialTargetedTaskIds )` | private | Esegue fino a due passaggi di repair gene-level piu' repair aggregati; i task toccati dai ridimensionamenti diventano il target del passaggio successivo. |
+| `private Chromosome repairGenes( Chromosome chromosome, SystemSnapshot snapshot, SnapshotRepairContext context, DeadlineRepairCatalog catalog, Set<String> targetedTaskIds )` | private | Ripara tutti i geni nel primo passaggio e soltanto i geni indicati nei passaggi successivi. |
 | `public Gene repairGene(Gene gene, TaskInstance task, SystemSnapshot snapshot)` | public | Adapter compatibile con i chiamanti precedenti. |
 | `private Gene repairGene( Gene gene, TaskInstance task, SystemSnapshot snapshot, SnapshotRepairContext context, DeadlineRepairCatalog catalog )` | private | Ripara un gene usando indici e catalogo dello snapshot corrente. |
 | `private Gene repairDeadlineIfNeeded( Gene currentGene, TaskInstance task, SnapshotRepairContext context, DeadlineRepairCatalog catalog, VehicleSnapshot sourceVehicle, NodeCandidate localCandidate )` | private | Applica la policy deadline-aware soltanto quando il gene corrente non rispetta la deadline. prova quote alternative mantenendo il nodo remoto corrente; prova candidati remoti alternativi; prova l'esecuzione locale; se nessuna alternativa è ammissibile, sceglie il best-effort. |
@@ -2511,7 +2668,7 @@ Campi dichiarati principali:
 **Problematiche aperte**
 
 - Il best-effort degradato non e' una prova di infeasibilita' globale: indica solo che il repair limitato non ha trovato una scelta ammissibile.
-- Il repair aggregato resta sulla CPU; non esiste ancora un repair aggregato equivalente per banda globale o gateway.
+- Il repair aggregato comprende CPU, banda per link e banda per pool. Rimane da validare se la scalatura proporzionale e' sufficiente negli scenari piu' competitivi.
 
 ### `ResourceAllocationDecision`
 
@@ -2777,7 +2934,7 @@ Nessuna specifica nota per questa classe.
 
 **Cosa fa, in parole semplici**
 
-Punto unico di composizione del report temporale della finestra adattiva. Il main non conosce più i singoli printer specialistici. Questo oggetto mantiene insieme il report diagnostico generale, i bounds adattivi, il timing, il riuso della popolazione, la sorgente dati e il prefilter.
+Punto unico di composizione del report temporale della finestra adattiva. Il main non conosce piu' i singoli printer specialistici. Questo oggetto mantiene insieme il report diagnostico generale, deadline best-effort, cloud gateway-aware, `Dl(k)` sugli access link, banda gerarchica, mobilita', latenza, bounds adattivi, timing, riuso della popolazione, sorgente dati e prefilter.
 
 **Relazione con la formalizzazione**
 
@@ -2785,8 +2942,7 @@ Non cambia il modello: rende osservabili fitness, vincoli, tempi e diagnosi.
 
 **Con chi comunica**
 
-Comunica direttamente con: `FilteringSystemStateSource`, `MaGaConfig`, `TemporalRuntimeProfile`, `TemporalWindowResult`.
-In pratica questa classe riceve questi oggetti, li costruisce oppure li passa allo step successivo del flusso.
+Comunica direttamente con `FilteringSystemStateSource`, `MaGaConfig`, `TemporalRuntimeProfile`, `TemporalWindowResult` e con i printer specialistici: `DeepTemporalWindowDiagnosticPrinter`, `DeadlineBestEffortDiagnosticPrinter`, `CloudGatewayDiagnosticPrinter`, `AccessLinkDynamicityDiagnosticPrinter`, `BandwidthPoolDiagnosticPrinter`, `MobilityDiagnosticPrinter`, `LatencyDiagnosticPrinter`, `AdaptiveWindowDiagnosticPrinter`, `TemporalTimingDiagnosticPrinter`, `PopulationReuseDecisionDiagnosticPrinter`, `SystemStateSourceDiagnosticPrinter` e `CandidateFilteringPrinter`.
 
 **Campi o valori importanti**
 
@@ -2800,9 +2956,97 @@ Campi dichiarati principali:
 |---|---:|---|
 | `public AdaptiveWindowReportPrinter(MaGaConfig config)` | public | Costruttore: crea l'oggetto e controlla che i dati necessari siano validi. |
 | `public AdaptiveWindowReportPrinter(MaGaConfig config, PrintStream out)` | public | Costruttore: crea l'oggetto e controlla che i dati necessari siano validi. |
-| `public void print( String requestedSourceMode, String snapshotFolder, TemporalWindowResult result, FilteringSystemStateSource filteredSource )` | public | Mantiene compatibilità con eventuali chiamanti precedenti. Il vecchio overload non esponeva il profilo temporale e viene quindi interpretato come replay astratto configurato. |
-| `public void print( String requestedSourceMode, TemporalRuntimeProfile runtimeProfile, String snapshotFolder, TemporalWindowResult result, FilteringSystemStateSource filteredSource )` | public | Stampa una sezione diagnostica o un report leggibile. |
-| `private void printExecutionMetadata( String requestedSourceMode, TemporalRuntimeProfile runtimeProfile, String snapshotFolder )` | private | Stampa una sezione diagnostica o un report leggibile. |
+| `public void print( String sourceMode, String folder, TemporalWindowResult result, FilteringSystemStateSource filteredSource )` | public | Mantiene compatibilita' con chiamanti precedenti e usa `CONFIGURED_RUNTIME`. |
+| `public void print( String sourceMode, TemporalRuntimeProfile profile, String folder, TemporalWindowResult result, FilteringSystemStateSource filteredSource )` | public | Stampa metadata e tutti i printer specialistici. |
+| `private void metadata(String sourceMode, TemporalRuntimeProfile profile, String folder)` | private | Stampa profilo temporale, cartella snapshot e interpretazione della banda gerarchica. |
+
+**Problematiche aperte**
+
+Nessuna specifica nota per questa classe.
+
+### `CloudGatewayDiagnosticPrinter`
+
+- File: `src/io/reporting/CloudGatewayDiagnosticPrinter.java:23`
+- Tipo: `class`
+- Nome completo: `io.reporting.CloudGatewayDiagnosticPrinter`
+
+**Cosa fa, in parole semplici**
+
+Report dedicato ai gateway radio e alle decisioni CLOUD gateway-aware. Stampa configurazione `STRICT_GATEWAY`, numero di gateway/access link, decisioni cloud, placeholder cloud residui e transizioni di gateway tra finestre.
+
+**Relazione con la formalizzazione**
+
+Non cambia il modello: rende osservabile il passaggio da cloud placeholder a cloud derivato dall'access gateway attivo.
+
+**Con chi comunica**
+
+Comunica con `TemporalWindowResult`, `CandidateFilteringResult`, `SystemSnapshot`, `AccessLinkSnapshot`, `GeneEvaluationBreakdown` e `MobilityLinkMetrics`.
+
+**Metodi**
+
+| Metodo | Visibilita' | Spiegazione semplice |
+|---|---:|---|
+| `public CloudGatewayDiagnosticPrinter(PrintStream out)` | public | Costruisce il printer. |
+| `public void print(TemporalWindowResult result, List<CandidateFilteringResult> filteringResults)` | public | Stampa configurazione, riepilogo, dettagli cloud e transizioni gateway. |
+
+**Problematiche aperte**
+
+Nessuna specifica nota per questa classe.
+
+### `AccessLinkDynamicityDiagnosticPrinter`
+
+- File: `src/io/reporting/AccessLinkDynamicityDiagnosticPrinter.java:32`
+- Tipo: `class`
+- Nome completo: `io.reporting.AccessLinkDynamicityDiagnosticPrinter`
+
+**Cosa fa, in parole semplici**
+
+Report diagnostico della componente `Dl(k)` gateway-aware. Mostra qualita' `q_v(k)`, variazioni tra finestre consecutive, access link degradati/recuperati, indisponibilita' e handover.
+
+**Relazione con la formalizzazione**
+
+Non cambia il modello: rende leggibile `Dl(k) = average |q_v(k) - q_v(k-1)|` sui veicoli comuni.
+
+**Con chi comunica**
+
+Comunica con `MobilityConfig`, `AccessLinkMetricsEstimator`, `SystemSnapshot`, `AccessLinkSnapshot`, `VehicleSnapshot` e `TemporalWindowResult`.
+
+**Metodi**
+
+| Metodo | Visibilita' | Spiegazione semplice |
+|---|---:|---|
+| `public AccessLinkDynamicityDiagnosticPrinter(MobilityConfig mobilityConfig, PrintStream out, int topK)` | public | Costruisce il printer con estimator e limite top-N. |
+| `public void print(TemporalWindowResult result)` | public | Stampa summary, top cambiamenti e interpretazione di `Dl(k)`. |
+
+**Problematiche aperte**
+
+Nessuna specifica nota per questa classe.
+
+### `BandwidthPoolDiagnosticPrinter`
+
+- File: `src/io/reporting/BandwidthPoolDiagnosticPrinter.java:29`
+- Tipo: `class`
+- Nome completo: `io.reporting.BandwidthPoolDiagnosticPrinter`
+
+**Cosa fa, in parole semplici**
+
+Report gerarchico della banda. Distingue il vincolo del singolo link source-aware (`candidateId`) dal vincolo del pool condiviso (`poolId`) e stampa riepiloghi/dettagli su link e pool saturi o violati.
+
+**Relazione con la formalizzazione**
+
+Non cambia il modello: rende osservabile `sum_i b_i <= Bmax_link` e `sum_i b_i <= Bmax_pool`.
+
+**Con chi comunica**
+
+Comunica con `BandwidthPoolResolver`, `SystemSnapshot`, `BandwidthPoolSnapshot`, `NodeCandidate`, `Gene` e `TemporalWindowResult`.
+
+**Metodi**
+
+| Metodo | Visibilita' | Spiegazione semplice |
+|---|---:|---|
+| `public BandwidthPoolDiagnosticPrinter(PrintStream out)` | public | Costruisce il printer con resolver standard. |
+| `public BandwidthPoolDiagnosticPrinter(PrintStream out, BandwidthPoolResolver resolver)` | public | Costruisce il printer con resolver esplicito. |
+| `public void print(TemporalWindowResult result)` | public | Stampa interpretazione, configurazione, summary e dettagli link/pool. |
 
 **Problematiche aperte**
 
@@ -3311,7 +3555,7 @@ Nessuna specifica nota per questa classe.
 
 **Cosa fa, in parole semplici**
 
-Report diagnostico dedicato alla mobilità. La classe non ricalcola la fitness. Legge i breakdown prodotti durante la valutazione del miglior cromosoma di ogni finestra e rende espliciti distanza, copertura, phi_cov, phi_link, phi_ho e contributi pesati. Rende visibili copertura, instabilita' e componenti della penalita' mobility-aware.
+Report diagnostico dedicato alla mobilita' e alle metriche gateway-aware. La classe non ricalcola la fitness: legge i breakdown prodotti durante la valutazione del miglior cromosoma e rende espliciti distanza, raggio, copertura, `phi_cov`, `phi_link`, `phi_ho`, penalty e modello usato. Per CLOUD mostra anche gateway di riferimento, decisioni `gatewayAwareCloud` e residui `placeholderCloud`.
 
 **Relazione con la formalizzazione**
 
@@ -3345,10 +3589,9 @@ Campi dichiarati principali:
 | `private List<GeneEvaluationBreakdown> genes(TemporalStepResult step)` | private | Metodo di supporto: realizza il passo `genes` dentro la responsabilita' della classe. |
 | `private List<GeneEvaluationBreakdown> remoteGenes(TemporalStepResult step)` | private | Metodo di supporto: realizza il passo `remote genes` dentro la responsabilita' della classe. |
 | `private String modelSummary(List<GeneEvaluationBreakdown> genes)` | private | Metodo di supporto: realizza il passo `model summary` dentro la responsabilita' della classe. |
-| `private String numberOrDash(double value)` | private | Metodo di supporto: realizza il passo `number or dash` dentro la responsabilita' della classe. |
-| `private String metersOrDash(double value)` | private | Metodo di supporto: realizza il passo `meters or dash` dentro la responsabilita' della classe. |
-| `private String speedOrDash(double value)` | private | Metodo di supporto: realizza il passo `speed or dash` dentro la responsabilita' della classe. |
-| `private void printSectionTitle(String title)` | private | Stampa una sezione diagnostica o un report leggibile. |
+| `private String n(double value)` | private | Formatta un numero o `-` se non finito. |
+| `private String text(String value)` | private | Formatta testo opzionale o `-`. |
+| `private void title(String value)` | private | Stampa il titolo di una sezione. |
 | `private void printf(String format, Object... values)` | private | Stampa una sezione diagnostica o un report leggibile. |
 
 **Problematiche aperte**
@@ -3377,33 +3620,28 @@ In pratica questa classe riceve questi oggetti, li costruisce oppure li passa al
 **Campi o valori importanti**
 
 Campi dichiarati principali:
-- `private int count`
-- `private int cloudPlaceholderCount`
-- `private double totalMobilityPenalty`
-- `private double totalCoverageTime`
-- `private double minimumCoverageTime = Double.POSITIVE_INFINITY`
-- `private double totalCoverageRisk`
-- `private double maximumCoverageRisk`
-- `private double totalLinkInstability`
-- `private double maximumLinkInstability`
-- `private double totalHandoverRisk`
-- `private double maximumHandoverRisk`
-- `private double totalDistance`
-- `private int distanceCount`
-- `private double totalRadius`
-- `private int radiusCount`
-- `private double totalSourceSpeed`
-- `private int sourceSpeedCount`
-- `private double totalRelativeSpeed`
-- `private int relativeSpeedCount`
-- `private double averageCoverageTime = Double.NaN`
-- `private double averageCoverageRisk`
-- `private double averageLinkInstability`
-- `private double averageHandoverRisk`
-- `private double averageDistance = Double.NaN`
-- `private double averageRadius = Double.NaN`
-- `private double averageSourceSpeed = Double.NaN`
-- `private double averageRelativeSpeed = Double.NaN`
+- `int count`
+- `int gatewayAwareCloud`
+- `int placeholderCloud`
+- `int distCount`
+- `int radiusCount`
+- `double totalPenalty`
+- `double sumCoverage`
+- `double minimumCoverage = Double.POSITIVE_INFINITY`
+- `double sumCovRisk`
+- `double maxCovRisk`
+- `double sumLink`
+- `double maxLink`
+- `double sumHo`
+- `double maxHo`
+- `double sumDistance`
+- `double sumRadius`
+- `double averageCoverage = Double.NaN`
+- `double averageCovRisk`
+- `double averageLink`
+- `double averageHo`
+- `double averageDistance = Double.NaN`
+- `double averageRadius = Double.NaN`
 
 **Metodi**
 
@@ -3912,7 +4150,7 @@ Nessuna specifica nota per questa classe.
 
 **Cosa fa, in parole semplici**
 
-Carica uno snapshot statico del sistema da file JSON. Il loader separa quattro passaggi: lettura del JSON in DTO grezzi, validazione centralizzata in `SnapshotValidator`, mapping verso il modello interno e verifica dell'invariante locale necessario al repair.
+Carica uno snapshot statico del sistema da file JSON. Il loader legge i DTO grezzi con Jackson, li mappa nel domain model completo e poi applica `SnapshotValidator` e `LocalCandidateInvariantValidator`. Il mapping ora include veicoli, task, candidati, gateway radio, access link e pool di banda.
 
 **Relazione con la formalizzazione**
 
@@ -3920,29 +4158,30 @@ Fornisce o valida lo stato osservato `S_k` prima che il GA possa ragionare.
 
 **Con chi comunica**
 
-Comunica direttamente con: `LocalCandidateInvariantValidator`, `NodeCandidate`, `NodeCandidateInputDto`, `NodeType`, `ObjectMapper`, `SnapshotInputDto`, `SnapshotValidator`, `SystemSnapshot`, `TaskInputDto`, `TaskInstance`, `VehicleInputDto`, `VehicleSnapshot`.
-In pratica questa classe riceve questi oggetti, li costruisce oppure li passa allo step successivo del flusso.
+Comunica direttamente con `ObjectMapper`, `SnapshotInputDto`, i DTO di veicolo/task/candidato/gateway/link/pool, `SystemSnapshot`, `NodeCandidate`, `AccessGatewaySnapshot`, `AccessLinkSnapshot`, `BandwidthPoolSnapshot`, `SnapshotValidator` e `LocalCandidateInvariantValidator`.
 
 **Campi o valori importanti**
 
 Campi dichiarati principali:
 - `private final ObjectMapper objectMapper`
-- `private final SnapshotValidator snapshotValidator`
-- `private final LocalCandidateInvariantValidator localCandidateInvariantValidator`
+- `private final SnapshotValidator validator`
+- `private final LocalCandidateInvariantValidator localValidator`
 
 **Metodi**
 
 | Metodo | Visibilita' | Spiegazione semplice |
 |---|---:|---|
 | `public SnapshotLoader()` | public | Costruisce un loader basato su Jackson e sui validator standard. |
-| `public SnapshotLoader(SnapshotValidator snapshotValidator)` | public | Costruisce un loader mantenendo compatibilità con i chiamanti esistenti. @param snapshotValidator validator da usare prima del mapping |
-| `public SnapshotLoader( SnapshotValidator snapshotValidator, LocalCandidateInvariantValidator localCandidateInvariantValidator )` | public | Costruisce un loader con validator espliciti. @param snapshotValidator validator dei DTO grezzi @param localCandidateInvariantValidator validator del fallback locale |
+| `public SnapshotLoader(SnapshotValidator snapshotValidator)` | public | Costruisce un loader mantenendo compatibilita' con i chiamanti esistenti. |
+| `public SnapshotLoader( SnapshotValidator snapshotValidator, LocalCandidateInvariantValidator localCandidateInvariantValidator )` | public | Costruisce un loader con validator espliciti. |
 | `public SystemSnapshot load(String filePath) throws IOException` | public | Carica uno snapshot da file JSON. @param filePath percorso del file JSON @return snapshot convertito nel modello interno @throws IOException se il file non e' leggibile o il JSON non e' valido |
-| `private SystemSnapshot toSystemSnapshot(SnapshotInputDto dto)` | private | Converte il DTO principale in `SystemSnapshot`. |
-| `private List<VehicleSnapshot> toVehicles(List<VehicleInputDto> vehicleDtos)` | private | Converte i veicoli JSON in `VehicleSnapshot`. |
-| `private List<TaskInstance> toTasks(List<TaskInputDto> taskDtos)` | private | Converte i task JSON in `TaskInstance`. |
-| `private List<NodeCandidate> toCandidateNodes(List<NodeCandidateInputDto> nodeDtos)` | private | Converte i candidati JSON in `NodeCandidate`. |
-| `private NodeType parseNodeType(String value)` | private | Converte il tipo del nodo da stringa JSON a enum. |
+| `private SystemSnapshot map(SnapshotInputDto dto)` | private | Converte il DTO principale in `SystemSnapshot` completo. |
+| `private List<VehicleSnapshot> vehicles(List<VehicleInputDto> vehicleDtos)` | private | Converte i veicoli JSON in `VehicleSnapshot`. |
+| `private List<TaskInstance> tasks(List<TaskInputDto> taskDtos)` | private | Converte i task JSON in `TaskInstance`. |
+| `private List<NodeCandidate> candidates(List<NodeCandidateInputDto> nodeDtos)` | private | Converte i candidati JSON in `NodeCandidate`, incluso `bandwidthPoolId`. |
+| `private List<AccessGatewaySnapshot> gateways(List<AccessGatewayInputDto> gatewayDtos)` | private | Converte i gateway JSON in `AccessGatewaySnapshot`. |
+| `private List<AccessLinkSnapshot> links(List<AccessLinkInputDto> linkDtos)` | private | Converte gli access link JSON in `AccessLinkSnapshot`. |
+| `private List<BandwidthPoolSnapshot> pools(List<BandwidthPoolInputDto> poolDtos)` | private | Converte i pool JSON in `BandwidthPoolSnapshot`. |
 
 **Problematiche aperte**
 
@@ -4022,6 +4261,7 @@ Campi dichiarati principali:
 - `public Double nodeX`
 - `public Double nodeY`
 - `public Double coverageRadiusMeters`
+- `public String bandwidthPoolId`
 
 **Metodi**
 
@@ -4039,7 +4279,7 @@ Nessuna specifica nota per questa classe.
 
 **Cosa fa, in parole semplici**
 
-DTO grezzo dello snapshot letto da JSON o da un adapter esterno. Non contiene logica di dominio: rappresenta solo la forma dell'input. La validazione avviene in `SnapshotValidator` prima del mapping verso il modello interno.
+DTO grezzo dello snapshot letto da JSON o da un adapter esterno. Non contiene logica di dominio: rappresenta solo la forma dell'input. Il loader lo mappa in `SystemSnapshot`, poi la validazione strutturale avviene sul domain model.
 
 **Relazione con la formalizzazione**
 
@@ -4058,10 +4298,105 @@ Campi dichiarati principali:
 - `public List<VehicleInputDto> vehicles`
 - `public List<TaskInputDto> tasks`
 - `public List<NodeCandidateInputDto> candidateNodes`
+- `public List<AccessGatewayInputDto> accessGateways`
+- `public List<AccessLinkInputDto> accessLinks`
+- `public List<BandwidthPoolInputDto> bandwidthPools`
 
 **Metodi**
 
 Questa classe non dichiara metodi propri; contiene soprattutto dati, costanti o valori enum.
+
+**Problematiche aperte**
+
+Nessuna specifica nota per questa classe.
+
+### `AccessGatewayInputDto`
+
+- File: `src/io/snapshot/dto/AccessGatewayInputDto.java:4`
+- Tipo: `class`
+- Nome completo: `io.snapshot.dto.AccessGatewayInputDto`
+
+**Cosa fa, in parole semplici**
+
+DTO grezzo di un gateway radio nello snapshot JSON.
+
+**Relazione con la formalizzazione**
+
+Porta nel domain model il gateway usato per CLOUD/EDGE, access link e pool condivisi.
+
+**Campi o valori importanti**
+
+Campi dichiarati principali:
+- `public String gatewayId`
+- `public String gatewayType`
+- `public Double x`
+- `public Double y`
+- `public Double coverageRadiusMeters`
+- `public String bandwidthPoolId`
+
+**Metodi**
+
+Questa classe non dichiara metodi propri; contiene soprattutto dati grezzi di input.
+
+**Problematiche aperte**
+
+Nessuna specifica nota per questa classe.
+
+### `AccessLinkInputDto`
+
+- File: `src/io/snapshot/dto/AccessLinkInputDto.java:4`
+- Tipo: `class`
+- Nome completo: `io.snapshot.dto.AccessLinkInputDto`
+
+**Cosa fa, in parole semplici**
+
+DTO grezzo del collegamento radio tra veicolo e gateway.
+
+**Relazione con la formalizzazione**
+
+Alimenta il modello gateway-aware di CLOUD, `Dl(k)` e il riferimento di copertura.
+
+**Campi o valori importanti**
+
+Campi dichiarati principali:
+- `public String accessLinkId`
+- `public String vehicleId`
+- `public String gatewayId`
+- `public Boolean active`
+- `public Boolean available`
+
+**Metodi**
+
+Questa classe non dichiara metodi propri; contiene soprattutto dati grezzi di input.
+
+**Problematiche aperte**
+
+Nessuna specifica nota per questa classe.
+
+### `BandwidthPoolInputDto`
+
+- File: `src/io/snapshot/dto/BandwidthPoolInputDto.java:4`
+- Tipo: `class`
+- Nome completo: `io.snapshot.dto.BandwidthPoolInputDto`
+
+**Cosa fa, in parole semplici**
+
+DTO grezzo di un pool di banda condivisa.
+
+**Relazione con la formalizzazione**
+
+Trasporta il `Bmax` globale o specializzato per gateway/V2V.
+
+**Campi o valori importanti**
+
+Campi dichiarati principali:
+- `public String poolId`
+- `public String poolType`
+- `public Double availableBandwidth`
+
+**Metodi**
+
+Questa classe non dichiara metodi propri; contiene soprattutto dati grezzi di input.
 
 **Problematiche aperte**
 
@@ -4233,9 +4568,113 @@ Campi dichiarati principali:
 
 Nessuna specifica nota per questa classe.
 
+## Package `model.bandwidth`
+
+Risolve il vincolo di banda condivisa introdotto dagli snapshot gateway-aware.
+
+### `BandwidthPoolType`
+
+- File: `src/model/bandwidth/BandwidthPoolType.java:4`
+- Tipo: `enum`
+- Nome completo: `model.bandwidth.BandwidthPoolType`
+
+**Cosa fa, in parole semplici**
+
+Classifica il dominio radio del pool: `GLOBAL`, `GATEWAY` o `DIRECT_V2V`.
+
+**Relazione con la formalizzazione**
+
+`GLOBAL` rappresenta direttamente il `Bmax` unico. `GATEWAY` e `DIRECT_V2V` specializzano `Bmax` in piu' budget radio quando lo scenario li dichiara.
+
+**Problematiche aperte**
+
+Nessuna specifica nota per questa enum.
+
+### `BandwidthPoolResolver`
+
+- File: `src/model/bandwidth/BandwidthPoolResolver.java:13`
+- Tipo: `class`
+- Nome completo: `model.bandwidth.BandwidthPoolResolver`
+
+**Cosa fa, in parole semplici**
+
+Determina quale `BandwidthPoolSnapshot` viene consumato da un candidato remoto. I candidati LOCAL non consumano banda remota. I candidati V2V possono indicare direttamente `bandwidthPoolId`; EDGE e CLOUD usano il gateway radio attivo del veicolo sorgente; se lo snapshot espone un solo pool `GLOBAL`, quello viene usato come fallback di compatibilita'.
+
+**Relazione con la formalizzazione**
+
+Collega la variabile di banda del gene al vincolo aggregato `Bmax`: non basta rispettare la banda del singolo link, bisogna rispettare anche la capacita' del pool condiviso.
+
+**Con chi comunica**
+
+Comunica con `SystemSnapshot`, `NodeCandidate`, `AccessLinkSnapshot`, `AccessGatewaySnapshot` e `BandwidthPoolSnapshot`. Viene usato da `FitnessEvaluator`, `BandwidthPoolAggregateRepairOperator` e `BandwidthPoolDiagnosticPrinter`.
+
+**Metodi principali**
+
+| Metodo | Visibilita' | Spiegazione semplice |
+|---|---:|---|
+| `public BandwidthPoolSnapshot resolve(SystemSnapshot snapshot, NodeCandidate candidate)` | public | Restituisce il pool consumato dal candidato remoto o solleva eccezione se il binding non e' risolvibile. |
+
+**Problematiche aperte**
+
+Ogni veicolo deve avere esattamente un access link attivo se usa EDGE/CLOUD senza `bandwidthPoolId` esplicito; questa assunzione e' validata da `SnapshotValidator`.
+
 ## Package `model.mobility`
 
-Stima metriche mobility-aware: copertura, distanza, velocita' relativa e instabilita' del link.
+Stima metriche mobility-aware: copertura, distanza, velocita' relativa, access gateway attivo e instabilita' del link.
+
+### `AccessLinkResolver`
+
+- File: `src/model/mobility/AccessLinkResolver.java:13`
+- Tipo: `class`
+- Nome completo: `model.mobility.AccessLinkResolver`
+
+**Cosa fa, in parole semplici**
+
+Trova nello snapshot il collegamento radio attivo di un veicolo, il gateway associato e il veicolo sorgente. Centralizza gli errori strutturali: nessun link attivo, link attivi multipli, gateway mancante o veicolo mancante.
+
+**Con chi comunica**
+
+Viene usato da `AccessLinkMetricsEstimator` e indirettamente da `CoverageEstimator`, `CoverageReferenceCalculator` e `LinkDynamicityCalculator`.
+
+**Problematiche aperte**
+
+Nessuna specifica nota per questa classe.
+
+### `AccessLinkMetrics`
+
+- File: `src/model/mobility/AccessLinkMetrics.java:6`
+- Tipo: `class`
+- Nome completo: `model.mobility.AccessLinkMetrics`
+
+**Cosa fa, in parole semplici**
+
+Contiene le metriche geometriche del link radio attivo: accessLinkId, gatewayId, tipo di gateway, distanza veicolo-gateway, raggio, velocita' sorgente, tempo di copertura residuo, instabilita' link e disponibilita'.
+
+**Relazione con la formalizzazione**
+
+Fornisce la proxy `phi_link` e il tempo di copertura usati da `Dl(k)`, cloud gateway-aware e bound temporali.
+
+**Problematiche aperte**
+
+Nessuna specifica nota per questa classe.
+
+### `AccessLinkMetricsEstimator`
+
+- File: `src/model/mobility/AccessLinkMetricsEstimator.java:18`
+- Tipo: `class`
+- Nome completo: `model.mobility.AccessLinkMetricsEstimator`
+
+**Cosa fa, in parole semplici**
+
+Calcola le metriche dell'access link attivo usando posizione del veicolo, posizione del gateway, raggio di copertura e `MobilityConfig`. Un link e' disponibile solo se il flag dello snapshot e la geometria sono entrambi validi. Il tempo residuo e' clampato dal massimo configurato; l'instabilita' e' `distance / radius` clampato in `[0, 1]`.
+
+**Con chi comunica**
+
+Usa `AccessLinkResolver`, `AccessGatewaySnapshot`, `AccessLinkSnapshot`, `VehicleSnapshot` e `MobilityConfig`.
+
+**Problematiche aperte**
+
+La stima e' ancora geometrica e scalare: non usa heading, traiettorie o fading radio.
 
 ### `CoverageEstimator`
 
@@ -4245,7 +4684,7 @@ Stima metriche mobility-aware: copertura, distanza, velocita' relativa e instabi
 
 **Cosa fa, in parole semplici**
 
-Stima le grandezze mobility-aware di un candidato rispetto a un task. La classe usa lo snapshot corrente, il task e il candidato selezionato. Il tempo di copertura e l'instabilità del collegamento vengono ricavati da un'unica stima, così fitness e report osservano gli stessi valori. Calcola copertura e instabilita' link con una stima unica usata da fitness, repair e report.
+Stima le grandezze mobility-aware di un candidato rispetto a un task. Per LOCAL usa un tempo convenzionale; per CLOUD usa l'access gateway attivo del veicolo sorgente; per EDGE usa geometria del candidato infrastrutturale; per VEHICLE usa distanza V2V e velocita' relativa scalare. Il tempo di copertura e l'instabilita' del collegamento vengono ricavati da una stima unica, cosi' fitness, repair e report osservano gli stessi valori.
 
 **Relazione con la formalizzazione**
 
@@ -4253,13 +4692,14 @@ Implementa la parte mobility-aware: tempo di copertura, instabilita' link, risch
 
 **Con chi comunica**
 
-Comunica direttamente con: `MobilityConfig`, `NodeCandidate`, `NodeType`, `SystemSnapshot`, `TaskInstance`, `VehicleSnapshot`.
+Comunica direttamente con: `MobilityConfig`, `AccessLinkMetricsEstimator`, `NodeCandidate`, `NodeType`, `SystemSnapshot`, `TaskInstance`, `VehicleSnapshot`.
 In pratica questa classe riceve questi oggetti, li costruisce oppure li passa allo step successivo del flusso.
 
 **Campi o valori importanti**
 
 Campi dichiarati principali:
 - `private final MobilityConfig mobilityConfig`
+- `private final AccessLinkMetricsEstimator accessLinkMetricsEstimator`
 
 **Metodi**
 
@@ -4279,7 +4719,7 @@ Campi dichiarati principali:
 
 **Problematiche aperte**
 
-- La copertura cloud e' ancora un placeholder stabile: il gateway radio verso cloud non e' modellato esplicitamente.
+- La copertura CLOUD e' gateway-aware: dipende dall'access link attivo del veicolo sorgente.
 - La copertura V2V usa differenza scalare di velocita', non vettori direzionali completi.
 - La copertura edge usa geometria e velocita' scalare, senza heading del veicolo.
 
@@ -4313,6 +4753,7 @@ Campi dichiarati principali:
 - `private final double relativeSpeedMetersPerSecond`
 - `private final double coverageTimeSeconds`
 - `private final double linkInstability`
+- `private final String referenceAccessGatewayId`
 
 **Metodi**
 
@@ -4320,7 +4761,8 @@ Campi dichiarati principali:
 |---|---:|---|
 | `public MobilityLinkMetrics( NodeType nodeType, ModelMode modelMode, double distanceMeters, double coverageRadiusMeters, double sourceSpeedMetersPerSecond, double relativeSpeedMetersPerSecond, double coverageTimeSeconds, double linkInstability )` | public | Costruttore: crea l'oggetto e controlla che i dati necessari siano validi. |
 | `public static MobilityLinkMetrics local(double coverageTimeSeconds)` | public | Metodo di supporto: realizza il passo `local` dentro la responsabilita' della classe. |
-| `public static MobilityLinkMetrics cloud(double coverageTimeSeconds)` | public | Metodo di supporto: realizza il passo `cloud` dentro la responsabilita' della classe. |
+| `public static MobilityLinkMetrics cloudGateway(AccessLinkMetrics access)` | public | Crea metriche CLOUD derivate dal gateway radio attivo. |
+| `public static MobilityLinkMetrics cloud(double coverageTimeSeconds)` | public | Metodo deprecato mantenuto per compatibilita' diagnostica con vecchi report. |
 | `public static MobilityLinkMetrics legacy( NodeType nodeType, double coverageTimeSeconds )` | public | Metodo di supporto: realizza il passo `legacy` dentro la responsabilita' della classe. |
 | `public NodeType getNodeType()` | public | Restituisce il valore di `NodeType` senza modificarlo. |
 | `public ModelMode getModelMode()` | public | Restituisce il valore di `ModelMode` senza modificarlo. |
@@ -4330,7 +4772,9 @@ Campi dichiarati principali:
 | `public double getRelativeSpeedMetersPerSecond()` | public | Restituisce il valore di `RelativeSpeedMetersPerSecond` senza modificarlo. |
 | `public double getCoverageTimeSeconds()` | public | Restituisce il valore di `CoverageTimeSeconds` senza modificarlo. |
 | `public double getLinkInstability()` | public | Restituisce il valore di `LinkInstability` senza modificarlo. |
+| `public String getReferenceAccessGatewayId()` | public | Restituisce il gateway radio usato dal modello CLOUD, se presente. |
 | `public boolean isCloudStablePlaceholder()` | public | Risponde con true/false alla domanda `is cloud stable placeholder`. |
+| `public boolean isCloudGatewayAware()` | public | Indica se il collegamento CLOUD e' stato stimato tramite gateway attivo. |
 | `public boolean hasGeometricDistance()` | public | Risponde con true/false alla domanda `has geometric distance`. |
 | `public boolean hasCoverageRadius()` | public | Risponde con true/false alla domanda `has coverage radius`. |
 | `public boolean hasRelativeSpeed()` | public | Risponde con true/false alla domanda `has relative speed`. |
@@ -4339,7 +4783,8 @@ Campi dichiarati principali:
 
 **Problematiche aperte**
 
-- I valori `CLOUD_STABLE_PLACEHOLDER` e `V2V_SCALAR_RELATIVE_SPEED` indicano approssimazioni ancora da sostituire con dati piu' ricchi.
+- `CLOUD_STABLE_PLACEHOLDER` resta solo per compatibilita' con report storici. Il modello operativo usa `CLOUD_GATEWAY_GEOMETRIC`.
+- `V2V_SCALAR_RELATIVE_SPEED` resta una proxy semplificata: non usa heading o vettori di traiettoria.
 
 ### `ModelMode` (tipo interno di `MobilityLinkMetrics`)
 
@@ -4363,7 +4808,7 @@ In pratica questa classe riceve questi oggetti, li costruisce oppure li passa al
 **Campi o valori importanti**
 
 Valori enum principali:
-`LOCAL_CONVENTIONAL`, `EDGE_GEOMETRIC`, `V2V_SCALAR_RELATIVE_SPEED`, `CLOUD_STABLE_PLACEHOLDER`, `LEGACY_UNAVAILABLE`
+`LOCAL_CONVENTIONAL`, `EDGE_GEOMETRIC`, `V2V_SCALAR_RELATIVE_SPEED`, `CLOUD_GATEWAY_GEOMETRIC`, `CLOUD_STABLE_PLACEHOLDER`, `LEGACY_UNAVAILABLE`
 
 **Metodi**
 
@@ -4385,7 +4830,7 @@ Descrive i tipi e le istanze dei nodi candidati: locale, veicolo, edge, cloud.
 
 **Cosa fa, in parole semplici**
 
-Rappresenta una possibile opzione di esecuzione per un task generato da uno specifico veicolo sorgente. Il candidato è source-aware: `sourceVehicleId` indica il veicolo che può usare il candidato; `executionNodeId` indica il nodo fisico che eseguirà il task; `propagationDelaySeconds` rappresenta `tau_n`, cioè il ritardo end-to-end aggregato del percorso remoto. Il ritardo di propagazione esclude i tempi di trasferimento dipendenti dalla banda. Viene conteggiato una sola volta per ogni scelta remota ed è nullo per i candidati locali. Il tempo di copertura non è memorizzato in questa classe. Viene calcolato da una classe dedicata usando veicoli, posizione del nodo, raggio di copertura e, nel caso V2V, veicolo target. Rappresenta un possibile nodo `n_i` per un task: local, vehicle, edge o cloud.
+Rappresenta una possibile opzione di esecuzione per un task generato da uno specifico veicolo sorgente. Il candidato e' source-aware: `sourceVehicleId` indica il veicolo che puo' usare il candidato; `executionNodeId` indica il nodo fisico che eseguira' il task; `propagationDelaySeconds` rappresenta `tau_n`, cioe' il ritardo end-to-end aggregato del percorso remoto. Il ritardo di propagazione esclude i tempi di trasferimento dipendenti dalla banda. Viene conteggiato una sola volta per ogni scelta remota ed e' nullo per i candidati locali. Il tempo di copertura non e' memorizzato in questa classe: viene calcolato da `CoverageEstimator` e, per CLOUD, dall'access gateway attivo. Il campo opzionale `bandwidthPoolId` permette soprattutto ai candidati V2V diretti di dichiarare esplicitamente il pool di banda condivisa consumato; EDGE e CLOUD possono invece risolverlo tramite gateway attivo.
 
 **Relazione con la formalizzazione**
 
@@ -4409,12 +4854,14 @@ Campi dichiarati principali:
 - `private final Double nodeX`
 - `private final Double nodeY`
 - `private final Double coverageRadiusMeters`
+- `private final String bandwidthPoolId`
 
 **Metodi**
 
 | Metodo | Visibilita' | Spiegazione semplice |
 |---|---:|---|
-| `public NodeCandidate( String candidateId, String sourceVehicleId, String executionNodeId, NodeType type, double availableCpu, double availableBandwidth, double propagationDelaySeconds, Double nodeX, Double nodeY, Double coverageRadiusMeters )` | public | Costruisce un candidato di esecuzione source-aware. @param candidateId identificativo univoco del candidato @param sourceVehicleId veicolo sorgente per cui il candidato è valido @param executionNodeId nodo fisico che esegue il task @param type tipo del candidato @param availableCpu CPU disponibile sul nodo di esecuzione @param availableBandwidth banda disponibile sul link sorgente-destinazione @param propagationDelaySeconds ritardo end-to-end aggregato `tau_n` @param nodeX coordinata X del nodo infrastrutturale, se applicabile @param nodeY coordinata Y del nodo infrastrutturale, se applicabile @param coverageRadiusMeters raggio di copertura del nodo, se applicabile |
+| `public NodeCandidate( String candidateId, String sourceVehicleId, String executionNodeId, NodeType type, double availableCpu, double availableBandwidth, double propagationDelaySeconds, Double nodeX, Double nodeY, Double coverageRadiusMeters )` | public | Costruttore storico: delega al costruttore completo lasciando `bandwidthPoolId = null`. |
+| `public NodeCandidate( String candidateId, String sourceVehicleId, String executionNodeId, NodeType type, double availableCpu, double availableBandwidth, double propagationDelaySeconds, Double nodeX, Double nodeY, Double coverageRadiusMeters, String bandwidthPoolId )` | public | Costruisce un candidato source-aware completo, con binding opzionale al pool di banda. |
 | `public String getCandidateId()` | public | Restituisce il valore di `CandidateId` senza modificarlo. |
 | `public String getNodeId()` | public | Metodo di compatibilità con vecchie parti del codice. @return identificativo del candidato |
 | `public String getSourceVehicleId()` | public | Restituisce il valore di `SourceVehicleId` senza modificarlo. |
@@ -4427,6 +4874,7 @@ Campi dichiarati principali:
 | `public Double getNodeX()` | public | @return coordinata X del nodo, se presente |
 | `public Double getNodeY()` | public | @return coordinata Y del nodo, se presente |
 | `public Double getCoverageRadiusMeters()` | public | @return raggio di copertura del nodo, se presente |
+| `public String getBandwidthPoolId()` | public | Restituisce il pool di banda esplicito del candidato, se dichiarato. |
 | `public boolean isLocal()` | public | Risponde con true/false alla domanda `is local`. |
 | `public boolean isVehicle()` | public | Risponde con true/false alla domanda `is vehicle`. |
 | `public boolean isEdge()` | public | Risponde con true/false alla domanda `is edge`. |
@@ -4590,7 +5038,7 @@ Rappresenta la fotografia del sistema nella finestra corrente.
 
 **Cosa fa, in parole semplici**
 
-Fotografia dello stato del sistema in un istante simulato. Contiene veicoli, task attivi e candidati di esecuzione disponibili per quello specifico tempo. La classe resta mutabile per supportare la deserializzazione e la composizione degli snapshot filtrati. Rappresenta lo stato `S_k` dato al GA.
+Fotografia dello stato del sistema in un istante simulato. Contiene veicoli, task attivi, candidati di esecuzione, gateway radio, access link veicolo-gateway e pool di banda condivisa. La classe resta mutabile per supportare la deserializzazione e la composizione degli snapshot filtrati. Rappresenta lo stato `S_k` dato al GA e ai report temporali.
 
 **Relazione con la formalizzazione**
 
@@ -4598,8 +5046,7 @@ Rappresenta parametri osservati nello stato `S_k`, non variabili decise dal GA.
 
 **Con chi comunica**
 
-Comunica direttamente con: `NodeCandidate`.
-In pratica questa classe riceve questi oggetti, li costruisce oppure li passa allo step successivo del flusso.
+Comunica direttamente con `VehicleSnapshot`, `TaskInstance`, `NodeCandidate`, `AccessGatewaySnapshot`, `AccessLinkSnapshot` e `BandwidthPoolSnapshot`. Viene letto da loader, validator, prefilter, GA, fitness, repair, dynamicity e report.
 
 **Campi o valori importanti**
 
@@ -4609,13 +5056,18 @@ Campi dichiarati principali:
 - `private List<VehicleSnapshot> vehicles`
 - `private List<TaskInstance> tasks`
 - `private List<NodeCandidate> candidateNodes`
+- `private List<AccessGatewaySnapshot> accessGateways`
+- `private List<AccessLinkSnapshot> accessLinks`
+- `private List<BandwidthPoolSnapshot> bandwidthPools`
 
 **Metodi**
 
 | Metodo | Visibilita' | Spiegazione semplice |
 |---|---:|---|
 | `public SystemSnapshot()` | public | Costruttore: crea l'oggetto e controlla che i dati necessari siano validi. |
-| `public SystemSnapshot( String snapshotId, double timeSeconds, List<VehicleSnapshot> vehicles, List<TaskInstance> tasks, List<NodeCandidate> candidateNodes )` | public | Crea uno snapshot completo. @param snapshotId identificativo dello snapshot @param timeSeconds tempo simulato associato allo snapshot @param vehicles veicoli presenti nello scenario @param tasks task attivi nello scenario @param candidateNodes candidati di esecuzione disponibili |
+| `public SystemSnapshot( String snapshotId, double timeSeconds, List<VehicleSnapshot> vehicles, List<TaskInstance> tasks, List<NodeCandidate> candidateNodes )` | public | Costruttore storico privo di gateway, access link e pool. |
+| `public SystemSnapshot( String snapshotId, double timeSeconds, List<VehicleSnapshot> vehicles, List<TaskInstance> tasks, List<NodeCandidate> candidateNodes, List<AccessGatewaySnapshot> accessGateways, List<AccessLinkSnapshot> accessLinks )` | public | Costruttore gateway-aware precedente ai pool di banda. |
+| `public SystemSnapshot( String snapshotId, double timeSeconds, List<VehicleSnapshot> vehicles, List<TaskInstance> tasks, List<NodeCandidate> candidateNodes, List<AccessGatewaySnapshot> accessGateways, List<AccessLinkSnapshot> accessLinks, List<BandwidthPoolSnapshot> bandwidthPools )` | public | Costruttore completo con gateway, access link e pool radio condivisi. |
 | `public String getSnapshotId()` | public | Restituisce il valore di `SnapshotId` senza modificarlo. |
 | `public void setSnapshotId(String snapshotId)` | public | Aggiorna il valore di `SnapshotId` nell'oggetto. |
 | `public double getTimeSeconds()` | public | Restituisce il valore di `TimeSeconds` senza modificarlo. |
@@ -4626,7 +5078,126 @@ Campi dichiarati principali:
 | `public void setTasks(List<TaskInstance> tasks)` | public | Aggiorna il valore di `Tasks` nell'oggetto. |
 | `public List<NodeCandidate> getCandidateNodes()` | public | Restituisce il valore di `CandidateNodes` senza modificarlo. |
 | `public void setCandidateNodes(List<NodeCandidate> candidateNodes)` | public | Aggiorna il valore di `CandidateNodes` nell'oggetto. |
+| `public List<AccessGatewaySnapshot> getAccessGateways()` | public | Restituisce i gateway radio osservati nello snapshot. |
+| `public void setAccessGateways(List<AccessGatewaySnapshot> accessGateways)` | public | Aggiorna i gateway radio osservati. |
+| `public List<AccessLinkSnapshot> getAccessLinks()` | public | Restituisce i collegamenti radio veicolo-gateway. |
+| `public void setAccessLinks(List<AccessLinkSnapshot> accessLinks)` | public | Aggiorna i collegamenti radio veicolo-gateway. |
+| `public List<BandwidthPoolSnapshot> getBandwidthPools()` | public | Restituisce i pool di banda condivisa. |
+| `public void setBandwidthPools(List<BandwidthPoolSnapshot> bandwidthPools)` | public | Aggiorna i pool di banda condivisa. |
 | `public String toString()` | public | Converte l'oggetto in una stringa utile per debug e report. |
+
+**Problematiche aperte**
+
+Nessuna specifica nota per questa classe.
+
+### `AccessGatewaySnapshot`
+
+- File: `src/model/snapshot/AccessGatewaySnapshot.java:4`
+- Tipo: `class`
+- Nome completo: `model.snapshot.AccessGatewaySnapshot`
+
+**Cosa fa, in parole semplici**
+
+Descrive un punto di accesso radio osservato nello scenario. Contiene identificativo, tipo, posizione, raggio di copertura e binding opzionale a un pool di banda.
+
+**Relazione con la formalizzazione**
+
+Rende esplicito il gateway usato da CLOUD/EDGE per stimare copertura, instabilita' e pool `Bmax` condiviso.
+
+**Campi o valori importanti**
+
+Campi dichiarati principali:
+- `private final String gatewayId`
+- `private final String gatewayType`
+- `private final double x`
+- `private final double y`
+- `private final double coverageRadiusMeters`
+- `private final String bandwidthPoolId`
+
+**Metodi**
+
+| Metodo | Visibilita' | Spiegazione semplice |
+|---|---:|---|
+| `public AccessGatewaySnapshot(String gatewayId, String gatewayType, double x, double y, double coverageRadiusMeters)` | public | Costruttore storico senza pool esplicito. |
+| `public AccessGatewaySnapshot(String gatewayId, String gatewayType, double x, double y, double coverageRadiusMeters, String bandwidthPoolId)` | public | Costruisce il gateway completo con pool opzionale. |
+| `public String getGatewayId()` | public | Restituisce l'identificativo del gateway. |
+| `public String getGatewayType()` | public | Restituisce il tipo dichiarato del gateway. |
+| `public double getX()` | public | Restituisce la coordinata X. |
+| `public double getY()` | public | Restituisce la coordinata Y. |
+| `public double getCoverageRadiusMeters()` | public | Restituisce il raggio di copertura. |
+| `public String getBandwidthPoolId()` | public | Restituisce il pool associato al gateway, se presente. |
+
+**Problematiche aperte**
+
+Nessuna specifica nota per questa classe.
+
+### `AccessLinkSnapshot`
+
+- File: `src/model/snapshot/AccessLinkSnapshot.java:10`
+- Tipo: `class`
+- Nome completo: `model.snapshot.AccessLinkSnapshot`
+
+**Cosa fa, in parole semplici**
+
+Associa un veicolo a un gateway radio. `active` indica il collegamento attualmente usato dal veicolo; `available` indica la disponibilita' dichiarata dalla sorgente. La disponibilita' geometrica viene stimata separatamente.
+
+**Relazione con la formalizzazione**
+
+E' il dato base usato per CLOUD gateway-aware, per `Dl(k)` e per il riferimento di copertura temporale.
+
+**Campi o valori importanti**
+
+Campi dichiarati principali:
+- `private final String accessLinkId`
+- `private final String vehicleId`
+- `private final String gatewayId`
+- `private final boolean active`
+- `private final boolean available`
+
+**Metodi**
+
+| Metodo | Visibilita' | Spiegazione semplice |
+|---|---:|---|
+| `public AccessLinkSnapshot(String accessLinkId, String vehicleId, String gatewayId, boolean active, boolean available)` | public | Costruisce il collegamento radio osservato. |
+| `public String getAccessLinkId()` | public | Restituisce l'identificativo del link. |
+| `public String getVehicleId()` | public | Restituisce il veicolo associato. |
+| `public String getGatewayId()` | public | Restituisce il gateway associato. |
+| `public boolean isActive()` | public | Indica se il link e' quello attivo per il veicolo. |
+| `public boolean isAvailable()` | public | Indica se la sorgente dichiara il link disponibile. |
+
+**Problematiche aperte**
+
+Nessuna specifica nota per questa classe.
+
+### `BandwidthPoolSnapshot`
+
+- File: `src/model/snapshot/BandwidthPoolSnapshot.java:12`
+- Tipo: `class`
+- Nome completo: `model.snapshot.BandwidthPoolSnapshot`
+
+**Cosa fa, in parole semplici**
+
+Descrive una capacita' di banda condivisa nello snapshot. Un pool `GLOBAL` riproduce il `Bmax` unico della formalizzazione; pool `GATEWAY` e `DIRECT_V2V` permettono domini radio distinti.
+
+**Relazione con la formalizzazione**
+
+Rappresenta il vincolo aggregato `sum_i b_i <= Bmax_pool` applicato da fitness, repair e report.
+
+**Campi o valori importanti**
+
+Campi dichiarati principali:
+- `private final String poolId`
+- `private final BandwidthPoolType poolType`
+- `private final double availableBandwidth`
+
+**Metodi**
+
+| Metodo | Visibilita' | Spiegazione semplice |
+|---|---:|---|
+| `public BandwidthPoolSnapshot(String poolId, BandwidthPoolType poolType, double availableBandwidth)` | public | Costruisce un pool di banda condivisa. |
+| `public String getPoolId()` | public | Restituisce l'identificativo del pool. |
+| `public BandwidthPoolType getPoolType()` | public | Restituisce il tipo di pool. |
+| `public double getAvailableBandwidth()` | public | Restituisce la capacita' disponibile del pool. |
 
 **Problematiche aperte**
 
@@ -4777,7 +5348,7 @@ In pratica questa classe riceve questi oggetti, li costruisce oppure li passa al
 
 **Cosa fa, in parole semplici**
 
-Punto unico di validazione degli snapshot. La validazione puo' avvenire prima del mapping, sui DTO grezzi letti dal JSON, oppure sul domain model per compatibilita' con i chiamanti esistenti. Le regole applicate restano le stesse: campi obbligatori, valori numerici, unicita' degli ID, riferimenti e vincoli per tipo di candidato.
+Punto unico di validazione strutturale finale del domain model. Non valida piu' direttamente i DTO grezzi: `SnapshotLoader` prima mappa il JSON in `SystemSnapshot`, poi chiama questo validator. Le regole correnti controllano snapshot id, liste obbligatorie, unicita' degli ID, riferimenti tra veicoli/task/candidati/gateway/link/pool, almeno un pool di banda, esattamente un access link attivo per veicolo, fallback LOCAL per ogni task e risoluzione del pool di banda per ogni candidato remoto.
 
 **Relazione con la formalizzazione**
 
@@ -4785,173 +5356,26 @@ Fornisce o valida lo stato osservato `S_k` prima che il GA possa ragionare.
 
 **Con chi comunica**
 
-Comunica direttamente con: `NodeCandidate`, `NodeCandidateInputDto`, `NodeType`, `SnapshotInputDto`, `SystemSnapshot`, `TaskInputDto`, `TaskInstance`, `VehicleInputDto`, `VehicleSnapshot`.
-In pratica questa classe riceve questi oggetti, li costruisce oppure li passa allo step successivo del flusso.
+Comunica direttamente con `SystemSnapshot`, `TaskInstance`, `VehicleSnapshot`, `NodeCandidate`, `AccessGatewaySnapshot`, `AccessLinkSnapshot`, `BandwidthPoolSnapshot` e `BandwidthPoolResolver`.
 
 **Metodi**
 
 | Metodo | Visibilita' | Spiegazione semplice |
 |---|---:|---|
-| `public void validate(SnapshotInputDto dto)` | public | Valida lo snapshot grezzo prima della costruzione del domain model. @param dto snapshot letto dal JSON o da un adapter esterno |
-| `public void validate(SystemSnapshot snapshot)` | public | Valida uno snapshot gia' costruito. @param snapshot snapshot da controllare |
-| `private void validateSnapshot( String snapshotId, Double timeSeconds, List<VehicleData> vehicles, List<TaskData> tasks, List<CandidateData> candidates )` | private | Controlla la correttezza di `validate snapshot` e solleva un'eccezione se trova dati incoerenti. |
-| `private List<VehicleData> toVehicleDataFromDto( List<VehicleInputDto> vehicles )` | private | Metodo di supporto: realizza il passo `to vehicle data from dto` dentro la responsabilita' della classe. |
-| `private List<VehicleData> toVehicleDataFromModel( List<VehicleSnapshot> vehicles )` | private | Metodo di supporto: realizza il passo `to vehicle data from model` dentro la responsabilita' della classe. |
-| `private List<TaskData> toTaskDataFromDto(List<TaskInputDto> tasks)` | private | Metodo di supporto: realizza il passo `to task data from dto` dentro la responsabilita' della classe. |
-| `private List<TaskData> toTaskDataFromModel(List<TaskInstance> tasks)` | private | Metodo di supporto: realizza il passo `to task data from model` dentro la responsabilita' della classe. |
-| `private List<CandidateData> toCandidateDataFromDto( List<NodeCandidateInputDto> candidates )` | private | Metodo di supporto: realizza il passo `to candidate data from dto` dentro la responsabilita' della classe. |
-| `private List<CandidateData> toCandidateDataFromModel( List<NodeCandidate> candidates )` | private | Metodo di supporto: realizza il passo `to candidate data from model` dentro la responsabilita' della classe. |
-| `private <T> List<T> requireList(List<T> list, String name)` | private | Metodo di supporto: realizza il passo `require list` dentro la responsabilita' della classe. |
-| `private <T> T requireElement(T element, String listName, int index)` | private | Metodo di supporto: realizza il passo `require element` dentro la responsabilita' della classe. |
-| `private void validateVehicleIds(List<VehicleData> vehicles)` | private | Controlla la correttezza di `validate vehicle ids` e solleva un'eccezione se trova dati incoerenti. |
-| `private void validateTaskIds(List<TaskData> tasks)` | private | Controlla la correttezza di `validate task ids` e solleva un'eccezione se trova dati incoerenti. |
-| `private void validateCandidateIds(List<CandidateData> candidates)` | private | Controlla la correttezza di `validate candidate ids` e solleva un'eccezione se trova dati incoerenti. |
-| `private void validateCandidateTypes(List<CandidateData> candidates)` | private | Controlla la correttezza di `validate candidate types` e solleva un'eccezione se trova dati incoerenti. |
-| `private void validateVehicleNumericFields(List<VehicleData> vehicles)` | private | Controlla la correttezza di `validate vehicle numeric fields` e solleva un'eccezione se trova dati incoerenti. |
-| `private void validateTaskRequiredFields(List<TaskData> tasks)` | private | Controlla la correttezza di `validate task required fields` e solleva un'eccezione se trova dati incoerenti. |
-| `private void validateTaskNumericFields(List<TaskData> tasks)` | private | Controlla la correttezza di `validate task numeric fields` e solleva un'eccezione se trova dati incoerenti. |
-| `private void validateCandidateRequiredFields( List<CandidateData> candidates )` | private | Controlla la correttezza di `validate candidate required fields` e solleva un'eccezione se trova dati incoerenti. |
-| `private void validateCandidateNumericFields( List<CandidateData> candidates )` | private | Controlla la correttezza di `validate candidate numeric fields` e solleva un'eccezione se trova dati incoerenti. |
-| `private void validateTasksReferenceExistingVehicles( List<TaskData> tasks, List<VehicleData> vehicles )` | private | Controlla la correttezza di `validate tasks reference existing vehicles` e solleva un'eccezione se trova dati incoerenti. |
-| `private void validateCandidatesReferenceExistingSourceVehicles( List<CandidateData> candidates, List<VehicleData> vehicles )` | private | Controlla la correttezza di `validate candidates reference existing source vehicles` e solleva un'eccezione se trova dati incoerenti. |
-| `private void validateCandidateSemanticRules( List<CandidateData> candidates, List<VehicleData> vehicles )` | private | Controlla la correttezza di `validate candidate semantic rules` e solleva un'eccezione se trova dati incoerenti. |
-| `private void validateLocalCandidate(CandidateData candidate)` | private | Controlla la correttezza di `validate local candidate` e solleva un'eccezione se trova dati incoerenti. |
-| `private void validateVehicleCandidate( CandidateData candidate, Set<String> vehicleIds )` | private | Controlla la correttezza di `validate vehicle candidate` e solleva un'eccezione se trova dati incoerenti. |
-| `private void validateEdgeCandidate(CandidateData candidate)` | private | Controlla la correttezza di `validate edge candidate` e solleva un'eccezione se trova dati incoerenti. |
-| `private void validateCloudCandidate(CandidateData candidate)` | private | Controlla la correttezza di `validate cloud candidate` e solleva un'eccezione se trova dati incoerenti. |
-| `private void validateEachTaskHasValidCandidates( List<TaskData> tasks, List<CandidateData> candidates )` | private | Controlla la correttezza di `validate each task has valid candidates` e solleva un'eccezione se trova dati incoerenti. |
-| `private Set<String> collectVehicleIds(List<VehicleData> vehicles)` | private | Metodo di supporto: realizza il passo `collect vehicle ids` dentro la responsabilita' della classe. |
-| `private NodeType parseNodeType(String rawType, String candidateId)` | private | Interpreta input testuale o grezzo e lo trasforma in un valore usabile dal codice. |
-| `private void requireText(String value, String fieldName)` | private | Metodo di supporto: realizza il passo `require text` dentro la responsabilita' della classe. |
-| `private void requireFinite( Double value, String fieldName, String ownerId )` | private | Metodo di supporto: realizza il passo `require finite` dentro la responsabilita' della classe. |
-| `private void requireNonNegativeFinite( Double value, String fieldName, String ownerId )` | private | Metodo di supporto: realizza il passo `require non negative finite` dentro la responsabilita' della classe. |
-| `private void requirePositiveFinite( Double value, String fieldName, String ownerId )` | private | Metodo di supporto: realizza il passo `require positive finite` dentro la responsabilita' della classe. |
-| `private void validateOptionalFinite( Double value, String fieldName, String ownerId )` | private | Controlla la correttezza di `validate optional finite` e solleva un'eccezione se trova dati incoerenti. |
-| `private void validateOptionalPositive( Double value, String fieldName, String ownerId )` | private | Controlla la correttezza di `validate optional positive` e solleva un'eccezione se trova dati incoerenti. |
-
-**Problematiche aperte**
-
-Nessuna specifica nota per questa classe.
-
-### `VehicleData` (tipo interno di `SnapshotValidator`)
-
-- File: `src/validation/snapshot/SnapshotValidator.java:712`
-- Tipo: `class`
-- Nome completo: `validation.snapshot.SnapshotValidator.VehicleData`
-
-**Cosa fa, in parole semplici**
-
-Classe di supporto del progetto MA-GA.
-
-**Relazione con la formalizzazione**
-
-Fornisce o valida lo stato osservato `S_k` prima che il GA possa ragionare.
-
-**Con chi comunica**
-
-Comunica direttamente con: `NodeCandidate`, `NodeCandidateInputDto`, `NodeType`, `SnapshotInputDto`, `SystemSnapshot`, `TaskInputDto`, `TaskInstance`, `VehicleInputDto`, `VehicleSnapshot`.
-In pratica questa classe riceve questi oggetti, li costruisce oppure li passa allo step successivo del flusso.
-
-**Campi o valori importanti**
-
-Campi dichiarati principali:
-- `private final String vehicleId`
-- `private final Double x`
-- `private final Double y`
-- `private final Double speed`
-- `private final Double localCpu`
-
-**Metodi**
-
-| Metodo | Visibilita' | Spiegazione semplice |
-|---|---:|---|
-| `private VehicleData( String vehicleId, Double x, Double y, Double speed, Double localCpu )` | private | Costruttore: crea l'oggetto e controlla che i dati necessari siano validi. |
-
-**Problematiche aperte**
-
-Nessuna specifica nota per questa classe.
-
-### `TaskData` (tipo interno di `SnapshotValidator`)
-
-- File: `src/validation/snapshot/SnapshotValidator.java:735`
-- Tipo: `class`
-- Nome completo: `validation.snapshot.SnapshotValidator.TaskData`
-
-**Cosa fa, in parole semplici**
-
-Classe di supporto del progetto MA-GA.
-
-**Relazione con la formalizzazione**
-
-Fornisce o valida lo stato osservato `S_k` prima che il GA possa ragionare.
-
-**Con chi comunica**
-
-Comunica direttamente con: `NodeCandidate`, `NodeCandidateInputDto`, `NodeType`, `SnapshotInputDto`, `SystemSnapshot`, `TaskInputDto`, `TaskInstance`, `VehicleInputDto`, `VehicleSnapshot`.
-In pratica questa classe riceve questi oggetti, li costruisce oppure li passa allo step successivo del flusso.
-
-**Campi o valori importanti**
-
-Campi dichiarati principali:
-- `private final String taskId`
-- `private final String sourceVehicleId`
-- `private final Double inputSizeBits`
-- `private final Double outputSizeBits`
-- `private final Double cpuCycles`
-- `private final Double deadlineSeconds`
-
-**Metodi**
-
-| Metodo | Visibilita' | Spiegazione semplice |
-|---|---:|---|
-| `private TaskData( String taskId, String sourceVehicleId, Double inputSizeBits, Double outputSizeBits, Double cpuCycles, Double deadlineSeconds )` | private | Costruttore: crea l'oggetto e controlla che i dati necessari siano validi. |
-
-**Problematiche aperte**
-
-Nessuna specifica nota per questa classe.
-
-### `CandidateData` (tipo interno di `SnapshotValidator`)
-
-- File: `src/validation/snapshot/SnapshotValidator.java:761`
-- Tipo: `class`
-- Nome completo: `validation.snapshot.SnapshotValidator.CandidateData`
-
-**Cosa fa, in parole semplici**
-
-Classe di supporto del progetto MA-GA.
-
-**Relazione con la formalizzazione**
-
-Fornisce o valida lo stato osservato `S_k` prima che il GA possa ragionare.
-
-**Con chi comunica**
-
-Comunica direttamente con: `NodeCandidate`, `NodeCandidateInputDto`, `NodeType`, `SnapshotInputDto`, `SystemSnapshot`, `TaskInputDto`, `TaskInstance`, `VehicleInputDto`, `VehicleSnapshot`.
-In pratica questa classe riceve questi oggetti, li costruisce oppure li passa allo step successivo del flusso.
-
-**Campi o valori importanti**
-
-Campi dichiarati principali:
-- `private final String candidateId`
-- `private final String sourceVehicleId`
-- `private final String executionNodeId`
-- `private final String rawType`
-- `private NodeType type`
-- `private final Double availableCpu`
-- `private final Double availableBandwidth`
-- `private final Double baseLatencySeconds`
-- `private final Double nodeX`
-- `private final Double nodeY`
-- `private final Double coverageRadiusMeters`
-
-**Metodi**
-
-| Metodo | Visibilita' | Spiegazione semplice |
-|---|---:|---|
-| `private CandidateData( String candidateId, String sourceVehicleId, String executionNodeId, String rawType, NodeType type, Double availableCpu, Double availableBandwidth, Double baseLatencySeconds, Double nodeX, Double nodeY, Double coverageRadiusMeters )` | private | Costruttore: crea l'oggetto e controlla che i dati necessari siano validi. |
-| `private static CandidateData fromInput( String candidateId, String sourceVehicleId, String executionNodeId, String rawType, Double availableCpu, Double availableBandwidth, Double baseLatencySeconds, Double nodeX, Double nodeY, Double coverageRadiusMeters )` | private | Metodo di supporto: realizza il passo `from input` dentro la responsabilita' della classe. |
-| `private static CandidateData fromModel( String candidateId, String sourceVehicleId, String executionNodeId, NodeType type, Double availableCpu, Double availableBandwidth, Double baseLatencySeconds, Double nodeX, Double nodeY, Double coverageRadiusMeters )` | private | Metodo di supporto: realizza il passo `from model` dentro la responsabilita' della classe. |
-| `private boolean hasCoverageGeometry()` | private | Risponde con true/false alla domanda `has coverage geometry`. |
+| `public void validate(SystemSnapshot snapshot)` | public | Valida lo snapshot di dominio completo. |
+| `private void gatewayPools(List<AccessGatewaySnapshot> gateways, Set<String> pools)` | private | Verifica che ogni gateway con `bandwidthPoolId` punti a un pool esistente. |
+| `private void candidates(SystemSnapshot snapshot, List<NodeCandidate> candidates, Set<String> vehicles)` | private | Valida sorgenti, regole LOCAL/VEHICLE e risoluzione del pool per i candidati remoti. |
+| `private void tasks(List<TaskInstance> tasks, Set<String> vehicles, List<NodeCandidate> candidates)` | private | Verifica sorgente dei task e presenza di fallback LOCAL. |
+| `private void links(List<AccessLinkSnapshot> links, Set<String> vehicles, Set<String> gateways)` | private | Valida access link univoci, riferimenti e un solo link attivo per veicolo. |
+| `private Set<String> idsVehicles(List<VehicleSnapshot> vehicles)` | private | Indicizza e valida gli ID veicolo. |
+| `private Set<String> idsGateways(List<AccessGatewaySnapshot> gateways)` | private | Indicizza e valida gli ID gateway. |
+| `private Set<String> idsPools(List<BandwidthPoolSnapshot> pools)` | private | Indicizza i pool e richiede almeno un pool di banda. |
+| `private void uniqueTasks(List<TaskInstance> tasks)` | private | Controlla l'unicita' degli ID task. |
+| `private void uniqueCandidates(List<NodeCandidate> candidates)` | private | Controlla l'unicita' degli ID candidato. |
+| `private <T> List<T> req(List<T> values, String name)` | private | Richiede che una lista dello snapshot non sia nulla. |
+| `private void add(Set<String> ids, String value, String field)` | private | Aggiunge un ID verificando testo non vuoto e unicita'. |
+| `private void ref(Set<String> ids, String value, String label)` | private | Verifica che un riferimento punti a un ID esistente. |
+| `private void requireText(String value, String field)` | private | Richiede testo non nullo e non vuoto. |
 
 **Problematiche aperte**
 
@@ -5174,7 +5598,7 @@ Calcola singole componenti della dinamicita': veicoli, task, risorse, link.
 
 **Cosa fa, in parole semplici**
 
-Calcola Dl(k), cioè la variazione dei link/candidati source-aware. La copertura non viene usata qui perché non è una proprietà statica del NodeCandidate. Viene calcolata separatamente dal CoverageEstimator.
+Calcola `Dl(k)`, cioe' la variazione della qualita' dei collegamenti radio di accesso dei veicoli presenti in due finestre consecutive. La qualita' del veicolo `v` e' `q_v(k) = 1 - phi_link(v, gatewayAttivo)`, derivata da `AccessLinkMetricsEstimator`. I candidati computazionali aggiunti o rimossi non modificano piu' `Dl(k)` se l'access link radio resta invariato.
 
 **Relazione con la formalizzazione**
 
@@ -5182,26 +5606,29 @@ Realizza l'indice `D(k)` e le sue componenti `Dv`, `Dt`, `Dr`, `Dl`.
 
 **Con chi comunica**
 
-Comunica direttamente con: `LinkMetrics`, `MetricMapComparator`, `NodeCandidate`, `SystemSnapshot`.
-In pratica questa classe riceve questi oggetti, li costruisce oppure li passa allo step successivo del flusso.
+Comunica direttamente con `AccessLinkMetricsEstimator`, `AccessLinkMetrics`, `MobilityConfig`, `SystemSnapshot` e `VehicleSnapshot`. Il vecchio `MetricMapComparator<LinkMetrics>` resta solo in un costruttore deprecato per compatibilita' sorgente.
 
 **Campi o valori importanti**
 
 Campi dichiarati principali:
-- `private final MetricMapComparator<LinkMetrics> comparator`
+- `private final AccessLinkMetricsEstimator accessLinkMetricsEstimator`
 
 **Metodi**
 
 | Metodo | Visibilita' | Spiegazione semplice |
 |---|---:|---|
-| `public LinkDynamicityCalculator()` | public | Costruisce il calculator con comparator standard. |
-| `public LinkDynamicityCalculator( MetricMapComparator<LinkMetrics> comparator )` | public | Costruisce il calculator con comparator esplicito. @param comparator comparator tra mappe di metriche |
-| `public double compute( SystemSnapshot previousSnapshot, SystemSnapshot currentSnapshot )` | public | Calcola la variazione normalizzata dei link/candidati. @param previousSnapshot snapshot precedente @param currentSnapshot snapshot corrente @return Dl(k) in [0, 1] |
-| `private Map<String, LinkMetrics> buildLinkMap( SystemSnapshot snapshot )` | private | Costruisce la mappa candidateId -> LinkMetrics. |
+| `public LinkDynamicityCalculator()` | public | Costruttore storico con `MobilityConfig.defaultConfig()`. |
+| `public LinkDynamicityCalculator(MobilityConfig mobilityConfig)` | public | Costruisce il calculator gateway-aware con configurazione esplicita. |
+| `public LinkDynamicityCalculator(AccessLinkMetricsEstimator accessLinkMetricsEstimator)` | public | Costruttore utile per test con estimator esplicito. |
+| `public LinkDynamicityCalculator(MetricMapComparator<LinkMetrics> ignoredComparator)` | public | Overload deprecato: il comparator storico sui candidateId non viene piu' usato. |
+| `public double compute(SystemSnapshot previousSnapshot, SystemSnapshot currentSnapshot)` | public | Calcola `Dl(k)` come media delle differenze assolute di qualita' sugli ID veicolo comuni. |
+| `public double quality(SystemSnapshot snapshot, String vehicleId)` | public | Restituisce `q_v(k)`; un access link indisponibile vale 0. |
+| `public AccessLinkMetricsEstimator getAccessLinkMetricsEstimator()` | public | Espone l'estimator usato dai report diagnostici. |
+| `private Set<String> vehicleIds(SystemSnapshot snapshot)` | private | Estrae gli ID dei veicoli osservati. |
 
 **Problematiche aperte**
 
-- `Dl(k)` usa candidateId, banda e latenza; non e' ancora un indicatore radio `q_v(k)` derivato direttamente dal simulatore.
+- `Dl(k)` e' gateway-aware, ma dipende ancora dalla proxy geometrica di `AccessLinkMetricsEstimator`, non da una misura radio MOSAIC/SUMO nativa.
 
 ### `ResourceDynamicityCalculator`
 
@@ -5285,7 +5712,7 @@ Nessuna specifica nota per questa classe.
 
 **Cosa fa, in parole semplici**
 
-Calcola Dv(k), cioè la variazione dei veicoli tra due snapshot. Il confronto non usa solo la presenza degli ID. Per veicoli presenti in entrambi gli snapshot considera anche: - posizione; - velocità; - CPU locale.
+Calcola `Dv(k)`, cioe' la variazione dell'insieme dei veicoli osservati. La definizione corrente usa solo il churn: ingressi e uscite dallo scenario. Posizione, velocita' e CPU locale non sono assorbite da questa componente; la qualita' geometrica dei link appartiene a `Dl(k)` e la CPU locale a `Dr(k)`.
 
 **Relazione con la formalizzazione**
 
@@ -5293,22 +5720,21 @@ Realizza l'indice `D(k)` e le sue componenti `Dv`, `Dt`, `Dr`, `Dl`.
 
 **Con chi comunica**
 
-Comunica direttamente con: `MetricMapComparator`, `SystemSnapshot`, `VehicleMetrics`, `VehicleSnapshot`.
-In pratica questa classe riceve questi oggetti, li costruisce oppure li passa allo step successivo del flusso.
+Comunica direttamente con `SystemSnapshot` e `VehicleSnapshot`. `MetricMapComparator<VehicleMetrics>` resta solo nel costruttore deprecato.
 
 **Campi o valori importanti**
 
 Campi dichiarati principali:
-- `private final MetricMapComparator<VehicleMetrics> comparator`
+- `private static final double EPSILON = 1.0E-9`
 
 **Metodi**
 
 | Metodo | Visibilita' | Spiegazione semplice |
 |---|---:|---|
-| `public VehicleDynamicityCalculator()` | public | Costruisce il calculator con comparator standard. |
-| `public VehicleDynamicityCalculator( MetricMapComparator<VehicleMetrics> comparator )` | public | Costruisce il calculator con comparator esplicito. @param comparator comparator tra mappe di metriche |
-| `public double compute( SystemSnapshot previousSnapshot, SystemSnapshot currentSnapshot )` | public | Calcola la variazione normalizzata dei veicoli. @param previousSnapshot snapshot precedente @param currentSnapshot snapshot corrente @return Dv(k) in [0, 1] |
-| `private Map<String, VehicleMetrics> buildVehicleMap( SystemSnapshot snapshot )` | private | Costruisce la mappa vehicleId -> VehicleMetrics. |
+| `public VehicleDynamicityCalculator()` | public | Costruisce il calculator aderente alla formalizzazione. |
+| `public VehicleDynamicityCalculator(MetricMapComparator<VehicleMetrics> ignoredComparator)` | public | Overload deprecato: il comparator storico non viene piu' usato. |
+| `public double compute(SystemSnapshot previousSnapshot, SystemSnapshot currentSnapshot)` | public | Calcola `|V(k) symmetricDifference V(k-1)| / (|V(k) union V(k-1)| + epsilon)`. |
+| `private Set<String> vehicleIds(SystemSnapshot snapshot)` | private | Estrae gli ID veicolo dallo snapshot. |
 
 **Problematiche aperte**
 
@@ -6094,7 +6520,7 @@ Nessuna specifica nota per questa classe.
 
 **Cosa fa, in parole semplici**
 
-Prefiltra i candidati prima dell'esecuzione del GA. Il filtro applica soltanto controlli strutturali. Non elimina candidati raggiungibili perché poco convenienti, vicini al limite di copertura o apparentemente incompatibili con una deadline. Queste valutazioni spettano al repair deadline-aware, alla fitness e alla penalità mobility-aware. I candidati LOCAL vengono sempre mantenuti. I candidati remoti vengono rimossi soltanto se non possono essere utilizzati in modo matematicamente sensato: CPU o banda nulle/non valide, assenza di task per la sorgente, sorgente mancante, EDGE fuori copertura oppure collegamento V2V fuori raggio.
+Prefiltra i candidati prima dell'esecuzione del GA. Il filtro applica controlli strutturali e non elimina candidati raggiungibili solo perche' poco convenienti o vicini al limite. I candidati LOCAL vengono sempre mantenuti. I remoti vengono rimossi se mancano task/sorgente, CPU o banda sono non valide, EDGE/V2V sono fuori copertura, oppure CLOUD non dispone di un access gateway attivo e disponibile. Lo snapshot filtrato riduce solo `candidateNodes`: veicoli, task, gateway, access link e pool di banda vengono propagati senza perdita.
 
 **Relazione con la formalizzazione**
 
@@ -6102,14 +6528,14 @@ Supporta la traduzione pratica della formalizzazione in codice.
 
 **Con chi comunica**
 
-Comunica direttamente con: `NodeCandidate`, `NodeType`, `SystemSnapshot`, `TaskInstance`, `VehicleSnapshot`.
-In pratica questa classe riceve questi oggetti, li costruisce oppure li passa allo step successivo del flusso.
+Comunica direttamente con `CandidatePrefilterConfig`, `AccessLinkMetricsEstimator`, `AccessLinkMetrics`, `NodeCandidate`, `NodeType`, `SystemSnapshot`, `TaskInstance` e `VehicleSnapshot`.
 
 **Campi o valori importanti**
 
 Campi dichiarati principali:
 - `private static final double EPSILON = 1.0E-9`
 - `private final CandidatePrefilterConfig config`
+- `private final AccessLinkMetricsEstimator accessLinkMetricsEstimator`
 
 **Metodi**
 
@@ -6117,18 +6543,20 @@ Campi dichiarati principali:
 |---|---:|---|
 | `public CandidatePrefilter()` | public | Costruttore: crea l'oggetto e controlla che i dati necessari siano validi. |
 | `public CandidatePrefilter(CandidatePrefilterConfig config)` | public | Costruttore: crea l'oggetto e controlla che i dati necessari siano validi. |
+| `public CandidatePrefilter(CandidatePrefilterConfig config, MobilityConfig mobilityConfig)` | public | Costruisce il prefilter con configurazione di mobilita' esplicita. |
 | `public CandidateFilteringResult filter(SystemSnapshot snapshot)` | public | Applica il prefilter allo snapshot. @param snapshot snapshot originale osservato dalla sorgente @return risultato contenente snapshot filtrato e statistiche |
 | `private CandidateFilteringResult disabledResult(SystemSnapshot snapshot)` | private | Metodo di supporto: realizza il passo `disabled result` dentro la responsabilita' della classe. |
-| `private CandidateDecision evaluateCandidate( NodeCandidate candidate, Set<String> taskSourceIds, Map<String, VehicleSnapshot> vehicleById )` | private | Valuta `evaluate candidate` e restituisce un risultato o un breakdown. |
-| `private double estimateCoverageSeconds( NodeCandidate candidate, VehicleSnapshot sourceVehicle, Map<String, VehicleSnapshot> vehicleById )` | private | Stima la copertura strutturale corrente per EDGE, VEHICLE e CLOUD. Il tempo residuo non viene confrontato con soglie euristiche. Per il prefilter conta soltanto che il candidato sia raggiungibile nell'istante osservato. La fragilità della scelta resta valutabile dalla penalità mobility-aware. |
+| `private CandidateDecision evaluate( SystemSnapshot snapshot, NodeCandidate candidate, Set<String> taskSources, Map<String, VehicleSnapshot> vehicles )` | private | Valuta un candidato e decide se tenerlo o rimuoverlo. |
+| `private double estimateNonCloudCoverage( NodeCandidate candidate, VehicleSnapshot source, Map<String, VehicleSnapshot> vehicles )` | private | Stima la copertura strutturale per EDGE e V2V. CLOUD usa invece l'access link attivo. |
 | `private Map<String, VehicleSnapshot> indexVehicles(SystemSnapshot snapshot)` | private | Prepara una mappa di lookup per trovare rapidamente gli oggetti. |
 | `private Set<String> indexTaskSourceIds(SystemSnapshot snapshot)` | private | Prepara una mappa di lookup per trovare rapidamente gli oggetti. |
 | `private double distance( double x1, double y1, double x2, double y2 )` | private | Metodo di supporto: realizza il passo `distance` dentro la responsabilita' della classe. |
 
 **Problematiche aperte**
 
-- Usa lower bound e slack: riduce candidati impossibili o deboli, ma non garantisce che il GA rispetti tutte le deadline.
-- Per cloud e V2V dipende ancora dalle approssimazioni di mobilita' disponibili nello snapshot.
+- Il prefilter e' strutturale: il rispetto delle deadline resta compito di repair e fitness.
+- Per V2V con velocita' relativa nulla usa `cloudCoverageSeconds` come clamp convenzionale storico.
+- Per CLOUD richiede access link attivo; scenari senza gateway non sono piu' trattati come cloud sempre disponibile.
 
 ### `CandidateDecision` (tipo interno di `CandidatePrefilter`)
 
@@ -6154,16 +6582,16 @@ In pratica questa classe riceve questi oggetti, li costruisce oppure li passa al
 Campi dichiarati principali:
 - `private final boolean keep`
 - `private final CandidateRejectionReason reason`
-- `private final double estimatedCoverageSeconds`
+- `private final double coverageSeconds`
 - `private final String note`
 
 **Metodi**
 
 | Metodo | Visibilita' | Spiegazione semplice |
 |---|---:|---|
-| `private CandidateDecision( boolean keep, CandidateRejectionReason reason, double estimatedCoverageSeconds, String note )` | private | Costruttore: crea l'oggetto e controlla che i dati necessari siano validi. |
-| `private static CandidateDecision keep( double estimatedCoverageSeconds, String note )` | private | Metodo di supporto: realizza il passo `keep` dentro la responsabilita' della classe. |
-| `private static CandidateDecision reject( CandidateRejectionReason reason, double estimatedCoverageSeconds, String note )` | private | Metodo di supporto: realizza il passo `reject` dentro la responsabilita' della classe. |
+| `private CandidateDecision( boolean keep, CandidateRejectionReason reason, double coverageSeconds, String note )` | private | Costruttore: crea l'oggetto e controlla che i dati necessari siano validi. |
+| `private static CandidateDecision keep(double coverage, String note)` | private | Crea una decisione di mantenimento. |
+| `private static CandidateDecision reject(CandidateRejectionReason reason, double coverage, String note)` | private | Crea una decisione di rimozione. |
 
 **Problematiche aperte**
 
@@ -6215,13 +6643,13 @@ Campi dichiarati principali:
 | `public double getDeadlineSlackFactor()` | public | @deprecated mantenuto soltanto per compatibilità. |
 | `public double getV2vCoverageRadiusMeters()` | public | Restituisce il valore di `V2vCoverageRadiusMeters` senza modificarlo. |
 | `public double getCloudCoverageSeconds()` | public | Restituisce il valore di `CloudCoverageSeconds` senza modificarlo. |
-| `public boolean isKeepAllCloudCandidates()` | public | @deprecated il cloud è sempre mantenuto finché manca un gateway esplicito. |
+| `public boolean isKeepAllCloudCandidates()` | public | @deprecated il CLOUD non viene piu' mantenuto automaticamente. |
 | `private static double validateNonNegative(String fieldName, double value)` | private | Controlla la correttezza di `validate non negative` e solleva un'eccezione se trova dati incoerenti. |
 | `private static double validatePositive(String fieldName, double value)` | private | Controlla la correttezza di `validate positive` e solleva un'eccezione se trova dati incoerenti. |
 
 **Problematiche aperte**
 
-- I parametri di slack, copertura e soglie sono sperimentali e vanno calibrati sullo scenario MOSAIC/SUMO.
+- I parametri storici di soglia restano per compatibilita', ma il criterio ufficiale non elimina alternative raggiungibili soltanto perche' deboli.
 
 ### `CandidateRejectionReason`
 
@@ -6244,7 +6672,7 @@ Comunica come etichetta condivisa: altre classi lo usano per evitare stringhe li
 **Campi o valori importanti**
 
 Valori enum principali:
-`KEPT`, `NO_TASK_FOR_SOURCE`, `INVALID_CPU`, `INVALID_BANDWIDTH`, `INSUFFICIENT_COVERAGE`, `DEADLINE_LOWER_BOUND_TOO_HIGH`, `RESTORED_AS_FALLBACK`
+`KEPT`, `NO_TASK_FOR_SOURCE`, `INVALID_CPU`, `INVALID_BANDWIDTH`, `INSUFFICIENT_COVERAGE`, `ACCESS_LINK_UNAVAILABLE`, `DEADLINE_LOWER_BOUND_TOO_HIGH`, `RESTORED_AS_FALLBACK`
 
 **Metodi**
 
@@ -7010,7 +7438,7 @@ Nessuna specifica nota per questa classe.
 
 **Cosa fa, in parole semplici**
 
-Calcola il tempo di copertura di riferimento della finestra corrente. La formalizzazione richiede una sola stima per ciascun veicolo osservato, non una stima per ogni candidato computazionale. Nella versione standalone non esiste ancora un modello esplicito del collegamento di accesso radio. Come correzione minima, questa classe usa quindi il migliore candidato EDGE raggiungibile di ciascun veicolo come proxy del relativo nodo infrastrutturale o di accesso. I candidati VEHICLE sono esclusi: descrivono alternative V2V utili al GA, ma non il collegamento infrastrutturale di riferimento del veicolo. LOCAL e CLOUD restano esclusi perché usano tempi convenzionali e falserebbero il bound massimo della finestra.
+Calcola il tempo di copertura di riferimento della finestra corrente usando gli access link attivi. Ogni veicolo osservato contribuisce una sola volta alla media tramite `AccessLinkMetricsEstimator.estimateActiveLink`. Il numero di candidati EDGE, VEHICLE o CLOUD non modifica artificialmente il riferimento temporale.
 
 **Relazione con la formalizzazione**
 
@@ -7018,28 +7446,24 @@ Implementa la parte mobility-aware: tempo di copertura, instabilita' link, risch
 
 **Con chi comunica**
 
-Comunica direttamente con: `MobilityConfig`, `NodeCandidate`, `NodeType`, `SystemSnapshot`, `VehicleSnapshot`.
-In pratica questa classe riceve questi oggetti, li costruisce oppure li passa allo step successivo del flusso.
+Comunica direttamente con `MobilityConfig`, `AccessLinkMetricsEstimator`, `AccessLinkMetrics`, `SystemSnapshot` e `VehicleSnapshot`.
 
 **Campi o valori importanti**
 
 Campi dichiarati principali:
-- `private final MobilityConfig mobilityConfig`
+- `private final AccessLinkMetricsEstimator estimator`
 
 **Metodi**
 
 | Metodo | Visibilita' | Spiegazione semplice |
 |---|---:|---|
 | `public CoverageReferenceCalculator(MobilityConfig mobilityConfig)` | public | Costruttore: crea l'oggetto e controlla che i dati necessari siano validi. |
-| `public double computeReferenceCoverageSeconds(SystemSnapshot snapshot)` | public | Calcola la media dei migliori tempi di copertura EDGE, una sola volta per ciascun veicolo per il quale è disponibile una proxy infrastrutturale. Se un veicolo dispone di più candidati EDGE, viene usato quello con maggiore copertura residua. In questo modo il numero delle alternative computazionali non modifica artificialmente il peso del veicolo nella media. |
+| `public double computeReferenceCoverageSeconds(SystemSnapshot snapshot)` | public | Calcola la media della copertura dell'access link attivo per ogni veicolo. |
 | `public boolean hasReferenceCoverage(SystemSnapshot snapshot)` | public | Risponde con true/false alla domanda `has reference coverage`. |
-| `private double estimateEdgeCoverage( NodeCandidate candidate, VehicleSnapshot source )` | private | Stima `estimate edge coverage` senza modificare lo stato principale. |
-| `private Map<String, VehicleSnapshot> indexVehicles(SystemSnapshot snapshot)` | private | Prepara una mappa di lookup per trovare rapidamente gli oggetti. |
-| `private double euclideanDistance( double x1, double y1, double x2, double y2 )` | private | Metodo di supporto: realizza il passo `euclidean distance` dentro la responsabilita' della classe. |
 
 **Problematiche aperte**
 
-- Il riferimento di copertura e' una scelta aggregata operativa; va verificato rispetto alla definizione finale di `T_ref_coverage(k)`.
+- Il riferimento di copertura e' gateway-aware, ma resta basato sulle metriche derivate dall'access link attivo; una sorgente MOSAIC/SUMO radio nativa potrebbe sostituire l'estimatore geometrico.
 
 ### `TemporalOperationalMetrics`
 

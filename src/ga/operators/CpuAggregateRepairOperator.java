@@ -21,7 +21,8 @@ import java.util.Set;
  * scelto. Questo operatore controlla invece la somma delle CPU assegnate allo
  * stesso {@code executionNodeId}.</p>
  *
- * <p>La banda non viene modificata: il repair della banda resta una OpenIssue.</p>
+ * <p>La banda viene riparata da operatori dedicati, eseguiti dopo il repair
+ * CPU nel {@link RepairOperator}.</p>
  */
 public final class CpuAggregateRepairOperator {
     private static final double EPSILON = 1.0E-9;
