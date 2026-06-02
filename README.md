@@ -1,7 +1,7 @@
 # MA-GA Core
 
 Questo repository contiene il core Java del **Mobility-Aware Genetic Algorithm
-(MA-GA)** per il computation offloading nel continuum veicolo, edge e cloud.
+(MA-GA)** per il computation offloading in scenari veicolo, edge e cloud.
 
 L'obiettivo del progetto e' scegliere, per ogni task generato da un veicolo,
 dove eseguirlo e con quali risorse:
@@ -9,14 +9,38 @@ dove eseguirlo e con quali risorse:
 - esecuzione locale sul veicolo sorgente;
 - offloading verso un altro veicolo;
 - offloading verso edge;
-- offloading verso cloud.
+- offloading verso cloud tramite gateway radio attivo.
 
-Il codice lavora su snapshot JSON dello scenario e puo' eseguire sia ottimizzazioni
-statiche indipendenti, sia una sequenza temporale con finestra adattiva.
+Il codice lavora su snapshot JSON dello scenario e supporta sia ottimizzazioni
+statiche indipendenti, sia sequenze temporali con finestra adattiva, riuso della
+popolazione e diagnostiche dettagliate.
 
-## Cosa fa il progetto
+## Stato attuale
 
-MA-GA rappresenta una soluzione come un cromosoma. Ogni gene descrive la scelta
+La versione corrente e' riallineata al modello gateway-aware e alla banda
+gerarchica.
+
+Punti principali:
+
+- il cloud operativo e' `STRICT_GATEWAY`: copertura, instabilita' link e rischio
+  handover delle decisioni `CLOUD` derivano dall'access gateway attivo;
+- il vecchio placeholder cloud stabile non e' usato nei report correnti
+  (`legacyPlaceholderEnabled: false`);
+- gli snapshot possono includere gateway, access link e pool di banda tramite
+  `AccessGatewaySnapshot`, `AccessLinkSnapshot` e `BandwidthPoolSnapshot`;
+- la banda e' controllata su due livelli:
+  - limite source-aware del singolo candidato (`candidateId`);
+  - pool condiviso (`poolId`) di tipo `GLOBAL`, `GATEWAY` o `DIRECT_V2V`;
+- il repair aggregato della banda e' implementato e lavora insieme al repair
+  del singolo gene e al repair aggregato CPU;
+- `Dv(k)` misura il churn dei veicoli, mentre `Dl(k)` misura la variazione della
+  qualita' dell'access link attivo;
+- il prefilter dei candidati rimuove candidati non utilizzabili e mantiene nello
+  snapshot filtrato gateway, access link e pool di banda.
+
+## Cosa ottimizza MA-GA
+
+Una soluzione e' rappresentata come un cromosoma. Ogni gene descrive la scelta
 per un singolo task:
 
 - candidato selezionato;
@@ -24,55 +48,39 @@ per un singolo task:
 - CPU assegnata;
 - banda assegnata.
 
-La fitness valuta la soluzione combinando:
+La fitness minimizza una combinazione di:
 
 - tempo di completamento;
 - latenza comunicativa complessiva;
 - penalita' mobility-aware;
-- uso di CPU e banda;
+- uso e pressione di CPU e banda;
 - violazioni residue di deadline.
 
-La versione corrente include anche un repair piu' esplicito per deadline,
-copertura e CPU aggregata. Se il repair non trova una scelta ammissibile per un
-task, il codice puo' usare una modalita' best-effort degradata, segnalata nei
-report.
+Se il repair non trova una scelta che rispetti la deadline tra le alternative
+valutate, la decisione puo' essere marcata come `DEGRADED_BEST_EFFORT`. Questa
+etichetta indica un esito di repair limitato e degradato, non una prova di
+infeasibilita' globale del task.
 
-## Funzionalita' principali
+## Funzionalita'
 
 - GA snapshot-based con inizializzazione, selezione, crossover, mutazione,
   elitismo, repair e fitness dettagliata.
-- Gestione temporale con `TemporalWindowManager`, riuso della popolazione e
-  finestra adattiva.
+- Scaling adattivo dei parametri GA in base allo snapshot.
+- Vincoli e repair per deadline, coverage, CPU aggregata, banda per-link e
+  banda per-pool.
+- Gestione temporale con `TemporalWindowManager`, finestra adattiva e riuso
+  della popolazione.
 - Replay JSON in due modalita':
-  - `JSON_TIME`, coerente con il tempo logico del manager;
-  - `JSON_SEQUENCE`, replay ordinale utile per diagnosi.
+  - `JSON_TIME`, indicizzato sul tempo logico richiesto dal manager;
+  - `JSON_SEQUENCE`, replay ordinale utile per diagnosi riproducibili.
 - Profilo runtime della finestra:
-  - `OBSERVED_RUNTIME`, usa il runtime GA osservato dalla finestra precedente;
+  - `OBSERVED_RUNTIME`, usa il runtime GA osservato nella finestra precedente;
   - `CONFIGURED_RUNTIME`, usa una stima configurata e riproducibile.
-- Diagnostiche dedicate per deadline, latenza, mobilita', sorgente temporale,
-  risorse, prefilter e riuso della popolazione.
+- Diagnostiche per deadline, best-effort degradato, gateway cloud, access link,
+  banda gerarchica, mobilita', latenza, finestra adattiva, sorgente temporale,
+  prefilter e riuso della popolazione.
 
-## Stato del modello
-
-Il codice e' allineato alla formalizzazione nelle parti centrali:
-
-- gene e cromosoma rappresentano le variabili decisionali;
-- `OffloadingTimeModel` calcola i tempi locale/remoto/parziale;
-- `FitnessEvaluator` calcola la funzione obiettivo;
-- `DynamicityEvaluator` misura la dinamicita' tra finestre;
-- `window.timing` calcola i bound temporali della finestra.
-
-Restano alcune scelte di prototipo da tenere presenti:
-
-- la banda e' ancora modellata per link/candidato, non come unico `Bmax`
-  globale aggregato;
-- esiste un repair aggregato CPU, ma non ancora un repair aggregato banda;
-- la copertura cloud e' un placeholder stabile;
-- la copertura V2V usa velocita' relativa scalare;
-- l'integrazione MOSAIC/SUMO e' predisposta tramite interfacce, ma non contiene
-  ancora un bridge concreto nel repository.
-
-## Struttura rapida
+## Struttura
 
 ```text
 src/
@@ -80,109 +88,176 @@ src/
   config/              pesi, soglie, parametri GA, mobilita' e finestra
   ga/                  algoritmo genetico, fitness, vincoli e operatori
   io/                  loader JSON e report diagnostici
-  model/               snapshot, nodi, geni, tempi e mobilita'
-  validation/          validazione degli snapshot e invarianti richiesti
+  model/               snapshot, nodi, geni, offloading, banda e mobilita'
+  validation/          validazione degli snapshot e invarianti
   window/              sorgenti temporali, dinamicita', riuso e timing
 
 data/
   snapshots/           dataset JSON inclusi
-  docs/                documentazione tecnica estesa
+  docs/                documentazione tecnica e guide di lettura
 ```
 
-## Esecuzione rapida
+## Entry point
 
-Il progetto e' un modulo Java per IntelliJ IDEA. Richiede un JDK compatibile
-con Java 21 e la libreria Jackson Databind configurata nel progetto.
-
-In IntelliJ e' sufficiente creare una Run Configuration con la main class
-desiderata e inserire gli eventuali program arguments.
+Il progetto e' un modulo Java per IntelliJ IDEA. Richiede Java 21 e Jackson
+Databind configurato nel progetto. Non e' presente un wrapper Maven o Gradle:
+il modo piu' diretto per eseguire i main e' una Run Configuration di IntelliJ.
 
 ### Finestra adattiva
 
-Esegue il ciclo temporale completo sullo scenario predefinito.
+Main class:
 
 ```text
-Main class:
 app.AdaptiveWindowMain
-
-Program arguments:
 ```
 
-Esempio con sorgente temporale, profilo runtime, cartella snapshot e numero di
-finestre:
+Uso:
 
 ```text
-Main class:
-app.AdaptiveWindowMain
+AdaptiveWindowMain [sourceMode] [runtimeProfile] [folder] [maxSteps]
+```
 
-Program arguments:
+Argomenti:
+
+- `sourceMode`: `JSON_TIME`, `JSON_SEQUENCE`; `MOSAIC` e' dichiarato ma richiede
+  una implementazione concreta di `MosaicSnapshotBridge`;
+- `runtimeProfile`: `OBSERVED_RUNTIME` o `CONFIGURED_RUNTIME`;
+- `folder`: cartella di snapshot temporali;
+- `maxSteps`: numero massimo di finestre da eseguire.
+
+Esempio diagnostico completo sullo scenario piu' ricco:
+
+```text
+JSON_SEQUENCE CONFIGURED_RUNTIME data/snapshots/temporal/scenarios/comprehensive_dynamic_validation 27
+```
+
+Esempio operativo indicizzato sul tempo:
+
+```text
 JSON_TIME OBSERVED_RUNTIME data/snapshots/temporal/scenarios/urban_realistic_dynamic_calibrated 8
-```
-
-Per un replay ordinale diagnostico:
-
-```text
-Main class:
-app.AdaptiveWindowMain
-
-Program arguments:
-JSON_SEQUENCE CONFIGURED_RUNTIME data/snapshots/temporal/scenarios/urban_realistic_dynamic_calibrated 8
 ```
 
 ### Batch statico GA
 
-Esegue il GA su tutti gli snapshot di una cartella, trattandoli come scenari
-indipendenti.
+Main class:
 
 ```text
-Main class:
 app.GaBatchMain
-
-Program arguments:
 ```
 
-Con cartella esplicita e dettagli:
+Uso:
 
 ```text
-Main class:
-app.GaBatchMain
-
-Program arguments:
-data/snapshots/ga/scenarios/static_baseline --details
+GaBatchMain [snapshotFolder] [--details]
 ```
+
+Esempio sugli scenari statici presenti:
+
+```text
+data/snapshots/ga/scenarios --details
+```
+
+Ogni snapshot viene trattato come scenario indipendente: la popolazione finale
+di uno snapshot non viene riusata nel successivo.
 
 ## Dataset inclusi
 
-Gli snapshot sono divisi in due gruppi principali:
+Gli snapshot sono divisi in due famiglie:
 
 - `data/snapshots/ga`: scenari statici per confrontare il GA;
 - `data/snapshots/temporal`: sequenze temporali per la finestra adattiva.
 
-La cartella temporale usata di default e':
+Scenari temporali principali:
+
+- `data/snapshots/temporal/scenarios/comprehensive_dynamic_validation`;
+- `data/snapshots/temporal/scenarios/gateway_cloud_validation`;
+- `data/snapshots/temporal/scenarios/static_baseline`;
+- `data/snapshots/temporal/scenarios/urban_moderate`;
+- `data/snapshots/temporal/scenarios/urban_realistic_dynamic_calibrated`.
+
+Lo scenario piu' utile per controllare il comportamento corrente di gateway,
+access link, deadline, banda gerarchica, mobilita' e finestra adattiva e':
 
 ```text
-data/snapshots/temporal/scenarios/urban_realistic_dynamic_calibrated
+data/snapshots/temporal/scenarios/comprehensive_dynamic_validation
 ```
 
-## Documentazione completa
+## Come leggere i report
 
-Il README e' solo una preview del progetto. La spiegazione completa del codice,
-classe per classe e metodo per metodo, si trova in:
+Il report di `AdaptiveWindowMain` e' composto da molte sezioni. La lettura
+consigliata e':
+
+1. `EXECUTIVE SUMMARY`;
+2. `WORST WINDOWS`;
+3. sezioni deadline e `DEGRADED_BEST_EFFORT`;
+4. sezioni latenza comunicativa;
+5. sezioni banda link/pool;
+6. sezioni gateway cloud, access link e mobilita';
+7. sezioni finestra adattiva, sorgente temporale, riuso popolazione e prefilter.
+
+La guida completa alla lettura e' in:
+
+```text
+data/docs/guida_lettura_report_maga.md
+```
+
+Il riallineamento dei risultati correnti rispetto ai report storici e' in:
+
+```text
+data/docs/actual_results.md
+```
+
+## Interpretazione dello scenario completo
+
+Nel run diagnostico completo su
+`comprehensive_dynamic_validation`, il sistema mostra il comportamento atteso
+per molte parti del modello:
+
+- cloud gateway-aware attivo;
+- placeholder cloud disabilitato;
+- prefilter operativo;
+- repair CPU efficace;
+- repair banda gerarchico efficace;
+- nessuna violazione finale di coverage nello scenario analizzato.
+
+Il problema residuo principale emerso dal report completo e' sulle deadline in
+finestre severe: alcune decisioni cloud parziali restano in
+`DEGRADED_BEST_EFFORT` per latenza di upload troppo alta. In quei casi le
+violazioni non sono causate da coverage insufficiente o da violazione formale
+del pool di banda; il collo di bottiglia e' spesso il link cloud per-candidato.
+
+## Limiti ancora aperti
+
+- `MOSAIC`/`MOSAIC_LIVE` richiede ancora un bridge concreto.
+- Il modello V2V usa distanza euclidea e velocita' relativa scalare
+  `abs(v_source - v_target)`, senza vettori di traiettoria o heading.
+- Il repair best-effort valuta un insieme limitato di alternative: non dimostra
+  infeasibilita' globale.
+- In scenari con finestre molto corte, il runtime osservato del GA puo' superare
+  la finestra logica; l'integrazione live richiede una policy esplicita.
+- `FULL_OFFLOADING` puo' non comparire in alcuni scenari: se e' atteso, vanno
+  controllate inizializzazione, mutazione e repair di `offloadingRatio`.
+
+## Documentazione tecnica
+
+Documentazione estesa del codice:
 
 ```text
 data/docs/documentazione_completa_codice_maga.md
 ```
 
-Quella documentazione include anche il confronto con la formalizzazione e le
-problematiche aperte associate alle classi coinvolte.
+Documentazione architetturale in LaTeX:
 
-## Lettura consigliata
+```text
+data/docs/documentazione_architettura_maga.tex
+```
 
-Per orientarsi nel codice senza perdersi:
+Guida consigliata per orientarsi nel codice:
 
-1. partire da `model.snapshot`, `model.node` e `model.genetic`;
-2. leggere `model.offloading` e `model.mobility`;
-3. guardare `ga.constraints` e `ga.operators.RepairOperator`;
-4. leggere `ga.fitness.FitnessEvaluator`;
-5. seguire il ciclo in `ga.core.MaGaOptimizer`;
-6. chiudere con `window.core.TemporalWindowManager` e i report in `io.reporting`.
+1. `model.snapshot`, `model.node`, `model.bandwidth` e `model.genetic`;
+2. `model.offloading` e `model.mobility`;
+3. `ga.constraints` e `ga.operators`;
+4. `ga.fitness.FitnessEvaluator`;
+5. `ga.core.MaGaOptimizer`;
+6. `window.core.TemporalWindowManager`;
+7. `io.reporting`.
