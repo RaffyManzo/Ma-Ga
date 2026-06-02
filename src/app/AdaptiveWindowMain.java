@@ -55,7 +55,7 @@ public final class AdaptiveWindowMain {
         TemporalWindowManager manager = new TemporalWindowManager(
                 windowConfig,
                 new MaGaOptimizer(maGaConfig),
-                new DynamicityEvaluator(windowConfig),
+                new DynamicityEvaluator(windowConfig, maGaConfig.getMobilityConfig()),
                 new PopulationAdapter(windowConfig, maGaConfig, new Random(maGaConfig.getGeneticAlgorithmConfig().getRandomSeed())),
                 new PopulationReuseDecisionPolicy(windowConfig),
                 controller,

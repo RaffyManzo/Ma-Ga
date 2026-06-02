@@ -34,6 +34,7 @@ public final class AdaptiveWindowReportPrinter {
         new DeepTemporalWindowDiagnosticPrinter(config, out, 10).print(result);
         new DeadlineBestEffortDiagnosticPrinter(out, 10).print(result);
         new CloudGatewayDiagnosticPrinter(out).print(result, filteredSource.getFilteringResults());
+        new AccessLinkDynamicityDiagnosticPrinter(config.getMobilityConfig(), out, 10).print(result);
         new MobilityDiagnosticPrinter(config, out, 10).print(result);
         new LatencyDiagnosticPrinter(config, out, 10).print(result);
         new AdaptiveWindowDiagnosticPrinter(out).print(result);
