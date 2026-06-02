@@ -10,10 +10,11 @@ import java.util.List;
  * il modello interno.</p>
  */
 public final class SnapshotInputDto {
-
     public String snapshotId;
     public Double timeSeconds;
     public List<VehicleInputDto> vehicles;
     public List<TaskInputDto> tasks;
     public List<NodeCandidateInputDto> candidateNodes;
+    public List<AccessGatewayInputDto> accessGateways;
+    public List<AccessLinkInputDto> accessLinks;
 }

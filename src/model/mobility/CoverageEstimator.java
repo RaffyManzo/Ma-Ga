@@ -13,24 +13,21 @@ import java.util.Objects;
 /**
  * Stima le grandezze mobility-aware di un candidato rispetto a un task.
  *
- * <p>La classe usa lo snapshot corrente, il task e il candidato selezionato.
- * Il tempo di copertura e l'instabilità del collegamento vengono ricavati
- * da un'unica stima, così fitness e report osservano gli stessi valori.</p>
+ * <p>Per il CLOUD usa il gateway radio attivo del veicolo sorgente. Il cloud
+ * non viene più trattato come collegamento convenzionalmente stabile.</p>
  */
 public final class CoverageEstimator {
-
     private final MobilityConfig mobilityConfig;
+    private final AccessLinkMetricsEstimator accessLinkMetricsEstimator;
 
     public CoverageEstimator(MobilityConfig mobilityConfig) {
         this.mobilityConfig = Objects.requireNonNull(
                 mobilityConfig,
                 "mobilityConfig must not be null."
         );
+        this.accessLinkMetricsEstimator = new AccessLinkMetricsEstimator(mobilityConfig);
     }
 
-    /**
-     * Calcola tutte le metriche mobility-aware grezze del collegamento.
-     */
     public MobilityLinkMetrics estimateLinkMetrics(
             SystemSnapshot snapshot,
             TaskInstance task,
@@ -39,34 +36,26 @@ public final class CoverageEstimator {
         Objects.requireNonNull(snapshot, "snapshot must not be null.");
         Objects.requireNonNull(task, "task must not be null.");
         Objects.requireNonNull(candidate, "candidate must not be null.");
-
         validateCandidateForTask(task, candidate);
 
         if (candidate.getType() == NodeType.LOCAL) {
-            return MobilityLinkMetrics.local(
-                    mobilityConfig.getLocalCoverageTimeSeconds()
-            );
+            return MobilityLinkMetrics.local(mobilityConfig.getLocalCoverageTimeSeconds());
         }
-
         if (candidate.getType() == NodeType.CLOUD) {
-            // Assunzione provvisoria del prototipo standalone:
-            // il gateway radio usato per raggiungere il cloud non è ancora modellato.
-            return MobilityLinkMetrics.cloud(
-                    mobilityConfig.getCloudCoverageTimeSeconds()
+            return MobilityLinkMetrics.cloudGateway(
+                    accessLinkMetricsEstimator.estimateActiveLink(
+                            snapshot,
+                            task.getSourceVehicleId()
+                    )
             );
         }
-
         if (candidate.getType() == NodeType.EDGE) {
             return estimateInfrastructureMetrics(snapshot, task, candidate);
         }
-
         if (candidate.getType() == NodeType.VEHICLE) {
             return estimateV2vMetrics(snapshot, task, candidate);
         }
-
-        throw new IllegalArgumentException(
-                "Unsupported candidate type: " + candidate.getType()
-        );
+        throw new IllegalArgumentException("Unsupported candidate type: " + candidate.getType());
     }
 
     public double estimateCoverageTimeSeconds(
@@ -74,8 +63,7 @@ public final class CoverageEstimator {
             TaskInstance task,
             NodeCandidate candidate
     ) {
-        return estimateLinkMetrics(snapshot, task, candidate)
-                .getCoverageTimeSeconds();
+        return estimateLinkMetrics(snapshot, task, candidate).getCoverageTimeSeconds();
     }
 
     public double estimateLinkInstability(
@@ -83,8 +71,7 @@ public final class CoverageEstimator {
             TaskInstance task,
             NodeCandidate candidate
     ) {
-        return estimateLinkMetrics(snapshot, task, candidate)
-                .getLinkInstability();
+        return estimateLinkMetrics(snapshot, task, candidate).getLinkInstability();
     }
 
     private MobilityLinkMetrics estimateInfrastructureMetrics(
@@ -92,33 +79,21 @@ public final class CoverageEstimator {
             TaskInstance task,
             NodeCandidate candidate
     ) {
-        VehicleSnapshot sourceVehicle = findVehicleById(
-                snapshot,
-                task.getSourceVehicleId()
-        );
-
+        VehicleSnapshot sourceVehicle = findVehicleById(snapshot, task.getSourceVehicleId());
         requireInfrastructureGeometry(candidate);
-
         double distanceMeters = distance(
-                sourceVehicle.getX(),
-                sourceVehicle.getY(),
-                candidate.getNodeX(),
-                candidate.getNodeY()
+                sourceVehicle.getX(), sourceVehicle.getY(),
+                candidate.getNodeX(), candidate.getNodeY()
         );
-
         double radiusMeters = candidate.getCoverageRadiusMeters();
         double remainingDistanceMeters = radiusMeters - distanceMeters;
         double safeSpeed = Math.max(
-                sourceVehicle.getSpeed(),
+                Math.abs(sourceVehicle.getSpeed()),
                 mobilityConfig.getEpsilonSpeedMetersPerSecond()
         );
-
         double coverageTime = remainingDistanceMeters <= 0.0
                 ? 0.0
-                : mobilityConfig.clampCoverageTime(
-                        remainingDistanceMeters / safeSpeed
-                );
-
+                : mobilityConfig.clampCoverageTime(remainingDistanceMeters / safeSpeed);
         return new MobilityLinkMetrics(
                 candidate.getType(),
                 MobilityLinkMetrics.ModelMode.EDGE_GEOMETRIC,
@@ -136,38 +111,22 @@ public final class CoverageEstimator {
             TaskInstance task,
             NodeCandidate candidate
     ) {
-        VehicleSnapshot sourceVehicle = findVehicleById(
-                snapshot,
-                task.getSourceVehicleId()
-        );
-        VehicleSnapshot targetVehicle = findVehicleById(
-                snapshot,
-                candidate.getExecutionNodeId()
-        );
-
+        VehicleSnapshot sourceVehicle = findVehicleById(snapshot, task.getSourceVehicleId());
+        VehicleSnapshot targetVehicle = findVehicleById(snapshot, candidate.getExecutionNodeId());
         double distanceMeters = distance(
-                sourceVehicle.getX(),
-                sourceVehicle.getY(),
-                targetVehicle.getX(),
-                targetVehicle.getY()
+                sourceVehicle.getX(), sourceVehicle.getY(),
+                targetVehicle.getX(), targetVehicle.getY()
         );
-
         double radiusMeters = mobilityConfig.getV2vCommunicationRadiusMeters();
         double remainingDistanceMeters = radiusMeters - distanceMeters;
-        double relativeSpeed = Math.abs(
-                sourceVehicle.getSpeed() - targetVehicle.getSpeed()
-        );
+        double relativeSpeed = Math.abs(sourceVehicle.getSpeed() - targetVehicle.getSpeed());
         double safeRelativeSpeed = Math.max(
                 relativeSpeed,
                 mobilityConfig.getEpsilonSpeedMetersPerSecond()
         );
-
         double coverageTime = remainingDistanceMeters <= 0.0
                 ? 0.0
-                : mobilityConfig.clampCoverageTime(
-                        remainingDistanceMeters / safeRelativeSpeed
-                );
-
+                : mobilityConfig.clampCoverageTime(remainingDistanceMeters / safeRelativeSpeed);
         return new MobilityLinkMetrics(
                 candidate.getType(),
                 MobilityLinkMetrics.ModelMode.V2V_SCALAR_RELATIVE_SPEED,
@@ -183,77 +142,46 @@ public final class CoverageEstimator {
     private void requireInfrastructureGeometry(NodeCandidate candidate) {
         if (!candidate.hasCoverageGeometry()) {
             throw new IllegalArgumentException(
-                    "Infrastructure candidate "
-                            + candidate.getCandidateId()
+                    "Infrastructure candidate " + candidate.getCandidateId()
                             + " must define nodeX, nodeY and coverageRadiusMeters."
             );
         }
     }
 
-    private VehicleSnapshot findVehicleById(
-            SystemSnapshot snapshot,
-            String vehicleId
-    ) {
+    private VehicleSnapshot findVehicleById(SystemSnapshot snapshot, String vehicleId) {
         if (vehicleId == null || vehicleId.isBlank()) {
-            throw new IllegalArgumentException(
-                    "vehicleId must not be null or blank."
-            );
+            throw new IllegalArgumentException("vehicleId must not be null or blank.");
         }
-
         List<VehicleSnapshot> vehicles = snapshot.getVehicles();
         if (vehicles == null) {
-            throw new IllegalArgumentException(
-                    "snapshot.vehicles must not be null."
-            );
+            throw new IllegalArgumentException("snapshot.vehicles must not be null.");
         }
-
-        for (Object item : vehicles) {
-            if (!(item instanceof VehicleSnapshot)) {
-                throw new IllegalArgumentException(
-                        "snapshot.vehicles contains an invalid element: " + item
-                );
-            }
-
-            VehicleSnapshot vehicle = (VehicleSnapshot) item;
+        for (VehicleSnapshot vehicle : vehicles) {
             if (vehicleId.equals(vehicle.getVehicleId())) {
                 return vehicle;
             }
         }
-
-        throw new IllegalArgumentException(
-                "Vehicle not found in snapshot: " + vehicleId
-        );
+        throw new IllegalArgumentException("Vehicle not found in snapshot: " + vehicleId);
     }
 
-    private void validateCandidateForTask(
-            TaskInstance task,
-            NodeCandidate candidate
-    ) {
+    private void validateCandidateForTask(TaskInstance task, NodeCandidate candidate) {
         if (!candidate.isValidForSourceVehicle(task.getSourceVehicleId())) {
             throw new IllegalArgumentException(
-                    "Candidate "
-                            + candidate.getCandidateId()
+                    "Candidate " + candidate.getCandidateId()
                             + " is not valid for task source vehicle "
                             + task.getSourceVehicleId()
             );
         }
     }
 
-    private double distance(
-            double x1,
-            double y1,
-            double x2,
-            double y2
-    ) {
+    private double distance(double x1, double y1, double x2, double y2) {
         double dx = x1 - x2;
         double dy = y1 - y2;
         return Math.sqrt(dx * dx + dy * dy);
     }
 
     private double clamp01(double value) {
-        if (!Double.isFinite(value)) {
-            return 1.0;
-        }
+        if (!Double.isFinite(value)) { return 1.0; }
         return Math.max(0.0, Math.min(1.0, value));
     }
 }

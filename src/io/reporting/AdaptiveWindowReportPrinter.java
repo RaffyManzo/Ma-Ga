@@ -8,64 +8,32 @@ import window.state.TemporalWindowResult;
 import java.io.PrintStream;
 import java.util.Objects;
 
-/**
- * Punto unico di composizione del report temporale della finestra adattiva.
- *
- * <p>Il main non conosce più i singoli printer specialistici. Questo oggetto
- * mantiene insieme il report diagnostico generale, i bounds adattivi, il
- * timing, il riuso della popolazione, la sorgente dati e il prefilter.</p>
- */
+/** Punto unico di composizione del report temporale della finestra adattiva. */
 public final class AdaptiveWindowReportPrinter {
-
     private final MaGaConfig config;
     private final PrintStream out;
 
-    public AdaptiveWindowReportPrinter(MaGaConfig config) {
-        this(config, System.out);
-    }
-
+    public AdaptiveWindowReportPrinter(MaGaConfig config) { this(config, System.out); }
     public AdaptiveWindowReportPrinter(MaGaConfig config, PrintStream out) {
         this.config = Objects.requireNonNull(config, "config must not be null.");
         this.out = Objects.requireNonNull(out, "out must not be null.");
     }
 
-    /**
-     * Mantiene compatibilità con eventuali chiamanti precedenti.
-     *
-     * <p>Il vecchio overload non esponeva il profilo temporale e viene quindi
-     * interpretato come replay astratto configurato.</p>
-     */
-    public void print(
-            String requestedSourceMode,
-            String snapshotFolder,
-            TemporalWindowResult result,
-            FilteringSystemStateSource filteredSource
-    ) {
-        print(
-                requestedSourceMode,
-                TemporalRuntimeProfile.CONFIGURED_RUNTIME,
-                snapshotFolder,
-                result,
-                filteredSource
-        );
+    public void print(String sourceMode, String folder, TemporalWindowResult result, FilteringSystemStateSource filteredSource) {
+        print(sourceMode, TemporalRuntimeProfile.CONFIGURED_RUNTIME, folder, result, filteredSource);
     }
 
     public void print(
-            String requestedSourceMode,
+            String sourceMode,
             TemporalRuntimeProfile runtimeProfile,
-            String snapshotFolder,
+            String folder,
             TemporalWindowResult result,
             FilteringSystemStateSource filteredSource
     ) {
-        Objects.requireNonNull(requestedSourceMode, "requestedSourceMode must not be null.");
-        Objects.requireNonNull(runtimeProfile, "runtimeProfile must not be null.");
-        Objects.requireNonNull(snapshotFolder, "snapshotFolder must not be null.");
-        Objects.requireNonNull(result, "result must not be null.");
-        Objects.requireNonNull(filteredSource, "filteredSource must not be null.");
-
-        printExecutionMetadata(requestedSourceMode, runtimeProfile, snapshotFolder);
+        printExecutionMetadata(sourceMode, runtimeProfile, folder);
         new DeepTemporalWindowDiagnosticPrinter(config, out, 10).print(result);
         new DeadlineBestEffortDiagnosticPrinter(out, 10).print(result);
+        new CloudGatewayDiagnosticPrinter(out).print(result, filteredSource.getFilteringResults());
         new MobilityDiagnosticPrinter(config, out, 10).print(result);
         new LatencyDiagnosticPrinter(config, out, 10).print(result);
         new AdaptiveWindowDiagnosticPrinter(out).print(result);
@@ -75,27 +43,18 @@ public final class AdaptiveWindowReportPrinter {
         new CandidateFilteringPrinter(out).print(filteredSource.getFilteringResults());
     }
 
-    private void printExecutionMetadata(
-            String requestedSourceMode,
-            TemporalRuntimeProfile runtimeProfile,
-            String snapshotFolder
-    ) {
+    private void printExecutionMetadata(String sourceMode, TemporalRuntimeProfile profile, String folder) {
         out.println("============================================================");
         out.println("MA-GA ADAPTIVE WINDOW EXECUTION");
         out.println("============================================================");
-        out.println("Requested source mode: " + requestedSourceMode);
-        out.println("Runtime profile: " + runtimeProfile);
-        out.println("Snapshot folder: " + snapshotFolder);
+        out.println("Requested source mode: " + sourceMode);
+        out.println("Runtime profile: " + profile);
+        out.println("Snapshot folder: " + folder);
         out.println();
-        out.println("Source mode interpretation:");
-        out.println("- JSON_TIME: time-driven replay.\n"
-                + "  The manager requests a logical time and the source must not expose future snapshots.");
-        out.println("- JSON_SEQUENCE: ordinal diagnostic replay. All files are consumed in sequence; a positive time shift can be expected after adaptive window changes.");
-        out.println();
-        out.println("Runtime profile interpretation:");
-        out.println("- OBSERVED_RUNTIME: operational verification.\n"
-                + "  DeltaT_min uses the GA runtime observed in the previous window after the initial estimate.");
-        out.println("- CONFIGURED_RUNTIME: abstract replay. DeltaT_min uses the configured GA estimate to keep offline experiments reproducible.");
+        out.println("Gateway interpretation:");
+        out.println("- STRICT_GATEWAY: every observed vehicle must expose one active access link.");
+        out.println("- CLOUD decisions derive coverage and link instability from the active gateway.");
+        out.println("- No silent CLOUD_STABLE_PLACEHOLDER fallback is enabled.");
         out.println();
     }
 }
