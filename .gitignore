@@ -1,6 +1,19 @@
 ### IntelliJ IDEA ###
 out/
-tmp/
+tmp/mosaic-25.2/bin/
+tmp/mosaic-25.2/etc/
+tmp/mosaic-25.2/lib/
+tmp/mosaic-25.2/tmp/
+tmp/mosaic-25.2/tools/web/
+tmp/mosaic-25.2/logs/
+
+/tmp/mosaic-25.2/CONTRIBUTING.md
+/tmp/mosaic-25.2/LICENSE
+/tmp/mosaic-25.2/mosaic.bat
+/tmp/mosaic-25.2/mosaic.sh
+/tmp/mosaic-25.2/NOTICE.md
+/tmp/mosaic-25.2/NOTICE-THIRD-PARTY.md
+
 !**/src/main/**/out/
 !**/src/test/**/out/
 
@@ -28,3 +41,4 @@ bin/
 
 ### Mac OS ###
 .DS_Store
+
