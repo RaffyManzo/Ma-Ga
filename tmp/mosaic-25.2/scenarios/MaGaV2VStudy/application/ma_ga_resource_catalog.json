@@ -1,0 +1,74 @@
+{
+  "schemaVersion": "0.1",
+  "description": "Catalogo configurato delle risorse MA-GA associate allo scenario MaGaMosaicStudy.",
+
+  "policies": {
+    "gatewaySelection": "NEAREST_AVAILABLE_WITHIN_RADIUS",
+    "cloudAccess": "THROUGH_ACTIVE_GATEWAY",
+    "gatewayPoolBandwidth": "MIN_CELL_UPLINK_DOWNLINK",
+    "bandwidthResidualPolicy": "NOMINAL_ONLY_FOR_INITIAL_EXPORTER"
+  },
+
+  "gateways": [
+    {
+      "runtimeId": "rsu_0",
+      "gatewayId": "rsu_north",
+      "gatewayType": "RSU",
+      "cellRegionId": "region_north_normal",
+      "coverageRadiusMeters": 520.0,
+      "bandwidthPoolId": "pool_rsu_north"
+    },
+    {
+      "runtimeId": "rsu_1",
+      "gatewayId": "rsu_central",
+      "gatewayType": "RSU",
+      "cellRegionId": "region_central_degraded",
+      "coverageRadiusMeters": 300.0,
+      "bandwidthPoolId": "pool_rsu_central"
+    }
+  ],
+
+  "bandwidthPools": [
+    {
+      "poolId": "pool_rsu_north",
+      "poolType": "GATEWAY",
+      "cellRegionId": "region_north_normal",
+      "nominalBandwidthBitsPerSecond": 40000000
+    },
+    {
+      "poolId": "pool_rsu_central",
+      "poolType": "GATEWAY",
+      "cellRegionId": "region_central_degraded",
+      "nominalBandwidthBitsPerSecond": 8000000
+    }
+  ],
+
+  "executionNodes": [
+    {
+      "executionNodeId": "edge_north",
+      "type": "EDGE",
+      "gatewayIds": [
+        "rsu_north"
+      ],
+      "availableCpuCyclesPerSecond": 12000000000,
+      "basePropagationDelaySeconds": 0.005
+    },
+    {
+      "executionNodeId": "edge_central",
+      "type": "EDGE",
+      "gatewayIds": [
+        "rsu_central"
+      ],
+      "availableCpuCyclesPerSecond": 9000000000,
+      "basePropagationDelaySeconds": 0.005
+    },
+    {
+      "executionNodeId": "cloud_regional",
+      "type": "CLOUD",
+      "mosaicServerRuntimeId": "server_0",
+      "accessPolicy": "THROUGH_ACTIVE_GATEWAY",
+      "availableCpuCyclesPerSecond": 100000000000,
+      "serverBaseDelaySeconds": 0.2
+    }
+  ]
+}
