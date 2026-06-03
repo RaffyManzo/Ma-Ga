@@ -2,7 +2,7 @@
 
 Questo folder contiene i primi frammenti dell'exporter offline per lo studio Eclipse MOSAIC -> MA-GA.
 
-Gli script presenti sono diagnostici e usano solo la standard library Python. Non invocano il core Java MA-GA e non modificano gli scenari MOSAIC.
+Gli script sono diagnostici, usano solo la standard library Python, non invocano il core Java MA-GA e non modificano gli scenari MOSAIC.
 
 ## Fase 10A - Aggregazione del workload diagnostico
 
@@ -50,7 +50,7 @@ CSV generato:
 data/mosaic-study/task_stream.csv
 ```
 
-Colonne, in ordine:
+Colonne:
 
 ```text
 taskId
@@ -64,11 +64,7 @@ cpuCycles
 deadlineSeconds
 ```
 
-La cartella di output viene creata automaticamente se non esiste.
-
 ### Esempio PowerShell 10A
-
-Dalla root della repository `maga-core/`:
 
 ```powershell
 python .\tools\mosaic-offline-exporter\export_task_stream.py `
@@ -76,7 +72,7 @@ python .\tools\mosaic-offline-exporter\export_task_stream.py `
   --out-file ".\data\mosaic-study\task_stream.csv"
 ```
 
-Se `python` non e' nel `PATH`, su Windows e' possibile usare il launcher:
+Con il launcher Windows:
 
 ```powershell
 py .\tools\mosaic-offline-exporter\export_task_stream.py `
@@ -86,7 +82,7 @@ py .\tools\mosaic-offline-exporter\export_task_stream.py `
 
 ### Validazioni 10A
 
-Lo script fallisce con un messaggio leggibile se:
+Lo script fallisce se:
 
 ```text
 la cartella input non esiste
@@ -95,11 +91,8 @@ non trova alcuna riga TASK_ACTIVATION
 una riga TASK_ACTIVATION e' malformata
 manca un campo obbligatorio
 un campo appare due volte nella stessa riga
-un valore numerico non e' valido
-un valore numerico richiesto non e' finito
-taskId e' vuoto
-sourceVehicleId e' vuoto
-profileId e' vuoto
+un valore numerico non e' valido o non e' finito
+taskId, sourceVehicleId o profileId sono vuoti
 esistono taskId duplicati
 activationTimeNs < 0
 activationTimeMs < 0
@@ -117,14 +110,7 @@ taskId == <profileId>__<sourceVehicleId>__t_<activationTimeMs>
 sourceVehicleId == nome della cartella veicolo che contiene il log
 ```
 
-Esempio:
-
-```text
-apps/veh_0/MaGaWorkloadDiagnosticApp.log
-    -> sourceVehicleId deve essere veh_0
-```
-
-Prima di scrivere il CSV, i record vengono ordinati deterministicamente per:
+I record vengono ordinati per:
 
 ```text
 activationTimeNs
@@ -133,40 +119,18 @@ profileId
 taskId
 ```
 
-La scrittura e' sicura: lo script scrive prima un file temporaneo nella cartella di output e sostituisce il CSV finale solo dopo che tutte le validazioni sono state superate.
-
-### Output diagnostico 10A
-
-A fine esecuzione lo script stampa:
-
-```text
-numero di file analizzati
-numero di TASK_ACTIVATION trovati
-numero di task esportati
-numero di duplicati
-distribuzione per profileId
-distribuzione per sourceVehicleId
-primo activationTimeNs
-ultimo activationTimeNs
-percorso del CSV generato
-```
-
-Per la run diagnostica `log-20260603-123856-MaGaWorkloadStudy` il risultato atteso e' `682` task. Questo valore non e' hard-coded nello script.
+La scrittura e' atomica: prima file temporaneo, poi sostituzione del CSV finale.
 
 ### Limiti 10A
 
-Questa fase:
-
 ```text
-non genera ancora SystemSnapshot
+non genera SystemSnapshot
 non assegna task alle finestre MA-GA
 non invoca il core Java
 non implementa il bridge live
 non consuma i task dopo una decisione MA-GA
-non legge dinamicamente la configurazione ma_ga_workload_config.json
+non legge dinamicamente ma_ga_workload_config.json
 ```
-
-Il CSV prodotto e' un artefatto intermedio per le fasi successive dell'exporter offline.
 
 ## Fase 10B - Normalizzazione dello stato dei veicoli
 
@@ -178,11 +142,9 @@ Script:
 export_vehicle_state_stream.py
 ```
 
-Lo script legge `VEHICLE_REGISTRATION` e `VEHICLE_UPDATES` dalla run diagnostica, valida il ciclo di vita minimo dei veicoli e produce un CSV con una riga per ogni aggiornamento veicolare valido.
+Lo script legge `VEHICLE_REGISTRATION` e `VEHICLE_UPDATES`, valida il ciclo di vita minimo dei veicoli e produce un CSV con una riga per ogni aggiornamento veicolare valido.
 
 ### Input 10B
-
-File MOSAIC:
 
 ```text
 tmp/mosaic-25.2/logs/log-20260603-123856-MaGaWorkloadStudy/output.csv
@@ -199,8 +161,6 @@ Gli altri eventi vengono ignorati.
 
 ### Campi letti da VEHICLE_UPDATES
 
-Per la Fase 10B vengono letti solo i primi 8 campi:
-
 ```text
 indice 0 -> event marker
 indice 1 -> timeNs
@@ -216,13 +176,11 @@ Non vengono attribuiti significati non verificati agli altri campi o ai booleani
 
 ### Output 10B
 
-CSV generato:
-
 ```text
 data/mosaic-study/vehicle_state_stream.csv
 ```
 
-Colonne, in ordine:
+Colonne:
 
 ```text
 timeNs
@@ -237,20 +195,15 @@ heading
 active
 ```
 
-Regole di output:
+Regole:
 
 ```text
-active viene impostato a true per ogni VEHICLE_UPDATES esportato
-projectedX resta vuoto
-projectedY resta vuoto
+active = true per ogni VEHICLE_UPDATES esportato
+projectedX e projectedY restano vuoti
 timeSeconds = timeNs / 1_000_000_000
 ```
 
-La cartella di output viene creata automaticamente se non esiste.
-
 ### Esempio PowerShell 10B
-
-Dalla root della repository `maga-core/`:
 
 ```powershell
 python .\tools\mosaic-offline-exporter\export_vehicle_state_stream.py `
@@ -268,119 +221,241 @@ py .\tools\mosaic-offline-exporter\export_vehicle_state_stream.py `
 
 ### Validazioni 10B
 
-Lo script fallisce con un messaggio leggibile se:
+Lo script fallisce se:
 
 ```text
-il file input non esiste
-il percorso input non e' un file
-non trova alcuna riga VEHICLE_REGISTRATION
-non trova alcuna riga VEHICLE_UPDATES
+il file input non esiste o non e' un file
+non trova VEHICLE_REGISTRATION o VEHICLE_UPDATES
 una riga VEHICLE_REGISTRATION ha meno di 3 campi
 una riga VEHICLE_UPDATES ha meno di 8 campi
-timeNs non e' un intero valido
-timeNs < 0
+timeNs non e' intero valido o e' < 0
 vehicleId e' vuoto
-speed non e' numerico
-heading non e' numerico
-latitude non e' numerica
-longitude non e' numerica
-altitude non e' numerica
-un valore numerico richiesto non e' finito
+speed, heading, latitude, longitude o altitude non sono numerici o non sono finiti
 speed < 0
-heading < 0
-heading >= 360
-latitude < -90
-latitude > 90
-longitude < -180
-longitude > 180
+heading < 0 oppure heading >= 360
+latitude fuori [-90, 90]
+longitude fuori [-180, 180]
 un veicolo viene registrato piu' di una volta
-un VEHICLE_UPDATES compare prima della registrazione del veicolo
-lo stesso veicolo possiede piu' di uno stato allo stesso timeNs
-il tempo degli eventi rilevanti diminuisce durante la lettura del file
+un VEHICLE_UPDATES compare prima della registrazione
+lo stesso veicolo ha piu' stati allo stesso timeNs
+il tempo degli eventi rilevanti diminuisce durante la lettura
 ```
 
-Lo script non corregge automaticamente dati anomali, non normalizza l'heading e non elimina righe `VEHICLE_UPDATES` silenziosamente.
-
-Prima di scrivere il CSV, gli stati vengono ordinati deterministicamente per:
+Gli stati vengono ordinati per:
 
 ```text
 timeNs
 vehicleId con ordinamento naturale
 ```
 
-L'ordinamento naturale produce:
-
-```text
-veh_0
-veh_1
-veh_2
-...
-veh_9
-veh_10
-veh_11
-```
-
-La scrittura e' sicura: lo script scrive prima un file temporaneo nella cartella di output e sostituisce il CSV finale solo dopo che tutte le validazioni sono state superate.
-
-### Riepilogo diagnostico 10B
-
-A fine esecuzione lo script stampa:
-
-```text
-Vehicle state stream export completed
-inputFile=<path>
-registrationsFound=<count>
-vehicleUpdatesFound=<count>
-statesExported=<count>
-registeredVehicles=<count>
-updatedVehicles=<count>
-duplicateRegistrations=0
-duplicateVehicleStates=0
-updatesBeforeRegistration=0
-projectedCoordinatesPopulated=0
-projectedCoordinatesMissing=<count>
-vehicleUpdateFieldCountDistribution:
-  <fieldCount>=<rowCount>
-firstStateTimeNs=<value>
-lastStateTimeNs=<value>
-outFile=<path>
-```
-
-Per la run diagnostica corrente sono attesi:
-
-```text
-registrationsFound=12
-vehicleUpdatesFound=1824
-statesExported=1824
-registeredVehicles=12
-updatedVehicles=12
-projectedCoordinatesPopulated=0
-projectedCoordinatesMissing=1824
-vehicleUpdateFieldCountDistribution:
-  30=1824
-firstStateTimeNs=7000000000
-lastStateTimeNs=180000000000
-```
-
-Questi valori emergono dal file e non sono hard-coded nello script.
+La scrittura e' atomica.
 
 ### Limiti 10B
 
-Questa fase:
-
 ```text
-non calcola ancora projectedX/projectedY
-non calcola ancora distanze
-non aggiunge ancora localCpu
-non costruisce ancora VehicleSnapshot
-non assembla ancora SystemSnapshot
+non calcola projectedX/projectedY
+non calcola distanze
+non aggiunge localCpu
+non costruisce VehicleSnapshot
+non assembla SystemSnapshot
 non invoca il core Java
 non implementa il bridge live
 ```
 
-`VEHICLE_REGISTRATION` viene usato per validare il ciclo di vita minimo del veicolo. Il CSV contiene una riga per ogni `VEHICLE_UPDATES` valido.
+Nella run diagnostica corrente non sono stati osservati eventi di rimozione dei veicoli. La gestione delle uscite verra' estesa solo dopo avere osservato il relativo formato reale.
 
-Nella run diagnostica corrente non sono stati osservati eventi di rimozione dei veicoli. Non viene quindi inventata una rappresentazione delle uscite. La gestione delle uscite verra' estesa solo dopo avere osservato il relativo formato reale.
+## Fase 10C - Normalizzazione e validazione dell'infrastruttura
+
+La Fase 10C costruisce una fotografia statica validata dell'infrastruttura necessaria alle fasi successive dell'exporter offline.
+
+Script:
+
+```text
+export_infrastructure_snapshot.py
+```
+
+Lo script combina:
+
+```text
+registrazioni runtime RSU/server da output.csv
+configurazione Cell
+configurazione SNS
+catalogo risorse MA-GA
+```
+
+e produce:
+
+```text
+data/mosaic-study/infrastructure_snapshot.json
+```
+
+### Input 10C
+
+Argomenti obbligatori:
+
+```text
+--output-csv
+--cell-config
+--network-config
+--regions-config
+--sns-config
+--resource-catalog
+--out-file
+```
+
+Run/scenario diagnostico:
+
+```text
+tmp/mosaic-25.2/logs/log-20260603-123856-MaGaWorkloadStudy/output.csv
+tmp/mosaic-25.2/scenarios/MaGaWorkloadStudy/cell/cell_config.json
+tmp/mosaic-25.2/scenarios/MaGaWorkloadStudy/cell/network.json
+tmp/mosaic-25.2/scenarios/MaGaWorkloadStudy/cell/regions.json
+tmp/mosaic-25.2/scenarios/MaGaWorkloadStudy/sns/sns_config.json
+tmp/mosaic-25.2/scenarios/MaGaWorkloadStudy/application/ma_ga_resource_catalog.json
+```
+
+### Esempio PowerShell 10C
+
+```powershell
+python .\tools\mosaic-offline-exporter\export_infrastructure_snapshot.py `
+  --output-csv ".\tmp\mosaic-25.2\logs\log-20260603-123856-MaGaWorkloadStudy\output.csv" `
+  --cell-config ".\tmp\mosaic-25.2\scenarios\MaGaWorkloadStudy\cell\cell_config.json" `
+  --network-config ".\tmp\mosaic-25.2\scenarios\MaGaWorkloadStudy\cell\network.json" `
+  --regions-config ".\tmp\mosaic-25.2\scenarios\MaGaWorkloadStudy\cell\regions.json" `
+  --sns-config ".\tmp\mosaic-25.2\scenarios\MaGaWorkloadStudy\sns\sns_config.json" `
+  --resource-catalog ".\tmp\mosaic-25.2\scenarios\MaGaWorkloadStudy\application\ma_ga_resource_catalog.json" `
+  --out-file ".\data\mosaic-study\infrastructure_snapshot.json"
+```
+
+Con il launcher Windows:
+
+```powershell
+py .\tools\mosaic-offline-exporter\export_infrastructure_snapshot.py `
+  --output-csv ".\tmp\mosaic-25.2\logs\log-20260603-123856-MaGaWorkloadStudy\output.csv" `
+  --cell-config ".\tmp\mosaic-25.2\scenarios\MaGaWorkloadStudy\cell\cell_config.json" `
+  --network-config ".\tmp\mosaic-25.2\scenarios\MaGaWorkloadStudy\cell\network.json" `
+  --regions-config ".\tmp\mosaic-25.2\scenarios\MaGaWorkloadStudy\cell\regions.json" `
+  --sns-config ".\tmp\mosaic-25.2\scenarios\MaGaWorkloadStudy\sns\sns_config.json" `
+  --resource-catalog ".\tmp\mosaic-25.2\scenarios\MaGaWorkloadStudy\application\ma_ga_resource_catalog.json" `
+  --out-file ".\data\mosaic-study\infrastructure_snapshot.json"
+```
+
+### Struttura generale del JSON 10C
+
+```json
+{
+  "schemaVersion": "0.1",
+  "source": {},
+  "runtimeRegistrations": {
+    "rsus": [],
+    "servers": []
+  },
+  "policies": {},
+  "gateways": [],
+  "bandwidthPools": [],
+  "executionNodes": [],
+  "vehicleProfiles": [],
+  "v2vPolicy": {},
+  "cell": {
+    "globalNetwork": {},
+    "regions": [],
+    "bandwidthMeasurements": []
+  },
+  "sns": {},
+  "validations": {
+    "errors": [],
+    "warnings": []
+  }
+}
+```
+
+`gateways` copia il catalogo e aggiunge le coordinate runtime della RSU registrata. `bandwidthPools` copia il catalogo e aggiunge:
+
+```text
+expectedNominalBandwidthBitsPerSecond
+nominalBandwidthValidation = PASS
+```
+
+### Validazioni bloccanti 10C
+
+Lo script fallisce se:
+
+```text
+un file input non esiste o non e' un file
+un JSON non e' valido
+non trova RSU_REGISTRATION o SERVER_REGISTRATION
+una registrazione runtime e' malformata
+timeNs e' invalido o negativo
+runtimeId o profile sono vuoti
+coordinate RSU non numeriche, non finite o fuori range
+una RSU o un server runtime viene registrato piu' di una volta
+gateway runtimeId non registrato come RSU
+gatewayId/runtimeId/poolId/executionNodeId non sono valorizzati o non sono univoci
+gatewayType non e' valorizzato
+coverageRadiusMeters <= 0
+bandwidthPoolId non riferisce un pool esistente
+cellRegionId non riferisce una regione Cell esistente
+poolType non e' valorizzato
+nominalBandwidthBitsPerSecond <= 0
+executionNodes[*].type non e' EDGE o CLOUD
+EDGE senza gatewayId o con gatewayId inesistente
+CPU EDGE/CLOUD <= 0
+ritardi base EDGE/CLOUD mancanti, non finiti o negativi
+nessun CLOUD presente
+CLOUD senza mosaicServerRuntimeId registrato
+CLOUD accessPolicy diverso da THROUGH_ACTIVE_GATEWAY
+policies.cloudAccess diverso da THROUGH_ACTIVE_GATEWAY
+policies gatewaySelection/gatewayPoolBandwidth/bandwidthResidualPolicy non valorizzate
+nominalBandwidthBitsPerSecond di un pool gateway non coincide con min(uplink, downlink) della regione Cell
+```
+
+Lo script non corregge automaticamente i JSON e non inventa valori mancanti.
+
+### Warning non bloccanti 10C
+
+Lo script completa l'export ma registra warning se:
+
+```text
+la description del catalogo cita MaGaMosaicStudy mentre il catalogo e' usato in MaGaWorkloadStudy
+il server runtime del CLOUD ha profilo WeatherServer
+v2vPolicy.candidatePolicy = DIRECT_SINGLEHOP_ONLY ma sns.maximumTtl > 1
+vehicleProfiles[*].localCpuCyclesPerSecond e' null
+v2vPolicy.nominalBandwidthBitsPerSecond e' null
+v2vPolicy.bandwidthSource = CONFIGURED_VALUE_TO_BE_CALIBRATED
+vehicleProfiles[*].cpuSource = CONFIGURED_VALUE_TO_BE_CALIBRATED
+```
+
+Questi warning non vengono risolti nella Fase 10C.
+
+### Parametri ancora null
+
+Sono preservati intenzionalmente:
+
+```text
+vehicleProfiles[*].localCpuCyclesPerSecond = null
+v2vPolicy.nominalBandwidthBitsPerSecond = null
+```
+
+Non vengono sostituiti con numeri arbitrari.
+
+### Limiti 10C
+
+La Fase 10C:
+
+```text
+non calcola banda residua
+non usa bandwidthMeasurements per sottrarre traffico
+non seleziona gateway attivi
+non costruisce access link
+non costruisce candidati EDGE
+non costruisce candidati CLOUD
+non costruisce candidati V2V
+non genera SystemSnapshot
+non invoca il core Java
+non implementa il bridge live
+```
+
+Il file `infrastructure_snapshot.json` e' un artefatto statico validato per le fasi successive dell'exporter offline.
 
 ## Stato complessivo
 
@@ -389,6 +464,7 @@ Le fasi implementate producono artefatti intermedi:
 ```text
 data/mosaic-study/task_stream.csv
 data/mosaic-study/vehicle_state_stream.csv
+data/mosaic-study/infrastructure_snapshot.json
 ```
 
 Questi file saranno input per le fasi successive dell'exporter offline. Non costituiscono ancora snapshot MA-GA completi.

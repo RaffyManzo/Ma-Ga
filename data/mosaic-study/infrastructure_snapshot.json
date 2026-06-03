@@ -1,0 +1,311 @@
+{
+  "schemaVersion": "0.1",
+  "source": {
+    "scenarioId": "MaGaWorkloadStudy",
+    "outputCsv": "tmp/mosaic-25.2/logs/log-20260603-123856-MaGaWorkloadStudy/output.csv",
+    "cellConfig": "tmp/mosaic-25.2/scenarios/MaGaWorkloadStudy/cell/cell_config.json",
+    "cellNetwork": "tmp/mosaic-25.2/scenarios/MaGaWorkloadStudy/cell/network.json",
+    "cellRegions": "tmp/mosaic-25.2/scenarios/MaGaWorkloadStudy/cell/regions.json",
+    "snsConfig": "tmp/mosaic-25.2/scenarios/MaGaWorkloadStudy/sns/sns_config.json",
+    "resourceCatalog": "tmp/mosaic-25.2/scenarios/MaGaWorkloadStudy/application/ma_ga_resource_catalog.json"
+  },
+  "runtimeRegistrations": {
+    "rsus": [
+      {
+        "timeNs": 0,
+        "runtimeId": "rsu_0",
+        "profile": "MaGaGateway",
+        "latitude": 52.644,
+        "longitude": 13.567
+      },
+      {
+        "timeNs": 0,
+        "runtimeId": "rsu_1",
+        "profile": "MaGaGateway",
+        "latitude": 52.625,
+        "longitude": 13.563
+      }
+    ],
+    "servers": [
+      {
+        "timeNs": 0,
+        "runtimeId": "server_0",
+        "profile": "WeatherServer"
+      }
+    ]
+  },
+  "policies": {
+    "gatewaySelection": "NEAREST_AVAILABLE_WITHIN_RADIUS",
+    "cloudAccess": "THROUGH_ACTIVE_GATEWAY",
+    "gatewayPoolBandwidth": "MIN_CELL_UPLINK_DOWNLINK",
+    "bandwidthResidualPolicy": "NOMINAL_ONLY_FOR_INITIAL_EXPORTER"
+  },
+  "gateways": [
+    {
+      "runtimeId": "rsu_1",
+      "gatewayId": "rsu_central",
+      "gatewayType": "RSU",
+      "cellRegionId": "region_central_degraded",
+      "coverageRadiusMeters": 300.0,
+      "bandwidthPoolId": "pool_rsu_central",
+      "latitude": 52.625,
+      "longitude": 13.563
+    },
+    {
+      "runtimeId": "rsu_0",
+      "gatewayId": "rsu_north",
+      "gatewayType": "RSU",
+      "cellRegionId": "region_north_normal",
+      "coverageRadiusMeters": 520.0,
+      "bandwidthPoolId": "pool_rsu_north",
+      "latitude": 52.644,
+      "longitude": 13.567
+    }
+  ],
+  "bandwidthPools": [
+    {
+      "poolId": "pool_rsu_central",
+      "poolType": "GATEWAY",
+      "cellRegionId": "region_central_degraded",
+      "nominalBandwidthBitsPerSecond": 8000000,
+      "expectedNominalBandwidthBitsPerSecond": 8000000,
+      "nominalBandwidthValidation": "PASS"
+    },
+    {
+      "poolId": "pool_rsu_north",
+      "poolType": "GATEWAY",
+      "cellRegionId": "region_north_normal",
+      "nominalBandwidthBitsPerSecond": 40000000,
+      "expectedNominalBandwidthBitsPerSecond": 40000000,
+      "nominalBandwidthValidation": "PASS"
+    }
+  ],
+  "executionNodes": [
+    {
+      "executionNodeId": "cloud_regional",
+      "type": "CLOUD",
+      "mosaicServerRuntimeId": "server_0",
+      "accessPolicy": "THROUGH_ACTIVE_GATEWAY",
+      "availableCpuCyclesPerSecond": 100000000000,
+      "serverBaseDelaySeconds": 0.2
+    },
+    {
+      "executionNodeId": "edge_central",
+      "type": "EDGE",
+      "gatewayIds": [
+        "rsu_central"
+      ],
+      "availableCpuCyclesPerSecond": 9000000000,
+      "basePropagationDelaySeconds": 0.005
+    },
+    {
+      "executionNodeId": "edge_north",
+      "type": "EDGE",
+      "gatewayIds": [
+        "rsu_north"
+      ],
+      "availableCpuCyclesPerSecond": 12000000000,
+      "basePropagationDelaySeconds": 0.005
+    }
+  ],
+  "vehicleProfiles": [
+    {
+      "profileId": "car_default",
+      "mappingPrototype": "Car",
+      "localCpuCyclesPerSecond": null,
+      "cpuSource": "CONFIGURED_VALUE_TO_BE_CALIBRATED"
+    }
+  ],
+  "v2vPolicy": {
+    "candidatePolicy": "DIRECT_SINGLEHOP_ONLY",
+    "positionSource": "SUMO_VEHICLE_UPDATES",
+    "radioStateSource": "ADHOC_CONFIGURATION",
+    "radiusSource": "SNS_CONFIG_OR_ADHOC_CONFIGURATION",
+    "poolPolicy": "ONE_SHARED_POOL_PER_UNORDERED_PAIR",
+    "nominalBandwidthBitsPerSecond": null,
+    "bandwidthSource": "CONFIGURED_VALUE_TO_BE_CALIBRATED",
+    "propagationDelayPolicy": "SNS_SINGLEHOP_MAX_DELAY",
+    "conservativePropagationDelaySeconds": 0.0024,
+    "lossProbabilitySource": "SNS_CONFIG"
+  },
+  "cell": {
+    "globalNetwork": {
+      "uplink": {
+        "delay": {
+          "type": "ConstantDelay",
+          "delay": "100 ms"
+        },
+        "transmission": {
+          "lossProbability": 0.0
+        },
+        "capacity": 28000000
+      },
+      "downlink": {
+        "unicast": {
+          "delay": {
+            "type": "ConstantDelay",
+            "delay": "100 ms"
+          },
+          "transmission": {
+            "lossProbability": 0.0
+          }
+        },
+        "multicast": {
+          "delay": {
+            "type": "ConstantDelay",
+            "delay": "100 ms"
+          },
+          "transmission": {
+            "lossProbability": 0.0
+          },
+          "usableCapacity": 0.6
+        },
+        "capacity": 42200000
+      }
+    },
+    "regions": [
+      {
+        "id": "region_central_degraded",
+        "area": {
+          "nw": {
+            "lon": 13.559,
+            "lat": 52.632
+          },
+          "se": {
+            "lon": 13.567,
+            "lat": 52.618
+          }
+        },
+        "uplink": {
+          "delay": {
+            "type": "ConstantDelay",
+            "delay": "250 ms"
+          },
+          "transmission": {
+            "lossProbability": 0.05,
+            "maxRetries": 0
+          },
+          "capacity": "8 Mbps"
+        },
+        "downlink": {
+          "unicast": {
+            "delay": {
+              "type": "ConstantDelay",
+              "delay": "250 ms"
+            },
+            "transmission": {
+              "lossProbability": 0.05,
+              "maxRetries": 0
+            }
+          },
+          "multicast": {
+            "delay": {
+              "type": "ConstantDelay",
+              "delay": "250 ms"
+            },
+            "transmission": {
+              "lossProbability": 0.05,
+              "maxRetries": 0
+            },
+            "usableCapacity": 0.6
+          },
+          "capacity": "12 Mbps"
+        }
+      },
+      {
+        "id": "region_north_normal",
+        "area": {
+          "nw": {
+            "lon": 13.563,
+            "lat": 52.657
+          },
+          "se": {
+            "lon": 13.571,
+            "lat": 52.632
+          }
+        },
+        "uplink": {
+          "delay": {
+            "type": "ConstantDelay",
+            "delay": "80 ms"
+          },
+          "transmission": {
+            "lossProbability": 0.0,
+            "maxRetries": 0
+          },
+          "capacity": "40 Mbps"
+        },
+        "downlink": {
+          "unicast": {
+            "delay": {
+              "type": "ConstantDelay",
+              "delay": "80 ms"
+            },
+            "transmission": {
+              "lossProbability": 0.0,
+              "maxRetries": 0
+            }
+          },
+          "multicast": {
+            "delay": {
+              "type": "ConstantDelay",
+              "delay": "80 ms"
+            },
+            "transmission": {
+              "lossProbability": 0.0,
+              "maxRetries": 0
+            },
+            "usableCapacity": 0.6
+          },
+          "capacity": "60 Mbps"
+        }
+      }
+    ],
+    "bandwidthMeasurements": [
+      {
+        "fromRegion": "*",
+        "toRegion": "*",
+        "transmissionMode": "UplinkUnicast"
+      },
+      {
+        "fromRegion": "*",
+        "toRegion": "*",
+        "transmissionMode": "DownlinkUnicast"
+      },
+      {
+        "fromRegion": "*",
+        "toRegion": "*",
+        "transmissionMode": "DownlinkMulticast"
+      }
+    ]
+  },
+  "sns": {
+    "maximumTtl": 10,
+    "singlehopRadius": 709.4,
+    "adhocTransmissionModel": {
+      "type": "SophisticatedAdhocTransmissionModel"
+    },
+    "singlehopDelay": {
+      "type": "SimpleRandomDelay",
+      "steps": 5,
+      "minDelay": "0.4 ms",
+      "maxDelay": "2.4 ms"
+    },
+    "singleHopTransmission": {
+      "lossProbability": 0.0,
+      "maxRetries": 0
+    }
+  },
+  "validations": {
+    "errors": [],
+    "warnings": [
+      "CLOUD node cloud_regional uses runtime server server_0 with profile WeatherServer",
+      "catalog.description contains MaGaMosaicStudy while resource catalog is used for MaGaWorkloadStudy",
+      "v2vPolicy candidatePolicy is DIRECT_SINGLEHOP_ONLY but sns.maximumTtl is 10",
+      "v2vPolicy.bandwidthSource is CONFIGURED_VALUE_TO_BE_CALIBRATED",
+      "v2vPolicy.nominalBandwidthBitsPerSecond is null",
+      "vehicleProfiles[car_default].cpuSource is CONFIGURED_VALUE_TO_BE_CALIBRATED",
+      "vehicleProfiles[car_default].localCpuCyclesPerSecond is null"
+    ]
+  }
+}
