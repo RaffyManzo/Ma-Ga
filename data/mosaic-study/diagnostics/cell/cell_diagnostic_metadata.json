@@ -1,0 +1,31 @@
+{
+  "diagnosticOnly": true,
+  "mixedSources": false,
+  "handoverSource": "tmp\\mosaic-25.2\\logs\\log-20260602-172233-MaGaCellStudy\\output.csv",
+  "bandwidthSource": "tmp\\mosaic-25.2\\logs\\log-20260602-172233-MaGaCellStudy\\bandwidthMeasurements",
+  "handoverRecords": 38,
+  "handoverEventTypes": {
+    "REGION_TRANSITION": 14,
+    "REGISTRATION": 12,
+    "REMOVAL": 12
+  },
+  "bandwidthFilesAnalyzed": [
+    "tmp\\mosaic-25.2\\logs\\log-20260602-172233-MaGaCellStudy\\bandwidthMeasurements\\ALL#ALL#ALL#Dn.csv",
+    "tmp\\mosaic-25.2\\logs\\log-20260602-172233-MaGaCellStudy\\bandwidthMeasurements\\ALL#ALL#ALL#Up.csv"
+  ],
+  "bandwidthRawRecords": 2943,
+  "bandwidthRawRecordsByFile": {
+    "tmp\\mosaic-25.2\\logs\\log-20260602-172233-MaGaCellStudy\\bandwidthMeasurements\\ALL#ALL#ALL#Dn.csv": 1989,
+    "tmp\\mosaic-25.2\\logs\\log-20260602-172233-MaGaCellStudy\\bandwidthMeasurements\\ALL#ALL#ALL#Up.csv": 954
+  },
+  "bandwidthDirections": {
+    "DOWNLINK": 1989,
+    "UPLINK": 954
+  },
+  "unitStatus": "UNRESOLVED",
+  "finalBandwidthStreamGenerated": false,
+  "warnings": [
+    "Cell bandwidth measurements are exported as raw values because the local workspace did not provide an unambiguous unit proof.",
+    "Cell diagnostic outputs are not aligned with the MaGaWorkloadStudy timeline and must not be used directly for final snapshot assembly."
+  ]
+}
