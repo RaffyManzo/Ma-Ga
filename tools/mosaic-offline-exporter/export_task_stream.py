@@ -149,6 +149,8 @@ def parse_task_record(payload: str, file_path: Path, line_number: int) -> TaskRe
     deadline_seconds = parse_decimal_field(
         fields["deadlineSeconds"], "deadlineSeconds", file_path, line_number
     )
+    if not deadline_seconds.is_finite():
+        raise malformed(file_path, line_number, "deadlineSeconds must be finite")
 
     activation_time_ns = parsed_ints["activationTimeNs"]
     activation_time_ms = parsed_ints["activationTimeMs"]
