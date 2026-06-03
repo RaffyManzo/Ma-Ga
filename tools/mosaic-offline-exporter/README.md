@@ -627,3 +627,230 @@ non viene generato SystemSnapshot
 non viene invocato il core Java
 non viene implementato il bridge live
 ```
+
+## Fase 10F - Preview diagnostica dei candidati EDGE e CLOUD
+
+Script:
+
+```text
+export_remote_candidate_preview.py
+```
+
+Scopo: ricostruire candidati remoti source-aware di tipo `EDGE` e `CLOUD` usando i gateway attivi prodotti dalla Fase 10E e l'infrastruttura statica validata dalla Fase 10C.
+
+La Fase 10F non usa:
+
+```text
+data/mosaic-study/diagnostics/cell/cell_bandwidth_raw_stream.csv
+```
+
+Quel file deriva da una run Cell storica diversa e conserva valori con `unitStatus = UNRESOLVED`.
+
+### Input 10F
+
+```text
+data/mosaic-study/access_link_preview.csv
+data/mosaic-study/infrastructure_snapshot.json
+```
+
+Lo script considera solo righe di access link con:
+
+```text
+active = true
+available = true
+```
+
+Se uno stato veicolare non ha gateway attivo, non vengono generati candidati remoti per quello stato.
+
+### Output 10F
+
+```text
+data/mosaic-study/remote_candidate_preview.csv
+```
+
+Colonne:
+
+```text
+timeNs
+timeSeconds
+candidateId
+sourceVehicleId
+executionNodeId
+type
+availableCpu
+availableBandwidth
+propagationDelaySeconds
+regionalRadioDelaySeconds
+nodeBaseDelaySeconds
+bandwidthPoolId
+gatewayId
+runtimeGatewayId
+cellRegionId
+bandwidthPolicy
+bandwidthSource
+propagationDelayPolicy
+```
+
+`remote_candidate_preview.csv` contiene candidati source-aware. Il formato `candidateId` e':
+
+```text
+<executionNodeId>_for_<sourceVehicleId>
+```
+
+### Comando PowerShell 10F
+
+```powershell
+python .\tools\mosaic-offline-exporter\export_remote_candidate_preview.py `
+  --access-link-file ".\data\mosaic-study\access_link_preview.csv" `
+  --infrastructure-snapshot ".\data\mosaic-study\infrastructure_snapshot.json" `
+  --out-file ".\data\mosaic-study\remote_candidate_preview.csv"
+```
+
+Su Windows, se `python` non e' nel PATH, usare `py` con gli stessi argomenti.
+
+### Regole EDGE 10F
+
+Per ogni gateway attivo:
+
+```text
+EDGE e' disponibile solo tramite gateway associato
+gatewayId deve essere presente in executionNode.gatewayIds
+availableCpu = executionNode.availableCpuCyclesPerSecond
+availableBandwidth = nominalBandwidthBitsPerSecond del pool del gateway attivo
+bandwidthPoolId = pool del gateway attivo
+runtimeGatewayId = runtime gateway attivo
+```
+
+Un candidato EDGE non viene generato attraverso gateway non associati al nodo.
+
+### Regole CLOUD 10F
+
+Per ogni gateway attivo:
+
+```text
+CLOUD e' disponibile tramite gateway attivo
+accessPolicy deve essere THROUGH_ACTIVE_GATEWAY
+availableCpu = executionNode.availableCpuCyclesPerSecond
+availableBandwidth = nominalBandwidthBitsPerSecond del pool del gateway attivo
+bandwidthPoolId = pool del gateway attivo
+runtimeGatewayId = runtime gateway attivo
+```
+
+Il cloud non e' associato staticamente a una singola RSU: il percorso cambia in base al gateway attivo del veicolo.
+
+### Policy banda 10F
+
+Per ogni candidato:
+
+```text
+bandwidthPolicy = NOMINAL_ONLY_FOR_INITIAL_EXPORTER
+bandwidthSource = INFRASTRUCTURE_SNAPSHOT_GATEWAY_POOL
+availableBandwidth = bandwidthPools[*].nominalBandwidthBitsPerSecond
+```
+
+Non viene ancora applicata banda residua Cell. I dati raw Cell storici non vengono usati.
+
+### Policy diagnostica del ritardo 10F
+
+Lo script usa la regione Cell associata al gateway attivo:
+
+```text
+gateway.cellRegionId
+```
+
+Da quella regione legge:
+
+```text
+uplink.delay.delay
+downlink.unicast.delay.delay
+```
+
+Sono supportate almeno queste unita':
+
+```text
+ns
+us
+µs
+ms
+s
+```
+
+La policy diagnostica e':
+
+```text
+regionalRadioDelaySeconds = max(uplinkDelaySeconds, downlinkUnicastDelaySeconds)
+EDGE propagationDelaySeconds = regionalRadioDelaySeconds + basePropagationDelaySeconds
+CLOUD propagationDelaySeconds = regionalRadioDelaySeconds + serverBaseDelaySeconds
+propagationDelayPolicy = MAX_CELL_UPLINK_DOWNLINK_UNICAST_PLUS_NODE_BASE_DIAGNOSTIC
+```
+
+`propagationDelaySeconds` e' una baseline diagnostica, non una calibrazione scientifica definitiva.
+
+### Validazioni 10F
+
+Lo script fallisce se:
+
+```text
+access_link_preview.csv non esiste o e' malformato
+infrastructure_snapshot.json non esiste o non e' JSON valido
+manca una colonna obbligatoria
+un valore numerico richiesto non e' numerico o non e' finito
+un booleano non e' true oppure false
+un link active non e' available
+un veicolo possiede piu' di un gateway active allo stesso timeNs
+gatewayId, runtimeGatewayId o bandwidthPoolId sono vuoti
+gatewayId non esiste nel JSON
+runtimeGatewayId non coincide con il runtimeId del gateway
+bandwidthPoolId non coincide con il pool del gateway
+il pool non esiste
+nominalBandwidthBitsPerSecond del pool non e' numerico, finito e > 0
+un executionNodeId non e' univoco
+un nodo EDGE non possiede gatewayIds
+un nodo EDGE referenzia gateway inesistenti
+CPU o ritardo base di EDGE/CLOUD non sono validi
+un nodo CLOUD non possiede accessPolicy = THROUGH_ACTIVE_GATEWAY
+gateway.cellRegionId e' vuoto o non esiste in cell.regions
+il delay regionale richiesto manca
+il delay regionale usa un'unita' non riconosciuta
+lo stesso candidato compare piu' di una volta nello stesso timeNs
+un candidato EDGE viene generato attraverso un gateway non associato
+un candidato CLOUD viene generato senza gateway attivo
+```
+
+### Riepilogo console 10F
+
+Lo script stampa:
+
+```text
+Remote candidate preview export completed
+activeAccessLinksRead
+edgeExecutionNodesRead
+cloudExecutionNodesRead
+candidatesExported
+edgeCandidates
+cloudCandidates
+statesWithRemoteCandidates
+distinctSourceVehicles
+candidateBandwidthPolicy
+candidatePropagationDelayPolicy
+warnings
+outFile
+```
+
+Warning attesi:
+
+```text
+candidate bandwidth uses nominal gateway-pool capacity because residual Cell bandwidth is unavailable for MaGaWorkloadStudy
+candidate propagation delay is diagnostic and uses gateway-associated Cell region plus configured node base delay
+Cell raw diagnostics from historical runs are not used for remote candidate generation
+```
+
+Limiti:
+
+```text
+non vengono ancora generati candidati LOCAL
+non vengono ancora generati candidati VEHICLE o V2V
+non viene ancora assemblato SystemSnapshot
+non viene invocato il core Java
+non viene implementato il bridge live
+```

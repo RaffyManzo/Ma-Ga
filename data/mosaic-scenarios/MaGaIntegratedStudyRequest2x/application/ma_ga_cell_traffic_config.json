@@ -1,0 +1,9 @@
+{
+  "destinationId": "server_0",
+  "requestPayloadBytes": 2000,
+  "responsePayloadBytes": 500,
+  "intervalMs": 1000,
+  "initialDelayMs": 1000,
+  "maxUplinkBitrate": "50 Mbps",
+  "maxDownlinkBitrate": "50 Mbps"
+}
