@@ -1,0 +1,17 @@
+{
+  "availableFromPolicy": "SAFE_AFTER_TIMESTAMP",
+  "bandwidthMeasurementsDir": "tmp\\mosaic-25.2\\logs\\log-20260603-174645-MaGaIntegratedStudy\\bandwidthMeasurements",
+  "bandwidthRecords": 1080,
+  "bucketBoundaryPolicy": "START_TIMESTAMP_FOR_INTERVAL",
+  "handoverRecords": 48,
+  "infrastructureSnapshot": "data\\mosaic-study\\infrastructure_snapshot.json",
+  "outputCsv": "tmp\\mosaic-25.2\\logs\\log-20260603-174645-MaGaIntegratedStudy\\output.csv",
+  "residualPolicy": "NOMINAL_MINUS_OBSERVED_DIAGNOSTIC",
+  "sourceRun": "log-20260603-174645-MaGaIntegratedStudy",
+  "terminalBuckets": 0,
+  "unitStatus": "PROVEN_BITS_PER_SECOND",
+  "warnings": [
+    "Cell bandwidth buckets use START_TIMESTAMP_FOR_INTERVAL and are safe only after bucket end.",
+    "Cell residual bandwidth is diagnostic and uses nominal capacity minus observed traffic."
+  ]
+}

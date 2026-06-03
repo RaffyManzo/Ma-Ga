@@ -1,8 +1,31 @@
 # MOSAIC Offline Exporter
 
-Questo folder contiene i primi componenti diagnostici dell'exporter offline Eclipse MOSAIC -> MA-GA.
+Questo folder contiene la pipeline diagnostica offline Eclipse MOSAIC -> MA-GA. Gli script usano solo la standard library Python, non invocano il core Java MA-GA, non modificano gli scenari MOSAIC e non implementano il bridge live.
 
-Gli script usano solo la standard library Python, non invocano il core Java MA-GA, non modificano gli scenari MOSAIC e non implementano il bridge live.
+## Struttura canonica
+
+```text
+data/docs/mosaic-study/       documentazione definitiva delle fasi
+data/mosaic-scenarios/        sorgenti versionabili degli scenari MOSAIC
+data/mosaic-study/            CSV, JSON e diagnostica generati
+data/snapshots/               snapshot JSON finali della futura Fase 10I
+tools/mosaic-offline-exporter/ exporter offline
+tmp/mosaic-25.2/              deployment locale, log ed eseguibili temporanei
+```
+
+La baseline integrata definitiva usata per la pipeline 10A-10F e':
+
+```text
+tmp/mosaic-25.2/logs/log-20260603-174645-MaGaIntegratedStudy/
+```
+
+I file di scenario versionabili sono letti da:
+
+```text
+data/mosaic-scenarios/MaGaIntegratedStudy/
+```
+
+Su Windows, se `python` non e' nel PATH, usare `py` con gli stessi argomenti.
 
 ## Fase 10A - Aggregazione del workload diagnostico
 
@@ -12,27 +35,13 @@ Script:
 export_task_stream.py
 ```
 
-Scopo: leggere i log applicativi di `MaGaWorkloadDiagnosticApp` ed esportare uno stream CSV dei task computazionali sintetici generati durante la simulazione.
-
-### Input 10A
+Input:
 
 ```text
-tmp/mosaic-25.2/logs/log-20260603-123856-MaGaWorkloadStudy/apps/
+tmp/mosaic-25.2/logs/log-20260603-174645-MaGaIntegratedStudy/apps/
 ```
 
-Lo script cerca ricorsivamente:
-
-```text
-MaGaWorkloadDiagnosticApp.log
-```
-
-ed estrae solo payload:
-
-```text
-TASK_ACTIVATION|...
-```
-
-### Output 10A
+Output:
 
 ```text
 data/mosaic-study/task_stream.csv
@@ -52,44 +61,27 @@ cpuCycles
 deadlineSeconds
 ```
 
-### Comando PowerShell 10A
+Comando:
 
 ```powershell
 python .\tools\mosaic-offline-exporter\export_task_stream.py `
-  --workload-log-root ".\tmp\mosaic-25.2\logs\log-20260603-123856-MaGaWorkloadStudy\apps" `
+  --workload-log-root ".\tmp\mosaic-25.2\logs\log-20260603-174645-MaGaIntegratedStudy\apps" `
   --out-file ".\data\mosaic-study\task_stream.csv"
 ```
 
-Su Windows, se `python` non e' nel PATH, usare `py` con gli stessi argomenti.
-
-### Validazioni 10A
-
-Lo script fallisce se:
+Validazioni principali:
 
 ```text
-la cartella input non esiste
-non trova alcun MaGaWorkloadDiagnosticApp.log
-non trova alcuna riga TASK_ACTIVATION
-una riga TASK_ACTIVATION e' malformata
-manca un campo obbligatorio
-un campo appare due volte nella stessa riga
-un valore numerico non e' valido o non e' finito
-taskId, sourceVehicleId o profileId sono vuoti
-esistono taskId duplicati
-activationTimeNs < 0
-activationTimeMs < 0
-inputSizeBits <= 0
-outputSizeBits < 0
-cpuCycles <= 0
-deadlineSeconds <= 0
-```
-
-Verifica inoltre:
-
-```text
+cartella input esistente
+almeno un MaGaWorkloadDiagnosticApp.log
+almeno una riga TASK_ACTIVATION
+campi obbligatori presenti una sola volta
+valori numerici validi e finiti
+deadlineSeconds finito e > 0
+taskId non vuoto e univoco
 activationTimeNs == activationTimeMs * 1_000_000
 taskId == <profileId>__<sourceVehicleId>__t_<activationTimeMs>
-sourceVehicleId == cartella veicolo che contiene il log
+sourceVehicleId coerente con la cartella del log
 ```
 
 Limiti:
@@ -97,10 +89,9 @@ Limiti:
 ```text
 non genera SystemSnapshot
 non assegna task alle finestre MA-GA
+non consuma i task dopo una decisione MA-GA
 non invoca il core Java
 non implementa il bridge live
-non consuma i task dopo una decisione MA-GA
-non legge dinamicamente ma_ga_workload_config.json
 ```
 
 ## Fase 10B - Normalizzazione dello stato dei veicoli
@@ -111,39 +102,22 @@ Script:
 export_vehicle_state_stream.py
 ```
 
-Scopo: normalizzare gli stati veicolari osservati da `output.csv`.
-
-### Input 10B
+Input:
 
 ```text
-tmp/mosaic-25.2/logs/log-20260603-123856-MaGaWorkloadStudy/output.csv
+tmp/mosaic-25.2/logs/log-20260603-174645-MaGaIntegratedStudy/output.csv
 ```
 
-Eventi usati:
+Eventi letti:
 
 ```text
 VEHICLE_REGISTRATION
 VEHICLE_UPDATES
 ```
 
-`VEHICLE_REGISTRATION` viene usato per validare il ciclo di vita minimo del veicolo. Il CSV contiene una riga per ogni `VEHICLE_UPDATES` valido.
+`VEHICLE_REGISTRATION` valida il ciclo di vita minimo. Ogni `VEHICLE_UPDATES` valido produce una riga.
 
-### Campi letti da VEHICLE_UPDATES
-
-```text
-indice 0 -> event marker
-indice 1 -> timeNs
-indice 2 -> vehicleId
-indice 3 -> speed
-indice 4 -> heading
-indice 5 -> latitude
-indice 6 -> longitude
-indice 7 -> altitude
-```
-
-Gli altri campi non ricevono significati non verificati.
-
-### Output 10B
+Output:
 
 ```text
 data/mosaic-study/vehicle_state_stream.csv
@@ -167,50 +141,27 @@ active
 Regole:
 
 ```text
-active = true per ogni stato esportato
+active = true
 projectedX e projectedY restano vuoti
 ```
 
-La conversione cartesiana, le distanze metriche precise e `localCpu` saranno gestite in fasi successive.
-
-### Comando PowerShell 10B
+Comando:
 
 ```powershell
 python .\tools\mosaic-offline-exporter\export_vehicle_state_stream.py `
-  --input-file ".\tmp\mosaic-25.2\logs\log-20260603-123856-MaGaWorkloadStudy\output.csv" `
+  --input-file ".\tmp\mosaic-25.2\logs\log-20260603-174645-MaGaIntegratedStudy\output.csv" `
   --out-file ".\data\mosaic-study\vehicle_state_stream.csv"
-```
-
-### Validazioni 10B
-
-Lo script fallisce se:
-
-```text
-il file input non esiste
-non trova VEHICLE_REGISTRATION o VEHICLE_UPDATES
-una registrazione o un update ha campi insufficienti
-timeNs non e' intero o e' negativo
-vehicleId e' vuoto
-speed, heading, latitude, longitude o altitude non sono numerici o non sono finiti
-speed < 0
-heading < 0 o heading >= 360
-coordinate fuori intervallo
-un veicolo viene registrato piu' di una volta
-un update compare prima della registrazione
-lo stesso veicolo ha piu' stati allo stesso timeNs
-il tempo degli eventi rilevanti diminuisce
 ```
 
 Limiti:
 
 ```text
-non calcola projectedX/projectedY
+non calcola coordinate cartesiane
 non calcola distanze
 non aggiunge localCpu
 non costruisce VehicleSnapshot
 non assembla SystemSnapshot
 non implementa il bridge live
-non modella uscite dei veicoli, perche' non osservate nella run diagnostica corrente
 ```
 
 ## Fase 10C - Normalizzazione e validazione dell'infrastruttura
@@ -221,79 +172,39 @@ Script:
 export_infrastructure_snapshot.py
 ```
 
-Scopo: costruire una fotografia statica validata dell'infrastruttura configurata per la run workload.
-
-### Input 10C
+Input:
 
 ```text
-tmp/mosaic-25.2/logs/log-20260603-123856-MaGaWorkloadStudy/output.csv
-tmp/mosaic-25.2/scenarios/MaGaWorkloadStudy/cell/cell_config.json
-tmp/mosaic-25.2/scenarios/MaGaWorkloadStudy/cell/network.json
-tmp/mosaic-25.2/scenarios/MaGaWorkloadStudy/cell/regions.json
-tmp/mosaic-25.2/scenarios/MaGaWorkloadStudy/sns/sns_config.json
-tmp/mosaic-25.2/scenarios/MaGaWorkloadStudy/application/ma_ga_resource_catalog.json
+tmp/mosaic-25.2/logs/log-20260603-174645-MaGaIntegratedStudy/output.csv
+data/mosaic-scenarios/MaGaIntegratedStudy/cell/cell_config.json
+data/mosaic-scenarios/MaGaIntegratedStudy/cell/network.json
+data/mosaic-scenarios/MaGaIntegratedStudy/cell/regions.json
+data/mosaic-scenarios/MaGaIntegratedStudy/sns/sns_config.json
+data/mosaic-scenarios/MaGaIntegratedStudy/application/ma_ga_resource_catalog.json
 ```
 
-Eventi letti da `output.csv`:
-
-```text
-RSU_REGISTRATION
-SERVER_REGISTRATION
-```
-
-### Output 10C
+Output:
 
 ```text
 data/mosaic-study/infrastructure_snapshot.json
 ```
 
-Struttura generale:
-
-```text
-schemaVersion
-source
-runtimeRegistrations
-policies
-gateways
-bandwidthPools
-executionNodes
-vehicleProfiles
-v2vPolicy
-cell
-sns
-validations
-```
-
-### Comando PowerShell 10C
+Comando:
 
 ```powershell
 python .\tools\mosaic-offline-exporter\export_infrastructure_snapshot.py `
-  --output-csv ".\tmp\mosaic-25.2\logs\log-20260603-123856-MaGaWorkloadStudy\output.csv" `
-  --cell-config ".\tmp\mosaic-25.2\scenarios\MaGaWorkloadStudy\cell\cell_config.json" `
-  --network-config ".\tmp\mosaic-25.2\scenarios\MaGaWorkloadStudy\cell\network.json" `
-  --regions-config ".\tmp\mosaic-25.2\scenarios\MaGaWorkloadStudy\cell\regions.json" `
-  --sns-config ".\tmp\mosaic-25.2\scenarios\MaGaWorkloadStudy\sns\sns_config.json" `
-  --resource-catalog ".\tmp\mosaic-25.2\scenarios\MaGaWorkloadStudy\application\ma_ga_resource_catalog.json" `
+  --output-csv ".\tmp\mosaic-25.2\logs\log-20260603-174645-MaGaIntegratedStudy\output.csv" `
+  --cell-config ".\data\mosaic-scenarios\MaGaIntegratedStudy\cell\cell_config.json" `
+  --network-config ".\data\mosaic-scenarios\MaGaIntegratedStudy\cell\network.json" `
+  --regions-config ".\data\mosaic-scenarios\MaGaIntegratedStudy\cell\regions.json" `
+  --sns-config ".\data\mosaic-scenarios\MaGaIntegratedStudy\sns\sns_config.json" `
+  --resource-catalog ".\data\mosaic-scenarios\MaGaIntegratedStudy\application\ma_ga_resource_catalog.json" `
   --out-file ".\data\mosaic-study\infrastructure_snapshot.json"
 ```
 
-### Validazioni 10C
+Lo script valida RSU e server registrati, alias runtime -> MA-GA, unicita' di gateway/pool/nodi, coverage, CPU, ritardi, policy cloud e `nominalBandwidthBitsPerSecond = min(uplink, downlink)` dei pool gateway.
 
-Lo script valida:
-
-```text
-RSU e server registrati a runtime
-mapping runtimeId -> gatewayId e server cloud
-unicita' di gateway, pool e execution node
-coverageRadiusMeters > 0
-availableCpuCyclesPerSecond > 0 per EDGE e CLOUD
-ritardi base finiti e non negativi
-policy cloud THROUGH_ACTIVE_GATEWAY
-coerenza dei cellRegionId
-nominalBandwidthBitsPerSecond dei pool gateway = min(uplink, downlink) della regione Cell
-```
-
-Warning non bloccanti preservano valori ancora irrisolti:
+Valori intenzionalmente irrisolti restano preservati come warning:
 
 ```text
 vehicleProfiles[*].localCpuCyclesPerSecond = null
@@ -304,69 +215,54 @@ CONFIGURED_VALUE_TO_BE_CALIBRATED
 Limiti:
 
 ```text
-non calcola banda residua
-non usa bandwidthMeasurements per sottrarre traffico
-non seleziona gateway attivi
+non calcola gateway attivi
 non costruisce access link
 non costruisce candidati EDGE, CLOUD o V2V
+non usa bandwidthMeasurements per sottrarre traffico
 non genera SystemSnapshot
-non invoca il core Java
-non implementa il bridge live
 ```
 
-## Fase 10D - Diagnostica Cell su run storiche
+## Fase 10D - Stream Cell integrati
 
 Script:
 
 ```text
-export_cell_network_diagnostics.py
+export_cell_network_streams.py
 ```
 
-Scopo: validare un parser per handover regionali Cell e misure aggregate/raw Cell usando run diagnostiche storiche, senza mescolare questi dati con la timeline della run workload.
+Questa fase usa la baseline integrata definitiva, non le run storiche Cell. Il parser storico resta disponibile in `export_cell_network_diagnostics.py` e produce solo output raw diagnostici sotto `data/mosaic-study/diagnostics/cell/`.
 
-La run workload:
-
-```text
-tmp/mosaic-25.2/logs/log-20260603-123856-MaGaWorkloadStudy/
-```
-
-non contiene `CELLULAR_HANDOVER` e i file `bandwidthMeasurements/ALL#ALL#ALL#Dn.csv` e `ALL#ALL#ALL#Up.csv` hanno solo intestazione. Questo e' coerente con lo scenario diagnostico workload e non va compensato inventando dati.
-
-La run storica selezionata per la diagnostica Cell e':
+Input:
 
 ```text
-tmp/mosaic-25.2/logs/log-20260602-172233-MaGaCellStudy/
-```
-
-Questa run contiene sia handover sia misure bandwidth popolate, quindi non serve usare sorgenti miste.
-
-### Input 10D
-
-```text
-tmp/mosaic-25.2/logs/log-20260602-172233-MaGaCellStudy/output.csv
-tmp/mosaic-25.2/logs/log-20260602-172233-MaGaCellStudy/bandwidthMeasurements/
+tmp/mosaic-25.2/logs/log-20260603-174645-MaGaIntegratedStudy/output.csv
+tmp/mosaic-25.2/logs/log-20260603-174645-MaGaIntegratedStudy/bandwidthMeasurements/
 data/mosaic-study/infrastructure_snapshot.json
 ```
 
-### Output 10D
+Output:
 
 ```text
-data/mosaic-study/diagnostics/cell/cell_handover_stream.csv
-data/mosaic-study/diagnostics/cell/cell_bandwidth_raw_stream.csv
-data/mosaic-study/diagnostics/cell/cell_diagnostic_metadata.json
-```
-
-Non viene generato:
-
-```text
+data/mosaic-study/cell_handover_stream.csv
 data/mosaic-study/cell_bandwidth_stream.csv
+data/mosaic-study/diagnostics/cell/integrated_baseline_metadata.json
 ```
 
-finche' l'unita' dei valori Cell non viene dimostrata in modo esplicito e non ambiguo tramite file locali, sorgenti, JAR, Javadoc o documentazione disponibile.
+Comando:
 
-### Handover stream 10D
+```powershell
+python .\tools\mosaic-offline-exporter\export_cell_network_streams.py `
+  --output-csv ".\tmp\mosaic-25.2\logs\log-20260603-174645-MaGaIntegratedStudy\output.csv" `
+  --bandwidth-measurements-dir ".\tmp\mosaic-25.2\logs\log-20260603-174645-MaGaIntegratedStudy\bandwidthMeasurements" `
+  --infrastructure-snapshot ".\data\mosaic-study\infrastructure_snapshot.json" `
+  --handover-out-file ".\data\mosaic-study\cell_handover_stream.csv" `
+  --bandwidth-out-file ".\data\mosaic-study\cell_bandwidth_stream.csv" `
+  --metadata-out-file ".\data\mosaic-study\diagnostics\cell\integrated_baseline_metadata.json"
+```
 
-Input atteso:
+### Handover
+
+Input:
 
 ```text
 CELLULAR_HANDOVER;timeNs;vehicleId;previousRegion;currentRegion
@@ -384,116 +280,66 @@ eventType
 sourceFile
 ```
 
-Classificazione:
+Eventi:
 
 ```text
-previousRegion nullo e currentRegion valorizzato -> REGISTRATION
-previousRegion valorizzato e currentRegion valorizzato e diverso -> REGION_TRANSITION
-previousRegion valorizzato e currentRegion nullo -> REMOVAL
+REGISTRATION
+REGION_TRANSITION
+REMOVAL
 ```
 
-Valori null accettati:
+### Bandwidth
+
+File letti:
 
 ```text
-null
-NULL
-None
-stringa vuota
+ALL#ALL#ALL#Up.csv
+ALL#ALL#ALL#Dn.csv
 ```
 
-### Bandwidth raw stream 10D
-
-Formato osservato:
+Unita':
 
 ```text
-time,region_north_normal,region_central_degraded,globalNetwork
+unitStatus = PROVEN_BITS_PER_SECOND
 ```
+
+Semantica temporale dimostrata dai bytecode locali MOSAIC:
+
+```text
+bucketBoundaryPolicy = START_TIMESTAMP_FOR_INTERVAL
+availableFromPolicy = SAFE_AFTER_TIMESTAMP
+```
+
+Una riga `time = t` rappresenta il bucket `[t, t + 1)`. Per evitare future look-ahead, il dato e' disponibile solo da `t + 1`.
 
 Output:
 
 ```text
-sourceFile
-direction
-timeRaw
+measurementTimeSeconds
+availableFromTimeSeconds
+bucketStartSeconds
+bucketEndSeconds
 regionId
-trafficObservedRaw
-unitStatus
-```
-
-`direction` deriva dal nome file:
-
-```text
-ALL#ALL#ALL#Up.csv -> UPLINK
-ALL#ALL#ALL#Dn.csv -> DOWNLINK
-```
-
-`unitStatus` resta:
-
-```text
-UNRESOLVED
-```
-
-finche' l'unita' non e' provata. Per questo motivo lo script non calcola ancora:
-
-```text
+direction
 trafficObservedBitsPerSecond
+nominalCapacityBitsPerSecond
 residualCapacityBitsPerSecond
+residualPolicy
+bucketBoundaryPolicy
+availableFromPolicy
+sourceFile
 ```
 
-### Comando PowerShell 10D
-
-```powershell
-python .\tools\mosaic-offline-exporter\export_cell_network_diagnostics.py `
-  --handover-output-csv ".\tmp\mosaic-25.2\logs\log-20260602-172233-MaGaCellStudy\output.csv" `
-  --bandwidth-measurements-dir ".\tmp\mosaic-25.2\logs\log-20260602-172233-MaGaCellStudy\bandwidthMeasurements" `
-  --infrastructure-snapshot ".\data\mosaic-study\infrastructure_snapshot.json" `
-  --handover-out-file ".\data\mosaic-study\diagnostics\cell\cell_handover_stream.csv" `
-  --bandwidth-raw-out-file ".\data\mosaic-study\diagnostics\cell\cell_bandwidth_raw_stream.csv" `
-  --metadata-out-file ".\data\mosaic-study\diagnostics\cell\cell_diagnostic_metadata.json"
-```
-
-### Validazioni 10D
-
-Handover:
+Policy residua diagnostica:
 
 ```text
-file esistente
-almeno una riga CELLULAR_HANDOVER
-almeno 5 campi
-timeNs intero e >= 0
-vehicleId valorizzato
-regioni coerenti con infrastructure_snapshot.json o globalNetwork
-nessun duplicato
-tempo non decrescente
+residualPolicy = NOMINAL_MINUS_OBSERVED_DIAGNOSTIC
+residualCapacityBitsPerSecond = max(0, nominalCapacityBitsPerSecond - trafficObservedBitsPerSecond)
 ```
 
-Bandwidth raw:
+Questa formula e' una baseline diagnostica iniziale, non un modello scientificamente definitivo di allocazione radio.
 
-```text
-cartella esistente
-almeno un CSV
-intestazione presente
-prima colonna time
-almeno una regione
-righe con stesso numero di colonne dell'intestazione
-valori numerici finiti e >= 0
-tempo non decrescente per file
-nessun record duplicato
-regionId riconosciuto
-```
-
-Limiti:
-
-```text
-gli output 10D sono diagnostici
-gli output 10D non sono allineati alla timeline MaGaWorkloadStudy
-gli output 10D non devono essere usati direttamente per assemblare snapshot finali della run workload
-la banda viene esportata raw se l'unita' non e' dimostrata
-non viene calcolata banda residua
-non viene attribuita una misura aggregata a un gateway fisico
-```
-
-## Fase 10E - Preview dei gateway attivi sulla run workload
+## Fase 10E - Preview dei gateway attivi
 
 Script:
 
@@ -501,30 +347,17 @@ Script:
 export_access_link_preview.py
 ```
 
-Scopo: costruire una preview diagnostica dei gateway disponibili e attivi per ogni stato veicolare della run workload.
-
-La 10E e' indipendente dagli handover regionali Cell. Gli handover regionali descrivono cambi di condizioni Cell, non cambi fisici di RSU. Il gateway attivo deriva dalla geometria.
-
-### Input 10E
-
-Obbligatori:
+Input:
 
 ```text
 data/mosaic-study/vehicle_state_stream.csv
 data/mosaic-study/infrastructure_snapshot.json
+data/mosaic-study/cell_handover_stream.csv
 ```
 
-Facoltativo, solo se disponibile uno stream handover allineato alla stessa run degli stati veicolari:
+Gli handover regionali Cell sono usati solo per controlli diagnostici. Non selezionano direttamente una RSU.
 
-```text
-cell_handover_stream.csv
-```
-
-Se lo stream handover viene fornito, viene usato solo per controlli diagnostici. Non seleziona direttamente una RSU.
-
-Lo stream prodotto dalla Fase 10D corrente deriva da una run storica Cell e non e' allineato alla timeline `MaGaWorkloadStudy`; non deve quindi essere passato alla 10E della run workload corrente.
-
-### Output 10E
+Output:
 
 ```text
 data/mosaic-study/access_link_preview.csv
@@ -546,41 +379,7 @@ cellRegionId
 bandwidthPoolId
 ```
 
-Viene prodotta una riga per ogni combinazione:
-
-```text
-stato veicolo x gateway
-```
-
-### Policy geometrica 10E
-
-Poiche' `projectedX` e `projectedY` sono ancora vuoti, la distanza e' calcolata in modo diagnostico con formula Haversine:
-
-```text
-earthRadiusMeters = 6371000.0
-distancePolicy = HAVERSINE_FROM_LAT_LON_DIAGNOSTIC
-```
-
-Regola:
-
-```text
-available = distanceMeters <= coverageRadiusMeters
-active = gateway disponibile piu' vicino per (timeNs, vehicleId)
-tie-break = gatewayId lessicograficamente minore
-```
-
-Se nessun gateway e' disponibile, nessun link viene marcato `active`.
-
-### Comando PowerShell 10E
-
-```powershell
-python .\tools\mosaic-offline-exporter\export_access_link_preview.py `
-  --vehicle-state-file ".\data\mosaic-study\vehicle_state_stream.csv" `
-  --infrastructure-snapshot ".\data\mosaic-study\infrastructure_snapshot.json" `
-  --out-file ".\data\mosaic-study\access_link_preview.csv"
-```
-
-Con handover opzionale allineato alla stessa run, non con gli output storici della 10D corrente:
+Comando:
 
 ```powershell
 python .\tools\mosaic-offline-exporter\export_access_link_preview.py `
@@ -590,42 +389,23 @@ python .\tools\mosaic-offline-exporter\export_access_link_preview.py `
   --out-file ".\data\mosaic-study\access_link_preview.csv"
 ```
 
-### Validazioni 10E
-
-Lo script valida:
+Policy geometrica:
 
 ```text
-file input esistenti
-CSV e JSON validi
-campi obbligatori presenti
-coordinate numeriche e finite
-gatewayId univoci
-runtimeGatewayId univoci
-coverageRadiusMeters > 0
-pool referenziati esistenti
-regioni referenziate esistenti
-distanceMeters >= 0
-massimo un gateway active per veicolo e timeNs
-ogni active e' anche available
-```
-
-Se `--cell-handover-stream` non e' fornito, lo script emette il warning:
-
-```text
-cell handover stream not provided; access links are derived from geometry only
+distancePolicy = HAVERSINE_FROM_LAT_LON_DIAGNOSTIC
+earthRadiusMeters = 6371000.0
+available = distanceMeters <= coverageRadiusMeters
+active = gateway disponibile piu' vicino per (timeNs, vehicleId)
+tie-break = gatewayId lessicograficamente minore
 ```
 
 Limiti:
 
 ```text
 projectedX e projectedY restano vuoti
-la distanza Haversine e' una baseline diagnostica
 gli handover regionali non equivalgono a handover fisici di RSU
-non vengono costruiti candidati EDGE o CLOUD
-non vengono costruiti candidati V2V
-non viene generato SystemSnapshot
-non viene invocato il core Java
-non viene implementato il bridge live
+non costruisce candidati EDGE, CLOUD o V2V
+non genera SystemSnapshot
 ```
 
 ## Fase 10F - Preview diagnostica dei candidati EDGE e CLOUD
@@ -636,36 +416,28 @@ Script:
 export_remote_candidate_preview.py
 ```
 
-Scopo: ricostruire candidati remoti source-aware di tipo `EDGE` e `CLOUD` usando i gateway attivi prodotti dalla Fase 10E e l'infrastruttura statica validata dalla Fase 10C.
-
-La Fase 10F non usa:
-
-```text
-data/mosaic-study/diagnostics/cell/cell_bandwidth_raw_stream.csv
-```
-
-Quel file deriva da una run Cell storica diversa e conserva valori con `unitStatus = UNRESOLVED`.
-
-### Input 10F
+Input:
 
 ```text
 data/mosaic-study/access_link_preview.csv
 data/mosaic-study/infrastructure_snapshot.json
+data/mosaic-study/cell_bandwidth_stream.csv
 ```
 
-Lo script considera solo righe di access link con:
-
-```text
-active = true
-available = true
-```
-
-Se uno stato veicolare non ha gateway attivo, non vengono generati candidati remoti per quello stato.
-
-### Output 10F
+Output:
 
 ```text
 data/mosaic-study/remote_candidate_preview.csv
+```
+
+Comando:
+
+```powershell
+python .\tools\mosaic-offline-exporter\export_remote_candidate_preview.py `
+  --access-link-file ".\data\mosaic-study\access_link_preview.csv" `
+  --infrastructure-snapshot ".\data\mosaic-study\infrastructure_snapshot.json" `
+  --cell-bandwidth-stream ".\data\mosaic-study\cell_bandwidth_stream.csv" `
+  --out-file ".\data\mosaic-study\remote_candidate_preview.csv"
 ```
 
 Colonne:
@@ -686,96 +458,43 @@ bandwidthPoolId
 gatewayId
 runtimeGatewayId
 cellRegionId
+bandwidthMeasurementTimeSeconds
+bandwidthAgeSeconds
+uplinkResidualBandwidth
+downlinkResidualBandwidth
 bandwidthPolicy
 bandwidthSource
+bandwidthLookupPolicy
+bucketBoundaryPolicy
 propagationDelayPolicy
 ```
 
-`remote_candidate_preview.csv` contiene candidati source-aware. Il formato `candidateId` e':
+Regole:
 
 ```text
-<executionNodeId>_for_<sourceVehicleId>
+EDGE e' disponibile solo tramite gateway associato in executionNode.gatewayIds
+CLOUD e' disponibile tramite il gateway attivo
+candidateId = <executionNodeId>_for_<sourceVehicleId>
 ```
 
-### Comando PowerShell 10F
-
-```powershell
-python .\tools\mosaic-offline-exporter\export_remote_candidate_preview.py `
-  --access-link-file ".\data\mosaic-study\access_link_preview.csv" `
-  --infrastructure-snapshot ".\data\mosaic-study\infrastructure_snapshot.json" `
-  --out-file ".\data\mosaic-study\remote_candidate_preview.csv"
-```
-
-Su Windows, se `python` non e' nel PATH, usare `py` con gli stessi argomenti.
-
-### Regole EDGE 10F
-
-Per ogni gateway attivo:
+Policy banda:
 
 ```text
-EDGE e' disponibile solo tramite gateway associato
-gatewayId deve essere presente in executionNode.gatewayIds
-availableCpu = executionNode.availableCpuCyclesPerSecond
-availableBandwidth = nominalBandwidthBitsPerSecond del pool del gateway attivo
-bandwidthPoolId = pool del gateway attivo
-runtimeGatewayId = runtime gateway attivo
+bandwidthPolicy = MIN_RESIDUAL_CELL_UPLINK_DOWNLINK_DIAGNOSTIC
+bandwidthLookupPolicy = LATEST_SAFE_AVAILABLE_CELL_BUCKET
+bandwidthSource = CELL_BANDWIDTH_STREAM_RESIDUAL
+availableBandwidth = min(uplinkResidualCapacityBitsPerSecond, downlinkResidualCapacityBitsPerSecond)
 ```
 
-Un candidato EDGE non viene generato attraverso gateway non associati al nodo.
-
-### Regole CLOUD 10F
-
-Per ogni gateway attivo:
+La lookup usa solo misure con:
 
 ```text
-CLOUD e' disponibile tramite gateway attivo
-accessPolicy deve essere THROUGH_ACTIVE_GATEWAY
-availableCpu = executionNode.availableCpuCyclesPerSecond
-availableBandwidth = nominalBandwidthBitsPerSecond del pool del gateway attivo
-bandwidthPoolId = pool del gateway attivo
-runtimeGatewayId = runtime gateway attivo
+availableFromTimeSeconds <= timeSeconds del candidato
 ```
 
-Il cloud non e' associato staticamente a una singola RSU: il percorso cambia in base al gateway attivo del veicolo.
+Quindi non usa future look-ahead.
 
-### Policy banda 10F
-
-Per ogni candidato:
-
-```text
-bandwidthPolicy = NOMINAL_ONLY_FOR_INITIAL_EXPORTER
-bandwidthSource = INFRASTRUCTURE_SNAPSHOT_GATEWAY_POOL
-availableBandwidth = bandwidthPools[*].nominalBandwidthBitsPerSecond
-```
-
-Non viene ancora applicata banda residua Cell. I dati raw Cell storici non vengono usati.
-
-### Policy diagnostica del ritardo 10F
-
-Lo script usa la regione Cell associata al gateway attivo:
-
-```text
-gateway.cellRegionId
-```
-
-Da quella regione legge:
-
-```text
-uplink.delay.delay
-downlink.unicast.delay.delay
-```
-
-Sono supportate almeno queste unita':
-
-```text
-ns
-us
-µs
-ms
-s
-```
-
-La policy diagnostica e':
+Policy ritardo:
 
 ```text
 regionalRadioDelaySeconds = max(uplinkDelaySeconds, downlinkUnicastDelaySeconds)
@@ -784,73 +503,13 @@ CLOUD propagationDelaySeconds = regionalRadioDelaySeconds + serverBaseDelaySecon
 propagationDelayPolicy = MAX_CELL_UPLINK_DOWNLINK_UNICAST_PLUS_NODE_BASE_DIAGNOSTIC
 ```
 
-`propagationDelaySeconds` e' una baseline diagnostica, non una calibrazione scientifica definitiva.
-
-### Validazioni 10F
-
-Lo script fallisce se:
-
-```text
-access_link_preview.csv non esiste o e' malformato
-infrastructure_snapshot.json non esiste o non e' JSON valido
-manca una colonna obbligatoria
-un valore numerico richiesto non e' numerico o non e' finito
-un booleano non e' true oppure false
-un link active non e' available
-un veicolo possiede piu' di un gateway active allo stesso timeNs
-gatewayId, runtimeGatewayId o bandwidthPoolId sono vuoti
-gatewayId non esiste nel JSON
-runtimeGatewayId non coincide con il runtimeId del gateway
-bandwidthPoolId non coincide con il pool del gateway
-il pool non esiste
-nominalBandwidthBitsPerSecond del pool non e' numerico, finito e > 0
-un executionNodeId non e' univoco
-un nodo EDGE non possiede gatewayIds
-un nodo EDGE referenzia gateway inesistenti
-CPU o ritardo base di EDGE/CLOUD non sono validi
-un nodo CLOUD non possiede accessPolicy = THROUGH_ACTIVE_GATEWAY
-gateway.cellRegionId e' vuoto o non esiste in cell.regions
-il delay regionale richiesto manca
-il delay regionale usa un'unita' non riconosciuta
-lo stesso candidato compare piu' di una volta nello stesso timeNs
-un candidato EDGE viene generato attraverso un gateway non associato
-un candidato CLOUD viene generato senza gateway attivo
-```
-
-### Riepilogo console 10F
-
-Lo script stampa:
-
-```text
-Remote candidate preview export completed
-activeAccessLinksRead
-edgeExecutionNodesRead
-cloudExecutionNodesRead
-candidatesExported
-edgeCandidates
-cloudCandidates
-statesWithRemoteCandidates
-distinctSourceVehicles
-candidateBandwidthPolicy
-candidatePropagationDelayPolicy
-warnings
-outFile
-```
-
-Warning attesi:
-
-```text
-candidate bandwidth uses nominal gateway-pool capacity because residual Cell bandwidth is unavailable for MaGaWorkloadStudy
-candidate propagation delay is diagnostic and uses gateway-associated Cell region plus configured node base delay
-Cell raw diagnostics from historical runs are not used for remote candidate generation
-```
-
 Limiti:
 
 ```text
-non vengono ancora generati candidati LOCAL
-non vengono ancora generati candidati VEHICLE o V2V
-non viene ancora assemblato SystemSnapshot
-non viene invocato il core Java
-non viene implementato il bridge live
+availableBandwidth usa banda residua diagnostica, non allocazione finale
+non genera candidati LOCAL
+non genera candidati VEHICLE o V2V
+non assembla SystemSnapshot
+non invoca il core Java
+non implementa il bridge live
 ```

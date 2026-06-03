@@ -266,9 +266,10 @@ def read_infrastructure(path: Path) -> tuple[list[Gateway], set[str], set[str]]:
     return sorted(gateways, key=lambda gateway: gateway.gateway_id), pool_ids, region_ids
 
 
-def read_optional_handover_stream(path: Path, valid_regions: set[str], min_time_ns: int, max_time_ns: int) -> None:
+def read_optional_handover_stream(path: Path, valid_regions: set[str], min_time_ns: int, max_time_ns: int) -> int:
     require_file(path, "cell handover stream CSV")
     required_fields = {"timeNs", "vehicleId", "previousRegion", "currentRegion"}
+    outside_vehicle_state_interval = 0
     try:
         with path.open("r", encoding="utf-8", newline="") as handle:
             reader = csv.DictReader(handle)
@@ -281,7 +282,7 @@ def read_optional_handover_stream(path: Path, valid_regions: set[str], min_time_
                 source = f"{path}:{line_number}"
                 time_ns = parse_int_value((row.get("timeNs") or "").strip(), "timeNs", source)
                 if time_ns < min_time_ns or time_ns > max_time_ns:
-                    raise ExportError(f"{source}: handover time is outside the observed vehicle state interval")
+                    outside_vehicle_state_interval += 1
                 vehicle_id = (row.get("vehicleId") or "").strip()
                 if not vehicle_id:
                     raise ExportError(f"{source}: vehicleId is empty")
@@ -291,6 +292,7 @@ def read_optional_handover_stream(path: Path, valid_regions: set[str], min_time_
                         raise ExportError(f"{source}: {field_name} is not a known Cell region: {region_id}")
     except OSError as exc:
         raise ExportError(f"{path}: CSV is not readable") from exc
+    return outside_vehicle_state_interval
 
 
 def haversine_distance_meters(lat_a: float, lon_a: float, lat_b: float, lon_b: float) -> float:
@@ -382,8 +384,17 @@ def run() -> None:
     if handover_stream is None:
         warnings.append("cell handover stream not provided; access links are derived from geometry only")
     else:
-        read_optional_handover_stream(handover_stream, region_ids, states[0].time_ns, states[-1].time_ns)
+        out_of_interval_handovers = read_optional_handover_stream(
+            handover_stream,
+            region_ids,
+            states[0].time_ns,
+            states[-1].time_ns,
+        )
         warnings.append("regional Cell handovers are not used as physical gateway handovers")
+        if out_of_interval_handovers:
+            warnings.append(
+                f"{out_of_interval_handovers} Cell handovers fall outside the exported vehicle state interval"
+            )
 
     links = build_links(states, gateways)
     write_csv_atomic(

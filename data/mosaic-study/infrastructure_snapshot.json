@@ -1,13 +1,13 @@
 {
   "schemaVersion": "0.1",
   "source": {
-    "scenarioId": "MaGaWorkloadStudy",
-    "outputCsv": "tmp/mosaic-25.2/logs/log-20260603-123856-MaGaWorkloadStudy/output.csv",
-    "cellConfig": "tmp/mosaic-25.2/scenarios/MaGaWorkloadStudy/cell/cell_config.json",
-    "cellNetwork": "tmp/mosaic-25.2/scenarios/MaGaWorkloadStudy/cell/network.json",
-    "cellRegions": "tmp/mosaic-25.2/scenarios/MaGaWorkloadStudy/cell/regions.json",
-    "snsConfig": "tmp/mosaic-25.2/scenarios/MaGaWorkloadStudy/sns/sns_config.json",
-    "resourceCatalog": "tmp/mosaic-25.2/scenarios/MaGaWorkloadStudy/application/ma_ga_resource_catalog.json"
+    "scenarioId": "UNKNOWN",
+    "outputCsv": "tmp/mosaic-25.2/logs/log-20260603-174645-MaGaIntegratedStudy/output.csv",
+    "cellConfig": "data/mosaic-scenarios/MaGaIntegratedStudy/cell/cell_config.json",
+    "cellNetwork": "data/mosaic-scenarios/MaGaIntegratedStudy/cell/network.json",
+    "cellRegions": "data/mosaic-scenarios/MaGaIntegratedStudy/cell/regions.json",
+    "snsConfig": "data/mosaic-scenarios/MaGaIntegratedStudy/sns/sns_config.json",
+    "resourceCatalog": "data/mosaic-scenarios/MaGaIntegratedStudy/application/ma_ga_resource_catalog.json"
   },
   "runtimeRegistrations": {
     "rsus": [
@@ -300,7 +300,6 @@
     "errors": [],
     "warnings": [
       "CLOUD node cloud_regional uses runtime server server_0 with profile WeatherServer",
-      "catalog.description contains MaGaMosaicStudy while resource catalog is used for MaGaWorkloadStudy",
       "v2vPolicy candidatePolicy is DIRECT_SINGLEHOP_ONLY but sns.maximumTtl is 10",
       "v2vPolicy.bandwidthSource is CONFIGURED_VALUE_TO_BE_CALIBRATED",
       "v2vPolicy.nominalBandwidthBitsPerSecond is null",
