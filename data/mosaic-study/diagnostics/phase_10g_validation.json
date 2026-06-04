@@ -3,10 +3,7 @@
   "calibrationStatus": "TO_BE_REPLACED_DURING_RESOURCE_CALIBRATION",
   "candidatePolicy": "DIRECT_SINGLEHOP_ONLY",
   "catalogsUpdated": [
-    "data\\mosaic-scenarios\\MaGaIntegratedStudy\\application\\ma_ga_resource_catalog.json",
-    "data\\mosaic-scenarios\\MaGaIntegratedStudyRequest2x\\application\\ma_ga_resource_catalog.json",
-    "data\\mosaic-scenarios\\MaGaIntegratedStudyResponse2x\\application\\ma_ga_resource_catalog.json",
-    "data\\mosaic-scenarios\\MaGaIntegratedStudyFrequency2x\\application\\ma_ga_resource_catalog.json"
+    "C:\\Users\\raffa\\IdeaProjects\\maga-core\\data\\mosaic-scenarios\\MaGaIntegratedStudy\\application\\ma_ga_resource_catalog.json"
   ],
   "conservativePropagationDelaySeconds": 0.0024,
   "directReachablePairs": 6603,
@@ -16,10 +13,10 @@
   "errors": [],
   "futureLookAheadViolations": 0,
   "generatedFiles": [
-    "data\\mosaic-study\\local_candidate_preview.csv",
-    "data\\mosaic-study\\v2v_candidate_preview.csv",
-    "data\\mosaic-study\\v2v_bandwidth_pool_preview.csv",
-    "data\\mosaic-study\\diagnostics\\phase_10g_validation.json"
+    "C:\\Users\\raffa\\IdeaProjects\\maga-core\\data\\mosaic-study\\local_candidate_preview.csv",
+    "C:\\Users\\raffa\\IdeaProjects\\maga-core\\data\\mosaic-study\\v2v_candidate_preview.csv",
+    "C:\\Users\\raffa\\IdeaProjects\\maga-core\\data\\mosaic-study\\v2v_bandwidth_pool_preview.csv",
+    "C:\\Users\\raffa\\IdeaProjects\\maga-core\\data\\mosaic-study\\diagnostics\\phase_10g_validation.json"
   ],
   "inactiveRadioViolations": 66,
   "localCandidatesExported": 1824,

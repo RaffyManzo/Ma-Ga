@@ -166,6 +166,35 @@ Validazione del replay MOSAIC generato:
 - `SAFETY_MAX_STEPS_REACHED` e' solo un guardrail e non rappresenta una
   condizione di successo.
 
+### Pipeline offline MOSAIC -> MA-GA
+
+La pipeline offline MOSAIC -> stream diagnostici -> `SystemSnapshot` JSON ->
+replay e' consolidata in un comando unico:
+
+```powershell
+powershell -NoProfile -ExecutionPolicy Bypass `
+  -File .\tools\mosaic-offline-exporter\run_offline_pipeline.ps1 `
+  -RepoRoot "." `
+  -MosaicRoot ".\tmp\mosaic-25.2" `
+  -ScenarioName "MaGaIntegratedStudy" `
+  -SourceRun "log-20260604-220216-MaGaIntegratedStudy" `
+  -SimulationStartSeconds 0 `
+  -SimulationEndSeconds 180 `
+  -WindowIntervalSeconds 5 `
+  -SafetyMaxSteps 100000 `
+  -CleanGeneratedOutputs `
+  -VerifyDeterminism
+```
+
+L'orchestratore consuma una run MOSAIC gia' disponibile, rigenera gli artefatti
+offline, valida gli snapshot con Java, esegue `JSON_SEQUENCE` e valida
+`JSON_TIME` fino a `FULL_TIME_HORIZON_REACHED`. Produce manifest con SHA-256,
+log per stage e diagnostica Fase 11 sotto `data/mosaic-study/diagnostics/`.
+
+Il bridge live MOSAIC non e' ancora implementato. Restano aperti i warning
+sperimentali della baseline diagnostica: scenario non ancora stressante per
+offloading, decisioni osservate tutte locali e `FULL_OFFLOADING` non osservato.
+
 ### Batch statico GA
 
 Main class:

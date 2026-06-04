@@ -1,0 +1,16 @@
+Phase 10I-pre2 SUMO projection export completed
+sourceRun=log-20260604-220216-MaGaIntegratedStudy
+projectionPolicy=SUMO_NET_XML_UTM_WGS84_WITH_NET_OFFSET
+projectionUtility=STANDARD_LIBRARY_UTM_WGS84_FROM_SUMO_PROJ_PARAMETER
+vehicleStatesRead=1824
+vehicleStatesProjected=1824
+gatewaysRead=2
+gatewaysProjected=2
+roundTripValidationSamples=1826
+roundTripMaximumErrorMeters=0.00037287069228226144
+distanceComparisonSamples=3648
+maximumProjectedVsHaversineDifferenceMeters=3.100796595092106
+phase10iPre2Status=COMPLETED
+readyForPhase10I=true
+warningsCount=0
+errorsCount=0

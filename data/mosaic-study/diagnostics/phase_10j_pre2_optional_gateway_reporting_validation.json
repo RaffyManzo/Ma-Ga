@@ -33,7 +33,7 @@
   "jsonTimeSmokeWindowsExecuted" : 36,
   "jsonTimeSmokeStepsExecuted" : 36,
   "jsonTimeSmokeStatus" : "PASS",
-  "jsonTimeLastTriggerSeconds" : 31.57809,
+  "jsonTimeLastTriggerSeconds" : 31.653,
   "jsonTimeLastSourceSnapshot" : "mosaic_generated_005_t_030",
   "jsonTimeFutureLookAheadViolations" : 0,
   "futureLookAheadViolations" : 0,

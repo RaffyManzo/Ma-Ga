@@ -991,3 +991,107 @@ Prossimo passo:
 ```text
 Fase 10J - replay JSON_SEQUENCE e JSON_TIME nel core MA-GA
 ```
+
+## Fase 11 - Esecuzione end-to-end offline
+
+La Fase 11 consolida la pipeline offline MOSAIC -> MA-GA in un solo
+orchestratore PowerShell:
+
+```text
+run_offline_pipeline.ps1
+```
+
+Lo script consuma una run MOSAIC gia' esistente, non riesegue MOSAIC, non
+modifica gli scenari e non implementa il bridge live. Esegue in ordine gli
+exporter 10A-10I, le validazioni Java, il replay `JSON_SEQUENCE`, il replay
+`JSON_TIME` full horizon e genera manifest/diagnostiche Fase 11.
+
+Comando canonico:
+
+```powershell
+powershell -NoProfile -ExecutionPolicy Bypass `
+  -File .\tools\mosaic-offline-exporter\run_offline_pipeline.ps1 `
+  -RepoRoot "." `
+  -MosaicRoot ".\tmp\mosaic-25.2" `
+  -ScenarioName "MaGaIntegratedStudy" `
+  -SourceRun "log-20260604-220216-MaGaIntegratedStudy" `
+  -SimulationStartSeconds 0 `
+  -SimulationEndSeconds 180 `
+  -WindowIntervalSeconds 5 `
+  -SafetyMaxSteps 100000 `
+  -CleanGeneratedOutputs `
+  -VerifyDeterminism
+```
+
+Parametri principali:
+
+```text
+RepoRoot                 root repository, default "."
+MosaicRoot               installazione/log MOSAIC locale, default ".\tmp\mosaic-25.2"
+ScenarioName             scenario versionabile sotto data/mosaic-scenarios/
+SourceRun                cartella log sotto <MosaicRoot>\logs
+SimulationStartSeconds   inizio timeline 10H
+SimulationEndSeconds     fine timeline 10H
+WindowIntervalSeconds    passo timeline 10H
+SafetyMaxSteps           guardrail JSON_TIME full horizon
+CleanGeneratedOutputs    abilita pulizia whitelist dei soli output generati
+VerifyDeterminism        esegue due pass e confronta gli hash deterministici
+```
+
+Stage logici:
+
+```text
+00 preflight
+01 10A task stream
+02 10B vehicle state
+03 10C infrastructure
+04 10D Cell streams
+05 10E access links
+06 10F remote candidates
+07 10G local/V2V candidates
+08 10H timeline
+09 10H task assignment
+10 10I-pre contract validation
+11 10I-pre2 SUMO projection
+12 10I SystemSnapshot JSON
+13 10J-pre/10J-pre2 replay bootstrap and reporting
+14 10J JSON_TIME full horizon
+```
+
+Output Fase 11:
+
+```text
+data/mosaic-study/diagnostics/phase_11/logs/
+data/mosaic-study/diagnostics/phase_11_offline_pipeline_manifest.json
+data/mosaic-study/diagnostics/phase_11_artifact_manifest.csv
+data/mosaic-study/diagnostics/phase_11_offline_pipeline_validation.json
+```
+
+Regole di pulizia:
+
+```text
+-CleanGeneratedOutputs elimina solo stream, snapshot, diagnostiche rigenerabili
+e log Fase 11 esplicitamente in whitelist.
+Non elimina tmp/mosaic-25.2/logs, data/mosaic-scenarios, data/docs o src.
+```
+
+Determinismo:
+
+```text
+DETERMINISTIC_FROM_INPUTS
+    CSV, JSON e snapshot derivati dagli input
+
+RUNTIME_SENSITIVE_DIAGNOSTIC
+    log, trace temporali e diagnostiche con runtime/timestamp di esecuzione
+```
+
+Risultato canonico della baseline:
+
+```text
+phase11Status = COMPLETED
+readyForPhase12 = true
+deterministicArtifactsCompared = 57
+deterministicArtifactMismatches = []
+jsonTimeStopReason = FULL_TIME_HORIZON_REACHED
+futureLookAheadViolations = 0
+```

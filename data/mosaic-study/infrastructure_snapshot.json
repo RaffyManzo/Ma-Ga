@@ -2,12 +2,12 @@
   "schemaVersion": "0.1",
   "source": {
     "scenarioId": "UNKNOWN",
-    "outputCsv": "tmp/mosaic-25.2/logs/log-20260604-220216-MaGaIntegratedStudy/output.csv",
-    "cellConfig": "data/mosaic-scenarios/MaGaIntegratedStudy/cell/cell_config.json",
-    "cellNetwork": "data/mosaic-scenarios/MaGaIntegratedStudy/cell/network.json",
-    "cellRegions": "data/mosaic-scenarios/MaGaIntegratedStudy/cell/regions.json",
-    "snsConfig": "data/mosaic-scenarios/MaGaIntegratedStudy/sns/sns_config.json",
-    "resourceCatalog": "data/mosaic-scenarios/MaGaIntegratedStudy/application/ma_ga_resource_catalog.json"
+    "outputCsv": "C:/Users/raffa/IdeaProjects/maga-core/tmp/mosaic-25.2/logs/log-20260604-220216-MaGaIntegratedStudy/output.csv",
+    "cellConfig": "C:/Users/raffa/IdeaProjects/maga-core/data/mosaic-scenarios/MaGaIntegratedStudy/cell/cell_config.json",
+    "cellNetwork": "C:/Users/raffa/IdeaProjects/maga-core/data/mosaic-scenarios/MaGaIntegratedStudy/cell/network.json",
+    "cellRegions": "C:/Users/raffa/IdeaProjects/maga-core/data/mosaic-scenarios/MaGaIntegratedStudy/cell/regions.json",
+    "snsConfig": "C:/Users/raffa/IdeaProjects/maga-core/data/mosaic-scenarios/MaGaIntegratedStudy/sns/sns_config.json",
+    "resourceCatalog": "C:/Users/raffa/IdeaProjects/maga-core/data/mosaic-scenarios/MaGaIntegratedStudy/application/ma_ga_resource_catalog.json"
   },
   "runtimeRegistrations": {
     "rsus": [

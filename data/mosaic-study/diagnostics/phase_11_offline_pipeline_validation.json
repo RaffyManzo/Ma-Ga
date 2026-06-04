@@ -1,0 +1,59 @@
+{
+    "sourceRun":  "log-20260604-220216-MaGaIntegratedStudy",
+    "scenarioName":  "MaGaIntegratedStudy",
+    "phase":  "11_OFFLINE_PIPELINE_CONSOLIDATION",
+    "pipelineCommand":  "powershell -NoProfile -ExecutionPolicy Bypass -File \"tools\\mosaic-offline-exporter\\run_offline_pipeline.ps1\" -RepoRoot \".\" -MosaicRoot \".\\tmp\\mosaic-25.2\" -ScenarioName \"MaGaIntegratedStudy\" -SourceRun \"log-20260604-220216-MaGaIntegratedStudy\" -SimulationStartSeconds 0 -SimulationEndSeconds 180 -WindowIntervalSeconds 5 -SafetyMaxSteps 100000 -CleanGeneratedOutputs -VerifyDeterminism",
+    "stagesExpected":  15,
+    "stagesCompleted":  34,
+    "stagesFailed":  0,
+    "pipelineExitCode":  0,
+    "baselineConsistencyValidated":  true,
+    "staleArtifactsDetected":  false,
+    "staleArtifacts":  [
+
+                       ],
+    "missingArtifacts":  [
+
+                         ],
+    "emptyArtifacts":  [
+
+                       ],
+    "determinismVerificationRequested":  true,
+    "determinismVerificationCompleted":  true,
+    "deterministicArtifactsCompared":  57,
+    "deterministicArtifactMismatches":  [
+
+                                        ],
+    "taskCount":  682,
+    "vehicleStateCount":  1824,
+    "gatewayCount":  2,
+    "gatewayPoolCount":  2,
+    "executionNodeCount":  3,
+    "cellHandoverCount":  48,
+    "cellBandwidthRecordCount":  1080,
+    "activeAccessLinkPreviewCount":  564,
+    "remoteCandidateCount":  1128,
+    "localCandidateCount":  1824,
+    "v2vCandidateCount":  13206,
+    "v2vPoolCount":  6603,
+    "optimizationWindowCount":  36,
+    "snapshotCount":  36,
+    "snapshotLoaderValidationFailures":  0,
+    "snapshotValidatorFailures":  0,
+    "jsonSequenceValidationStatus":  "COMPLETED",
+    "jsonTimeFullHorizonValidationStatus":  "COMPLETED",
+    "jsonTimeStopReason":  "FULL_TIME_HORIZON_REACHED",
+    "jsonTimeFinalSnapshotReached":  true,
+    "futureLookAheadViolations":  0,
+    "warningDiagnosticBaselineNotStressingOffloading":  true,
+    "warningAllDecisionsLocal":  true,
+    "warningFullOffloadingNotObserved":  true,
+    "warnings":  [
+
+                 ],
+    "errors":  [
+
+               ],
+    "phase11Status":  "COMPLETED",
+    "readyForPhase12":  true
+}

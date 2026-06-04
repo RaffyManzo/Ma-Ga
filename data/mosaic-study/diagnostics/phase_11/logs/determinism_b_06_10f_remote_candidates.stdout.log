@@ -1,0 +1,27 @@
+Remote candidate preview export completed
+accessLinkFile=C:\Users\raffa\IdeaProjects\maga-core\data\mosaic-study\access_link_preview.csv
+infrastructureSnapshot=C:\Users\raffa\IdeaProjects\maga-core\data\mosaic-study\infrastructure_snapshot.json
+cellBandwidthStream=C:\Users\raffa\IdeaProjects\maga-core\data\mosaic-study\cell_bandwidth_stream.csv
+activeAccessLinksRead=564
+edgeExecutionNodesRead=2
+cloudExecutionNodesRead=1
+candidatesExported=1128
+edgeCandidates=564
+cloudCandidates=564
+statesWithRemoteCandidates=564
+distinctSourceVehicles=12
+candidateBandwidthPolicy=MIN_RESIDUAL_CELL_UPLINK_DOWNLINK_DIAGNOSTIC
+candidateBandwidthLookupPolicy=LATEST_SAFE_AVAILABLE_CELL_BUCKET
+candidatePropagationDelayPolicy=MAX_CELL_UPLINK_DOWNLINK_UNICAST_PLUS_NODE_BASE_DIAGNOSTIC
+multipleActiveGatewayViolations=0
+activeUnavailableViolations=0
+duplicateCandidates=0
+futureLookAheadViolations=0
+candidatesMissingSafeBandwidth=0
+warningsCount=4
+warnings:
+  candidate bandwidth uses residual Cell bandwidth from the integrated baseline only
+  candidate propagation delay is diagnostic and uses gateway-associated Cell region plus configured node base delay
+  Cell raw diagnostics from historical runs are not used for remote candidate generation
+  residual Cell bandwidth is diagnostic and not a final scientific network allocation model
+outFile=C:\Users\raffa\IdeaProjects\maga-core\data\mosaic-study\remote_candidate_preview.csv

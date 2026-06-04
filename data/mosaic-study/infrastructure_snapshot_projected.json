@@ -208,7 +208,7 @@
       "projectedX": 7096.244736438966,
       "projectedY": 5069.365300857462,
       "projectionPolicy": "SUMO_NET_XML_UTM_WGS84_WITH_NET_OFFSET",
-      "projectionSource": "data\\mosaic-scenarios\\MaGaIntegratedStudy\\sumo\\Barnim.net.xml",
+      "projectionSource": "C:\\Users\\raffa\\IdeaProjects\\maga-core\\data\\mosaic-scenarios\\MaGaIntegratedStudy\\sumo\\Barnim.net.xml",
       "runtimeId": "rsu_1"
     },
     {
@@ -222,7 +222,7 @@
       "projectedX": 7409.000530664227,
       "projectedY": 7177.264447211288,
       "projectionPolicy": "SUMO_NET_XML_UTM_WGS84_WITH_NET_OFFSET",
-      "projectionSource": "data\\mosaic-scenarios\\MaGaIntegratedStudy\\sumo\\Barnim.net.xml",
+      "projectionSource": "C:\\Users\\raffa\\IdeaProjects\\maga-core\\data\\mosaic-scenarios\\MaGaIntegratedStudy\\sumo\\Barnim.net.xml",
       "runtimeId": "rsu_0"
     }
   ],
@@ -240,7 +240,7 @@
       "projParameter": "+proj=utm +zone=33 +ellps=WGS84 +datum=WGS84 +units=m +no_defs"
     },
     "projectionPolicy": "SUMO_NET_XML_UTM_WGS84_WITH_NET_OFFSET",
-    "projectionSourceFile": "data\\mosaic-scenarios\\MaGaIntegratedStudy\\sumo\\Barnim.net.xml",
+    "projectionSourceFile": "C:\\Users\\raffa\\IdeaProjects\\maga-core\\data\\mosaic-scenarios\\MaGaIntegratedStudy\\sumo\\Barnim.net.xml",
     "projectionUtility": "STANDARD_LIBRARY_UTM_WGS84_FROM_SUMO_PROJ_PARAMETER",
     "projectionUtilitySource": "SUMO net.xml <location> projParameter and netOffset; sumolib semantics verified locally"
   },
@@ -253,7 +253,7 @@
         "projectedX": 7409.000530664227,
         "projectedY": 7177.264447211288,
         "projectionPolicy": "SUMO_NET_XML_UTM_WGS84_WITH_NET_OFFSET",
-        "projectionSource": "data\\mosaic-scenarios\\MaGaIntegratedStudy\\sumo\\Barnim.net.xml",
+        "projectionSource": "C:\\Users\\raffa\\IdeaProjects\\maga-core\\data\\mosaic-scenarios\\MaGaIntegratedStudy\\sumo\\Barnim.net.xml",
         "runtimeId": "rsu_0",
         "timeNs": 0
       },
@@ -264,7 +264,7 @@
         "projectedX": 7096.244736438966,
         "projectedY": 5069.365300857462,
         "projectionPolicy": "SUMO_NET_XML_UTM_WGS84_WITH_NET_OFFSET",
-        "projectionSource": "data\\mosaic-scenarios\\MaGaIntegratedStudy\\sumo\\Barnim.net.xml",
+        "projectionSource": "C:\\Users\\raffa\\IdeaProjects\\maga-core\\data\\mosaic-scenarios\\MaGaIntegratedStudy\\sumo\\Barnim.net.xml",
         "runtimeId": "rsu_1",
         "timeNs": 0
       }
@@ -296,13 +296,13 @@
     "singlehopRadius": 709.4
   },
   "source": {
-    "cellConfig": "data/mosaic-scenarios/MaGaIntegratedStudy/cell/cell_config.json",
-    "cellNetwork": "data/mosaic-scenarios/MaGaIntegratedStudy/cell/network.json",
-    "cellRegions": "data/mosaic-scenarios/MaGaIntegratedStudy/cell/regions.json",
-    "outputCsv": "tmp/mosaic-25.2/logs/log-20260604-220216-MaGaIntegratedStudy/output.csv",
-    "resourceCatalog": "data/mosaic-scenarios/MaGaIntegratedStudy/application/ma_ga_resource_catalog.json",
+    "cellConfig": "C:/Users/raffa/IdeaProjects/maga-core/data/mosaic-scenarios/MaGaIntegratedStudy/cell/cell_config.json",
+    "cellNetwork": "C:/Users/raffa/IdeaProjects/maga-core/data/mosaic-scenarios/MaGaIntegratedStudy/cell/network.json",
+    "cellRegions": "C:/Users/raffa/IdeaProjects/maga-core/data/mosaic-scenarios/MaGaIntegratedStudy/cell/regions.json",
+    "outputCsv": "C:/Users/raffa/IdeaProjects/maga-core/tmp/mosaic-25.2/logs/log-20260604-220216-MaGaIntegratedStudy/output.csv",
+    "resourceCatalog": "C:/Users/raffa/IdeaProjects/maga-core/data/mosaic-scenarios/MaGaIntegratedStudy/application/ma_ga_resource_catalog.json",
     "scenarioId": "UNKNOWN",
-    "snsConfig": "data/mosaic-scenarios/MaGaIntegratedStudy/sns/sns_config.json"
+    "snsConfig": "C:/Users/raffa/IdeaProjects/maga-core/data/mosaic-scenarios/MaGaIntegratedStudy/sns/sns_config.json"
   },
   "v2vPolicy": {
     "bandwidthSource": "DIAGNOSTIC_SYNTHETIC_VALUE",

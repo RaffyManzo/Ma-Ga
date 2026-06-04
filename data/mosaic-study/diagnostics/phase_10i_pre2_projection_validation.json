@@ -30,7 +30,7 @@
     "projParameter": "+proj=utm +zone=33 +ellps=WGS84 +datum=WGS84 +units=m +no_defs"
   },
   "projectionPolicy": "SUMO_NET_XML_UTM_WGS84_WITH_NET_OFFSET",
-  "projectionSourceFile": "data\\mosaic-scenarios\\MaGaIntegratedStudy\\sumo\\Barnim.net.xml",
+  "projectionSourceFile": "C:\\Users\\raffa\\IdeaProjects\\maga-core\\data\\mosaic-scenarios\\MaGaIntegratedStudy\\sumo\\Barnim.net.xml",
   "projectionUtility": "STANDARD_LIBRARY_UTM_WGS84_FROM_SUMO_PROJ_PARAMETER",
   "projectionUtilitySource": "SUMO_HOME tools/sumolib was inspected; convertLonLat2XY semantics are UTM plus netOffset, but local pyproj is unavailable. The exporter implements UTM WGS84 from the SUMO projParameter and applies the SUMO netOffset.",
   "readyForPhase10I": true,

@@ -1,0 +1,25 @@
+Phase 10H task-to-window assignment completed
+sourceRun=log-20260604-220216-MaGaIntegratedStudy
+taskAssignmentPolicy=PENDING_TASKS_AT_NEXT_OPTIMIZATION_WINDOW
+consumptionPolicy=REMOVE_AFTER_EXPORT_TO_WINDOW
+tasksRead=682
+tasksAssigned=682
+duplicateTaskIdsInInput=0
+duplicateAssignments=0
+tasksLost=0
+tasksAssignedBeforeActivation=0
+tasksAssignedToNonEarliestWindow=0
+tasksAtExactBoundary=117
+tasksAfterSimulationEnd=0
+negativeActivationTimes=0
+windowsGenerated=36
+emptyWindows=1
+minimumAssignmentDelayNs=0
+maximumAssignmentDelayNs=4000000000
+averageAssignmentDelayNs=2127565982.4046922
+phase10hStatus=COMPLETED
+readyForPhase10I=true
+warningsCount=0
+errorsCount=0
+outputFile=C:\Users\raffa\IdeaProjects\maga-core\data\mosaic-study\window_task_assignment.csv
+validationOutFile=C:\Users\raffa\IdeaProjects\maga-core\data\mosaic-study\diagnostics\phase_10h_validation.json
