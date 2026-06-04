@@ -1,7 +1,7 @@
 param(
     [string]$SnapshotFolder = ".\data\snapshots\mosaic-generated",
     [string]$Phase10iValidationFile = ".\data\mosaic-study\diagnostics\phase_10i_validation.json",
-    [string]$ValidationOutFile = ".\data\mosaic-study\diagnostics\phase_10j_pre_replay_bootstrap_validation.json"
+    [string]$ValidationOutFile = ".\data\mosaic-study\diagnostics\phase_10j_pre2_optional_gateway_reporting_validation.json"
 )
 
 Set-StrictMode -Version Latest

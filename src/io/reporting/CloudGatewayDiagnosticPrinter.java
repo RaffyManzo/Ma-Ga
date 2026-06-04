@@ -13,11 +13,13 @@ import window.state.TemporalWindowResult;
 
 import java.io.PrintStream;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 
 /** Report dedicato ai gateway radio e alle decisioni CLOUD gateway-aware. */
 public final class CloudGatewayDiagnosticPrinter {
@@ -40,14 +42,38 @@ public final class CloudGatewayDiagnosticPrinter {
         out.println("mode: STRICT_GATEWAY");
         out.println("legacyPlaceholderEnabled: false");
         if (result.getSteps().isEmpty()) {
-            out.println("gatewayCount: 0");
-            out.println("accessLinkCount: 0");
+            out.println("configuredGatewayCountAcrossRun: 0");
+            out.println("firstSnapshotAccessLinkCount: 0");
+            out.println("maximumAccessLinkCountAcrossWindows: 0");
+            out.println("maximumActiveAccessLinkCountAcrossWindows: 0");
+            out.println("windowsWithActiveAccessLinks: 0");
+            out.println("windowsWithoutActiveAccessLinks: 0");
             out.println();
             return;
         }
-        SystemSnapshot snapshot = observed(result.getSteps().get(0));
-        out.println("gatewayCount: " + snapshot.getAccessGateways().size());
-        out.println("accessLinkCount: " + snapshot.getAccessLinks().size());
+        Set<String> gatewayIds = new HashSet<>();
+        int maxAccessLinks = 0;
+        int maxActiveLinks = 0;
+        int windowsWithActiveLinks = 0;
+        for (TemporalStepResult step : result.getSteps()) {
+            SystemSnapshot snapshot = observed(step);
+            snapshot.getAccessGateways().forEach(gateway -> gatewayIds.add(gateway.getGatewayId()));
+            int activeLinks = countActive(snapshot);
+            maxAccessLinks = Math.max(maxAccessLinks, snapshot.getAccessLinks().size());
+            maxActiveLinks = Math.max(maxActiveLinks, activeLinks);
+            if (activeLinks > 0) {
+                windowsWithActiveLinks++;
+            }
+        }
+
+        SystemSnapshot firstSnapshot = observed(result.getSteps().get(0));
+        out.println("configuredGatewayCountAcrossRun: " + gatewayIds.size());
+        out.println("firstSnapshotAccessLinkCount: " + firstSnapshot.getAccessLinks().size());
+        out.println("maximumAccessLinkCountAcrossWindows: " + maxAccessLinks);
+        out.println("maximumActiveAccessLinkCountAcrossWindows: " + maxActiveLinks);
+        out.println("windowsWithActiveAccessLinks: " + windowsWithActiveLinks);
+        out.println("windowsWithoutActiveAccessLinks: "
+                + (result.getSteps().size() - windowsWithActiveLinks));
         out.println();
     }
 
@@ -109,15 +135,26 @@ public final class CloudGatewayDiagnosticPrinter {
 
     private void printTransitions(TemporalWindowResult result) {
         title("ACCESS LINK TRANSITIONS");
-        out.println("idx | vehicle | previousGateway | currentGateway | changed");
+        out.println("idx | vehicle | previousGateway | currentGateway | transition");
         Map<String, String> previous = null;
         for (TemporalStepResult step : result.getSteps()) {
             Map<String, String> current = activeGatewayByVehicle(observed(step));
             if (previous != null) {
-                for (Map.Entry<String, String> entry : current.entrySet()) {
-                    String old = previous.get(entry.getKey());
-                    if (old != null && !old.equals(entry.getValue())) {
-                        out.println(step.getWindowIndex() + " | " + entry.getKey() + " | " + old + " | " + entry.getValue() + " | true");
+                Set<String> vehicles = new HashSet<>();
+                vehicles.addAll(previous.keySet());
+                vehicles.addAll(current.keySet());
+                List<String> orderedVehicles = new ArrayList<>(vehicles);
+                orderedVehicles.sort(String::compareTo);
+                for (String vehicleId : orderedVehicles) {
+                    String oldGateway = previous.get(vehicleId);
+                    String newGateway = current.get(vehicleId);
+                    GatewayTransition transition = transition(oldGateway, newGateway);
+                    if (transition != GatewayTransition.UNCHANGED) {
+                        out.println(step.getWindowIndex()
+                                + " | " + vehicleId
+                                + " | " + textOrDash(oldGateway)
+                                + " | " + textOrDash(newGateway)
+                                + " | " + transition);
                     }
                 }
             }
@@ -149,8 +186,16 @@ public final class CloudGatewayDiagnosticPrinter {
         for (AccessLinkSnapshot link : snapshot.getAccessLinks()) { if (link.isActive()) { result.put(link.getVehicleId(), link.getGatewayId()); } }
         return result;
     }
+    private GatewayTransition transition(String previousGateway, String currentGateway) {
+        if (previousGateway == null && currentGateway == null) { return GatewayTransition.UNCHANGED; }
+        if (previousGateway == null) { return GatewayTransition.COVERAGE_GAIN; }
+        if (currentGateway == null) { return GatewayTransition.COVERAGE_LOSS; }
+        if (previousGateway.equals(currentGateway)) { return GatewayTransition.UNCHANGED; }
+        return GatewayTransition.HANDOVER;
+    }
     private String numberOrDash(double value) { return Double.isFinite(value) ? String.format(Locale.ITALY, "%.6f", value) : "-"; }
     private String textOrDash(String value) { return value == null || value.isBlank() ? "-" : value; }
     private void printf(String format, Object... values) { out.printf(Locale.ITALY, format, values); }
     private void title(String value) { out.println("------------------------------------------------------------"); out.println(value); out.println("------------------------------------------------------------"); }
+    private enum GatewayTransition { UNCHANGED, COVERAGE_GAIN, COVERAGE_LOSS, HANDOVER }
 }

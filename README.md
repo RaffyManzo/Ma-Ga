@@ -147,6 +147,13 @@ Note per replay JSON offline:
 - `TimeIndexedSnapshotReplaySource` conserva la semantica no-look-ahead: una
   richiesta precedente al primo snapshot restituisce `Optional.empty()`;
 - `JSON_SEQUENCE` continua a consumare ordinalmente anche una finestra vuota.
+- i report diagnostici supportano veicoli senza access link attivo: in assenza
+  di gateway la qualita' accesso e' `q_v(k)=0`, distanza e `phiLink` sono
+  renderizzati come `-`, e perdita copertura, recupero copertura e handover
+  sono distinti;
+- il riepilogo cloud separa il conteggio dei link del primo snapshot dagli
+  aggregati dell'intera run, evitando di trattare una finestra vuota iniziale
+  come rappresentativa della copertura globale.
 
 ### Batch statico GA
 

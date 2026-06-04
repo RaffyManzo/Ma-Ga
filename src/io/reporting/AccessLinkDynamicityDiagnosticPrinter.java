@@ -3,7 +3,6 @@ package io.reporting;
 import config.mobility.MobilityConfig;
 import model.mobility.AccessLinkMetrics;
 import model.mobility.AccessLinkMetricsEstimator;
-import model.snapshot.AccessLinkSnapshot;
 import model.snapshot.SystemSnapshot;
 import model.snapshot.VehicleSnapshot;
 import window.dynamicity.math.DynamicityMath;
@@ -20,6 +19,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 
 /**
@@ -61,7 +61,7 @@ public final class AccessLinkDynamicityDiagnosticPrinter {
 
     private void printSummary(TemporalWindowResult result) {
         title("ACCESS LINK DYNAMICITY DIAGNOSTIC");
-        out.println("idx | snapshot | commonVehicles | avgPrevQ | avgCurrQ | Dl | degradedLinks | recoveredLinks | unavailableLinks | handovers");
+        out.println("idx | snapshot | commonVehicles | avgPrevQ | avgCurrQ | Dl | degradedLinks | recoveredLinks | unavailableLinks | coverageLosses | coverageGains | handovers");
 
         SystemSnapshot previous = null;
         for (TemporalStepResult step : result.getSteps()) {
@@ -80,16 +80,20 @@ public final class AccessLinkDynamicityDiagnosticPrinter {
             int degraded = 0;
             int recovered = 0;
             int unavailable = 0;
+            int coverageLosses = 0;
+            int coverageGains = 0;
             int handovers = 0;
 
             for (LinkQualityChange change : changes) {
                 if (change.deltaQuality() < 0.0) { degraded++; }
                 if (change.deltaQuality() > 0.0) { recovered++; }
                 if (!change.currentAvailable()) { unavailable++; }
-                if (change.handover()) { handovers++; }
+                if (change.transition() == GatewayTransition.COVERAGE_LOSS) { coverageLosses++; }
+                if (change.transition() == GatewayTransition.COVERAGE_GAIN) { coverageGains++; }
+                if (change.transition() == GatewayTransition.HANDOVER) { handovers++; }
             }
 
-            printf("%d | %s | %d | %s | %s | %.6f | %d | %d | %d | %d%n",
+            printf("%d | %s | %d | %s | %s | %.6f | %d | %d | %d | %d | %d | %d%n",
                     step.getWindowIndex(),
                     current.getSnapshotId(),
                     changes.size(),
@@ -99,6 +103,8 @@ public final class AccessLinkDynamicityDiagnosticPrinter {
                     degraded,
                     recovered,
                     unavailable,
+                    coverageLosses,
+                    coverageGains,
                     handovers
             );
             previous = current;
@@ -108,7 +114,7 @@ public final class AccessLinkDynamicityDiagnosticPrinter {
 
     private void printTopChanges(TemporalWindowResult result) {
         title("TOP ACCESS LINK QUALITY CHANGES");
-        out.println("idx | vehicle | previousGateway | currentGateway | prevAvailable | currAvailable | prevDistance | currDistance | prevPhiLink | currPhiLink | prevQ | currQ | deltaQ | handover");
+        out.println("idx | vehicle | previousGateway | currentGateway | prevAvailable | currAvailable | prevDistance | currDistance | prevPhiLink | currPhiLink | prevQ | currQ | deltaQ | transition");
 
         List<IndexedChange> all = new ArrayList<>();
         SystemSnapshot previous = null;
@@ -116,7 +122,9 @@ public final class AccessLinkDynamicityDiagnosticPrinter {
             SystemSnapshot current = observed(step);
             if (previous != null) {
                 for (LinkQualityChange change : changes(previous, current)) {
-                    if (change.absoluteDeltaQuality() > 0.0 || change.handover()) {
+                    if (topK == 0
+                            || change.absoluteDeltaQuality() > 0.0
+                            || change.transition() != GatewayTransition.UNCHANGED) {
                         all.add(new IndexedChange(step.getWindowIndex(), change));
                     }
                 }
@@ -134,21 +142,21 @@ public final class AccessLinkDynamicityDiagnosticPrinter {
         for (int i = 0; i < limit; i++) {
             IndexedChange indexed = all.get(i);
             LinkQualityChange change = indexed.change();
-            printf("%d | %s | %s | %s | %s | %s | %s | %s | %.6f | %.6f | %.6f | %.6f | %.6f | %s%n",
+            printf("%d | %s | %s | %s | %s | %s | %s | %s | %s | %s | %.6f | %.6f | %.6f | %s%n",
                     indexed.windowIndex(),
                     change.vehicleId(),
-                    change.previousGatewayId(),
-                    change.currentGatewayId(),
+                    textOrDash(change.previousGatewayId()),
+                    textOrDash(change.currentGatewayId()),
                     change.previousAvailable(),
                     change.currentAvailable(),
                     numberOrDash(change.previousDistanceMeters()),
                     numberOrDash(change.currentDistanceMeters()),
-                    change.previousPhiLink(),
-                    change.currentPhiLink(),
+                    numberOrDash(change.previousPhiLink()),
+                    numberOrDash(change.currentPhiLink()),
                     change.previousQuality(),
                     change.currentQuality(),
                     change.deltaQuality(),
-                    change.handover()
+                    change.transition()
             );
         }
         out.println();
@@ -158,7 +166,9 @@ public final class AccessLinkDynamicityDiagnosticPrinter {
         title("ACCESS LINK DYNAMICITY INTERPRETATION");
         out.println("- Dv(k) now measures only vehicle entry/exit churn.");
         out.println("- Dl(k) is the mean absolute variation of q_v(k) over vehicles present in both consecutive windows.");
-        out.println("- q_v(k) = 1 - phi_link(v, activeGateway); unavailable access links have q_v(k) = 0.");
+        out.println("- q_v(k) = 1 - phi_link(v, activeGateway); unavailable or missing access links have q_v(k) = 0.");
+        out.println("- Missing gateways do not create synthetic distance or phi_link metrics; unavailable metrics are rendered as '-'.");
+        out.println("- Coverage loss and coverage gain are reported separately from gateway-to-gateway handover.");
         out.println("- Computational candidate additions do not alter Dl(k) when active access links stay unchanged.");
         out.println("- A gateway transition is reported separately. It affects Dl(k) only through the resulting quality variation.");
         out.println();
@@ -173,25 +183,41 @@ public final class AccessLinkDynamicityDiagnosticPrinter {
         List<LinkQualityChange> result = new ArrayList<>();
 
         for (String vehicleId : common) {
-            AccessLinkMetrics before = estimator.estimateActiveLink(previous, vehicleId);
-            AccessLinkMetrics after = estimator.estimateActiveLink(current, vehicleId);
-            double previousQuality = quality(before);
-            double currentQuality = quality(after);
+            LinkQualityState before = state(previous, vehicleId);
+            LinkQualityState after = state(current, vehicleId);
             result.add(new LinkQualityChange(
                     vehicleId,
-                    before.getGatewayId(),
-                    after.getGatewayId(),
-                    before.isAvailable(),
-                    after.isAvailable(),
-                    before.getDistanceMeters(),
-                    after.getDistanceMeters(),
-                    before.getLinkInstability(),
-                    after.getLinkInstability(),
-                    previousQuality,
-                    currentQuality
+                    before.gatewayId(),
+                    after.gatewayId(),
+                    before.available(),
+                    after.available(),
+                    before.distanceMeters(),
+                    after.distanceMeters(),
+                    before.phiLink(),
+                    after.phiLink(),
+                    before.quality(),
+                    after.quality()
             ));
         }
         return result;
+    }
+
+    private LinkQualityState state(SystemSnapshot snapshot, String vehicleId) {
+        Optional<AccessLinkMetrics> maybeMetrics =
+                estimator.estimateActiveLinkIfPresent(snapshot, vehicleId);
+        if (maybeMetrics.isEmpty()) {
+            return LinkQualityState.noActiveLink();
+        }
+
+        AccessLinkMetrics metrics = maybeMetrics.get();
+        return new LinkQualityState(
+                metrics.getGatewayId(),
+                metrics.isAvailable(),
+                metrics.getDistanceMeters(),
+                metrics.getLinkInstability(),
+                quality(metrics),
+                true
+        );
     }
 
     private double quality(AccessLinkMetrics metrics) {
@@ -239,6 +265,10 @@ public final class AccessLinkDynamicityDiagnosticPrinter {
                 : "-";
     }
 
+    private String textOrDash(String value) {
+        return value == null || value.isBlank() ? "-" : value;
+    }
+
     private void printf(String format, Object... values) {
         out.printf(Locale.ITALY, format, values);
     }
@@ -250,6 +280,33 @@ public final class AccessLinkDynamicityDiagnosticPrinter {
     }
 
     private record IndexedChange(int windowIndex, LinkQualityChange change) { }
+
+    private record LinkQualityState(
+            String gatewayId,
+            boolean available,
+            double distanceMeters,
+            double phiLink,
+            double quality,
+            boolean hasActiveAccessLink
+    ) {
+        private static LinkQualityState noActiveLink() {
+            return new LinkQualityState(
+                    null,
+                    false,
+                    Double.NaN,
+                    Double.NaN,
+                    0.0,
+                    false
+            );
+        }
+    }
+
+    private enum GatewayTransition {
+        UNCHANGED,
+        COVERAGE_GAIN,
+        COVERAGE_LOSS,
+        HANDOVER
+    }
 
     private record LinkQualityChange(
             String vehicleId,
@@ -272,8 +329,20 @@ public final class AccessLinkDynamicityDiagnosticPrinter {
             return Math.abs(deltaQuality());
         }
 
-        private boolean handover() {
-            return !Objects.equals(previousGatewayId, currentGatewayId);
+        private GatewayTransition transition() {
+            if (previousGatewayId == null && currentGatewayId == null) {
+                return GatewayTransition.UNCHANGED;
+            }
+            if (previousGatewayId == null) {
+                return GatewayTransition.COVERAGE_GAIN;
+            }
+            if (currentGatewayId == null) {
+                return GatewayTransition.COVERAGE_LOSS;
+            }
+            if (Objects.equals(previousGatewayId, currentGatewayId)) {
+                return GatewayTransition.UNCHANGED;
+            }
+            return GatewayTransition.HANDOVER;
         }
     }
 }
