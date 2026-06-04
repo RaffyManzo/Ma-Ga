@@ -8,7 +8,7 @@ Questo folder contiene la pipeline diagnostica offline Eclipse MOSAIC -> MA-GA. 
 data/docs/mosaic-study/       documentazione definitiva delle fasi
 data/mosaic-scenarios/        sorgenti versionabili degli scenari MOSAIC
 data/mosaic-study/            CSV, JSON e diagnostica generati
-data/snapshots/               snapshot JSON finali della futura Fase 10I
+data/snapshots/               snapshot JSON finali generati dalla Fase 10I
 tools/mosaic-offline-exporter/ exporter offline
 tmp/mosaic-25.2/              deployment locale, log ed eseguibili temporanei
 ```
@@ -660,7 +660,7 @@ la CPU locale e la banda V2V sono sintetiche e provvisorie
 la distanza usa Haversine su latitudine/longitudine
 SNS non espone una banda residua allocabile per coppia diretta
 la Fase 10G non produce snapshot finali
-la Fase 10I non e' implementata
+la Fase 10I usa questi dati come input e non viene eseguita dalla 10G
 il bridge live non e' implementato
 ```
 
@@ -800,3 +800,194 @@ EDGE / CLOUD = gateway attivo e risolvibile ancora obbligatorio
 Questa sottofase non introduce placeholder e non genera ancora snapshot MOSAIC
 finali. Il sistema e' pronto per riprendere la Fase 10I usando i dati 10A-10H
 gia' validati.
+
+## Fase 10I-pre2 - Normalizzazione cartesiana MOSAIC/SUMO
+
+La Fase 10I-pre2 normalizza le coordinate geografiche MOSAIC in coordinate
+cartesiane metriche coerenti con la rete SUMO. Non modifica gli input originali
+e non modifica il core Java.
+
+Script:
+
+```text
+export_projected_mosaic_coordinates.py
+```
+
+Input:
+
+```text
+data/mosaic-study/vehicle_state_stream.csv
+data/mosaic-study/infrastructure_snapshot.json
+data/mosaic-scenarios/MaGaIntegratedStudy/sumo/Barnim.net.xml
+```
+
+Output:
+
+```text
+data/mosaic-study/vehicle_state_stream_projected.csv
+data/mosaic-study/infrastructure_snapshot_projected.json
+data/mosaic-study/diagnostics/phase_10i_pre2_projection_validation.json
+```
+
+Comando:
+
+```powershell
+python .\tools\mosaic-offline-exporter\export_projected_mosaic_coordinates.py `
+  --vehicle-state-file ".\data\mosaic-study\vehicle_state_stream.csv" `
+  --infrastructure-file ".\data\mosaic-study\infrastructure_snapshot.json" `
+  --sumo-network-file ".\data\mosaic-scenarios\MaGaIntegratedStudy\sumo\Barnim.net.xml" `
+  --vehicle-state-out-file ".\data\mosaic-study\vehicle_state_stream_projected.csv" `
+  --infrastructure-out-file ".\data\mosaic-study\infrastructure_snapshot_projected.json" `
+  --validation-out-file ".\data\mosaic-study\diagnostics\phase_10i_pre2_projection_validation.json"
+```
+
+Policy:
+
+```text
+projectionPolicy = SUMO_NET_XML_UTM_WGS84_WITH_NET_OFFSET
+projectionUtility = STANDARD_LIBRARY_UTM_WGS84_FROM_SUMO_PROJ_PARAMETER
+```
+
+La proiezione deriva da `Barnim.net.xml`:
+
+```text
+projParameter = +proj=utm +zone=33 +ellps=WGS84 +datum=WGS84 +units=m +no_defs
+netOffset = -395635.35,-5826456.24
+```
+
+L'utility SUMO locale `sumolib` e' stata ispezionata. La sua semantica e'
+`UTM + netOffset`, ma nell'ambiente locale la conversione richiede `pyproj`,
+non installato. Per evitare dipendenze esterne, lo script implementa in standard
+library la conversione UTM WGS84 derivata dal `projParameter` SUMO.
+
+Controlli:
+
+```text
+coordinate veicolari finite e complete
+gateway proiettati
+round-trip lat/lon -> x/y -> lat/lon
+confronto diagnostico distanza proiettata vs Haversine
+phase10iPre2Status = COMPLETED solo se errors e' vuoto
+readyForPhase10I = true solo se la proiezione e' validata
+```
+
+Risultati della baseline:
+
+```text
+vehicleStatesProjected = 1824
+gatewaysProjected = 2
+roundTripValidationSamples = 1826
+roundTripMaximumErrorMeters = 0.00037287069228226144
+distanceComparisonSamples = 3648
+maximumProjectedVsHaversineDifferenceMeters = 3.100796595092106
+phase10iPre2Status = COMPLETED
+readyForPhase10I = true
+```
+
+## Fase 10I - Generazione SystemSnapshot JSON
+
+La Fase 10I assembla gli stream validati in snapshot JSON compatibili con il
+loader e con `SnapshotValidator`. Non esegue il GA, non implementa replay
+`JSON_SEQUENCE`, non implementa replay `JSON_TIME` e non modifica il core Java.
+
+Script:
+
+```text
+export_system_snapshots.py
+```
+
+Input principali:
+
+```text
+optimization_window_timeline.csv
+window_task_assignment.csv
+vehicle_state_stream_projected.csv
+infrastructure_snapshot_projected.json
+cell_bandwidth_stream.csv
+access_link_preview.csv
+remote_candidate_preview.csv
+local_candidate_preview.csv
+v2v_candidate_preview.csv
+v2v_bandwidth_pool_preview.csv
+```
+
+Output:
+
+```text
+data/snapshots/mosaic-generated/snapshot_*.json
+data/mosaic-study/snapshot_manifest.csv
+data/mosaic-study/diagnostics/phase_10i_validation.json
+```
+
+Comando:
+
+```powershell
+python .\tools\mosaic-offline-exporter\export_system_snapshots.py `
+  --timeline-file ".\data\mosaic-study\optimization_window_timeline.csv" `
+  --window-task-assignment-file ".\data\mosaic-study\window_task_assignment.csv" `
+  --vehicle-state-file ".\data\mosaic-study\vehicle_state_stream_projected.csv" `
+  --infrastructure-file ".\data\mosaic-study\infrastructure_snapshot_projected.json" `
+  --cell-bandwidth-file ".\data\mosaic-study\cell_bandwidth_stream.csv" `
+  --access-link-file ".\data\mosaic-study\access_link_preview.csv" `
+  --remote-candidate-file ".\data\mosaic-study\remote_candidate_preview.csv" `
+  --local-candidate-file ".\data\mosaic-study\local_candidate_preview.csv" `
+  --v2v-candidate-file ".\data\mosaic-study\v2v_candidate_preview.csv" `
+  --v2v-pool-file ".\data\mosaic-study\v2v_bandwidth_pool_preview.csv" `
+  --baseline-metadata-file ".\data\mosaic-study\diagnostics\cell\integrated_baseline_metadata.json" `
+  --phase-10g-validation-file ".\data\mosaic-study\diagnostics\phase_10g_validation.json" `
+  --phase-10h-validation-file ".\data\mosaic-study\diagnostics\phase_10h_validation.json" `
+  --phase-10i-pre-validation-file ".\data\mosaic-study\diagnostics\phase_10i_pre_snapshot_contract_validation.json" `
+  --phase-10i-pre2-validation-file ".\data\mosaic-study\diagnostics\phase_10i_pre2_projection_validation.json" `
+  --expected-source-run "log-20260604-220216-MaGaIntegratedStudy" `
+  --output-dir ".\data\snapshots\mosaic-generated" `
+  --manifest-out-file ".\data\mosaic-study\snapshot_manifest.csv" `
+  --validation-out-file ".\data\mosaic-study\diagnostics\phase_10i_validation.json" `
+  --clean-output-dir
+```
+
+Policy:
+
+```text
+snapshotTimelinePolicy = EXPLICIT_OPTIMIZATION_WINDOW_TIMELINE
+activeVehicleSetPolicy = ACTIVE_VEHICLES_FROM_EXACT_LOCAL_CANDIDATES
+vehicleLookupPolicy = LATEST_AVAILABLE_STATE_AT_OR_BEFORE_WINDOW
+accessLinkLookupPolicy = EXACT_WINDOW_TIMESTAMP
+localCandidateLookupPolicy = EXACT_WINDOW_TIMESTAMP
+v2vCandidateLookupPolicy = EXACT_WINDOW_TIMESTAMP
+remoteCandidateLookupPolicy = EXACT_WINDOW_TIMESTAMP
+v2vPoolLookupPolicy = EXACT_WINDOW_TIMESTAMP
+gatewayPoolAssemblyPolicy = LATEST_SAFE_AVAILABLE_CELL_BUCKET_PER_GATEWAY_POOL
+```
+
+Risultati:
+
+```text
+snapshotsGenerated = 36
+emptyTaskSnapshots = 1
+totalTasksAcrossSnapshots = 682
+vehiclesAcrossSnapshots = 369
+v2vCandidatesAcrossSnapshots = 2594
+edgeCandidatesAcrossSnapshots = 112
+cloudCandidatesAcrossSnapshots = 112
+futureLookAheadViolations = 0
+orphanReferenceViolations = 0
+javaLoaderValidationFailures = 0
+javaValidatorFailures = 0
+phase10iStatus = COMPLETED
+readyForPhase10J = true
+```
+
+Validazione Java:
+
+```text
+tmp/phase10i-validation/Phase10iSnapshotValidationMain.java
+```
+
+Il harness temporaneo carica tutti gli snapshot con `SnapshotLoader` e
+`JsonSnapshotFolderLoader`, invoca `SnapshotValidator` e non esegue il GA.
+
+Prossimo passo:
+
+```text
+Fase 10J - replay JSON_SEQUENCE e JSON_TIME nel core MA-GA
+```

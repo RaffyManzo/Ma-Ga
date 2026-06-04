@@ -1,0 +1,38 @@
+{
+  "snapshotId": "mosaic_generated_000_t_005",
+  "timeSeconds": 5.0,
+  "vehicles": [],
+  "tasks": [],
+  "candidateNodes": [],
+  "accessGateways": [
+    {
+      "gatewayId": "rsu_central",
+      "gatewayType": "RSU",
+      "x": 7096.244736438966,
+      "y": 5069.365300857462,
+      "coverageRadiusMeters": 300.0,
+      "bandwidthPoolId": "pool_rsu_central"
+    },
+    {
+      "gatewayId": "rsu_north",
+      "gatewayType": "RSU",
+      "x": 7409.000530664227,
+      "y": 7177.264447211288,
+      "coverageRadiusMeters": 520.0,
+      "bandwidthPoolId": "pool_rsu_north"
+    }
+  ],
+  "accessLinks": [],
+  "bandwidthPools": [
+    {
+      "poolId": "pool_rsu_central",
+      "poolType": "GATEWAY",
+      "availableBandwidth": 8000000.0
+    },
+    {
+      "poolId": "pool_rsu_north",
+      "poolType": "GATEWAY",
+      "availableBandwidth": 40000000.0
+    }
+  ]
+}
