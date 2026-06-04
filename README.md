@@ -155,6 +155,17 @@ Note per replay JSON offline:
   aggregati dell'intera run, evitando di trattare una finestra vuota iniziale
   come rappresentativa della copertura globale.
 
+Validazione del replay MOSAIC generato:
+
+- `JSON_SEQUENCE` valida l'esecuzione ordinale end-to-end: ogni file JSON viene
+  consumato nella sequenza ordinata;
+- `JSON_TIME` valida la causalita' temporale con lookup
+  `latest <= requestedTime` fino all'orizzonte finale realmente disponibile;
+- lo stop ordinario della validazione temporale e'
+  `FULL_TIME_HORIZON_REACHED`;
+- `SAFETY_MAX_STEPS_REACHED` e' solo un guardrail e non rappresenta una
+  condizione di successo.
+
 ### Batch statico GA
 
 Main class:
