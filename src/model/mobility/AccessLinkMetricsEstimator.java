@@ -7,6 +7,7 @@ import model.snapshot.SystemSnapshot;
 import model.snapshot.VehicleSnapshot;
 
 import java.util.Objects;
+import java.util.Optional;
 
 /**
  * Calcola copertura e instabilità del collegamento radio attivo.
@@ -35,7 +36,43 @@ public final class AccessLinkMetricsEstimator {
     }
 
     public AccessLinkMetrics estimateActiveLink(SystemSnapshot snapshot, String vehicleId) {
-        AccessLinkSnapshot link = resolver.requireActiveAccessLink(snapshot, vehicleId);
+        return estimateActiveLinkIfPresent(snapshot, vehicleId)
+                .orElseThrow(() -> new IllegalArgumentException(
+                        "Vehicle " + vehicleId + " has no active access link."
+                ));
+    }
+
+    /**
+     * Stima le metriche dell'access link attivo se il veicolo ne possiede uno.
+     *
+     * <p>Zero link attivi producono {@link Optional#empty()}; piu' di un link
+     * attivo resta un errore strutturale propagato dal resolver. Non vengono
+     * create metriche sintetiche per gateway mancanti.</p>
+     *
+     * @param snapshot snapshot da interrogare
+     * @param vehicleId veicolo sorgente
+     * @return metriche del link attivo, se presente
+     */
+    public Optional<AccessLinkMetrics> estimateActiveLinkIfPresent(
+            SystemSnapshot snapshot,
+            String vehicleId
+    ) {
+        Optional<AccessLinkSnapshot> activeLink = resolver.findActiveAccessLink(
+                snapshot,
+                vehicleId
+        );
+        if (activeLink.isEmpty()) {
+            return Optional.empty();
+        }
+
+        return Optional.of(estimate(snapshot, vehicleId, activeLink.get()));
+    }
+
+    private AccessLinkMetrics estimate(
+            SystemSnapshot snapshot,
+            String vehicleId,
+            AccessLinkSnapshot link
+    ) {
         AccessGatewaySnapshot gateway = resolver.requireGateway(snapshot, link.getGatewayId());
         VehicleSnapshot vehicle = resolver.requireVehicle(snapshot, vehicleId);
 

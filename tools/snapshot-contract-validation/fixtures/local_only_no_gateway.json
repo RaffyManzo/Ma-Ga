@@ -1,0 +1,47 @@
+{
+  "snapshotId": "local_only_no_gateway",
+  "timeSeconds": 10.0,
+  "vehicles": [
+    {
+      "vehicleId": "veh_1",
+      "x": 0.0,
+      "y": 0.0,
+      "speed": 10.0,
+      "localCpu": 4000000000.0
+    }
+  ],
+  "tasks": [
+    {
+      "taskId": "task_local_1",
+      "sourceVehicleId": "veh_1",
+      "inputSizeBits": 1000.0,
+      "outputSizeBits": 1000.0,
+      "cpuCycles": 1000000.0,
+      "deadlineSeconds": 1.0
+    }
+  ],
+  "candidateNodes": [
+    {
+      "candidateId": "local_for_veh_1",
+      "sourceVehicleId": "veh_1",
+      "executionNodeId": "veh_1",
+      "type": "LOCAL",
+      "availableCpu": 4000000000.0,
+      "availableBandwidth": 0.0,
+      "baseLatencySeconds": 0.0,
+      "nodeX": 0.0,
+      "nodeY": 0.0,
+      "coverageRadiusMeters": 1.0,
+      "bandwidthPoolId": null
+    }
+  ],
+  "accessGateways": [],
+  "accessLinks": [],
+  "bandwidthPools": [
+    {
+      "poolId": "pool_global_diagnostic",
+      "poolType": "GLOBAL",
+      "availableBandwidth": 1.0
+    }
+  ]
+}

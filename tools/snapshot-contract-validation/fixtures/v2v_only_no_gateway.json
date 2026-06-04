@@ -1,0 +1,93 @@
+{
+  "snapshotId": "v2v_only_no_gateway",
+  "timeSeconds": 10.0,
+  "vehicles": [
+    {
+      "vehicleId": "veh_1",
+      "x": 0.0,
+      "y": 0.0,
+      "speed": 10.0,
+      "localCpu": 4000000000.0
+    },
+    {
+      "vehicleId": "veh_2",
+      "x": 10.0,
+      "y": 0.0,
+      "speed": 10.0,
+      "localCpu": 4000000000.0
+    }
+  ],
+  "tasks": [
+    {
+      "taskId": "task_v2v_1",
+      "sourceVehicleId": "veh_1",
+      "inputSizeBits": 1000.0,
+      "outputSizeBits": 1000.0,
+      "cpuCycles": 1000000.0,
+      "deadlineSeconds": 1.0
+    }
+  ],
+  "candidateNodes": [
+    {
+      "candidateId": "local_for_veh_1",
+      "sourceVehicleId": "veh_1",
+      "executionNodeId": "veh_1",
+      "type": "LOCAL",
+      "availableCpu": 4000000000.0,
+      "availableBandwidth": 0.0,
+      "baseLatencySeconds": 0.0,
+      "nodeX": 0.0,
+      "nodeY": 0.0,
+      "coverageRadiusMeters": 1.0,
+      "bandwidthPoolId": null
+    },
+    {
+      "candidateId": "local_for_veh_2",
+      "sourceVehicleId": "veh_2",
+      "executionNodeId": "veh_2",
+      "type": "LOCAL",
+      "availableCpu": 4000000000.0,
+      "availableBandwidth": 0.0,
+      "baseLatencySeconds": 0.0,
+      "nodeX": 10.0,
+      "nodeY": 0.0,
+      "coverageRadiusMeters": 1.0,
+      "bandwidthPoolId": null
+    },
+    {
+      "candidateId": "vehicle_veh_2_v2v_for_veh_1",
+      "sourceVehicleId": "veh_1",
+      "executionNodeId": "veh_2",
+      "type": "VEHICLE",
+      "availableCpu": 4000000000.0,
+      "availableBandwidth": 10000000.0,
+      "baseLatencySeconds": 0.0024,
+      "nodeX": 10.0,
+      "nodeY": 0.0,
+      "coverageRadiusMeters": 709.4,
+      "bandwidthPoolId": "pool_v2v_veh_1_veh_2"
+    },
+    {
+      "candidateId": "vehicle_veh_1_v2v_for_veh_2",
+      "sourceVehicleId": "veh_2",
+      "executionNodeId": "veh_1",
+      "type": "VEHICLE",
+      "availableCpu": 4000000000.0,
+      "availableBandwidth": 10000000.0,
+      "baseLatencySeconds": 0.0024,
+      "nodeX": 0.0,
+      "nodeY": 0.0,
+      "coverageRadiusMeters": 709.4,
+      "bandwidthPoolId": "pool_v2v_veh_1_veh_2"
+    }
+  ],
+  "accessGateways": [],
+  "accessLinks": [],
+  "bandwidthPools": [
+    {
+      "poolId": "pool_v2v_veh_1_veh_2",
+      "poolType": "DIRECT_V2V",
+      "availableBandwidth": 10000000.0
+    }
+  ]
+}

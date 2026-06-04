@@ -1,0 +1,75 @@
+{
+  "snapshotId": "invalid_multiple_active_links",
+  "timeSeconds": 10.0,
+  "vehicles": [
+    {
+      "vehicleId": "veh_1",
+      "x": 0.0,
+      "y": 0.0,
+      "speed": 10.0,
+      "localCpu": 4000000000.0
+    }
+  ],
+  "tasks": [],
+  "candidateNodes": [
+    {
+      "candidateId": "local_for_veh_1",
+      "sourceVehicleId": "veh_1",
+      "executionNodeId": "veh_1",
+      "type": "LOCAL",
+      "availableCpu": 4000000000.0,
+      "availableBandwidth": 0.0,
+      "baseLatencySeconds": 0.0,
+      "nodeX": 0.0,
+      "nodeY": 0.0,
+      "coverageRadiusMeters": 1.0,
+      "bandwidthPoolId": null
+    }
+  ],
+  "accessGateways": [
+    {
+      "gatewayId": "rsu_1",
+      "gatewayType": "RSU",
+      "x": 0.0,
+      "y": 0.0,
+      "coverageRadiusMeters": 100.0,
+      "bandwidthPoolId": "pool_gateway_rsu_1"
+    },
+    {
+      "gatewayId": "rsu_2",
+      "gatewayType": "RSU",
+      "x": 1.0,
+      "y": 0.0,
+      "coverageRadiusMeters": 100.0,
+      "bandwidthPoolId": "pool_gateway_rsu_2"
+    }
+  ],
+  "accessLinks": [
+    {
+      "accessLinkId": "link_veh_1_rsu_1",
+      "vehicleId": "veh_1",
+      "gatewayId": "rsu_1",
+      "active": true,
+      "available": true
+    },
+    {
+      "accessLinkId": "link_veh_1_rsu_2",
+      "vehicleId": "veh_1",
+      "gatewayId": "rsu_2",
+      "active": true,
+      "available": true
+    }
+  ],
+  "bandwidthPools": [
+    {
+      "poolId": "pool_gateway_rsu_1",
+      "poolType": "GATEWAY",
+      "availableBandwidth": 10000000.0
+    },
+    {
+      "poolId": "pool_gateway_rsu_2",
+      "poolType": "GATEWAY",
+      "availableBandwidth": 10000000.0
+    }
+  ]
+}

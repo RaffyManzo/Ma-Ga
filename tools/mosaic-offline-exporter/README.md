@@ -780,3 +780,23 @@ Prossimo passo:
 ```text
 Fase 10I - composizione diagnostica dei SystemSnapshot JSON
 ```
+
+## Fase 10I-pre - Contratto snapshot per veicoli senza gateway
+
+Prima della composizione dei SystemSnapshot JSON finali, il contratto Java e'
+stato riallineato per rappresentare veicoli presenti nella simulazione ma privi
+di accesso infrastrutturale attivo.
+
+Regole aggiornate:
+
+```text
+active access link per veicolo = 0 oppure 1
+piu' di 1 link attivo = snapshot invalido
+LOCAL = nessun gateway richiesto
+VEHICLE / V2V = nessun gateway infrastrutturale richiesto
+EDGE / CLOUD = gateway attivo e risolvibile ancora obbligatorio
+```
+
+Questa sottofase non introduce placeholder e non genera ancora snapshot MOSAIC
+finali. Il sistema e' pronto per riprendere la Fase 10I usando i dati 10A-10H
+gia' validati.

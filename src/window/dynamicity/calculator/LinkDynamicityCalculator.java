@@ -11,6 +11,7 @@ import window.dynamicity.metrics.LinkMetrics;
 
 import java.util.HashSet;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 
 /**
@@ -128,12 +129,20 @@ public final class LinkDynamicityCalculator {
 
     /**
      * Restituisce q_v(k) in [0, 1]. Un access link indisponibile ha qualità 0.
+     *
+     * <p>Anche l'assenza di un access link attivo ha qualita' 0.</p>
      */
     public double quality(SystemSnapshot snapshot, String vehicleId) {
-        AccessLinkMetrics metrics = accessLinkMetricsEstimator.estimateActiveLink(
-                snapshot,
-                vehicleId
-        );
+        Optional<AccessLinkMetrics> maybeMetrics =
+                accessLinkMetricsEstimator.estimateActiveLinkIfPresent(
+                        snapshot,
+                        vehicleId
+                );
+        if (maybeMetrics.isEmpty()) {
+            return 0.0;
+        }
+
+        AccessLinkMetrics metrics = maybeMetrics.get();
         if (!metrics.isAvailable()) {
             return 0.0;
         }

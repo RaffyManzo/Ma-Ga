@@ -1,0 +1,154 @@
+{
+  "sourceRun": "log-20260604-220216-MaGaIntegratedStudy",
+  "phase": "10I_PRE_OPTIONAL_GATEWAY_ACCESS_CONTRACT_ALIGNMENT",
+  "previousContract": "EXACTLY_ONE_ACTIVE_ACCESS_LINK_PER_VEHICLE",
+  "updatedContract": "ZERO_OR_ONE_ACTIVE_ACCESS_LINK_PER_VEHICLE_WITH_STRICT_REMOTE_GATEWAY_REQUIREMENT",
+  "activeLinkCardinalityPolicy": "ZERO_OR_ONE_ACTIVE_ACCESS_LINK_PER_VEHICLE",
+  "remoteCandidateGatewayPolicy": "ACTIVE_GATEWAY_REQUIRED_FOR_EDGE_AND_CLOUD",
+  "linkDynamicityMissingGatewayPolicy": "ZERO_QUALITY_WITHOUT_ACTIVE_ACCESS_LINK",
+  "coverageReferencePopulationPolicy": "ACTIVE_ACCESS_LINK_VEHICLES_ONLY",
+  "coverageReferenceNoActiveLinkFallback": "ZERO_REFERENCE_COVERAGE_AND_EXISTING_TEMPORAL_FALLBACK",
+  "classesInspected": [
+    "src/validation/snapshot/SnapshotValidator.java",
+    "src/model/mobility/AccessLinkResolver.java",
+    "src/model/mobility/AccessLinkMetricsEstimator.java",
+    "src/model/mobility/AccessLinkMetrics.java",
+    "src/window/dynamicity/calculator/LinkDynamicityCalculator.java",
+    "src/window/timing/CoverageReferenceCalculator.java",
+    "src/window/prefilter/CandidatePrefilter.java",
+    "src/model/mobility/CoverageEstimator.java",
+    "src/model/bandwidth/BandwidthPoolResolver.java",
+    "src/model/node/NodeCandidate.java",
+    "src/model/node/NodeType.java",
+    "src/model/snapshot/SystemSnapshot.java",
+    "src/model/snapshot/AccessLinkSnapshot.java",
+    "src/model/snapshot/AccessGatewaySnapshot.java",
+    "src/model/snapshot/BandwidthPoolSnapshot.java"
+  ],
+  "classesModified": [
+    "src/validation/snapshot/SnapshotValidator.java",
+    "src/model/mobility/AccessLinkResolver.java",
+    "src/model/mobility/AccessLinkMetricsEstimator.java",
+    "src/window/dynamicity/calculator/LinkDynamicityCalculator.java",
+    "src/window/timing/CoverageReferenceCalculator.java"
+  ],
+  "testsExecuted": 9,
+  "testsPassed": 9,
+  "testsFailed": 0,
+  "testResults": {
+    "LOCAL_ONLY_NO_GATEWAY_ACCEPTED": "PASSED",
+    "V2V_ONLY_NO_GATEWAY_ACCEPTED": "PASSED",
+    "MIXED_GATEWAY_AND_LOCAL_ACCEPTED": "PASSED",
+    "MULTIPLE_ACTIVE_LINKS_REJECTED": "PASSED",
+    "CLOUD_WITHOUT_ACTIVE_GATEWAY_REJECTED": "PASSED",
+    "EDGE_WITHOUT_ACTIVE_GATEWAY_REJECTED": "PASSED",
+    "LINK_DYNAMICITY_WITHOUT_GATEWAY": "PASSED",
+    "COVERAGE_REFERENCE_MIXED_POPULATION": "PASSED",
+    "COVERAGE_REFERENCE_NO_GATEWAY_FALLBACK": "PASSED"
+  },
+  "windowsRead": 36,
+  "windowsWithVehicles": 35,
+  "windowsWithVehiclesWithoutActiveGateway": 35,
+  "windowsWithRemoteCandidates": 25,
+  "windowsWithOnlyLocalOrV2vCandidates": 10,
+  "localVehicleStatesRead": 1824,
+  "activeGatewayStatesRead": 564,
+  "statesWithoutActiveGateway": 1260,
+  "tasksInWindowsWithoutActiveGateway": 472,
+  "exampleWindows": {
+    "10": {
+      "vehicles": [
+        "veh_0"
+      ],
+      "activeGatewayVehicles": [],
+      "vehiclesWithoutActiveGateway": [
+        "veh_0"
+      ],
+      "tasks": 3,
+      "remoteCandidates": 0,
+      "v2vCandidates": 0
+    },
+    "15": {
+      "vehicles": [
+        "veh_0",
+        "veh_1",
+        "veh_2"
+      ],
+      "activeGatewayVehicles": [],
+      "vehiclesWithoutActiveGateway": [
+        "veh_0",
+        "veh_1",
+        "veh_2"
+      ],
+      "tasks": 5,
+      "remoteCandidates": 0,
+      "v2vCandidates": 6
+    },
+    "30": {
+      "vehicles": [
+        "veh_0",
+        "veh_1",
+        "veh_2",
+        "veh_3",
+        "veh_4",
+        "veh_5"
+      ],
+      "activeGatewayVehicles": [],
+      "vehiclesWithoutActiveGateway": [
+        "veh_0",
+        "veh_1",
+        "veh_2",
+        "veh_3",
+        "veh_4",
+        "veh_5"
+      ],
+      "tasks": 12,
+      "remoteCandidates": 0,
+      "v2vCandidates": 28
+    },
+    "180": {
+      "vehicles": [
+        "veh_0",
+        "veh_1",
+        "veh_10",
+        "veh_11",
+        "veh_2",
+        "veh_3",
+        "veh_4",
+        "veh_5",
+        "veh_6",
+        "veh_7",
+        "veh_8",
+        "veh_9"
+      ],
+      "activeGatewayVehicles": [],
+      "vehiclesWithoutActiveGateway": [
+        "veh_0",
+        "veh_1",
+        "veh_10",
+        "veh_11",
+        "veh_2",
+        "veh_3",
+        "veh_4",
+        "veh_5",
+        "veh_6",
+        "veh_7",
+        "veh_8",
+        "veh_9"
+      ],
+      "tasks": 23,
+      "remoteCandidates": 0,
+      "v2vCandidates": 0
+    }
+  },
+  "placeholderGatewaysIntroduced": 0,
+  "placeholderLinksIntroduced": 0,
+  "placeholderPoolsIntroduced": 0,
+  "compilationStatus": "COMPLETED",
+  "warnings": [
+    "javac 21.0.2 exits with code 0 and generates classes, but prints a Windows AccessDeniedException while closing the Jackson jar file system. Runtime validation passed all harness cases."
+  ],
+  "errors": [],
+  "phase10iPreStatus": "COMPLETED",
+  "readyForPhase10I": true
+}
