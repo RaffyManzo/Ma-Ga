@@ -32,12 +32,16 @@ import java.util.Random;
 public final class AdaptiveWindowMain {
     private static final String DEFAULT_SOURCE_MODE = "JSON_TIME";
     private static final TemporalRuntimeProfile DEFAULT_RUNTIME_PROFILE = TemporalRuntimeProfile.OBSERVED_RUNTIME;
-    private static final double START_TIME_SECONDS = 0.0;
     private AdaptiveWindowMain() { }
 
     public static void main(String[] args) throws Exception {
         RunArguments run = RunArguments.parse(args);
         List<SystemSnapshot> snapshots = new JsonSnapshotFolderLoader().load(run.folderPath());
+        if (snapshots.isEmpty()) {
+            throw new IllegalArgumentException(
+                    "Snapshot folder contains no loaded snapshots: " + run.folderPath()
+            );
+        }
         int maxSteps = run.maxSteps() == null ? snapshots.size() : run.maxSteps();
         MaGaConfig maGaConfig = MaGaConfig.defaultConfig(GaParameterScalingMode.ADAPTIVE);
         TemporalWindowConfig windowConfig = run.runtimeProfile().createWindowConfig();
@@ -63,7 +67,13 @@ public final class AdaptiveWindowMain {
                 source,
                 targetPopulationSize
         );
-        TemporalWindowResult result = manager.run(START_TIME_SECONDS, maxSteps);
+        /*
+         * Offline JSON replay starts from the first timestamp actually present
+         * in the folder. The time-indexed source must keep returning empty for
+         * requests before that point rather than looking ahead to a future file.
+         */
+        double replayStartTimeSeconds = snapshots.get(0).getTimeSeconds();
+        TemporalWindowResult result = manager.run(replayStartTimeSeconds, maxSteps);
         new AdaptiveWindowReportPrinter(maGaConfig).print(run.sourceMode(), run.runtimeProfile(), run.folderPath(), result, source);
     }
 

@@ -360,8 +360,13 @@ public final class MaGaOptimizer {
         if (snapshot.getTasks() == null) {
             throw new IllegalArgumentException("snapshot.tasks must not be null.");
         }
-        if (snapshot.getCandidateNodes() == null
-                || snapshot.getCandidateNodes().isEmpty()) {
+        if (snapshot.getCandidateNodes() == null) {
+            throw new IllegalArgumentException(
+                    "snapshot.candidateNodes must not be null."
+            );
+        }
+        if (!snapshot.getTasks().isEmpty()
+                && snapshot.getCandidateNodes().isEmpty()) {
             throw new IllegalArgumentException(
                     "snapshot.candidateNodes must contain at least one node."
             );

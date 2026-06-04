@@ -137,6 +137,17 @@ Esempio operativo indicizzato sul tempo:
 JSON_TIME OBSERVED_RUNTIME data/snapshots/temporal/scenarios/urban_realistic_dynamic_calibrated 8
 ```
 
+Note per replay JSON offline:
+
+- uno snapshot con `tasks=[]` e `candidateNodes=[]` e' una finestra vuota
+  valida; l'optimizer restituisce `EMPTY_TASK_SET`, fitness `0.0` e non avvia
+  il ciclo genetico;
+- `JSON_TIME` parte dal primo timestamp realmente disponibile nella cartella
+  caricata, non da un'origine temporale sintetica a `0.0 s`;
+- `TimeIndexedSnapshotReplaySource` conserva la semantica no-look-ahead: una
+  richiesta precedente al primo snapshot restituisce `Optional.empty()`;
+- `JSON_SEQUENCE` continua a consumare ordinalmente anche una finestra vuota.
+
 ### Batch statico GA
 
 Main class:
