@@ -675,10 +675,38 @@ def build_validation(
         warnings.append("LOCAL candidates were exported; direct V2V generation requires observed ad-hoc radio state.")
 
     times = {state.time_ns for state in vehicle_states}
+    vehicles_with_states = {state.vehicle_id for state in vehicle_states}
     vehicles_with_radio = {event.vehicle_id for event in radio_events}
+    if radio_events and vehicles_with_radio != vehicles_with_states:
+        missing = sorted(vehicles_with_states - vehicles_with_radio, key=natural_key)
+        errors.append(
+            "ADHOC_CONFIGURATION events do not cover every vehicle with exported states: "
+            + ",".join(missing)
+        )
+    if radio_events and not v2v_rows:
+        errors.append("ADHOC_CONFIGURATION events were found, but no direct V2V candidates were generated.")
+
+    phase_completed = (
+        v2v_status == "COMPLETED"
+        and not errors
+        and len(vehicle_states) > 0
+        and len(local_rows) == len(vehicle_states)
+        and len(v2v_rows) > 0
+        and len(pool_rows) > 0
+        and len(vehicles_with_radio) == len(vehicles_with_states)
+        and v2v_counters.get("futureLookAheadViolations", 0) == 0
+        and v2v_counters.get("selfCandidateViolations", 0) == 0
+        and v2v_counters.get("radiusViolations", 0) == 0
+        and v2v_counters.get("duplicateV2vCandidateIds", 0) == 0
+        and v2v_counters.get("ambiguousBandwidthPoolIds", 0) == 0
+        and v2v_counters.get("poolDirectionConsistencyViolations", 0) == 0
+        and duplicate_local_candidates == 0
+    )
 
     validation = {
         "sourceRun": source_run,
+        "phase10gStatus": "COMPLETED" if phase_completed else "INCOMPLETE",
+        "readyForPhase10H": phase_completed,
         "localCpuCyclesPerSecond": decimal_json_value(catalog.local_cpu),
         "localCpuSource": catalog.local_cpu_source,
         "v2vNominalBandwidthBitsPerSecond": decimal_json_value(catalog.v2v_bandwidth),

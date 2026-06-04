@@ -13,10 +13,10 @@ tools/mosaic-offline-exporter/ exporter offline
 tmp/mosaic-25.2/              deployment locale, log ed eseguibili temporanei
 ```
 
-La baseline integrata definitiva usata per la pipeline 10A-10F e':
+La baseline integrata definitiva usata per la pipeline 10A-10G e':
 
 ```text
-tmp/mosaic-25.2/logs/log-20260603-174645-MaGaIntegratedStudy/
+tmp/mosaic-25.2/logs/log-20260604-220216-MaGaIntegratedStudy/
 ```
 
 I file di scenario versionabili sono letti da:
@@ -38,7 +38,7 @@ export_task_stream.py
 Input:
 
 ```text
-tmp/mosaic-25.2/logs/log-20260603-174645-MaGaIntegratedStudy/apps/
+tmp/mosaic-25.2/logs/log-20260604-220216-MaGaIntegratedStudy/apps/
 ```
 
 Output:
@@ -65,7 +65,7 @@ Comando:
 
 ```powershell
 python .\tools\mosaic-offline-exporter\export_task_stream.py `
-  --workload-log-root ".\tmp\mosaic-25.2\logs\log-20260603-174645-MaGaIntegratedStudy\apps" `
+  --workload-log-root ".\tmp\mosaic-25.2\logs\log-20260604-220216-MaGaIntegratedStudy\apps" `
   --out-file ".\data\mosaic-study\task_stream.csv"
 ```
 
@@ -105,7 +105,7 @@ export_vehicle_state_stream.py
 Input:
 
 ```text
-tmp/mosaic-25.2/logs/log-20260603-174645-MaGaIntegratedStudy/output.csv
+tmp/mosaic-25.2/logs/log-20260604-220216-MaGaIntegratedStudy/output.csv
 ```
 
 Eventi letti:
@@ -149,7 +149,7 @@ Comando:
 
 ```powershell
 python .\tools\mosaic-offline-exporter\export_vehicle_state_stream.py `
-  --input-file ".\tmp\mosaic-25.2\logs\log-20260603-174645-MaGaIntegratedStudy\output.csv" `
+  --input-file ".\tmp\mosaic-25.2\logs\log-20260604-220216-MaGaIntegratedStudy\output.csv" `
   --out-file ".\data\mosaic-study\vehicle_state_stream.csv"
 ```
 
@@ -175,7 +175,7 @@ export_infrastructure_snapshot.py
 Input:
 
 ```text
-tmp/mosaic-25.2/logs/log-20260603-174645-MaGaIntegratedStudy/output.csv
+tmp/mosaic-25.2/logs/log-20260604-220216-MaGaIntegratedStudy/output.csv
 data/mosaic-scenarios/MaGaIntegratedStudy/cell/cell_config.json
 data/mosaic-scenarios/MaGaIntegratedStudy/cell/network.json
 data/mosaic-scenarios/MaGaIntegratedStudy/cell/regions.json
@@ -193,7 +193,7 @@ Comando:
 
 ```powershell
 python .\tools\mosaic-offline-exporter\export_infrastructure_snapshot.py `
-  --output-csv ".\tmp\mosaic-25.2\logs\log-20260603-174645-MaGaIntegratedStudy\output.csv" `
+  --output-csv ".\tmp\mosaic-25.2\logs\log-20260604-220216-MaGaIntegratedStudy\output.csv" `
   --cell-config ".\data\mosaic-scenarios\MaGaIntegratedStudy\cell\cell_config.json" `
   --network-config ".\data\mosaic-scenarios\MaGaIntegratedStudy\cell\network.json" `
   --regions-config ".\data\mosaic-scenarios\MaGaIntegratedStudy\cell\regions.json" `
@@ -204,12 +204,14 @@ python .\tools\mosaic-offline-exporter\export_infrastructure_snapshot.py `
 
 Lo script valida RSU e server registrati, alias runtime -> MA-GA, unicita' di gateway/pool/nodi, coverage, CPU, ritardi, policy cloud e `nominalBandwidthBitsPerSecond = min(uplink, downlink)` dei pool gateway.
 
-Valori intenzionalmente irrisolti restano preservati come warning:
+Valori diagnostici provvisori restano marcati nel catalogo come sintetici:
 
 ```text
-vehicleProfiles[*].localCpuCyclesPerSecond = null
-v2vPolicy.nominalBandwidthBitsPerSecond = null
-CONFIGURED_VALUE_TO_BE_CALIBRATED
+vehicleProfiles[car_default].localCpuCyclesPerSecond = 4000000000
+vehicleProfiles[car_default].cpuSource = DIAGNOSTIC_SYNTHETIC_VALUE
+v2vPolicy.nominalBandwidthBitsPerSecond = 10000000
+v2vPolicy.bandwidthSource = DIAGNOSTIC_SYNTHETIC_VALUE
+calibrationStatus = TO_BE_REPLACED_DURING_RESOURCE_CALIBRATION
 ```
 
 Limiti:
@@ -235,8 +237,8 @@ Questa fase usa la baseline integrata definitiva, non le run storiche Cell. Il p
 Input:
 
 ```text
-tmp/mosaic-25.2/logs/log-20260603-174645-MaGaIntegratedStudy/output.csv
-tmp/mosaic-25.2/logs/log-20260603-174645-MaGaIntegratedStudy/bandwidthMeasurements/
+tmp/mosaic-25.2/logs/log-20260604-220216-MaGaIntegratedStudy/output.csv
+tmp/mosaic-25.2/logs/log-20260604-220216-MaGaIntegratedStudy/bandwidthMeasurements/
 data/mosaic-study/infrastructure_snapshot.json
 ```
 
@@ -252,8 +254,8 @@ Comando:
 
 ```powershell
 python .\tools\mosaic-offline-exporter\export_cell_network_streams.py `
-  --output-csv ".\tmp\mosaic-25.2\logs\log-20260603-174645-MaGaIntegratedStudy\output.csv" `
-  --bandwidth-measurements-dir ".\tmp\mosaic-25.2\logs\log-20260603-174645-MaGaIntegratedStudy\bandwidthMeasurements" `
+  --output-csv ".\tmp\mosaic-25.2\logs\log-20260604-220216-MaGaIntegratedStudy\output.csv" `
+  --bandwidth-measurements-dir ".\tmp\mosaic-25.2\logs\log-20260604-220216-MaGaIntegratedStudy\bandwidthMeasurements" `
   --infrastructure-snapshot ".\data\mosaic-study\infrastructure_snapshot.json" `
   --handover-out-file ".\data\mosaic-study\cell_handover_stream.csv" `
   --bandwidth-out-file ".\data\mosaic-study\cell_bandwidth_stream.csv" `
@@ -522,13 +524,15 @@ Script:
 export_local_and_v2v_candidate_preview.py
 ```
 
-Questa fase estende la pipeline offline con preview diagnostiche dei candidati `LOCAL` e, quando lo stato radio e' ricostruibile senza supposizioni, dei candidati `VEHICLE` per V2V diretto single-hop. Non genera `SystemSnapshot`, non invoca il core Java MA-GA, non implementa il replay e non procede alla Fase 10H.
+Questa fase estende la pipeline offline con preview diagnostiche dei candidati `LOCAL` e dei candidati `VEHICLE` per V2V diretto single-hop. La baseline precedente non conteneva `ADHOC_CONFIGURATION`; per questo e' stato aggiunto il tool minimale `tools/mosaic-adhoc-radio-diagnostic/`, che abilita una radio ad-hoc senza inviare messaggi V2X. La nuova baseline contiene 12 eventi `SINGLE` e 12 eventi `OFF`, sufficienti a completare la validazione V2V.
+
+La 10G non genera `SystemSnapshot`, non invoca il core Java MA-GA, non implementa il replay e non procede alla Fase 10H.
 
 Input:
 
 ```text
 data/mosaic-study/vehicle_state_stream.csv
-tmp/mosaic-25.2/logs/log-20260603-174645-MaGaIntegratedStudy/output.csv
+tmp/mosaic-25.2/logs/log-20260604-220216-MaGaIntegratedStudy/output.csv
 data/mosaic-scenarios/MaGaIntegratedStudy/application/ma_ga_resource_catalog.json
 data/mosaic-scenarios/MaGaIntegratedStudy/sns/sns_config.json
 ```
@@ -547,7 +551,7 @@ Comando:
 ```powershell
 python .\tools\mosaic-offline-exporter\export_local_and_v2v_candidate_preview.py `
   --vehicle-state-file ".\data\mosaic-study\vehicle_state_stream.csv" `
-  --output-csv ".\tmp\mosaic-25.2\logs\log-20260603-174645-MaGaIntegratedStudy\output.csv" `
+  --output-csv ".\tmp\mosaic-25.2\logs\log-20260604-220216-MaGaIntegratedStudy\output.csv" `
   --resource-catalog ".\data\mosaic-scenarios\MaGaIntegratedStudy\application\ma_ga_resource_catalog.json" `
   --sns-config ".\data\mosaic-scenarios\MaGaIntegratedStudy\sns\sns_config.json" `
   --local-out-file ".\data\mosaic-study\local_candidate_preview.csv" `
@@ -615,7 +619,7 @@ Per ogni timestamp candidato viene usato soltanto l'ultimo evento radio noto con
 eventTime <= candidateTime
 ```
 
-Se la baseline non contiene eventi `ADHOC_CONFIGURATION`, l'exporter genera comunque i candidati `LOCAL`, crea CSV V2V vuoti con intestazione e registra nel JSON di validazione che la parte V2V e' stata saltata per mancanza di stato radio osservabile. Non assume mai che tutti i veicoli abbiano radio sempre attiva.
+Se una futura baseline non contenesse eventi `ADHOC_CONFIGURATION`, l'exporter genererebbe comunque i candidati `LOCAL`, creerebbe CSV V2V vuoti con intestazione e registrerebbe nel JSON di validazione che la parte V2V e' stata saltata per mancanza di stato radio osservabile. Non assume mai che tutti i veicoli abbiano radio sempre attiva.
 
 Controlli principali:
 
@@ -629,6 +633,24 @@ ogni pool V2V usa poolType DIRECT_V2V
 ogni pool e' condiviso per coppia non ordinata
 nessun lookup radio usa eventi futuri
 nessun candidateId e' duplicato allo stesso timestamp
+nessun bandwidthPoolId e' ambiguo allo stesso timestamp
+phase10gStatus = COMPLETED solo se LOCAL, V2V e pool sono validi
+readyForPhase10H = true solo se la pipeline 10G e' completa
+```
+
+Risultati della baseline `log-20260604-220216-MaGaIntegratedStudy`:
+
+```text
+vehicleStatesRead = 1824
+localCandidatesExported = 1824
+radioEventsRead = 24
+vehiclesWithRadioEvents = 12
+v2vGenerationStatus = COMPLETED
+v2vCandidatesExported = 13206
+v2vPoolsExported = 6603
+futureLookAheadViolations = 0
+phase10gStatus = COMPLETED
+readyForPhase10H = true
 ```
 
 Limiti:
@@ -638,6 +660,123 @@ la CPU locale e la banda V2V sono sintetiche e provvisorie
 la distanza usa Haversine su latitudine/longitudine
 SNS non espone una banda residua allocabile per coppia diretta
 la Fase 10G non produce snapshot finali
-la Fase 10H non e' implementata
+la Fase 10I non e' implementata
 il bridge live non e' implementato
+```
+
+## Fase 10H - Assegnazione diagnostica dei task alle finestre MA-GA
+
+La Fase 10H associa i task MOSAIC esportati in `task_stream.csv` a una timeline esplicita di finestre diagnostiche MA-GA. La fase non genera `SystemSnapshot`, non invoca il core Java, non modifica `TemporalWindowManager` e non procede alla Fase 10I.
+
+Script:
+
+```text
+generate_fixed_optimization_window_timeline.py
+export_window_task_assignment.py
+```
+
+Il primo script genera una timeline esplicita. Il secondo legge `task_stream.csv`, legge la timeline, verifica la baseline dichiarata nei metadata e assegna ogni task alla prima finestra valida.
+
+Input:
+
+```text
+data/mosaic-study/task_stream.csv
+data/mosaic-study/optimization_window_timeline.csv
+data/mosaic-study/diagnostics/cell/integrated_baseline_metadata.json
+```
+
+Output:
+
+```text
+data/mosaic-study/optimization_window_timeline.csv
+data/mosaic-study/window_task_assignment.csv
+data/mosaic-study/diagnostics/phase_10h_validation.json
+```
+
+Timeline diagnostica:
+
+```text
+timelinePolicy = FIXED_INTERVAL_DIAGNOSTIC
+simulationStartSeconds = 0
+simulationEndSeconds = 180
+windowIntervalSeconds = 5
+calibrationStatus = TO_BE_REPLACED_OR_DRIVEN_BY_TEMPORAL_WINDOW_MANAGER
+```
+
+La timeline fissa da 5 secondi e' una configurazione diagnostica. Non rappresenta ancora la durata adattiva delle finestre prevista dalla formalizzazione del MA-GA.
+
+Generazione timeline:
+
+```powershell
+python .\tools\mosaic-offline-exporter\generate_fixed_optimization_window_timeline.py `
+  --simulation-start-seconds 0 `
+  --simulation-end-seconds 180 `
+  --window-interval-seconds 5 `
+  --output-file ".\data\mosaic-study\optimization_window_timeline.csv"
+```
+
+Assegnazione task:
+
+```powershell
+python .\tools\mosaic-offline-exporter\export_window_task_assignment.py `
+  --task-stream-file ".\data\mosaic-study\task_stream.csv" `
+  --timeline-file ".\data\mosaic-study\optimization_window_timeline.csv" `
+  --baseline-metadata-file ".\data\mosaic-study\diagnostics\cell\integrated_baseline_metadata.json" `
+  --expected-source-run "log-20260604-220216-MaGaIntegratedStudy" `
+  --output-file ".\data\mosaic-study\window_task_assignment.csv" `
+  --validation-out-file ".\data\mosaic-study\diagnostics\phase_10h_validation.json"
+```
+
+Policy di assegnazione:
+
+```text
+taskAssignmentPolicy = PENDING_TASKS_AT_NEXT_OPTIMIZATION_WINDOW
+consumptionPolicy = REMOVE_AFTER_EXPORT_TO_WINDOW
+boundaryPolicy = INITIAL_INTERVAL_CLOSED_THEN_LEFT_OPEN_RIGHT_CLOSED
+```
+
+Regola temporale:
+
+```text
+prima finestra: [0, 5]
+finestre successive: (5, 10], (10, 15], ..., (175, 180]
+```
+
+L'assegnazione usa `activationTimeNs` e confronti su nanosecondi interi. Un task sul confine entra nella finestra con lo stesso timestamp.
+
+Risultati della baseline `log-20260604-220216-MaGaIntegratedStudy`:
+
+```text
+windowsGenerated = 36
+tasksRead = 682
+tasksAssigned = 682
+duplicateTaskIdsInInput = 0
+duplicateAssignments = 0
+tasksLost = 0
+tasksAssignedBeforeActivation = 0
+tasksAssignedToNonEarliestWindow = 0
+tasksAtExactBoundary = 117
+tasksAfterSimulationEnd = 0
+negativeActivationTimes = 0
+emptyWindows = 1
+minimumAssignmentDelayNs = 0
+maximumAssignmentDelayNs = 4000000000
+averageAssignmentDelayNs = 2127565982.4046922
+phase10hStatus = COMPLETED
+readyForPhase10I = true
+```
+
+Limiti:
+
+```text
+la Fase 10H non produce SystemSnapshot JSON
+la Fase 10H non invoca il core MA-GA
+la Fase 10H non modifica TemporalWindowManager
+la Fase 10H non simula completamento, migrazione o persistenza dei task remoti
+```
+
+Prossimo passo:
+
+```text
+Fase 10I - composizione diagnostica dei SystemSnapshot JSON
 ```

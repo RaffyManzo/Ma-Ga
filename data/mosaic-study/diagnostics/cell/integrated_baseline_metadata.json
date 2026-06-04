@@ -1,13 +1,13 @@
 {
   "availableFromPolicy": "SAFE_AFTER_TIMESTAMP",
-  "bandwidthMeasurementsDir": "tmp\\mosaic-25.2\\logs\\log-20260603-174645-MaGaIntegratedStudy\\bandwidthMeasurements",
+  "bandwidthMeasurementsDir": "tmp\\mosaic-25.2\\logs\\log-20260604-220216-MaGaIntegratedStudy\\bandwidthMeasurements",
   "bandwidthRecords": 1080,
   "bucketBoundaryPolicy": "START_TIMESTAMP_FOR_INTERVAL",
   "handoverRecords": 48,
   "infrastructureSnapshot": "data\\mosaic-study\\infrastructure_snapshot.json",
-  "outputCsv": "tmp\\mosaic-25.2\\logs\\log-20260603-174645-MaGaIntegratedStudy\\output.csv",
+  "outputCsv": "tmp\\mosaic-25.2\\logs\\log-20260604-220216-MaGaIntegratedStudy\\output.csv",
   "residualPolicy": "NOMINAL_MINUS_OBSERVED_DIAGNOSTIC",
-  "sourceRun": "log-20260603-174645-MaGaIntegratedStudy",
+  "sourceRun": "log-20260604-220216-MaGaIntegratedStudy",
   "terminalBuckets": 0,
   "unitStatus": "PROVEN_BITS_PER_SECOND",
   "warnings": [

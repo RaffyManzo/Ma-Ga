@@ -1,0 +1,225 @@
+{
+  "activationTimeCoherenceViolations": 0,
+  "averageAssignmentDelayNs": 2127565982.4046922,
+  "boundaryPolicy": "INITIAL_INTERVAL_CLOSED_THEN_LEFT_OPEN_RIGHT_CLOSED",
+  "calibrationStatus": "TO_BE_REPLACED_OR_DRIVEN_BY_TEMPORAL_WINDOW_MANAGER",
+  "consumptionPolicy": "REMOVE_AFTER_EXPORT_TO_WINDOW",
+  "duplicateAssignments": 0,
+  "duplicateTaskIdsInInput": 0,
+  "emptyWindowDetails": [
+    {
+      "tasksAssigned": 0,
+      "windowIndex": 1,
+      "windowTimeSeconds": "5"
+    }
+  ],
+  "emptyWindows": 1,
+  "errors": [],
+  "firstTaskActivationTimeNs": 7000000000,
+  "lastTaskActivationTimeNs": 180000000000,
+  "maximumAssignmentDelayNs": 4000000000,
+  "minimumAssignmentDelayNs": 0,
+  "negativeActivationTimes": 0,
+  "phase10hStatus": "COMPLETED",
+  "readyForPhase10I": true,
+  "simulationEndSeconds": 180,
+  "simulationStartSeconds": 0,
+  "sourceRun": "log-20260604-220216-MaGaIntegratedStudy",
+  "taskAssignmentPolicy": "PENDING_TASKS_AT_NEXT_OPTIMIZATION_WINDOW",
+  "tasksAfterSimulationEnd": 0,
+  "tasksAssigned": 682,
+  "tasksAssignedBeforeActivation": 0,
+  "tasksAssignedToNonEarliestWindow": 0,
+  "tasksAtExactBoundary": 117,
+  "tasksAtZero": 0,
+  "tasksLost": 0,
+  "tasksPerWindow": [
+    {
+      "tasksAssigned": 0,
+      "windowIndex": 1,
+      "windowTimeSeconds": "5"
+    },
+    {
+      "tasksAssigned": 3,
+      "windowIndex": 2,
+      "windowTimeSeconds": "10"
+    },
+    {
+      "tasksAssigned": 5,
+      "windowIndex": 3,
+      "windowTimeSeconds": "15"
+    },
+    {
+      "tasksAssigned": 8,
+      "windowIndex": 4,
+      "windowTimeSeconds": "20"
+    },
+    {
+      "tasksAssigned": 10,
+      "windowIndex": 5,
+      "windowTimeSeconds": "25"
+    },
+    {
+      "tasksAssigned": 12,
+      "windowIndex": 6,
+      "windowTimeSeconds": "30"
+    },
+    {
+      "tasksAssigned": 13,
+      "windowIndex": 7,
+      "windowTimeSeconds": "35"
+    },
+    {
+      "tasksAssigned": 19,
+      "windowIndex": 8,
+      "windowTimeSeconds": "40"
+    },
+    {
+      "tasksAssigned": 18,
+      "windowIndex": 9,
+      "windowTimeSeconds": "45"
+    },
+    {
+      "tasksAssigned": 21,
+      "windowIndex": 10,
+      "windowTimeSeconds": "50"
+    },
+    {
+      "tasksAssigned": 22,
+      "windowIndex": 11,
+      "windowTimeSeconds": "55"
+    },
+    {
+      "tasksAssigned": 23,
+      "windowIndex": 12,
+      "windowTimeSeconds": "60"
+    },
+    {
+      "tasksAssigned": 20,
+      "windowIndex": 13,
+      "windowTimeSeconds": "65"
+    },
+    {
+      "tasksAssigned": 24,
+      "windowIndex": 14,
+      "windowTimeSeconds": "70"
+    },
+    {
+      "tasksAssigned": 21,
+      "windowIndex": 15,
+      "windowTimeSeconds": "75"
+    },
+    {
+      "tasksAssigned": 22,
+      "windowIndex": 16,
+      "windowTimeSeconds": "80"
+    },
+    {
+      "tasksAssigned": 22,
+      "windowIndex": 17,
+      "windowTimeSeconds": "85"
+    },
+    {
+      "tasksAssigned": 23,
+      "windowIndex": 18,
+      "windowTimeSeconds": "90"
+    },
+    {
+      "tasksAssigned": 20,
+      "windowIndex": 19,
+      "windowTimeSeconds": "95"
+    },
+    {
+      "tasksAssigned": 24,
+      "windowIndex": 20,
+      "windowTimeSeconds": "100"
+    },
+    {
+      "tasksAssigned": 21,
+      "windowIndex": 21,
+      "windowTimeSeconds": "105"
+    },
+    {
+      "tasksAssigned": 22,
+      "windowIndex": 22,
+      "windowTimeSeconds": "110"
+    },
+    {
+      "tasksAssigned": 22,
+      "windowIndex": 23,
+      "windowTimeSeconds": "115"
+    },
+    {
+      "tasksAssigned": 23,
+      "windowIndex": 24,
+      "windowTimeSeconds": "120"
+    },
+    {
+      "tasksAssigned": 20,
+      "windowIndex": 25,
+      "windowTimeSeconds": "125"
+    },
+    {
+      "tasksAssigned": 24,
+      "windowIndex": 26,
+      "windowTimeSeconds": "130"
+    },
+    {
+      "tasksAssigned": 21,
+      "windowIndex": 27,
+      "windowTimeSeconds": "135"
+    },
+    {
+      "tasksAssigned": 22,
+      "windowIndex": 28,
+      "windowTimeSeconds": "140"
+    },
+    {
+      "tasksAssigned": 22,
+      "windowIndex": 29,
+      "windowTimeSeconds": "145"
+    },
+    {
+      "tasksAssigned": 23,
+      "windowIndex": 30,
+      "windowTimeSeconds": "150"
+    },
+    {
+      "tasksAssigned": 20,
+      "windowIndex": 31,
+      "windowTimeSeconds": "155"
+    },
+    {
+      "tasksAssigned": 24,
+      "windowIndex": 32,
+      "windowTimeSeconds": "160"
+    },
+    {
+      "tasksAssigned": 21,
+      "windowIndex": 33,
+      "windowTimeSeconds": "165"
+    },
+    {
+      "tasksAssigned": 22,
+      "windowIndex": 34,
+      "windowTimeSeconds": "170"
+    },
+    {
+      "tasksAssigned": 22,
+      "windowIndex": 35,
+      "windowTimeSeconds": "175"
+    },
+    {
+      "tasksAssigned": 23,
+      "windowIndex": 36,
+      "windowTimeSeconds": "180"
+    }
+  ],
+  "tasksRead": 682,
+  "timelinePolicy": "FIXED_INTERVAL_DIAGNOSTIC",
+  "uniqueTaskIdsAssigned": 682,
+  "uniqueTaskIdsRead": 682,
+  "warnings": [],
+  "windowIntervalSeconds": 5,
+  "windowsGenerated": 36
+}

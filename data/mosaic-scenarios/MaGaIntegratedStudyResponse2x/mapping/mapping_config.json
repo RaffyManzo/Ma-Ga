@@ -76,7 +76,8 @@
                 {
                     "applications": [
                         "org.eclipse.mosaic.app.maga.workload.MaGaWorkloadDiagnosticApp",
-                        "org.eclipse.mosaic.app.maga.celltraffic.MaGaCellTrafficDiagnosticVehicleApp"
+                        "org.eclipse.mosaic.app.maga.celltraffic.MaGaCellTrafficDiagnosticVehicleApp",
+                        "org.eclipse.mosaic.app.maga.adhocradio.MaGaAdHocRadioDiagnosticApp"
                     ],
                     "name": "Car",
                     "group": "WorkloadDiagnostic",
