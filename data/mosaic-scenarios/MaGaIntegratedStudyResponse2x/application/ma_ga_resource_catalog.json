@@ -75,8 +75,8 @@
     {
       "profileId": "car_default",
       "mappingPrototype": "Car",
-      "localCpuCyclesPerSecond": null,
-      "cpuSource": "CONFIGURED_VALUE_TO_BE_CALIBRATED"
+      "localCpuCyclesPerSecond": 4000000000,
+      "cpuSource": "DIAGNOSTIC_SYNTHETIC_VALUE"
     }
   ],
 
@@ -86,8 +86,8 @@
     "radioStateSource": "ADHOC_CONFIGURATION",
     "radiusSource": "SNS_CONFIG_OR_ADHOC_CONFIGURATION",
     "poolPolicy": "ONE_SHARED_POOL_PER_UNORDERED_PAIR",
-    "nominalBandwidthBitsPerSecond": null,
-    "bandwidthSource": "CONFIGURED_VALUE_TO_BE_CALIBRATED",
+    "nominalBandwidthBitsPerSecond": 10000000,
+    "bandwidthSource": "DIAGNOSTIC_SYNTHETIC_VALUE",
     "propagationDelayPolicy": "SNS_SINGLEHOP_MAX_DELAY",
     "conservativePropagationDelaySeconds": 0.0024,
     "lossProbabilitySource": "SNS_CONFIG"

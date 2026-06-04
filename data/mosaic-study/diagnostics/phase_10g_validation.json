@@ -1,0 +1,66 @@
+{
+  "ambiguousBandwidthPoolIds": 0,
+  "calibrationStatus": "TO_BE_REPLACED_DURING_RESOURCE_CALIBRATION",
+  "candidatePolicy": "DIRECT_SINGLEHOP_ONLY",
+  "catalogsUpdated": [
+    "data\\mosaic-scenarios\\MaGaIntegratedStudy\\application\\ma_ga_resource_catalog.json",
+    "data\\mosaic-scenarios\\MaGaIntegratedStudyRequest2x\\application\\ma_ga_resource_catalog.json",
+    "data\\mosaic-scenarios\\MaGaIntegratedStudyResponse2x\\application\\ma_ga_resource_catalog.json",
+    "data\\mosaic-scenarios\\MaGaIntegratedStudyFrequency2x\\application\\ma_ga_resource_catalog.json"
+  ],
+  "conservativePropagationDelaySeconds": 0.0024,
+  "directReachablePairs": 0,
+  "distancePolicy": "HAVERSINE_FROM_LAT_LON_DIAGNOSTIC",
+  "duplicateLocalCandidateIds": 0,
+  "duplicateV2vCandidateIds": 0,
+  "errors": [
+    "No ADHOC_CONFIGURATION events were found in the baseline output.csv; V2V candidates were not generated."
+  ],
+  "futureLookAheadViolations": 0,
+  "generatedFiles": [
+    "data\\mosaic-study\\local_candidate_preview.csv",
+    "data\\mosaic-study\\v2v_candidate_preview.csv",
+    "data\\mosaic-study\\v2v_bandwidth_pool_preview.csv",
+    "data\\mosaic-study\\diagnostics\\phase_10g_validation.json"
+  ],
+  "inactiveRadioViolations": 0,
+  "localCandidatesExported": 1824,
+  "localCpuCyclesPerSecond": 4000000000,
+  "localCpuSource": "DIAGNOSTIC_SYNTHETIC_VALUE",
+  "localDistributionByVehicle": {
+    "veh_0": 174,
+    "veh_1": 170,
+    "veh_10": 134,
+    "veh_11": 130,
+    "veh_2": 166,
+    "veh_3": 162,
+    "veh_4": 158,
+    "veh_5": 154,
+    "veh_6": 150,
+    "veh_7": 146,
+    "veh_8": 142,
+    "veh_9": 138
+  },
+  "poolDirectionConsistencyViolations": 0,
+  "poolPolicy": "ONE_SHARED_POOL_PER_UNORDERED_PAIR",
+  "radioEventsRead": 0,
+  "radioStateSource": "ADHOC_CONFIGURATION",
+  "radiusViolations": 0,
+  "selfCandidateViolations": 0,
+  "singlehopRadiusMeters": 709.4,
+  "sourceRun": "log-20260603-174645-MaGaIntegratedStudy",
+  "timestampsEvaluated": 0,
+  "unorderedPairsEvaluated": 0,
+  "v2vBandwidthSource": "DIAGNOSTIC_SYNTHETIC_VALUE",
+  "v2vCandidatesExported": 0,
+  "v2vDistributionBySourceVehicleId": {},
+  "v2vDistributionByTargetVehicleId": {},
+  "v2vGenerationStatus": "SKIPPED_MISSING_RADIO_EVENTS",
+  "v2vNominalBandwidthBitsPerSecond": 10000000,
+  "v2vPoolsExported": 0,
+  "vehicleStatesRead": 1824,
+  "vehiclesWithRadioEvents": 0,
+  "warnings": [
+    "LOCAL candidates were exported; direct V2V generation requires observed ad-hoc radio state."
+  ]
+}

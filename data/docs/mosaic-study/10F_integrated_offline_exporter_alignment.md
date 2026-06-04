@@ -1,4 +1,7 @@
-# Fase 12 - Riallineamento exporter offline alla baseline integrata
+# Fase 10A-10F - Riallineamento exporter offline alla baseline integrata
+
+> Questo documento descrive il checkpoint conclusivo raggiunto dopo la Fase 10F.
+> Non rappresenta la Fase 12 della roadmap generale.
 
 ## Obiettivo
 
@@ -26,7 +29,7 @@ tmp/mosaic-25.2/              deployment locale, log ed eseguibili temporanei
 Il documento di calibrazione Cell integrata e' stato collocato in:
 
 ```text
-data/docs/mosaic-study/11_integrated_cell_diagnostic_calibration.md
+data/docs/mosaic-study/10D_integrated_cell_diagnostic_calibration.md
 ```
 
 ## Baseline usata

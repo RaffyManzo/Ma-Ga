@@ -1,8 +1,11 @@
-# Fase 11 - Diagnostica Cell integrata con uplink e downlink
+# Fase 10D - Diagnostica Cell integrata con uplink e downlink
+
+> Questo documento descrive una sottofase della Fase 10, interna alla normalizzazione Cell della pipeline offline.
+> Non rappresenta la Fase 11 della roadmap generale.
 
 ## Obiettivo
 
-Questa fase corregge la baseline diagnostica integrata aggiungendo traffico Cell downlink controllato.
+Questa sottofase corregge il blocco relativo alla normalizzazione Cell aggiungendo traffico diagnostico Cell uplink e downlink controllato alla baseline integrata.
 
 Il flusso finale e':
 
@@ -24,7 +27,7 @@ bandwidthMeasurements downlink
 scalabilita controllata request/response/frequenza
 ```
 
-Questa diagnostica non e' lo scenario realistico finale e non modifica il core MA-GA.
+Questa diagnostica verifica le unita' `PROVEN_BITS_PER_SECOND`, non e' lo scenario realistico finale e non modifica il core MA-GA.
 
 ## Problema iniziale
 

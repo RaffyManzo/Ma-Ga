@@ -513,3 +513,131 @@ non assembla SystemSnapshot
 non invoca il core Java
 non implementa il bridge live
 ```
+
+## Fase 10G - Preview diagnostica dei candidati LOCAL e V2V diretti
+
+Script:
+
+```text
+export_local_and_v2v_candidate_preview.py
+```
+
+Questa fase estende la pipeline offline con preview diagnostiche dei candidati `LOCAL` e, quando lo stato radio e' ricostruibile senza supposizioni, dei candidati `VEHICLE` per V2V diretto single-hop. Non genera `SystemSnapshot`, non invoca il core Java MA-GA, non implementa il replay e non procede alla Fase 10H.
+
+Input:
+
+```text
+data/mosaic-study/vehicle_state_stream.csv
+tmp/mosaic-25.2/logs/log-20260603-174645-MaGaIntegratedStudy/output.csv
+data/mosaic-scenarios/MaGaIntegratedStudy/application/ma_ga_resource_catalog.json
+data/mosaic-scenarios/MaGaIntegratedStudy/sns/sns_config.json
+```
+
+Output:
+
+```text
+data/mosaic-study/local_candidate_preview.csv
+data/mosaic-study/v2v_candidate_preview.csv
+data/mosaic-study/v2v_bandwidth_pool_preview.csv
+data/mosaic-study/diagnostics/phase_10g_validation.json
+```
+
+Comando:
+
+```powershell
+python .\tools\mosaic-offline-exporter\export_local_and_v2v_candidate_preview.py `
+  --vehicle-state-file ".\data\mosaic-study\vehicle_state_stream.csv" `
+  --output-csv ".\tmp\mosaic-25.2\logs\log-20260603-174645-MaGaIntegratedStudy\output.csv" `
+  --resource-catalog ".\data\mosaic-scenarios\MaGaIntegratedStudy\application\ma_ga_resource_catalog.json" `
+  --sns-config ".\data\mosaic-scenarios\MaGaIntegratedStudy\sns\sns_config.json" `
+  --local-out-file ".\data\mosaic-study\local_candidate_preview.csv" `
+  --v2v-out-file ".\data\mosaic-study\v2v_candidate_preview.csv" `
+  --v2v-pool-out-file ".\data\mosaic-study\v2v_bandwidth_pool_preview.csv" `
+  --validation-out-file ".\data\mosaic-study\diagnostics\phase_10g_validation.json" `
+  --catalogs-updated `
+    ".\data\mosaic-scenarios\MaGaIntegratedStudy\application\ma_ga_resource_catalog.json" `
+    ".\data\mosaic-scenarios\MaGaIntegratedStudyRequest2x\application\ma_ga_resource_catalog.json" `
+    ".\data\mosaic-scenarios\MaGaIntegratedStudyResponse2x\application\ma_ga_resource_catalog.json" `
+    ".\data\mosaic-scenarios\MaGaIntegratedStudyFrequency2x\application\ma_ga_resource_catalog.json"
+```
+
+Valori diagnostici sintetici letti dal catalogo:
+
+```text
+vehicleProfiles[car_default].localCpuCyclesPerSecond = 4000000000
+vehicleProfiles[car_default].cpuSource = DIAGNOSTIC_SYNTHETIC_VALUE
+
+v2vPolicy.nominalBandwidthBitsPerSecond = 10000000
+v2vPolicy.bandwidthSource = DIAGNOSTIC_SYNTHETIC_VALUE
+```
+
+Questi valori non provengono da SUMO, SNS o misure MOSAIC. Sono una configurazione provvisoria con stato:
+
+```text
+calibrationStatus = TO_BE_REPLACED_DURING_RESOURCE_CALIBRATION
+```
+
+In futuro dovranno essere sostituiti con valori `LITERATURE_BASED` o `CALIBRATED_FROM_SCENARIO`.
+
+Policy `LOCAL`:
+
+```text
+candidateId = local_for_<sourceVehicleId>
+executionNodeId = sourceVehicleId
+type = LOCAL
+availableCpu = vehicleProfiles[car_default].localCpuCyclesPerSecond
+propagationDelaySeconds = 0
+```
+
+Policy V2V diretta:
+
+```text
+candidatePolicy = DIRECT_SINGLEHOP_ONLY
+radioStateSource = ADHOC_CONFIGURATION
+poolPolicy = ONE_SHARED_POOL_PER_UNORDERED_PAIR
+poolType = DIRECT_V2V
+distancePolicy = HAVERSINE_FROM_LAT_LON_DIAGNOSTIC
+propagationDelayPolicy = SNS_SINGLEHOP_MAX_DELAY
+```
+
+Il raggio `singlehopRadius` viene letto da `sns_config.json`. Il ritardo conservativo viene letto da `v2vPolicy.conservativePropagationDelaySeconds`. La banda V2V viene letta da `v2vPolicy.nominalBandwidthBitsPerSecond`.
+
+Lo stato radio e' interpretato solo se gli eventi `ADHOC_CONFIGURATION` sono presenti:
+
+```text
+SINGLE -> radio ad-hoc attiva
+OFF    -> radio ad-hoc disattiva
+```
+
+Per ogni timestamp candidato viene usato soltanto l'ultimo evento radio noto con:
+
+```text
+eventTime <= candidateTime
+```
+
+Se la baseline non contiene eventi `ADHOC_CONFIGURATION`, l'exporter genera comunque i candidati `LOCAL`, crea CSV V2V vuoti con intestazione e registra nel JSON di validazione che la parte V2V e' stata saltata per mancanza di stato radio osservabile. Non assume mai che tutti i veicoli abbiano radio sempre attiva.
+
+Controlli principali:
+
+```text
+ogni candidato LOCAL usa CPU letta dal catalogo
+ogni candidato LOCAL ha executionNodeId uguale al veicolo sorgente
+ogni candidato V2V, quando generato, ha source != target
+ogni candidato V2V usa CPU target letta dal profilo car_default
+ogni candidato V2V usa banda V2V letta dal catalogo
+ogni pool V2V usa poolType DIRECT_V2V
+ogni pool e' condiviso per coppia non ordinata
+nessun lookup radio usa eventi futuri
+nessun candidateId e' duplicato allo stesso timestamp
+```
+
+Limiti:
+
+```text
+la CPU locale e la banda V2V sono sintetiche e provvisorie
+la distanza usa Haversine su latitudine/longitudine
+SNS non espone una banda residua allocabile per coppia diretta
+la Fase 10G non produce snapshot finali
+la Fase 10H non e' implementata
+il bridge live non e' implementato
+```

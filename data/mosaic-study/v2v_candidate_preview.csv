@@ -1,0 +1,1 @@
+timeNs,timeSeconds,candidateId,sourceVehicleId,targetVehicleId,executionNodeId,type,availableCpu,distanceMeters,singlehopRadiusMeters,propagationDelaySeconds,bandwidthPoolId,availableBandwidth,bandwidthSource,radioStateSource,candidatePolicy,distancePolicy,propagationDelayPolicy
