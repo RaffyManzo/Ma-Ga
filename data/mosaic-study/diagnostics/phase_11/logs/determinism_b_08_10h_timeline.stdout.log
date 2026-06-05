@@ -1,9 +1,0 @@
-Phase 10H fixed optimization window timeline generation completed
-timelinePolicy=FIXED_INTERVAL_DIAGNOSTIC
-simulationStartSeconds=0
-simulationEndSeconds=180
-windowIntervalSeconds=5
-windowsGenerated=36
-firstWindowTimeSeconds=5
-lastWindowTimeSeconds=180
-outputFile=C:\Users\raffa\IdeaProjects\maga-core\data\mosaic-study\optimization_window_timeline.csv

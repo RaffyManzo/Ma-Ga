@@ -1,9 +1,0 @@
-Snapshot contract validation build
-repoRoot=C:\Users\raffa\IdeaProjects\maga-core
-classesDir=C:\Users\raffa\IdeaProjects\maga-core\tools\snapshot-contract-validation\out\classes
-classpath=C:\Users\raffa\IdeaProjects\maga-core\out\codex-lib\jackson-annotations-2.17.2.jar;C:\Users\raffa\IdeaProjects\maga-core\out\codex-lib\jackson-core-2.17.2.jar;C:\Users\raffa\IdeaProjects\maga-core\out\codex-lib\jackson-databind-2.17.2.jar
-projectSources=151
-harnessSources=1
-javac=C:\Program Files\Java\jdk-21\bin\javac.exe
-javac 21.0.2
-buildStatus=COMPLETED

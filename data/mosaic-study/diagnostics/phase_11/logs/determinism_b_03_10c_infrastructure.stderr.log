@@ -1,0 +1,15 @@
+Traceback (most recent call last):
+  File "C:\Users\raffa\IdeaProjects\maga-core\tools\mosaic-offline-exporter\export_infrastructure_snapshot.py", line 11, in <module>
+    import tempfile
+  File "C:\Python312\Lib\tempfile.py", line 43, in <module>
+    import shutil as _shutil
+  File "C:\Python312\Lib\shutil.py", line 10, in <module>
+    import fnmatch
+  File "<frozen importlib._bootstrap>", line 1360, in _find_and_load
+  File "<frozen importlib._bootstrap>", line 1331, in _find_and_load_unlocked
+  File "<frozen importlib._bootstrap>", line 935, in _load_unlocked
+  File "<frozen importlib._bootstrap_external>", line 991, in exec_module
+  File "<frozen importlib._bootstrap_external>", line 1081, in get_code
+  File "<frozen importlib._bootstrap_external>", line 1204, in path_stats
+  File "<frozen importlib._bootstrap_external>", line 147, in _path_stat
+KeyboardInterrupt
