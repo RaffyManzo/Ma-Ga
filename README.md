@@ -215,6 +215,17 @@ speed e stato radio ad-hoc locale. La validazione produce
 Il bridge live, le cache, l'assembler snapshot e MA-GA live non sono ancora
 implementati; la prossima sottofase e' la 13B.
 
+### Fase 13B - live state layer LOCAL/V2V
+
+La Fase 13B introduce lo scenario isolato `MaGaLiveStateLayerStudy` e il tool
+`tools/mosaic-live-state-layer/`. Il runtime mantiene una cache causale di
+veicoli e task diagnostici, carica infrastruttura statica di base e produce
+preview CSV per candidati `LOCAL`, candidati `VEHICLE` direct single-hop e pool
+`DIRECT_V2V`. La validazione produce
+`data/mosaic-study/diagnostics/phase_13b_live_state_layer_validation.json`.
+Cell live, EDGE/CLOUD, `SystemSnapshot`, bridge concreto e MA-GA live restano
+fuori scope; la prossima sottofase e' la 13C.
+
 ### Batch statico GA
 
 Main class:

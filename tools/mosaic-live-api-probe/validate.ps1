@@ -28,6 +28,7 @@ $LatestRun = Get-ChildItem -LiteralPath $LogsRoot -Directory |
 if ($null -eq $LatestRun) {
     throw "No MaGaLiveBridgeProbe run found under $LogsRoot"
 }
+$LatestRunRelativeDir = "tmp/mosaic-25.2/logs/$($LatestRun.Name)"
 
 $LogFiles = Get-ChildItem -LiteralPath $LatestRun.FullName -Recurse -File -Filter "*.log"
 $LogLines = foreach ($LogFile in $LogFiles) {
@@ -134,7 +135,8 @@ $Result = [ordered]@{
     phase = "13A_LIVE_API_PROBE_AND_RUNTIME_SKELETON"
     sourceRun = $LatestRun.Name
     scenarioName = "MaGaLiveBridgeProbe"
-    latestRunDir = $LatestRun.FullName
+    latestRunName = $LatestRun.Name
+    latestRunRelativeDir = $LatestRunRelativeDir
     simulationCompleted = $SimulationCompleted
     coordinatorStarts = $CoordinatorStartLines.Count
     coordinatorTicks = $CoordinatorTickLines.Count

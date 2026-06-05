@@ -1,0 +1,70 @@
+{
+  "tickIntervalMs": 1000,
+  "singlehopRadiusMeters": 709.4,
+  "localCpuCyclesPerSecond": 4000000000,
+  "localCpuSource": "DIAGNOSTIC_SYNTHETIC_VALUE",
+  "v2vNominalBandwidthBitsPerSecond": 10000000,
+  "v2vBandwidthSource": "DIAGNOSTIC_SYNTHETIC_VALUE",
+  "v2vPropagationDelaySeconds": 0.0024,
+  "taskProfiles": [
+    {
+      "profileId": "diagnostic_light",
+      "activationTimeMs": 7000,
+      "sourceVehicleId": "veh_0",
+      "inputSizeBits": 1000000,
+      "outputSizeBits": 100000,
+      "cpuCycles": 500000000,
+      "deadlineSeconds": 2.0
+    }
+  ],
+  "staticInfrastructure": {
+    "gateways": [
+      {
+        "runtimeId": "rsu_0",
+        "gatewayId": "rsu_north",
+        "gatewayType": "RSU",
+        "projectedX": 7409.000531,
+        "projectedY": 7177.264447,
+        "coverageRadiusMeters": 520.0,
+        "cellRegionId": "region_north_normal",
+        "bandwidthPoolId": "pool_rsu_north"
+      },
+      {
+        "runtimeId": "rsu_1",
+        "gatewayId": "rsu_central",
+        "gatewayType": "RSU",
+        "projectedX": 7096.244736,
+        "projectedY": 5069.365301,
+        "coverageRadiusMeters": 300.0,
+        "cellRegionId": "region_central_degraded",
+        "bandwidthPoolId": "pool_rsu_central"
+      }
+    ],
+    "edgeNodes": [
+      {
+        "executionNodeId": "edge_north",
+        "gatewayIds": [
+          "rsu_north"
+        ],
+        "availableCpuCyclesPerSecond": 12000000000,
+        "basePropagationDelaySeconds": 0.005
+      },
+      {
+        "executionNodeId": "edge_central",
+        "gatewayIds": [
+          "rsu_central"
+        ],
+        "availableCpuCyclesPerSecond": 9000000000,
+        "basePropagationDelaySeconds": 0.005
+      }
+    ],
+    "cloudNodes": [
+      {
+        "executionNodeId": "cloud_regional",
+        "mosaicServerRuntimeId": "server_0",
+        "availableCpuCyclesPerSecond": 100000000000,
+        "serverBaseDelaySeconds": 0.2
+      }
+    ]
+  }
+}
