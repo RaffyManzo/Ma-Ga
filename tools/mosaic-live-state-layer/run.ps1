@@ -1,5 +1,6 @@
 param(
-    [string]$MosaicRoot = ".\tmp\mosaic-25.2"
+    [string]$MosaicRoot = ".\tmp\mosaic-25.2",
+    [string]$ScenarioName = "MaGaLiveStateLayerStudy"
 )
 
 $ErrorActionPreference = "Stop"
@@ -12,14 +13,14 @@ $MosaicBat = Join-Path $ResolvedMosaicRoot "mosaic.bat"
 if (-not (Test-Path -LiteralPath $MosaicBat -PathType Leaf)) {
     throw "mosaic.bat not found: $MosaicBat"
 }
-if (-not (Test-Path -LiteralPath (Join-Path $ResolvedMosaicRoot "scenarios\MaGaLiveStateLayerStudy") -PathType Container)) {
-    throw "Live state layer scenario is not deployed under $ResolvedMosaicRoot"
+if (-not (Test-Path -LiteralPath (Join-Path $ResolvedMosaicRoot "scenarios\$ScenarioName") -PathType Container)) {
+    throw "Live state layer scenario $ScenarioName is not deployed under $ResolvedMosaicRoot"
 }
 
 Push-Location $ResolvedMosaicRoot
 try {
-    Write-Host "Running: .\mosaic.bat -s MaGaLiveStateLayerStudy"
-    & .\mosaic.bat -s MaGaLiveStateLayerStudy
+    Write-Host "Running: .\mosaic.bat -s $ScenarioName"
+    & .\mosaic.bat -s $ScenarioName
     if ($LASTEXITCODE -ne 0) {
         throw "MOSAIC run failed with exit code $LASTEXITCODE"
     }

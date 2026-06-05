@@ -1,5 +1,6 @@
 param(
-    [string]$MosaicRoot = ".\tmp\mosaic-25.2"
+    [string]$MosaicRoot = ".\tmp\mosaic-25.2",
+    [string]$ScenarioName = "MaGaLiveStateLayerStudy"
 )
 
 $ErrorActionPreference = "Stop"
@@ -7,9 +8,9 @@ $ErrorActionPreference = "Stop"
 $ToolRoot = $PSScriptRoot
 $RepoRoot = Split-Path -Parent (Split-Path -Parent $ToolRoot)
 $ResolvedMosaicRoot = (Resolve-Path -LiteralPath (Join-Path $RepoRoot $MosaicRoot)).Path
-$SourceScenario = Join-Path $RepoRoot "data\mosaic-scenarios\MaGaLiveStateLayerStudy"
+$SourceScenario = Join-Path $RepoRoot "data\mosaic-scenarios\$ScenarioName"
 $MosaicScenarioRoot = Join-Path $ResolvedMosaicRoot "scenarios"
-$TargetScenario = Join-Path $MosaicScenarioRoot "MaGaLiveStateLayerStudy"
+$TargetScenario = Join-Path $MosaicScenarioRoot $ScenarioName
 
 if (-not (Test-Path -LiteralPath (Join-Path $ResolvedMosaicRoot "mosaic.bat") -PathType Leaf)) {
     throw "mosaic.bat not found under MOSAIC root: $ResolvedMosaicRoot"
@@ -30,7 +31,7 @@ $ResolvedTargetParent = (Resolve-Path -LiteralPath $TargetParent).Path
 if (-not ($ResolvedTargetParent.Equals($ResolvedScenarioRoot, [System.StringComparison]::OrdinalIgnoreCase))) {
     throw "Refusing to deploy outside MOSAIC scenario root: $TargetScenario"
 }
-if ($TargetScenario -like "*MaGaIntegratedStudy*") {
+if ($ScenarioName -eq "MaGaIntegratedStudy" -or $TargetScenario -like "*MaGaIntegratedStudy*") {
     throw "Refusing to deploy over canonical scenario: $TargetScenario"
 }
 
@@ -44,7 +45,8 @@ if (Test-Path -LiteralPath $TargetScenario) {
 
 Copy-Item -LiteralPath $SourceScenario -Destination $TargetScenario -Recurse
 
-Write-Host "Deployed only live state layer scenario:"
+Write-Host "Deployed only requested live state scenario:"
+Write-Host "  ScenarioName: $ScenarioName"
 Write-Host "  Source: $SourceScenario"
 Write-Host "  Target: $TargetScenario"
 Write-Host "Copied files:"

@@ -1,5 +1,6 @@
 param(
-    [string]$MosaicRoot = ".\tmp\mosaic-25.2"
+    [string]$MosaicRoot = ".\tmp\mosaic-25.2",
+    [string]$ScenarioName = "MaGaLiveStateLayerStudy"
 )
 
 $ErrorActionPreference = "Stop"
@@ -20,6 +21,493 @@ if (-not (Test-Path -LiteralPath $LogsRoot -PathType Container)) {
 if (-not (Test-Path -LiteralPath $DiagnosticsDir -PathType Container)) {
     New-Item -ItemType Directory -Path $DiagnosticsDir | Out-Null
 }
+
+if ($ScenarioName -eq "MaGaLiveInfrastructureSnapshotStudy") {
+    $DiagnosticsFile13C = Join-Path $DiagnosticsDir "phase_13c_live_infrastructure_snapshot_validation.json"
+    $ScenarioConfig13C = Join-Path $RepoRoot "data\mosaic-scenarios\$ScenarioName\application\ma_ga_live_state_config.json"
+    if (-not (Test-Path -LiteralPath $ScenarioConfig13C -PathType Leaf)) {
+        throw "Live infrastructure config not found: $ScenarioConfig13C"
+    }
+    $Config13C = Get-Content -LiteralPath $ScenarioConfig13C -Raw | ConvertFrom-Json
+    $LatestRun13C = Get-ChildItem -LiteralPath $LogsRoot -Directory |
+        Where-Object { $_.Name -like "*-$ScenarioName" } |
+        Sort-Object LastWriteTime -Descending |
+        Select-Object -First 1
+    if ($null -eq $LatestRun13C) {
+        throw "No $ScenarioName run found under $LogsRoot"
+    }
+
+    $SourceRunRelativeDir13C = "tmp/mosaic-25.2/logs/$($LatestRun13C.Name)"
+    $PreviewDir13C = Join-Path $LatestRun13C.FullName "live-state-layer"
+    $InfrastructureDir = Join-Path $LatestRun13C.FullName "live-infrastructure-snapshot"
+    $SnapshotDir = Join-Path $InfrastructureDir "snapshots"
+    foreach ($RequiredDir in @($PreviewDir13C, $InfrastructureDir, $SnapshotDir)) {
+        if (-not (Test-Path -LiteralPath $RequiredDir -PathType Container)) {
+            throw "Required 13C output directory missing: $RequiredDir"
+        }
+    }
+
+    function Import-Phase13CCsv {
+        param(
+            [string]$Directory,
+            [string]$FileName
+        )
+        $Path = Join-Path $Directory $FileName
+        if (-not (Test-Path -LiteralPath $Path -PathType Leaf)) {
+            throw "Required preview CSV missing: $Path"
+        }
+        return ,@(Import-Csv -LiteralPath $Path)
+    }
+
+    function Count-Phase13CDuplicates {
+        param(
+            [array]$Rows,
+            [scriptblock]$KeySelector
+        )
+        $Groups = @{}
+        foreach ($Row in $Rows) {
+            $Key = & $KeySelector $Row
+            if (-not $Groups.ContainsKey($Key)) {
+                $Groups[$Key] = 0
+            }
+            $Groups[$Key]++
+        }
+        $Duplicates = 0
+        foreach ($Count in $Groups.Values) {
+            if ($Count -gt 1) {
+                $Duplicates += ($Count - 1)
+            }
+        }
+        return $Duplicates
+    }
+
+    function Get-Phase13CAbsoluteDiagnostics {
+        $Files = @()
+        $Count = 0
+        foreach ($JsonFile in Get-ChildItem -LiteralPath $DiagnosticsDir -File -Filter "*.json") {
+            $Text = Get-Content -LiteralPath $JsonFile.FullName -Raw
+            $Matches = [regex]::Matches($Text, "[A-Za-z]:\\\\|[A-Za-z]:/|latestRunDir")
+            if ($Matches.Count -gt 0) {
+                $Count += $Matches.Count
+                $Files += $JsonFile.Name
+            }
+        }
+        return [pscustomobject]@{
+            Count = $Count
+            Files = @($Files | Select-Object -Unique)
+        }
+    }
+
+    function Get-Phase13CFieldValues {
+        param(
+            [string[]]$Lines,
+            [string]$Field
+        )
+        $Values = @()
+        foreach ($Line in $Lines) {
+            if ($Line -match ("[|]" + [regex]::Escape($Field) + "=([^| )]+)")) {
+                $Values += $Matches[1]
+            }
+        }
+        return $Values
+    }
+
+    function Run-Phase13CJavaSnapshotValidation {
+        param(
+            [string]$SnapshotsPath
+        )
+        $HarnessSource = Join-Path $ToolRoot "harness\LiveSnapshotValidationHarness.java"
+        $HarnessClasses = Join-Path $ToolRoot "out\snapshot-harness-classes"
+        if (-not (Test-Path -LiteralPath $HarnessSource -PathType Leaf)) {
+            throw "Snapshot validation harness missing: $HarnessSource"
+        }
+        if (Test-Path -LiteralPath $HarnessClasses) {
+            Remove-Item -LiteralPath $HarnessClasses -Recurse -Force
+        }
+        New-Item -ItemType Directory -Path $HarnessClasses | Out-Null
+
+        $JacksonJars = @(
+            (Join-Path $RepoRoot "out\codex-lib\jackson-annotations-2.17.2.jar"),
+            (Join-Path $RepoRoot "out\codex-lib\jackson-core-2.17.2.jar"),
+            (Join-Path $RepoRoot "out\codex-lib\jackson-databind-2.17.2.jar")
+        )
+        if (-not (Test-Path -LiteralPath $JacksonJars[0] -PathType Leaf)) {
+            $JacksonJars = @(
+                (Join-Path $ResolvedMosaicRoot "lib\third-party\jackson-annotations-2.16.1.jar"),
+                (Join-Path $ResolvedMosaicRoot "lib\third-party\jackson-core-2.16.1.jar"),
+                (Join-Path $ResolvedMosaicRoot "lib\third-party\jackson-databind-2.16.1.jar")
+            )
+        }
+        foreach ($JarPath in $JacksonJars) {
+            if (-not (Test-Path -LiteralPath $JarPath -PathType Leaf)) {
+                throw "Jackson JAR not found for snapshot validation: $JarPath"
+            }
+        }
+
+        $SourcePath = Join-Path $RepoRoot "src"
+        $CoreSourceDirs = @(
+            (Join-Path $SourcePath "io\snapshot"),
+            (Join-Path $SourcePath "io\snapshot\dto"),
+            (Join-Path $SourcePath "model\snapshot"),
+            (Join-Path $SourcePath "model\node"),
+            (Join-Path $SourcePath "model\bandwidth"),
+            (Join-Path $SourcePath "validation\snapshot")
+        )
+        $CoreSources = foreach ($Dir in $CoreSourceDirs) {
+            Get-ChildItem -LiteralPath $Dir -File -Filter "*.java"
+        }
+        $CompileClasspath = ($JacksonJars) -join [IO.Path]::PathSeparator
+        $CompileSources = @($HarnessSource) + @($CoreSources | ForEach-Object { $_.FullName })
+        & javac -cp $CompileClasspath -d $HarnessClasses $CompileSources
+        if ($LASTEXITCODE -ne 0) {
+            return [pscustomobject]@{
+                LoaderFailures = 1
+                ValidatorFailures = 1
+                SnapshotsLoaded = 0
+                Output = "javac failed"
+            }
+        }
+
+        $RunClasspath = @($HarnessClasses) + $JacksonJars
+        $RunClasspathText = ($RunClasspath) -join [IO.Path]::PathSeparator
+        $HarnessOutput = & java -cp $RunClasspathText LiveSnapshotValidationHarness $SnapshotsPath 2>&1
+        if ($LASTEXITCODE -ne 0) {
+            return [pscustomobject]@{
+                LoaderFailures = 1
+                ValidatorFailures = 1
+                SnapshotsLoaded = 0
+                Output = ($HarnessOutput | Out-String).Trim()
+            }
+        }
+        $SnapshotsLoaded = 0
+        foreach ($Line in $HarnessOutput) {
+            if ($Line -match "snapshotsLoaded=(\d+)") {
+                $SnapshotsLoaded = [int]$Matches[1]
+            }
+        }
+        return [pscustomobject]@{
+            LoaderFailures = 0
+            ValidatorFailures = 0
+            SnapshotsLoaded = $SnapshotsLoaded
+            Output = ($HarnessOutput | Out-String).Trim()
+        }
+    }
+
+    $VehicleRows13C = Import-Phase13CCsv -Directory $PreviewDir13C -FileName "live_vehicle_state_preview.csv"
+    $TaskRows13C = Import-Phase13CCsv -Directory $PreviewDir13C -FileName "live_task_preview.csv"
+    $LocalRows13C = Import-Phase13CCsv -Directory $PreviewDir13C -FileName "live_local_candidate_preview.csv"
+    $V2vRows13C = Import-Phase13CCsv -Directory $PreviewDir13C -FileName "live_v2v_candidate_preview.csv"
+    $V2vPoolRows13C = Import-Phase13CCsv -Directory $PreviewDir13C -FileName "live_v2v_bandwidth_pool_preview.csv"
+    $CellEventRows = Import-Phase13CCsv -Directory $InfrastructureDir -FileName "live_cell_traffic_event_preview.csv"
+    $CellBucketRows = Import-Phase13CCsv -Directory $InfrastructureDir -FileName "live_cell_bandwidth_bucket_preview.csv"
+    $AccessLinkRows = Import-Phase13CCsv -Directory $InfrastructureDir -FileName "live_access_link_preview.csv"
+    $GatewayPoolRows = Import-Phase13CCsv -Directory $InfrastructureDir -FileName "live_gateway_bandwidth_pool_preview.csv"
+    $RemoteCandidateRows = Import-Phase13CCsv -Directory $InfrastructureDir -FileName "live_remote_candidate_preview.csv"
+    $ManifestRows = Import-Phase13CCsv -Directory $InfrastructureDir -FileName "live_snapshot_manifest.csv"
+    $SnapshotFiles = @(Get-ChildItem -LiteralPath $SnapshotDir -File -Filter "*.json")
+
+    $LogFiles13C = Get-ChildItem -LiteralPath $LatestRun13C.FullName -Recurse -File -Filter "*.log"
+    $LogLines13C = foreach ($LogFile in $LogFiles13C) {
+        Get-Content -LiteralPath $LogFile.FullName
+    }
+    $MarkerLines13C = @($LogLines13C | Where-Object { $_ -match "LIVE_STATE_|LIVE_CELL_DIAGNOSTIC_" })
+    $CoordinatorStartLines13C = @($MarkerLines13C | Where-Object { $_ -match "LIVE_STATE_COORDINATOR_START" })
+    $CoordinatorTickLines13C = @($MarkerLines13C | Where-Object { $_ -match "LIVE_STATE_COORDINATOR_TICK" })
+    $CoordinatorStopLines13C = @($MarkerLines13C | Where-Object { $_ -match "LIVE_STATE_COORDINATOR_STOP" })
+    $CoordinatorTickTimes13C = @(Get-Phase13CFieldValues -Lines $CoordinatorTickLines13C -Field "simulationTime" | ForEach-Object { [Int64]$_ })
+    $TickSet13C = @{}
+    foreach ($Time in $CoordinatorTickTimes13C) {
+        $TickSet13C[[string]$Time] = $true
+    }
+
+    $MosaicLog13C = Join-Path $LatestRun13C.FullName "MOSAIC.log"
+    $MosaicLogText13C = if (Test-Path -LiteralPath $MosaicLog13C -PathType Leaf) {
+        Get-Content -LiteralPath $MosaicLog13C -Raw
+    } else {
+        ""
+    }
+    $SimulationCompleted13C = $MosaicLogText13C -match "Simulation ended after" -and $MosaicLogText13C -match "Simulation finished"
+
+    $FutureVehicleStateViolations = 0
+    foreach ($Row in $VehicleRows13C) {
+        if ([Int64]$Row.lastUpdateTimeNs -gt [Int64]$Row.timeNs) {
+            $FutureVehicleStateViolations++
+        }
+    }
+    $FutureTaskActivationViolations = 0
+    foreach ($Row in $TaskRows13C) {
+        if ([Int64]$Row.activationTimeNs -gt [Int64]$Row.timeNs) {
+            $FutureTaskActivationViolations++
+        }
+    }
+    $FutureCellEventViolations = 0
+    foreach ($Row in $CellEventRows) {
+        if ([Int64]$Row.bucketStartNs -gt [Int64]$Row.timeNs) {
+            $FutureCellEventViolations++
+        }
+    }
+    $FutureSafeBucketViolations = 0
+    foreach ($Row in $CellBucketRows) {
+        if ([Int64]$Row.availableFromNs -gt [Int64]$Row.timeNs) {
+            $FutureSafeBucketViolations++
+        }
+    }
+    $FutureAccessLinkViolations = 0
+    foreach ($Row in $AccessLinkRows) {
+        if (-not $TickSet13C.ContainsKey([string]$Row.timeNs)) {
+            $FutureAccessLinkViolations++
+        }
+    }
+    $FutureCandidateViolations = 0
+    foreach ($Row in @($LocalRows13C + $V2vRows13C + $RemoteCandidateRows)) {
+        if (-not $TickSet13C.ContainsKey([string]$Row.timeNs)) {
+            $FutureCandidateViolations++
+        }
+    }
+    $FuturePoolViolations = 0
+    foreach ($Row in $V2vPoolRows13C) {
+        if (-not $TickSet13C.ContainsKey([string]$Row.timeNs)) {
+            $FuturePoolViolations++
+        }
+    }
+    foreach ($Row in $GatewayPoolRows) {
+        if ((-not $TickSet13C.ContainsKey([string]$Row.timeNs)) -or ([Int64]$Row.availableFromNs -gt [Int64]$Row.timeNs)) {
+            $FuturePoolViolations++
+        }
+    }
+
+    $MultipleActiveGatewayViolations = 0
+    $ActiveLinkGroups = @{}
+    foreach ($Row in $AccessLinkRows) {
+        if ($Row.active -eq "true") {
+            $Key = "$($Row.timeNs)|$($Row.vehicleId)"
+            if (-not $ActiveLinkGroups.ContainsKey($Key)) {
+                $ActiveLinkGroups[$Key] = 0
+            }
+            $ActiveLinkGroups[$Key]++
+        }
+    }
+    foreach ($Count in $ActiveLinkGroups.Values) {
+        if ($Count -gt 1) {
+            $MultipleActiveGatewayViolations += ($Count - 1)
+        }
+    }
+    $ActiveUnavailableLinkViolations = @($AccessLinkRows | Where-Object { $_.active -eq "true" -and $_.available -ne "true" }).Count
+
+    $GatewayPoolsByTime = @{}
+    foreach ($Row in $GatewayPoolRows) {
+        $GatewayPoolsByTime["$($Row.timeNs)|$($Row.poolId)"] = $true
+    }
+    $UnresolvedGatewayPoolViolations = 0
+    foreach ($Row in $RemoteCandidateRows) {
+        if (-not $GatewayPoolsByTime.ContainsKey("$($Row.timeNs)|$($Row.bandwidthPoolId)")) {
+            $UnresolvedGatewayPoolViolations++
+        }
+    }
+
+    $DuplicateCandidateIds = 0
+    foreach ($Group in @($LocalRows13C + $V2vRows13C + $RemoteCandidateRows) | Group-Object { "$($_.timeNs)|$($_.candidateId)" }) {
+        if ($Group.Count -gt 1) {
+            $DuplicateCandidateIds += ($Group.Count - 1)
+        }
+    }
+    $DuplicatePoolIds = 0
+    foreach ($Group in @($V2vPoolRows13C + $GatewayPoolRows) | Group-Object { "$($_.timeNs)|$($_.poolId)" }) {
+        if ($Group.Count -gt 1) {
+            $DuplicatePoolIds += ($Group.Count - 1)
+        }
+    }
+    $CloudPlaceholderViolations = @($RemoteCandidateRows | Where-Object {
+        $_.type -eq "CLOUD" -and (
+            -not [string]::IsNullOrWhiteSpace($_.nodeX) -or
+            -not [string]::IsNullOrWhiteSpace($_.nodeY) -or
+            -not [string]::IsNullOrWhiteSpace($_.coverageRadiusMeters)
+        )
+    }).Count
+
+    $OrphanReferenceViolations = 0
+    foreach ($SnapshotFile in $SnapshotFiles) {
+        $Snapshot = Get-Content -LiteralPath $SnapshotFile.FullName -Raw | ConvertFrom-Json
+        $VehicleIds = @{}
+        foreach ($Vehicle in @($Snapshot.vehicles)) { $VehicleIds[$Vehicle.vehicleId] = $true }
+        $GatewayIds = @{}
+        foreach ($Gateway in @($Snapshot.accessGateways)) { $GatewayIds[$Gateway.gatewayId] = $true }
+        $PoolIds = @{}
+        foreach ($Pool in @($Snapshot.bandwidthPools)) { $PoolIds[$Pool.poolId] = $true }
+        foreach ($Task in @($Snapshot.tasks)) {
+            if (-not $VehicleIds.ContainsKey($Task.sourceVehicleId)) { $OrphanReferenceViolations++ }
+        }
+        foreach ($Candidate in @($Snapshot.candidateNodes)) {
+            if (-not $VehicleIds.ContainsKey($Candidate.sourceVehicleId)) { $OrphanReferenceViolations++ }
+            if (($Candidate.type -eq "VEHICLE") -and (-not $VehicleIds.ContainsKey($Candidate.executionNodeId))) { $OrphanReferenceViolations++ }
+            if ($Candidate.PSObject.Properties.Name -contains "bandwidthPoolId") {
+                $PoolRef = [string]$Candidate.bandwidthPoolId
+                if (-not [string]::IsNullOrWhiteSpace($PoolRef) -and -not $PoolIds.ContainsKey($PoolRef)) { $OrphanReferenceViolations++ }
+            }
+        }
+        foreach ($Gateway in @($Snapshot.accessGateways)) {
+            if (-not $PoolIds.ContainsKey($Gateway.bandwidthPoolId)) { $OrphanReferenceViolations++ }
+        }
+        foreach ($Link in @($Snapshot.accessLinks)) {
+            if (-not $VehicleIds.ContainsKey($Link.vehicleId)) { $OrphanReferenceViolations++ }
+            if (-not $GatewayIds.ContainsKey($Link.gatewayId)) { $OrphanReferenceViolations++ }
+        }
+    }
+
+    $DistinctGatewayPoolTickCount = @($GatewayPoolRows | Select-Object -ExpandProperty timeNs -Unique).Count
+    $TicksWithoutSafeCellBucket = [Math]::Max(0, $CoordinatorTickLines13C.Count - $DistinctGatewayPoolTickCount)
+    $ActiveAccessLinkRows = @($AccessLinkRows | Where-Object { $_.active -eq "true" }).Count
+    $StatesWithoutActiveGateway = [Math]::Max(0, $VehicleRows13C.Count - $ActiveLinkGroups.Count)
+    $EdgeCandidateRows = @($RemoteCandidateRows | Where-Object { $_.type -eq "EDGE" }).Count
+    $CloudCandidateRows = @($RemoteCandidateRows | Where-Object { $_.type -eq "CLOUD" }).Count
+
+    $JavaValidation = Run-Phase13CJavaSnapshotValidation -SnapshotsPath $SnapshotDir
+
+    $CoreStatus13C = git -c safe.directory="$SafeRepoRoot" status --short src
+    if ($LASTEXITCODE -ne 0) {
+        throw "git status for src failed with exit code $LASTEXITCODE"
+    }
+    $CanonicalStatus13C = git -c safe.directory="$SafeRepoRoot" status --short data/mosaic-scenarios/MaGaIntegratedStudy
+    if ($LASTEXITCODE -ne 0) {
+        throw "git status for canonical scenario failed with exit code $LASTEXITCODE"
+    }
+    $CoreModified13C = -not [string]::IsNullOrWhiteSpace(($CoreStatus13C | Out-String).Trim())
+    $CanonicalScenarioModified13C = -not [string]::IsNullOrWhiteSpace(($CanonicalStatus13C | Out-String).Trim())
+
+    $Warnings13C = @(
+        "WARNING_CELL_BANDWIDTH_IS_DIAGNOSTIC_RUNTIME_ACCOUNTING_NOT_FEDERATE_MEASUREMENT",
+        "WARNING_CELL_REGIONAL_HANDOVER_NOT_AVAILABLE_DIRECTLY_LIVE",
+        "WARNING_DIAGNOSTIC_CPU_AND_V2V_BANDWIDTH_REQUIRE_FUTURE_CALIBRATION"
+    )
+    $Errors13C = @()
+    function Require-Phase13CCondition {
+        param(
+            [bool]$Condition,
+            [string]$Message
+        )
+        if (-not $Condition) {
+            $script:Errors13C += $Message
+        }
+    }
+
+    Require-Phase13CCondition $SimulationCompleted13C "simulationCompleted must be true"
+    Require-Phase13CCondition ($CellBucketRows.Count -gt 0) "at least one safe Cell bucket must be used"
+    Require-Phase13CCondition ($ActiveAccessLinkRows -gt 0) "at least one active access link must be observed"
+    Require-Phase13CCondition ($EdgeCandidateRows -gt 0) "at least one EDGE candidate must be observed"
+    Require-Phase13CCondition ($CloudCandidateRows -gt 0) "at least one CLOUD candidate must be observed"
+    Require-Phase13CCondition ($SnapshotFiles.Count -gt 0) "at least one live SystemSnapshot JSON must be generated"
+    Require-Phase13CCondition ($JavaValidation.LoaderFailures -eq 0) "javaLoaderValidationFailures must be 0"
+    Require-Phase13CCondition ($JavaValidation.ValidatorFailures -eq 0) "javaValidatorFailures must be 0"
+    Require-Phase13CCondition ($FutureVehicleStateViolations -eq 0) "futureVehicleStateViolations must be 0"
+    Require-Phase13CCondition ($FutureTaskActivationViolations -eq 0) "futureTaskActivationViolations must be 0"
+    Require-Phase13CCondition ($FutureCellEventViolations -eq 0) "futureCellEventViolations must be 0"
+    Require-Phase13CCondition ($FutureSafeBucketViolations -eq 0) "futureSafeBucketViolations must be 0"
+    Require-Phase13CCondition ($FutureAccessLinkViolations -eq 0) "futureAccessLinkViolations must be 0"
+    Require-Phase13CCondition ($FutureCandidateViolations -eq 0) "futureCandidateViolations must be 0"
+    Require-Phase13CCondition ($FuturePoolViolations -eq 0) "futurePoolViolations must be 0"
+    Require-Phase13CCondition ($MultipleActiveGatewayViolations -eq 0) "multipleActiveGatewayViolations must be 0"
+    Require-Phase13CCondition ($ActiveUnavailableLinkViolations -eq 0) "activeUnavailableLinkViolations must be 0"
+    Require-Phase13CCondition ($UnresolvedGatewayPoolViolations -eq 0) "unresolvedGatewayPoolViolations must be 0"
+    Require-Phase13CCondition ($OrphanReferenceViolations -eq 0) "orphanReferenceViolations must be 0"
+    Require-Phase13CCondition ($DuplicateCandidateIds -eq 0) "duplicateCandidateIds must be 0"
+    Require-Phase13CCondition ($DuplicatePoolIds -eq 0) "duplicatePoolIds must be 0"
+    Require-Phase13CCondition ($CloudPlaceholderViolations -eq 0) "cloudPlaceholderViolations must be 0"
+    Require-Phase13CCondition (-not $CoreModified13C) "coreModified must be false"
+    Require-Phase13CCondition (-not $CanonicalScenarioModified13C) "canonicalScenarioModified must be false"
+
+    $Completed13C = $Errors13C.Count -eq 0
+    $Result13C = [ordered]@{
+        phase = "13C_LIVE_INFRASTRUCTURE_AND_SNAPSHOT_ASSEMBLY"
+        sourceRun = $LatestRun13C.Name
+        sourceRunName = $LatestRun13C.Name
+        sourceRunRelativeDir = $SourceRunRelativeDir13C
+        scenarioName = $ScenarioName
+        simulationCompleted = $SimulationCompleted13C
+        coordinatorTicks = $CoordinatorTickLines13C.Count
+        vehiclesObserved = @($VehicleRows13C | Select-Object -ExpandProperty vehicleId -Unique)
+        tasksActivated = $TaskRows13C.Count
+        localCandidateRows = $LocalRows13C.Count
+        v2vCandidateRows = $V2vRows13C.Count
+        v2vPoolRows = $V2vPoolRows13C.Count
+        cellTrafficEvents = $CellEventRows.Count
+        cellBandwidthBuckets = $CellBucketRows.Count
+        safeCellBucketsUsed = $GatewayPoolRows.Count
+        ticksWithoutSafeCellBucket = $TicksWithoutSafeCellBucket
+        accessLinkRows = $AccessLinkRows.Count
+        activeAccessLinkRows = $ActiveAccessLinkRows
+        statesWithoutActiveGateway = $StatesWithoutActiveGateway
+        gatewayPoolRows = $GatewayPoolRows.Count
+        edgeCandidateRows = $EdgeCandidateRows
+        cloudCandidateRows = $CloudCandidateRows
+        snapshotsGenerated = $SnapshotFiles.Count
+        snapshotManifestRows = $ManifestRows.Count
+        snapshotJavaLoaderValidated = $JavaValidation.SnapshotsLoaded
+        snapshotJavaValidatorValidated = $JavaValidation.SnapshotsLoaded
+        futureVehicleStateViolations = $FutureVehicleStateViolations
+        futureTaskActivationViolations = $FutureTaskActivationViolations
+        futureCellEventViolations = $FutureCellEventViolations
+        futureSafeBucketViolations = $FutureSafeBucketViolations
+        futureAccessLinkViolations = $FutureAccessLinkViolations
+        futureCandidateViolations = $FutureCandidateViolations
+        futurePoolViolations = $FuturePoolViolations
+        multipleActiveGatewayViolations = $MultipleActiveGatewayViolations
+        activeUnavailableLinkViolations = $ActiveUnavailableLinkViolations
+        unresolvedGatewayPoolViolations = $UnresolvedGatewayPoolViolations
+        orphanReferenceViolations = $OrphanReferenceViolations
+        duplicateCandidateIds = $DuplicateCandidateIds
+        duplicatePoolIds = $DuplicatePoolIds
+        cloudPlaceholderViolations = $CloudPlaceholderViolations
+        javaLoaderValidationFailures = $JavaValidation.LoaderFailures
+        javaValidatorFailures = $JavaValidation.ValidatorFailures
+        absolutePathsInVersionedDiagnostics = 0
+        absolutePathFiles = @()
+        cellBandwidthSource = "DIAGNOSTIC_RUNTIME_ACCOUNTING_FROM_CONTROLLED_CELL_MESSAGES"
+        accessLinkPolicy = "NEAREST_AVAILABLE_GATEWAY_BY_PROJECTED_DISTANCE"
+        remoteCandidatePolicy = "EDGE_AND_CLOUD_REQUIRE_ACTIVE_GATEWAY_AND_SAFE_POOL"
+        snapshotAssemblyPolicy = "CAUSAL_LATEST_AVAILABLE_DATA_AT_OR_BEFORE_TICK"
+        warnings = $Warnings13C
+        errors = $Errors13C
+        phase13cStatus = if ($Completed13C) { "COMPLETED" } else { "BLOCKED" }
+        readyForPhase13D = $Completed13C
+    }
+
+    Set-Content -LiteralPath $DiagnosticsFile13C -Value ($Result13C | ConvertTo-Json -Depth 8) -Encoding UTF8
+    $AbsoluteDiagnostics = Get-Phase13CAbsoluteDiagnostics
+    $Result13C.absolutePathsInVersionedDiagnostics = $AbsoluteDiagnostics.Count
+    $Result13C.absolutePathFiles = $AbsoluteDiagnostics.Files
+    if ($AbsoluteDiagnostics.Count -ne 0) {
+        $Errors13C += "absolutePathsInVersionedDiagnostics must be 0"
+    }
+    $Completed13C = $Errors13C.Count -eq 0
+    $Result13C.errors = $Errors13C
+    $Result13C.phase13cStatus = if ($Completed13C) { "COMPLETED" } else { "BLOCKED" }
+    $Result13C.readyForPhase13D = $Completed13C
+    Set-Content -LiteralPath $DiagnosticsFile13C -Value ($Result13C | ConvertTo-Json -Depth 8) -Encoding UTF8
+
+    Write-Host "Validation result: $($Result13C.phase13cStatus)"
+    Write-Host "Diagnostics: $DiagnosticsFile13C"
+    Write-Host "Run: $($LatestRun13C.Name)"
+    Write-Host "coordinatorTicks=$($Result13C.coordinatorTicks)"
+    Write-Host "cellTrafficEvents=$($Result13C.cellTrafficEvents)"
+    Write-Host "cellBandwidthBuckets=$($Result13C.cellBandwidthBuckets)"
+    Write-Host "safeCellBucketsUsed=$($Result13C.safeCellBucketsUsed)"
+    Write-Host "activeAccessLinkRows=$($Result13C.activeAccessLinkRows)"
+    Write-Host "edgeCandidateRows=$($Result13C.edgeCandidateRows)"
+    Write-Host "cloudCandidateRows=$($Result13C.cloudCandidateRows)"
+    Write-Host "snapshotsGenerated=$($Result13C.snapshotsGenerated)"
+    Write-Host "javaLoaderValidationFailures=$($Result13C.javaLoaderValidationFailures)"
+    Write-Host "javaValidatorFailures=$($Result13C.javaValidatorFailures)"
+    Write-Host "absolutePathsInVersionedDiagnostics=$($Result13C.absolutePathsInVersionedDiagnostics)"
+    if (-not $Completed13C) {
+        Write-Host "Errors:"
+        foreach ($ErrorItem in $Errors13C) {
+            Write-Host "  $ErrorItem"
+        }
+        throw "Phase 13C validation failed"
+    }
+    return
+}
+
 if (-not (Test-Path -LiteralPath $ScenarioConfig -PathType Leaf)) {
     throw "Live state config not found: $ScenarioConfig"
 }

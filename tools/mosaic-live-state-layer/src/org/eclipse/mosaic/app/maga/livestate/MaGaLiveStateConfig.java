@@ -23,6 +23,7 @@ final class MaGaLiveStateConfig {
     long v2vNominalBandwidthBitsPerSecond;
     String v2vBandwidthSource;
     double v2vPropagationDelaySeconds;
+    CellDiagnosticAccounting cellDiagnosticAccounting;
     List<TaskProfile> taskProfiles;
     StaticInfrastructure staticInfrastructure;
 
@@ -86,6 +87,17 @@ final class MaGaLiveStateConfig {
         return staticInfrastructure;
     }
 
+    boolean hasCellDiagnosticAccounting() {
+        return cellDiagnosticAccounting != null;
+    }
+
+    CellDiagnosticAccounting getCellDiagnosticAccounting() {
+        if (cellDiagnosticAccounting == null) {
+            throw new IllegalStateException("cellDiagnosticAccounting is not configured");
+        }
+        return cellDiagnosticAccounting;
+    }
+
     private void validate(File configFile) {
         String source = configFile.getAbsolutePath();
         requirePositive(tickIntervalMs, "tickIntervalMs", source);
@@ -95,6 +107,9 @@ final class MaGaLiveStateConfig {
         requirePositive(v2vNominalBandwidthBitsPerSecond, "v2vNominalBandwidthBitsPerSecond", source);
         requireText(v2vBandwidthSource, "v2vBandwidthSource", source);
         requireFiniteNonNegative(v2vPropagationDelaySeconds, "v2vPropagationDelaySeconds", source);
+        if (cellDiagnosticAccounting != null) {
+            cellDiagnosticAccounting.validate(source);
+        }
         if (taskProfiles == null || taskProfiles.isEmpty()) {
             throw new IllegalArgumentException(source + ": taskProfiles must not be empty");
         }
@@ -196,6 +211,97 @@ final class MaGaLiveStateConfig {
             for (int i = 0; i < cloudNodes.size(); i++) {
                 cloudNodes.get(i).validate(source, i);
             }
+        }
+    }
+
+    static final class CellDiagnosticAccounting {
+        long bucketDurationMs;
+        String availableFromPolicy;
+        String bandwidthSource;
+        String destinationId;
+        long requestPayloadBytes;
+        long responsePayloadBytes;
+        long intervalMs;
+        long initialDelayMs;
+        String maxUplinkBitrate;
+        String maxDownlinkBitrate;
+        List<GatewayPool> gatewayPools;
+
+        long getBucketDurationNs() {
+            return bucketDurationMs * NANOSECONDS_PER_MILLISECOND;
+        }
+
+        long getIntervalNs() {
+            return intervalMs * NANOSECONDS_PER_MILLISECOND;
+        }
+
+        long getInitialDelayNs() {
+            return initialDelayMs * NANOSECONDS_PER_MILLISECOND;
+        }
+
+        long getMaxUplinkBitrateBitsPerSecond() {
+            return parseBitrateBitsPerSecond(maxUplinkBitrate);
+        }
+
+        long getMaxDownlinkBitrateBitsPerSecond() {
+            return parseBitrateBitsPerSecond(maxDownlinkBitrate);
+        }
+
+        void validate(String source) {
+            requirePositive(bucketDurationMs, "cellDiagnosticAccounting.bucketDurationMs", source);
+            requireText(availableFromPolicy, "cellDiagnosticAccounting.availableFromPolicy", source);
+            if (!"SAFE_AFTER_TIMESTAMP".equals(availableFromPolicy)) {
+                throw new IllegalArgumentException(source + ": cellDiagnosticAccounting.availableFromPolicy must be SAFE_AFTER_TIMESTAMP");
+            }
+            requireText(bandwidthSource, "cellDiagnosticAccounting.bandwidthSource", source);
+            if (!"DIAGNOSTIC_RUNTIME_ACCOUNTING_FROM_CONTROLLED_CELL_MESSAGES".equals(bandwidthSource)) {
+                throw new IllegalArgumentException(source + ": cellDiagnosticAccounting.bandwidthSource must be DIAGNOSTIC_RUNTIME_ACCOUNTING_FROM_CONTROLLED_CELL_MESSAGES");
+            }
+            requireText(destinationId, "cellDiagnosticAccounting.destinationId", source);
+            requirePositive(requestPayloadBytes, "cellDiagnosticAccounting.requestPayloadBytes", source);
+            requirePositive(responsePayloadBytes, "cellDiagnosticAccounting.responsePayloadBytes", source);
+            requirePositive(intervalMs, "cellDiagnosticAccounting.intervalMs", source);
+            requirePositive(initialDelayMs, "cellDiagnosticAccounting.initialDelayMs", source);
+            requireText(maxUplinkBitrate, "cellDiagnosticAccounting.maxUplinkBitrate", source);
+            requireText(maxDownlinkBitrate, "cellDiagnosticAccounting.maxDownlinkBitrate", source);
+            requirePositive(parseBitrateBitsPerSecond(maxUplinkBitrate), "cellDiagnosticAccounting.maxUplinkBitrate", source);
+            requirePositive(parseBitrateBitsPerSecond(maxDownlinkBitrate), "cellDiagnosticAccounting.maxDownlinkBitrate", source);
+            if (gatewayPools == null || gatewayPools.isEmpty()) {
+                throw new IllegalArgumentException(source + ": cellDiagnosticAccounting.gatewayPools must not be empty");
+            }
+            for (int i = 0; i < gatewayPools.size(); i++) {
+                gatewayPools.get(i).validate(source, i);
+            }
+        }
+    }
+
+    private static long parseBitrateBitsPerSecond(String value) {
+        String normalized = value.trim().toLowerCase();
+        double multiplier = 1.0;
+        if (normalized.endsWith("gbps")) {
+            multiplier = 1_000_000_000.0;
+            normalized = normalized.substring(0, normalized.length() - 4).trim();
+        } else if (normalized.endsWith("mbps")) {
+            multiplier = 1_000_000.0;
+            normalized = normalized.substring(0, normalized.length() - 4).trim();
+        } else if (normalized.endsWith("kbps")) {
+            multiplier = 1_000.0;
+            normalized = normalized.substring(0, normalized.length() - 4).trim();
+        } else if (normalized.endsWith("bps")) {
+            normalized = normalized.substring(0, normalized.length() - 3).trim();
+        }
+        double parsed = Double.parseDouble(normalized);
+        return Math.round(parsed * multiplier);
+    }
+
+    static final class GatewayPool {
+        String poolId;
+        long nominalCapacityBitsPerSecond;
+
+        void validate(String source, int index) {
+            String prefix = "cellDiagnosticAccounting.gatewayPools[" + index + "]";
+            requireText(poolId, prefix + ".poolId", source);
+            requirePositive(nominalCapacityBitsPerSecond, prefix + ".nominalCapacityBitsPerSecond", source);
         }
     }
 

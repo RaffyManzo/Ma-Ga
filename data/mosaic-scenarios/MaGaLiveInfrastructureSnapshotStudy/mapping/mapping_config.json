@@ -1,0 +1,90 @@
+{
+    "config": {
+        "fixedOrder": true
+    },
+
+    "prototypes": [
+        {
+            "name": "Car",
+            "vehicleClass": "ElectricVehicle",
+            "accel": 2.6,
+            "decel": 4.5,
+            "emergencyDecel": 6.0,
+            "length": 5.0,
+            "maxSpeed": 70.0,
+            "minGap": 2.5,
+            "sigma": 0.5,
+            "tau": 1,
+            "speedFactor": 1.0,
+            "speedMode": "DEFAULT",
+            "laneChangeMode": "DEFAULT",
+            "deviations": {
+                "speedFactor": 0.0,
+                "length": 0.0,
+                "minGap": 0.0,
+                "maxSpeed": 0.0,
+                "accel": 0.0,
+                "decel": 0.0,
+                "tau": 0.0
+            }
+        }
+    ],
+
+    "rsus": [
+        {
+            "name": "rsu_north",
+            "group": "MaGaGateway",
+            "position": {
+                "longitude": 13.567,
+                "latitude": 52.644
+            },
+            "applications": []
+        },
+        {
+            "name": "rsu_central",
+            "group": "MaGaGateway",
+            "position": {
+                "longitude": 13.563,
+                "latitude": 52.625
+            },
+            "applications": []
+        }
+    ],
+
+    "servers": [
+        {
+            "name": "server_0",
+            "group": "MaGaLiveStateCoordinator",
+            "applications": [
+                "org.eclipse.mosaic.app.maga.livestate.MaGaLiveStateCoordinatorApp",
+                "org.eclipse.mosaic.app.maga.livestate.MaGaLiveCellDiagnosticServerApp"
+            ]
+        }
+    ],
+
+    "vehicles": [
+        {
+            "startingTime": "0.0 s",
+            "targetFlow": 900,
+            "maxNumberVehicles": 12,
+            "pos": 1417,
+            "route": "1",
+            "lanes": [
+                0,
+                1
+            ],
+            "types": [
+                {
+                    "applications": [
+                        "org.eclipse.mosaic.app.maga.adhocradio.MaGaAdHocRadioDiagnosticApp",
+                        "org.eclipse.mosaic.app.maga.livestate.MaGaLiveVehicleStateApp",
+                        "org.eclipse.mosaic.app.maga.livestate.MaGaLiveCellDiagnosticVehicleApp"
+                    ],
+                    "name": "Car",
+                    "group": "LiveStateLayer",
+                    "weight": 1.0
+                }
+            ]
+        }
+    ]
+}

@@ -7,8 +7,9 @@ $ErrorActionPreference = "Stop"
 $ToolRoot = $PSScriptRoot
 $RepoRoot = Split-Path -Parent (Split-Path -Parent $ToolRoot)
 $ResolvedMosaicRoot = (Resolve-Path -LiteralPath (Join-Path $RepoRoot $MosaicRoot)).Path
-$VersionedScenario = Join-Path $RepoRoot "data\mosaic-scenarios\MaGaLiveStateLayerStudy"
-$ScenarioApplicationDir = Join-Path $VersionedScenario "application"
+$VersionedScenarios = @(
+    "MaGaLiveInfrastructureSnapshotStudy"
+)
 $SourceRoot = Join-Path $ToolRoot "src"
 $OutRoot = Join-Path $ToolRoot "out"
 $ClassesDir = Join-Path $OutRoot "classes"
@@ -19,8 +20,11 @@ $SourcesFile = Join-Path $OutRoot "sources.txt"
 if (-not (Test-Path -LiteralPath $ResolvedMosaicRoot -PathType Container)) {
     throw "MOSAIC root not found: $ResolvedMosaicRoot"
 }
-if (-not (Test-Path -LiteralPath $ScenarioApplicationDir -PathType Container)) {
-    throw "Live state scenario application directory not found: $ScenarioApplicationDir"
+foreach ($ScenarioName in $VersionedScenarios) {
+    $ScenarioApplicationDir = Join-Path $RepoRoot "data\mosaic-scenarios\$ScenarioName\application"
+    if (-not (Test-Path -LiteralPath $ScenarioApplicationDir -PathType Container)) {
+        throw "Live state scenario application directory not found: $ScenarioApplicationDir"
+    }
 }
 if (-not (Get-Command javac -ErrorAction SilentlyContinue)) {
     throw "javac not found in PATH"
@@ -101,7 +105,20 @@ $ExpectedClassFiles = @(
     "org\eclipse\mosaic\app\maga\livestate\LiveLocalCandidatePreview.class",
     "org\eclipse\mosaic\app\maga\livestate\LiveV2vCandidatePreview.class",
     "org\eclipse\mosaic\app\maga\livestate\LiveV2vBandwidthPoolPreview.class",
-    "org\eclipse\mosaic\app\maga\livestate\LiveLocalAndV2vCandidatePreviewBuilder.class"
+    "org\eclipse\mosaic\app\maga\livestate\LiveLocalAndV2vCandidatePreviewBuilder.class",
+    "org\eclipse\mosaic\app\maga\livestate\LiveCellTrafficEvent.class",
+    "org\eclipse\mosaic\app\maga\livestate\LiveCellBandwidthBucket.class",
+    "org\eclipse\mosaic\app\maga\livestate\LiveCellTrafficAccountingCache.class",
+    "org\eclipse\mosaic\app\maga\livestate\MaGaLiveCellDiagnosticRequestMessage.class",
+    "org\eclipse\mosaic\app\maga\livestate\MaGaLiveCellDiagnosticResponseMessage.class",
+    "org\eclipse\mosaic\app\maga\livestate\MaGaLiveCellDiagnosticVehicleApp.class",
+    "org\eclipse\mosaic\app\maga\livestate\MaGaLiveCellDiagnosticServerApp.class",
+    "org\eclipse\mosaic\app\maga\livestate\LiveAccessLinkPreview.class",
+    "org\eclipse\mosaic\app\maga\livestate\LiveGatewayBandwidthPoolPreview.class",
+    "org\eclipse\mosaic\app\maga\livestate\LiveRemoteCandidatePreview.class",
+    "org\eclipse\mosaic\app\maga\livestate\LiveInfrastructurePreviewBuilder.class",
+    "org\eclipse\mosaic\app\maga\livestate\LiveSystemSnapshotAssembler.class",
+    "org\eclipse\mosaic\app\maga\livestate\LiveSnapshotManifestEntry.class"
 )
 foreach ($ExpectedClassFile in $ExpectedClassFiles) {
     $ClassPath = Join-Path $ClassesDir $ExpectedClassFile
@@ -127,7 +144,10 @@ foreach ($ExpectedClassFile in $ExpectedClassFiles) {
     }
 }
 
-$ScenarioJar = Join-Path $ScenarioApplicationDir "maga-live-state-layer.jar"
-Copy-Item -LiteralPath $JarFile -Destination $ScenarioJar -Force
-Write-Host "Copied live state layer JAR to versioned scenario: $ScenarioJar"
+foreach ($ScenarioName in $VersionedScenarios) {
+    $ScenarioApplicationDir = Join-Path $RepoRoot "data\mosaic-scenarios\$ScenarioName\application"
+    $ScenarioJar = Join-Path $ScenarioApplicationDir "maga-live-state-layer.jar"
+    Copy-Item -LiteralPath $JarFile -Destination $ScenarioJar -Force
+    Write-Host "Copied live state layer JAR to versioned scenario: $ScenarioJar"
+}
 Write-Host "Build completed: $JarFile"

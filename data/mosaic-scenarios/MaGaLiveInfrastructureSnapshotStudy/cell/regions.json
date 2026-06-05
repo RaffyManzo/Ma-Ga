@@ -1,0 +1,100 @@
+{
+   "regions": [
+      {
+         "id": "region_north_normal",
+         "area": {
+            "nw": {
+               "lon": 13.563,
+               "lat": 52.657
+            },
+            "se": {
+               "lon": 13.571,
+               "lat": 52.632
+            }
+         },
+         "uplink": {
+            "delay": {
+               "type": "ConstantDelay",
+               "delay": "80 ms"
+            },
+            "transmission": {
+               "lossProbability": 0.0,
+               "maxRetries": 0
+            },
+            "capacity": "40 Mbps"
+         },
+         "downlink": {
+            "unicast": {
+               "delay": {
+                  "type": "ConstantDelay",
+                  "delay": "80 ms"
+               },
+               "transmission": {
+                  "lossProbability": 0.0,
+                  "maxRetries": 0
+               }
+            },
+            "multicast": {
+               "delay": {
+                  "type": "ConstantDelay",
+                  "delay": "80 ms"
+               },
+               "transmission": {
+                  "lossProbability": 0.0,
+                  "maxRetries": 0
+               },
+               "usableCapacity": 0.6
+            },
+            "capacity": "60 Mbps"
+         }
+      },
+      {
+         "id": "region_central_degraded",
+         "area": {
+            "nw": {
+               "lon": 13.559,
+               "lat": 52.632
+            },
+            "se": {
+               "lon": 13.567,
+               "lat": 52.618
+            }
+         },
+         "uplink": {
+            "delay": {
+               "type": "ConstantDelay",
+               "delay": "250 ms"
+            },
+            "transmission": {
+               "lossProbability": 0.05,
+               "maxRetries": 0
+            },
+            "capacity": "8 Mbps"
+         },
+         "downlink": {
+            "unicast": {
+               "delay": {
+                  "type": "ConstantDelay",
+                  "delay": "250 ms"
+               },
+               "transmission": {
+                  "lossProbability": 0.05,
+                  "maxRetries": 0
+               }
+            },
+            "multicast": {
+               "delay": {
+                  "type": "ConstantDelay",
+                  "delay": "250 ms"
+               },
+               "transmission": {
+                  "lossProbability": 0.05,
+                  "maxRetries": 0
+               },
+               "usableCapacity": 0.6
+            },
+            "capacity": "12 Mbps"
+         }
+      }
+   ]
+}

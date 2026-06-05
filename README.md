@@ -226,6 +226,18 @@ preview CSV per candidati `LOCAL`, candidati `VEHICLE` direct single-hop e pool
 Cell live, EDGE/CLOUD, `SystemSnapshot`, bridge concreto e MA-GA live restano
 fuori scope; la prossima sottofase e' la 13C.
 
+### Fase 13C - live infrastructure e snapshot JSON
+
+La Fase 13C introduce lo scenario isolato
+`MaGaLiveInfrastructureSnapshotStudy` estendendo
+`tools/mosaic-live-state-layer/`. Il runtime aggiunge accounting Cell
+diagnostico causale, bucket safe-after-timestamp, access link RSU geometrici,
+pool `GATEWAY`, candidati `EDGE`/`CLOUD` e snapshot JSON live compatibili con
+`JsonSnapshotFolderLoader` e `SnapshotValidator`. La validazione produce
+`data/mosaic-study/diagnostics/phase_13c_live_infrastructure_snapshot_validation.json`.
+La banda Cell resta diagnostica, non una misura diretta del federate; bridge
+concreto, `TemporalWindowManager` live e MA-GA live restano fuori scope.
+
 ### Batch statico GA
 
 Main class:
