@@ -195,6 +195,16 @@ Il bridge live MOSAIC non e' ancora implementato. Restano aperti i warning
 sperimentali della baseline diagnostica: scenario non ancora stressante per
 offloading, decisioni osservate tutte locali e `FULL_OFFLOADING` non osservato.
 
+### Fase 12 - design bridge live
+
+La Fase 11 offline e' completata sulla baseline
+`log-20260604-220216-MaGaIntegratedStudy`. La Fase 12 ha completato il design
+architetturale del bridge live MOSAIC -> SystemSnapshot -> MA-GA, documentando
+API MOSAIC verificate, cache causali, policy snapshot, gestione task pendenti e
+overrun GA su `DeltaT_max`. Il bridge live non e' ancora implementato; la Fase
+13 e' la prossima attivita' per skeleton runtime, adapter Cell, assembler live e
+coordinatore GA.
+
 ### Batch statico GA
 
 Main class:

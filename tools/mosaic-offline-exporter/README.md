@@ -1095,3 +1095,12 @@ deterministicArtifactMismatches = []
 jsonTimeStopReason = FULL_TIME_HORIZON_REACHED
 futureLookAheadViolations = 0
 ```
+
+## Fase 12 - progettazione bridge live
+
+La Fase 11 offline e' completata sulla baseline
+`log-20260604-220216-MaGaIntegratedStudy`. La Fase 12 ha completato il design
+del bridge live, ma non implementa ancora `MosaicSnapshotBridge` concreto, app
+runtime MOSAIC definitive o worker GA. La Fase 13 dovra' introdurre skeleton
+runtime, cache causali, adapter Cell live, assembler `SystemSnapshot` e
+coordinatore GA/strategy applier.
