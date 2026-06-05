@@ -1,0 +1,61 @@
+﻿{
+    "phase":  "13A_LIVE_API_PROBE_AND_RUNTIME_SKELETON",
+    "sourceRun":  "log-20260605-103006-MaGaLiveBridgeProbe",
+    "scenarioName":  "MaGaLiveBridgeProbe",
+    "latestRunDir":  "C:\\Users\\raffa\\IdeaProjects\\maga-core\\tmp\\mosaic-25.2\\logs\\log-20260605-103006-MaGaLiveBridgeProbe",
+    "simulationCompleted":  true,
+    "coordinatorStarts":  1,
+    "coordinatorTicks":  20,
+    "coordinatorStops":  1,
+    "vehicleStarts":  4,
+    "vehicleUpdates":  36,
+    "vehicleStops":  4,
+    "projectedPositionSamples":  36,
+    "invalidProjectedPositions":  0,
+    "speedSamples":  36,
+    "invalidSpeedSamples":  0,
+    "adHocStateSamples":  36,
+    "artificialV2xSendCallsInProbeSource":  0,
+    "v2xTransmissionEventsInOutput":  0,
+    "v2xReceptionEventsInOutput":  0,
+    "coreModified":  false,
+    "canonicalScenarioModified":  false,
+    "vehicleIdsObserved":  [
+                               "veh_0",
+                               "veh_1",
+                               "veh_2",
+                               "veh_3"
+                           ],
+    "firstSimulationTime":  0,
+    "lastSimulationTime":  20000000000,
+    "coordinatorTickTimes":  [
+                                 1000000000,
+                                 2000000000,
+                                 3000000000,
+                                 4000000000,
+                                 5000000000,
+                                 6000000000,
+                                 7000000000,
+                                 8000000000,
+                                 9000000000,
+                                 10000000000,
+                                 11000000000,
+                                 12000000000,
+                                 13000000000,
+                                 14000000000,
+                                 15000000000,
+                                 16000000000,
+                                 17000000000,
+                                 18000000000,
+                                 19000000000,
+                                 20000000000
+                             ],
+    "warnings":  [
+
+                 ],
+    "errors":  [
+
+               ],
+    "phase13aStatus":  "COMPLETED",
+    "readyForPhase13B":  true
+}

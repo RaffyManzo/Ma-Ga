@@ -205,6 +205,16 @@ overrun GA su `DeltaT_max`. Il bridge live non e' ancora implementato; la Fase
 13 e' la prossima attivita' per skeleton runtime, adapter Cell, assembler live e
 coordinatore GA.
 
+### Fase 13A - probe runtime MOSAIC
+
+La Fase 13A introduce lo scenario isolato `MaGaLiveBridgeProbe` e il tool
+`tools/mosaic-live-api-probe/` per validare lifecycle MOSAIC, tick periodici su
+server coordinator, `simulationTime`, vehicle update, projected position,
+speed e stato radio ad-hoc locale. La validazione produce
+`data/mosaic-study/diagnostics/phase_13a_live_api_probe_validation.json`.
+Il bridge live, le cache, l'assembler snapshot e MA-GA live non sono ancora
+implementati; la prossima sottofase e' la 13B.
+
 ### Batch statico GA
 
 Main class:

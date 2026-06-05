@@ -1,0 +1,5 @@
+{
+  "tickIntervalMs": 1000,
+  "logVehicleUpdates": true,
+  "logCoordinatorTicks": true
+}
