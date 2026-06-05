@@ -12,9 +12,6 @@ tmp/mosaic-25.2/logs/
 /tmp/mosaic-25.2/scenarios/
 /tmp/mosaic-25.2/tools/
 
-/data/mosaic-study/diagnostics/phase_11/logs/
-/data/snapshots/mosaic-generated/
-
 /tmp/mosaic-25.2/CONTRIBUTING.md
 /tmp/mosaic-25.2/LICENSE
 /tmp/mosaic-25.2/mosaic.bat
