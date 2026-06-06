@@ -172,3 +172,75 @@ implement:
 - 40-replicate runner;
 - MOSAIC end-to-end execution for the literature scenario;
 - scientific calibration.
+
+## Persistent Materialization and Smoke Run
+
+Phase 14C.4.1 separates rare materialization from frequent execution.
+
+Materialize once:
+
+```powershell
+powershell -NoProfile -ExecutionPolicy Bypass `
+  -File .\tools\intas-literature-scenario\materialize_literature_scenario.ps1 `
+  -Density nominal `
+  -DurationProfile smoke `
+  -Seed 104729
+```
+
+The persistent scenario is written under:
+
+```text
+tmp/materialized-literature-scenarios/
+  MaGaLiteratureBasedUrbanStudy/
+    nominal-smoke-seed-104729/
+```
+
+The materialization step validates InTAS, builds the reduced SUMO network and
+route subset, uses MOSAIC Scenario-Convert to create the real SQLite database,
+imports the selected routes and writes `materialization_manifest.json`. If the
+same inputs are already materialized, the command reuses the scenario and
+prints:
+
+```text
+MATERIALIZED_SCENARIO_REUSED
+```
+
+For the `smoke` duration profile, the persistent scenario records a technical
+execution override in the manifest:
+
+```text
+TECHNICAL_SMOKE_THROTTLE_NOT_CALIBRATION
+```
+
+The override lowers the generated workload rate and uses a 500 ms runtime tick
+only to keep the first end-to-end smoke test bounded. It is not a calibration
+choice and must not be reused as a scientific workload setting.
+
+Run often:
+
+```powershell
+powershell -NoProfile -ExecutionPolicy Bypass `
+  -File .\tools\intas-literature-scenario\run_literature_scenario.ps1 `
+  -MaterializedScenarioRoot .\tmp\materialized-literature-scenarios\MaGaLiteratureBasedUrbanStudy\nominal-smoke-seed-104729 `
+  -PrintDetailedLiveReport
+```
+
+The run script does not call InTAS and does not call Scenario-Convert. It only
+builds the runtime JAR, deploys the persistent scenario into the local MOSAIC
+workspace, runs `mosaic.bat -s MaGaLiteratureBasedUrbanStudy`, summarizes the
+run and executes the smoke validator. During deploy it injects the generated
+live runtime JAR and the generated ad-hoc radio diagnostic JAR required by the
+literature mapping. Neither JAR is versioned.
+
+Supporting scripts:
+
+```text
+materialize_literature_scenario.ps1
+validate_materialized_literature_scenario.py
+deploy_materialized_literature_scenario.ps1
+run_literature_scenario.ps1
+validate_literature_smoke_run.ps1
+```
+
+Generated persistent scenarios, databases and run logs are local artifacts and
+remain outside Git.
