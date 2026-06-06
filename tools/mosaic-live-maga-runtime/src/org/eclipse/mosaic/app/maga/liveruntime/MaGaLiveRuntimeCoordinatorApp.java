@@ -194,10 +194,10 @@ public class MaGaLiveRuntimeCoordinatorApp extends AbstractApplication<ServerOpe
         try (Stream<Path> paths = Files.list(logsRoot)) {
             return paths
                     .filter(Files::isDirectory)
-                    .filter(path -> path.getFileName().toString().contains("-MaGaLiveMagaRuntimeStudy"))
+                    .filter(path -> path.getFileName().toString().contains("-" + runtimeConfig.getScenarioName()))
                     .max(Comparator.comparing(path -> path.toFile().lastModified()))
                     .orElseThrow(() -> new IllegalStateException(
-                            "No MaGaLiveMagaRuntimeStudy run directory found under " + logsRoot
+                            "No " + runtimeConfig.getScenarioName() + " run directory found under " + logsRoot
                     ));
         } catch (IOException e) {
             throw new IllegalStateException("Unable to resolve MOSAIC run directory under " + logsRoot, e);

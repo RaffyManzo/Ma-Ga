@@ -14,6 +14,21 @@ $MosaicBat = Join-Path $ResolvedMosaicRoot "mosaic.bat"
 $DeployedScenario = Join-Path $ResolvedMosaicRoot "scenarios\$ScenarioName"
 $DeployedApplication = Join-Path $DeployedScenario "application"
 
+function Assert-SafeScenarioName {
+    param([string]$Name)
+    if ([string]::IsNullOrWhiteSpace($Name)) {
+        throw "ScenarioName must not be blank"
+    }
+    if ([IO.Path]::IsPathRooted($Name) -or
+            $Name.Contains("..") -or
+            $Name.Contains("\") -or
+            $Name.Contains("/") -or
+            -not ($Name -match "^[A-Za-z0-9_.-]+$")) {
+        throw "Invalid ScenarioName: $Name"
+    }
+}
+Assert-SafeScenarioName -Name $ScenarioName
+
 if (-not (Test-Path -LiteralPath $MosaicBat -PathType Leaf)) {
     throw "mosaic.bat not found: $MosaicBat"
 }

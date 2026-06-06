@@ -13,6 +13,7 @@ public final class MaGaLiveRuntimeConfig {
     static final String CONFIG_FILE_NAME = "ma_ga_live_runtime_config.json";
     private static final long NANOSECONDS_PER_MILLISECOND = 1_000_000L;
 
+    String scenarioName;
     long coordinatorTickIntervalMs;
     long initialOptimizationDelayMs;
     long gaPollingIntervalMs;
@@ -80,12 +81,27 @@ public final class MaGaLiveRuntimeConfig {
         return publishedSnapshotCopyLimit;
     }
 
+    public String getScenarioName() {
+        return scenarioName == null || scenarioName.isBlank()
+                ? "MaGaLiveMagaRuntimeStudy"
+                : scenarioName;
+    }
+
     public String profileName() {
         return diagnosticArtificialGaDelayMs > 0 ? "diagnostic-overrun" : "normal";
     }
 
     private void validate(File configFile) {
         String source = configFile.getAbsolutePath();
+        if (scenarioName == null || scenarioName.isBlank()) {
+            scenarioName = "MaGaLiveMagaRuntimeStudy";
+        }
+        if (scenarioName.contains("..")
+                || scenarioName.contains("\\")
+                || scenarioName.contains("/")
+                || !scenarioName.matches("^[A-Za-z0-9_.-]+$")) {
+            throw new IllegalArgumentException(source + ": scenarioName is invalid");
+        }
         requirePositive(coordinatorTickIntervalMs, "coordinatorTickIntervalMs", source);
         requirePositive(initialOptimizationDelayMs, "initialOptimizationDelayMs", source);
         requirePositive(gaPollingIntervalMs, "gaPollingIntervalMs", source);

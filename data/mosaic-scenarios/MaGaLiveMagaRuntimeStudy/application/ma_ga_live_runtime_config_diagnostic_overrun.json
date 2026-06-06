@@ -1,4 +1,5 @@
 {
+  "scenarioName": "MaGaLiveMagaRuntimeStudy",
   "coordinatorTickIntervalMs": 100,
   "initialOptimizationDelayMs": 1000,
   "gaPollingIntervalMs": 50,

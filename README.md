@@ -3,6 +3,29 @@
 Questo repository contiene il core Java del **Mobility-Aware Genetic Algorithm
 (MA-GA)** per il computation offloading in scenari veicolo, edge e cloud.
 
+## Avvio rapido MOSAIC live
+
+Il comando ordinario per avviare il runtime live MOSAIC -> MA-GA e':
+
+```powershell
+powershell -NoProfile -ExecutionPolicy Bypass `
+  -File .\run_maga_live.ps1
+```
+
+Il comando compila il runtime live, deploya lo scenario
+`MaGaLiveMagaRuntimeStudy`, esegue MOSAIC, produce le trace live e genera un
+riepilogo JSON/Markdown della run sotto:
+
+```text
+tmp/mosaic-25.2/logs/<run>/live-maga-runtime/
+```
+
+La guida operativa completa e':
+
+```text
+data/docs/mosaic-study/MOSAIC_LIVE_INTEGRATION_AND_EXECUTION_GUIDE.md
+```
+
 L'obiettivo del progetto e' scegliere, per ogni task generato da un veicolo,
 dove eseguirlo e con quali risorse:
 
@@ -170,11 +193,18 @@ Validazione del replay MOSAIC generato:
 ### Pipeline offline MOSAIC -> MA-GA
 
 La pipeline offline MOSAIC -> stream diagnostici -> `SystemSnapshot` JSON ->
-replay e' consolidata in un comando unico:
+replay resta disponibile come materiale regressivo archiviato. Il tool storico
+si trova in:
+
+```text
+archive/regression-tools/mosaic-offline-exporter/
+```
+
+Il comando storico era:
 
 ```powershell
 powershell -NoProfile -ExecutionPolicy Bypass `
-  -File .\tools\mosaic-offline-exporter\run_offline_pipeline.ps1 `
+  -File .\archive\regression-tools\mosaic-offline-exporter\run_offline_pipeline.ps1 `
   -RepoRoot "." `
   -MosaicRoot ".\tmp\mosaic-25.2" `
   -ScenarioName "MaGaIntegratedStudy" `
@@ -190,7 +220,8 @@ powershell -NoProfile -ExecutionPolicy Bypass `
 L'orchestratore consuma una run MOSAIC gia' disponibile, rigenera gli artefatti
 offline, valida gli snapshot con Java, esegue `JSON_SEQUENCE` e valida
 `JSON_TIME` fino a `FULL_TIME_HORIZON_REACHED`. Produce manifest con SHA-256,
-log per stage e diagnostica Fase 11 sotto `data/mosaic-study/diagnostics/`.
+log per stage e diagnostiche storiche ora conservate in
+`archive/generated-offline-artifacts/diagnostics-history/`.
 
 Il bridge live MOSAIC e' stato implementato e validato nelle Fasi 13D-13E in
 uno scenario runtime isolato. Restano aperti i warning sperimentali: strategy

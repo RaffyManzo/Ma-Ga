@@ -1,0 +1,57 @@
+﻿{
+    "phase":  "PRECALIBRATION_OPERATIONAL_PACKAGING",
+    "branch":  "MOSAIC/SUMO-integration",
+    "sourceCommit":  "965c3aa2499d64e3d61f35bd1edf234e4567f88c",
+    "activeRuntimeDirectories":  [
+                                     "src",
+                                     "tools/mosaic-live-maga-runtime",
+                                     "tools/mosaic-live-state-layer",
+                                     "tools/mosaic-adhoc-radio-diagnostic",
+                                     "data/mosaic-scenarios/MaGaLiveMagaRuntimeStudy",
+                                     "data/docs"
+                                 ],
+    "activeScenario":  "MaGaLiveMagaRuntimeStudy",
+    "archiveDirectory":  "archive",
+    "archiveManifest":  "archive/archive_manifest.csv",
+    "historicalScenariosArchived":  7,
+    "historicalToolsArchived":  3,
+    "regressionToolsArchived":  4,
+    "offlineArtifactsArchived":  8,
+    "generatedSnapshotsArchived":  1,
+    "localGeneratedDirectoriesDeleted":  [
+
+                                         ],
+    "localGeneratedDirectoriesKept":  [
+                                          "tmp/mosaic-25.2",
+                                          "tools/mosaic-live-maga-runtime/out"
+                                      ],
+    "documentationChecked":  true,
+    "readmeUpdated":  true,
+    "finalGuideCreated":  true,
+    "singleCommandRunnerCreated":  true,
+    "singleCommandRunnerPath":  "run_maga_live.ps1",
+    "singleCommandNormalValidated":  true,
+    "singleCommandBridgeValidationValidated":  true,
+    "normalRunName":  "log-20260606-122618-MaGaLiveMagaRuntimeStudy",
+    "normalRunSummaryJson":  "tmp/mosaic-25.2/logs/log-20260606-122618-MaGaLiveMagaRuntimeStudy/live-maga-runtime/live_run_summary.json",
+    "normalRunSummaryMarkdown":  "tmp/mosaic-25.2/logs/log-20260606-122618-MaGaLiveMagaRuntimeStudy/live-maga-runtime/live_run_summary.md",
+    "bridgeValidationStatus":  "COMPLETED",
+    "phase13eStillCompleted":  true,
+    "generatedRuntimeJarTracked":  false,
+    "generatedRuntimeJarRemovedFromVersionedScenario":  true,
+    "generatedRuntimeJarInjectedOnlyDuringDeploy":  true,
+    "coreModified":  false,
+    "temporalWindowManagerModified":  false,
+    "archiveSizeBytes":  93379083,
+    "warnings":  [
+                     "WARNING_JDK_ZIPFS_ACCESSDENIED_POST_COMPILE_NO_EXIT_FAILURE",
+                     "WARNING_ARCHIVE_RENAME_TEST_BLOCKED_BY_LOCAL_FILESYSTEM_LOCK_STATIC_RUNTIME_SCAN_PASSED"
+                 ],
+    "errors":  [
+
+               ],
+    "packagingStatus":  "COMPLETED",
+    "readyForCalibrationScenarioDesign":  true,
+    "archiveIndependenceStaticScanPassed":  true,
+    "archiveRenameTestValidated":  false
+}

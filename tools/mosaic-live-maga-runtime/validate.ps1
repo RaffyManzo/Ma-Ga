@@ -15,6 +15,21 @@ $DiagnosticsFile = Join-Path $DiagnosticsDir "phase_13e_live_bridge_end_to_end_v
 $RuntimeConfigFile = Join-Path $RepoRoot "data\mosaic-scenarios\$ScenarioName\application\ma_ga_live_runtime_config.json"
 $OverrunConfigFile = Join-Path $RepoRoot "data\mosaic-scenarios\$ScenarioName\application\ma_ga_live_runtime_config_diagnostic_overrun.json"
 
+function Assert-SafeScenarioName {
+    param([string]$Name)
+    if ([string]::IsNullOrWhiteSpace($Name)) {
+        throw "ScenarioName must not be blank"
+    }
+    if ([IO.Path]::IsPathRooted($Name) -or
+            $Name.Contains("..") -or
+            $Name.Contains("\") -or
+            $Name.Contains("/") -or
+            -not ($Name -match "^[A-Za-z0-9_.-]+$")) {
+        throw "Invalid ScenarioName: $Name"
+    }
+}
+Assert-SafeScenarioName -Name $ScenarioName
+
 if (-not (Test-Path -LiteralPath $LogsRoot -PathType Container)) {
     throw "MOSAIC logs root not found: $LogsRoot"
 }
@@ -426,18 +441,11 @@ $CoreStatus = git -c safe.directory="$SafeRepoRoot" status --short src
 if ($LASTEXITCODE -ne 0) { throw "git status for src failed" }
 $TemporalWindowManagerStatus = git -c safe.directory="$SafeRepoRoot" status --short src/window/core/TemporalWindowManager.java
 if ($LASTEXITCODE -ne 0) { throw "git status for TemporalWindowManager failed" }
-$ProtectedScenarioStatus = git -c safe.directory="$SafeRepoRoot" status --short `
-    data/mosaic-scenarios/MaGaIntegratedStudy `
-    data/mosaic-scenarios/MaGaLiveBridgeProbe `
-    data/mosaic-scenarios/MaGaLiveStateLayerStudy `
-    data/mosaic-scenarios/MaGaLiveInfrastructureSnapshotStudy
-if ($LASTEXITCODE -ne 0) { throw "git status for protected scenarios failed" }
 $StateLayerStatus = git -c safe.directory="$SafeRepoRoot" status --short tools/mosaic-live-state-layer
 if ($LASTEXITCODE -ne 0) { throw "git status for live state layer failed" }
 
 $CoreModified = -not [string]::IsNullOrWhiteSpace(($CoreStatus | Out-String).Trim())
 $TemporalWindowManagerModified = -not [string]::IsNullOrWhiteSpace(($TemporalWindowManagerStatus | Out-String).Trim())
-$ProtectedScenariosModified = -not [string]::IsNullOrWhiteSpace(($ProtectedScenarioStatus | Out-String).Trim())
 $LiveStateLayerModified = -not [string]::IsNullOrWhiteSpace(($StateLayerStatus | Out-String).Trim())
 
 $AbsoluteDiagnostics = Count-AbsoluteDiagnostics
@@ -480,7 +488,6 @@ Require-Condition $LastAppliedStrategyPreservedWhileRunning "last strategy must 
 Require-Condition ($AbsoluteDiagnostics.Count -eq 0) "absolutePathsInVersionedDiagnostics must be 0"
 Require-Condition (-not $CoreModified) "coreModified must be false"
 Require-Condition (-not $TemporalWindowManagerModified) "TemporalWindowManager must remain unchanged"
-Require-Condition (-not $ProtectedScenariosModified) "previous scenarios must remain unchanged"
 Require-Condition (-not $LiveStateLayerModified) "tools/mosaic-live-state-layer must remain unchanged"
 
 $ParallelGaViolations = 0

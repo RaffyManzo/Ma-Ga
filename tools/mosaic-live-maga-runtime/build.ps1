@@ -1,5 +1,6 @@
 param(
-    [string]$MosaicRoot = ".\tmp\mosaic-25.2"
+    [string]$MosaicRoot = ".\tmp\mosaic-25.2",
+    [string]$ScenarioName = "MaGaLiveMagaRuntimeStudy"
 )
 
 $ErrorActionPreference = "Stop"
@@ -16,13 +17,24 @@ $ClassesDir = Join-Path $OutRoot "classes"
 $ClasspathDir = Join-Path $OutRoot "classpath"
 $SourcesFile = Join-Path $OutRoot "sources.txt"
 $JarFile = Join-Path $OutRoot "maga-live-maga-runtime.jar"
-$ScenarioApplicationDir = Join-Path $RepoRoot "data\mosaic-scenarios\MaGaLiveMagaRuntimeStudy\application"
+
+function Assert-SafeScenarioName {
+    param([string]$Name)
+    if ([string]::IsNullOrWhiteSpace($Name)) {
+        throw "ScenarioName must not be blank"
+    }
+    if ([IO.Path]::IsPathRooted($Name) -or
+            $Name.Contains("..") -or
+            $Name.Contains("\") -or
+            $Name.Contains("/") -or
+            -not ($Name -match "^[A-Za-z0-9_.-]+$")) {
+        throw "Invalid ScenarioName: $Name"
+    }
+}
+Assert-SafeScenarioName -Name $ScenarioName
 
 if (-not (Test-Path -LiteralPath $ResolvedMosaicRoot -PathType Container)) {
     throw "MOSAIC root not found: $ResolvedMosaicRoot"
-}
-if (-not (Test-Path -LiteralPath $ScenarioApplicationDir -PathType Container)) {
-    throw "Runtime scenario application directory not found: $ScenarioApplicationDir"
 }
 foreach ($CommandName in @("javac", "jar")) {
     if (-not (Get-Command $CommandName -ErrorAction SilentlyContinue)) {
@@ -126,14 +138,8 @@ foreach ($ExpectedClassFile in $ExpectedClassFiles) {
     }
 }
 
-$ScenarioJar = Join-Path $ScenarioApplicationDir "maga-live-maga-runtime.jar"
-Copy-Item -LiteralPath $JarFile -Destination $ScenarioJar -Force
-Write-Host "Copied runtime JAR to versioned scenario: $ScenarioJar"
-
 foreach ($ProtectedPath in @(
-    "data/mosaic-scenarios/MaGaIntegratedStudy",
-    "data/mosaic-scenarios/MaGaLiveStateLayerStudy",
-    "data/mosaic-scenarios/MaGaLiveInfrastructureSnapshotStudy",
+    "tools/mosaic-live-state-layer",
     "src"
 )) {
     $Status = git -c safe.directory="$SafeRepoRoot" status --short $ProtectedPath
@@ -146,3 +152,4 @@ foreach ($ProtectedPath in @(
 }
 
 Write-Host "Build completed: $JarFile"
+Write-Host "Generated JAR is intentionally kept out of versioned scenarios."

@@ -2,6 +2,7 @@
 out/
 /tmp/
 /tools/mosaic-cell-traffic-diagnostic/out/
+data/mosaic-scenarios/MaGaLiveMagaRuntimeStudy/application/maga-live-maga-runtime.jar
 tmp/mosaic-25.2/bin/
 tmp/mosaic-25.2/etc/
 tmp/mosaic-25.2/lib/
@@ -46,4 +47,3 @@ bin/
 
 ### Mac OS ###
 .DS_Store
-

@@ -46,11 +46,8 @@ e crea:
 tools/mosaic-live-maga-runtime/out/maga-live-maga-runtime.jar
 ```
 
-Il JAR viene copiato solo in:
-
-```text
-data/mosaic-scenarios/MaGaLiveMagaRuntimeStudy/application/
-```
+Il JAR resta un artefatto generato e non viene piu' copiato nello scenario
+versionabile.
 
 ## Deploy
 
@@ -64,6 +61,12 @@ Il deploy sostituisce solo:
 
 ```text
 tmp/mosaic-25.2/scenarios/MaGaLiveMagaRuntimeStudy/
+```
+
+Dopo la copia dello scenario versionabile, il deploy inietta il JAR generato in:
+
+```text
+tmp/mosaic-25.2/scenarios/MaGaLiveMagaRuntimeStudy/application/maga-live-maga-runtime.jar
 ```
 
 ## Run normale
@@ -115,6 +118,42 @@ La validazione finale controlla:
 - copie JSON degli snapshot pubblicati caricate con `JsonSnapshotFolderLoader`;
 - `SnapshotValidator` e `LocalCandidateInvariantValidator`;
 - parity tra snapshot pubblicato in memoria e copia JSON diagnostica.
+
+## Summary singola run
+
+Dopo una run normale il runner root richiama:
+
+```powershell
+powershell -NoProfile -ExecutionPolicy Bypass `
+  -File .\tools\mosaic-live-maga-runtime\summarize-run.ps1 `
+  -MosaicRoot ".\tmp\mosaic-25.2" `
+  -ScenarioName "MaGaLiveMagaRuntimeStudy" `
+  -RunName "<run>"
+```
+
+Output:
+
+```text
+tmp/mosaic-25.2/logs/<run>/live-maga-runtime/live_run_summary.json
+tmp/mosaic-25.2/logs/<run>/live-maga-runtime/live_run_summary.md
+```
+
+## Runner root
+
+Comando ordinario:
+
+```powershell
+powershell -NoProfile -ExecutionPolicy Bypass `
+  -File .\run_maga_live.ps1
+```
+
+Validazione completa bridge:
+
+```powershell
+powershell -NoProfile -ExecutionPolicy Bypass `
+  -File .\run_maga_live.ps1 `
+  -Mode "validate-bridge"
+```
 
 ## Output locali
 
