@@ -31,9 +31,19 @@ from validate_intas_source import detect_license, git_value, read_sumocfg_routes
 TOOL_DIR = Path(__file__).resolve().parent
 DEFAULT_TARGETS = TOOL_DIR / "config" / "literature_scenario_targets.json"
 DEFAULT_SEEDS = TOOL_DIR / "config" / "reproducibility_seeds.json"
+DEFAULT_CATALOG = TOOL_DIR / "config" / "literature_calibration_catalog.json"
 SCENARIO_NAME = "MaGaLiteratureBasedUrbanStudy"
 SUBSCENARIO_NAME = "intas_literature_urban"
 SUPPORTED_PRESERVED_VEHICLE_CHILDREN = {"route", "routeDistribution", "stop", "param"}
+VEHICLE_APPLICATIONS = [
+    "org.eclipse.mosaic.app.maga.adhocradio.MaGaAdHocRadioDiagnosticApp",
+    "org.eclipse.mosaic.app.maga.livestate.MaGaLiveVehicleStateApp",
+    "org.eclipse.mosaic.app.maga.livestate.MaGaLiveCellDiagnosticVehicleApp",
+]
+SERVER_APPLICATIONS = [
+    "org.eclipse.mosaic.app.maga.liveruntime.MaGaLiveRuntimeCoordinatorApp",
+    "org.eclipse.mosaic.app.maga.livestate.MaGaLiveCellDiagnosticServerApp",
+]
 
 
 @dataclass(frozen=True)
@@ -114,6 +124,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--scenario-convert", help="Path to scenario-convert.sh/.bat. Defaults to SCENARIO_CONVERT or PATH.")
     parser.add_argument("--targets", default=str(DEFAULT_TARGETS), help="Target JSON configuration.")
     parser.add_argument("--seeds", default=str(DEFAULT_SEEDS), help="Seed JSON configuration.")
+    parser.add_argument("--catalog", default=str(DEFAULT_CATALOG), help="Literature calibration catalog JSON.")
     parser.add_argument(
         "--density",
         choices=["low_density", "nominal", "high_density", "all"],
@@ -661,6 +672,17 @@ def load_sumolib_net(net_path: Path):
         return None, f"SUMOLIB_UNAVAILABLE: {exc}"
 
 
+def convert_xy_to_lon_lat(net: Any, point: Point) -> dict[str, float]:
+    lon, lat = net.convertXY2LonLat(point.x, point.y)
+    return {"longitude": float(lon), "latitude": float(lat)}
+
+
+def plausible_ingolstadt_coordinate(position: dict[str, float]) -> bool:
+    lat = float(position["latitude"])
+    lon = float(position["longitude"])
+    return 48.55 <= lat <= 48.95 and 11.0 <= lon <= 11.8
+
+
 def parse_net_offset(metadata: dict[str, Any]) -> tuple[float, float] | None:
     value = metadata.get("location", {}).get("netOffset")
     if not value:
@@ -669,6 +691,24 @@ def parse_net_offset(metadata: dict[str, Any]) -> tuple[float, float] | None:
     if len(parts) != 2:
         return None
     return parts[0], parts[1]
+
+
+def sumolib_geographic_boundary(bounds: tuple[float, float, float, float], net_path: Path) -> dict[str, Any]:
+    net, method = load_sumolib_net(net_path)
+    if net is None:
+        return {"valid": False, "method": method, "error": method}
+    min_x, min_y, max_x, max_y = bounds
+    try:
+        nw = convert_xy_to_lon_lat(net, Point(min_x, max_y))
+        se = convert_xy_to_lon_lat(net, Point(max_x, min_y))
+    except Exception as exc:  # noqa: BLE001 - keep exact conversion failure in reports.
+        return {"valid": False, "method": method, "error": str(exc)}
+    return {
+        "valid": all(plausible_ingolstadt_coordinate(position) for position in (nw, se)),
+        "method": method,
+        "nw": {"lon": nw["longitude"], "lat": nw["latitude"]},
+        "se": {"lon": se["longitude"], "lat": se["latitude"]},
+    }
 
 
 def derive_projection(
@@ -682,13 +722,17 @@ def derive_projection(
     offset = parse_net_offset(metadata)
     if net is not None and offset is not None:
         try:
-            lon, lat = net.convertXY2LonLat(center.x, center.y)
+            center_geo = convert_xy_to_lon_lat(net, center)
+            lon = center_geo["longitude"]
+            lat = center_geo["latitude"]
             return {
                 "method": method,
                 "centerCoordinates": {"longitude": lon, "latitude": lat},
                 "cartesianOffset": {"x": offset[0], "y": offset[1]},
                 "fallback": None,
-                "valid": all(math.isfinite(value) for value in [lon, lat, offset[0], offset[1]]),
+                "plausibleIngolstadtCoordinate": plausible_ingolstadt_coordinate(center_geo),
+                "valid": all(math.isfinite(value) for value in [lon, lat, offset[0], offset[1]])
+                and plausible_ingolstadt_coordinate(center_geo),
             }
         except Exception as exc:  # noqa: BLE001 - pyproj may be absent on local SUMO installs.
             method = f"{method}_FAILED: {exc}"
@@ -702,6 +746,7 @@ def derive_projection(
             "centerCoordinates": {"longitude": lon, "latitude": lat},
             "cartesianOffset": {"x": offset[0], "y": offset[1]},
             "fallback": method,
+            "plausibleIngolstadtCoordinate": plausible_ingolstadt_coordinate({"longitude": lon, "latitude": lat}),
             "valid": all(math.isfinite(value) for value in [lon, lat, offset[0], offset[1]]),
         }
     return {
@@ -745,7 +790,9 @@ def point_position_for_mapping(point: Point, net_path: Path, metadata: dict[str,
     net, method = load_sumolib_net(net_path)
     if net is not None:
         try:
-            lon, lat = net.convertXY2LonLat(point.x, point.y)
+            converted = convert_xy_to_lon_lat(net, point)
+            lon = converted["longitude"]
+            lat = converted["latitude"]
             return {"longitude": lon, "latitude": lat, "conversionMethod": method}
         except Exception as exc:  # noqa: BLE001 - report fallback reason.
             method = f"{method}_FAILED: {exc}"
@@ -809,8 +856,6 @@ def write_scenario_files(
     candidate: Candidate,
     targets: dict[str, Any],
     duration_profile: str,
-    net_path: Path,
-    metadata: dict[str, Any],
     projection: dict[str, Any],
 ) -> None:
     if not projection.get("valid"):
@@ -843,7 +888,7 @@ def write_scenario_files(
         },
         "federates": {
             "application": True,
-            "cell": False,
+            "cell": True,
             "environment": False,
             "sns": True,
             "ns3": False,
@@ -857,24 +902,312 @@ def write_scenario_files(
         "updateInterval": f"{targets['sumoStepLengthSeconds']}s",
         "visualizer": False,
     }
-    mapping = {
-        "config": {"fixedOrder": True},
-        "prototypes": [{"name": "Car", "vehicleClass": "ElectricVehicle"}],
-        "rsus": [
+    write_json(scenario_dir / "scenario_config.json", scenario)
+    write_json(scenario_dir / "sumo" / "sumo_config.json", sumo_config)
+
+
+def write_mapping_config(
+    scenario_dir: Path,
+    candidate: Candidate,
+    used_vtype_ids: list[str],
+    net_path: Path,
+    metadata: dict[str, Any],
+) -> dict[str, Any]:
+    rsus = []
+    for index, point in enumerate(candidate.rsu_positions):
+        rsus.append(
             {
                 "name": f"rsu_{index}",
                 "group": "MaGaGateway",
                 "position": point_position_for_mapping(point, net_path, metadata),
                 "applications": [],
             }
-            for index, point in enumerate(candidate.rsu_positions)
+        )
+    mapping = {
+        "config": {"fixedOrder": True},
+        "prototypes": [
+            {
+                "name": vtype_id,
+                "applications": VEHICLE_APPLICATIONS,
+                "weight": 1.0,
+            }
+            for vtype_id in used_vtype_ids
         ],
-        "servers": [{"name": "server_0", "group": "MaGaLiveStateCoordinator", "applications": []}],
+        "rsus": rsus,
+        "servers": [
+            {
+                "name": "server_0",
+                "group": "server_0",
+                "applications": SERVER_APPLICATIONS,
+            }
+        ],
         "vehicles": [],
     }
-    write_json(scenario_dir / "scenario_config.json", scenario)
-    write_json(scenario_dir / "sumo" / "sumo_config.json", sumo_config)
     write_json(scenario_dir / "mapping" / "mapping_config.json", mapping)
+    return mapping
+
+
+def write_sns_config(scenario_dir: Path, catalog: dict[str, Any]) -> dict[str, Any]:
+    nominal = catalog["v2vProfiles"]["nominal"]
+    payload = {
+        "maximumTtl": 10,
+        "singlehopRadius": nominal["singlehopRadiusMeters"],
+        "adhocTransmissionModel": {"type": "SophisticatedAdhocTransmissionModel"},
+        "singlehopDelay": dict(nominal["snsDelay"]),
+        "singleHopTransmission": {
+            "lossProbability": nominal["lossProbability"],
+            "maxRetries": 0,
+        },
+    }
+    write_json(scenario_dir / "sns" / "sns_config.json", payload)
+    return payload
+
+
+def write_cell_configs(scenario_dir: Path, catalog: dict[str, Any], region_boundary: dict[str, Any]) -> dict[str, Any]:
+    profile = catalog["cellProfiles"]["CELL_5G_AVEIRO_P50"]
+    delay_ms = profile["symmetricOneWayDelaySeconds"] * 1000.0
+    capacity = profile["capacityBitsPerSecond"]
+    cell_config = {
+        "networkConfigurationFile": "network.json",
+        "regionConfigurationFile": "regions.json",
+        "bandwidthMeasurementInterval": 1,
+        "bandwidthMeasurementCompression": False,
+        "bandwidthMeasurements": [
+            {"fromRegion": "*", "toRegion": "*", "transmissionMode": "UplinkUnicast"},
+            {"fromRegion": "*", "toRegion": "*", "transmissionMode": "DownlinkUnicast"},
+            {"fromRegion": "*", "toRegion": "*", "transmissionMode": "DownlinkMulticast"},
+        ],
+        "headerLengths": {
+            "udpHeader": "8 Bytes",
+            "tcpHeader": "20 Bytes",
+            "ipHeader": "20 Bytes",
+            "cellularHeader": "18 Bytes",
+            "ethernetHeader": "18 Bytes",
+        },
+    }
+    network = {
+        "defaultDownlinkCapacity": "100 Gbps",
+        "defaultUplinkCapacity": "100 Gbps",
+        "globalNetwork": {
+            "uplink": {
+                "delay": {"type": "ConstantDelay", "delay": f"{delay_ms:g} ms"},
+                "transmission": {"lossProbability": 0.0, "maxRetries": 0},
+                "capacity": capacity,
+            },
+            "downlink": {
+                "unicast": {
+                    "delay": {"type": "ConstantDelay", "delay": f"{delay_ms:g} ms"},
+                    "transmission": {"lossProbability": 0.0, "maxRetries": 0},
+                },
+                "multicast": {
+                    "delay": {"type": "ConstantDelay", "delay": f"{delay_ms:g} ms"},
+                    "transmission": {"lossProbability": 0.0, "maxRetries": 0},
+                    "usableCapacity": 0.6,
+                },
+                "capacity": capacity,
+            },
+        },
+        "servers": [
+            {
+                "id": "server_0",
+                "uplink": {
+                    "delay": {"type": "ConstantDelay", "delay": "50 ms"},
+                    "transmission": {"lossProbability": 0.0, "maxRetries": 0},
+                },
+                "downlink": {
+                    "unicast": {
+                        "delay": {"type": "ConstantDelay", "delay": "50 ms"},
+                        "transmission": {"lossProbability": 0.0, "maxRetries": 0},
+                    }
+                },
+            }
+        ],
+    }
+    regions = {
+        "regions": [
+            {
+                "id": "region_cell_5g_aveiro_p50",
+                "area": {
+                    "nw": region_boundary["nw"],
+                    "se": region_boundary["se"],
+                },
+                "uplink": {
+                    "delay": {"type": "ConstantDelay", "delay": f"{delay_ms:g} ms"},
+                    "transmission": {"lossProbability": 0.0, "maxRetries": 0},
+                    "capacity": capacity,
+                },
+                "downlink": {
+                    "unicast": {
+                        "delay": {"type": "ConstantDelay", "delay": f"{delay_ms:g} ms"},
+                        "transmission": {"lossProbability": 0.0, "maxRetries": 0},
+                    },
+                    "multicast": {
+                        "delay": {"type": "ConstantDelay", "delay": f"{delay_ms:g} ms"},
+                        "transmission": {"lossProbability": 0.0, "maxRetries": 0},
+                        "usableCapacity": 0.6,
+                    },
+                    "capacity": capacity,
+                },
+            }
+        ]
+    }
+    write_json(scenario_dir / "cell" / "cell_config.json", cell_config)
+    write_json(scenario_dir / "cell" / "network.json", network)
+    write_json(scenario_dir / "cell" / "regions.json", regions)
+    return {"cell_config": cell_config, "network": network, "regions": regions}
+
+
+def write_application_config(scenario_dir: Path) -> dict[str, Any]:
+    payload = {
+        "messageCacheTime": "30s",
+        "encodePayloads": True,
+        "eventSchedulerThreads": 1,
+        "navigationConfiguration": {
+            "type": "database",
+            "databaseFile": f"{SUBSCENARIO_NAME}.db",
+        },
+        "perceptionConfiguration": {
+            "vehicleIndex": {"enabled": True},
+            "trafficLightIndex": {"enabled": True},
+            "wallIndex": {"enabled": False},
+        },
+    }
+    write_json(scenario_dir / "application" / "application_config.json", payload)
+    return payload
+
+
+def write_live_state_config(
+    scenario_dir: Path,
+    candidate: Candidate,
+    catalog: dict[str, Any],
+    mapping: dict[str, Any],
+) -> dict[str, Any]:
+    v2v = catalog["v2vProfiles"]["nominal"]
+    cell = catalog["cellProfiles"]["CELL_5G_AVEIRO_P50"]
+    compute = catalog["computeProfiles"]
+    infra = catalog["infrastructure"]
+    mapping_positions = {entry["name"]: entry["position"] for entry in mapping["rsus"]}
+    gateways = []
+    edge_nodes = []
+    for index, point in enumerate(candidate.rsu_positions):
+        runtime_id = f"rsu_{index}"
+        gateways.append(
+            {
+                "runtimeId": runtime_id,
+                "gatewayId": runtime_id,
+                "gatewayType": "RSU",
+                "projectedX": point.x,
+                "projectedY": point.y,
+                "longitude": mapping_positions[runtime_id]["longitude"],
+                "latitude": mapping_positions[runtime_id]["latitude"],
+                "coverageRadiusMeters": infra["nominalRsuCoverageRadiusMeters"],
+                "cellRegionId": "region_cell_5g_aveiro_p50",
+                "bandwidthPoolId": f"pool_rsu_{index}",
+            }
+        )
+        edge_nodes.append(
+            {
+                "executionNodeId": f"edge_rsu_{index}",
+                "gatewayIds": [runtime_id],
+                "availableCpuCyclesPerSecond": compute["edgeCpuCyclesPerSecond"],
+                "basePropagationDelaySeconds": infra["edgeBasePropagationDelaySeconds"],
+            }
+        )
+    payload = {
+        "tickIntervalMs": 1000,
+        "singlehopRadiusMeters": v2v["singlehopRadiusMeters"],
+        "localCpuCyclesPerSecond": compute["localVehicleCpuCyclesPerSecond"],
+        "localCpuSource": "LITERATURE_BASED_RANGE_CHOICE",
+        "v2vNominalBandwidthBitsPerSecond": v2v["effectivePoolCapacityBitsPerSecond"],
+        "v2vBandwidthSource": "LITERATURE_BASED_CALIBRATED_ABSTRACTION",
+        "v2vPropagationDelaySeconds": v2v["maGaFixedDelaySeconds"],
+        "cellDiagnosticAccounting": {
+            "bucketDurationMs": 1000,
+            "availableFromPolicy": "SAFE_AFTER_TIMESTAMP",
+            "bandwidthSource": catalog["runtimeCompatibility"]["cellDiagnosticAccountingSource"],
+            "configuredCellProfileSource": catalog["runtimeCompatibility"]["configuredCellProfileSource"],
+            "relationship": "CONFIGURED_CELL_PROFILE_AND_RUNTIME_ACCOUNTING_ARE_DISTINCT_CONCEPTS",
+            "destinationId": "server_0",
+            "requestPayloadBytes": 1000,
+            "responsePayloadBytes": 500,
+            "intervalMs": 1000,
+            "initialDelayMs": 1000,
+            "maxUplinkBitrate": "49.2 Mbps",
+            "maxDownlinkBitrate": "49.2 Mbps",
+            "gatewayPools": [
+                {"poolId": "pool_rsu_0", "nominalCapacityBitsPerSecond": cell["capacityBitsPerSecond"]},
+                {"poolId": "pool_rsu_1", "nominalCapacityBitsPerSecond": cell["capacityBitsPerSecond"]},
+            ],
+        },
+        "taskProfiles": [
+            {
+                "profileId": "bootstrap_medium_until_14C3",
+                "activationTimeMs": 7000,
+                "sourceVehicleId": "veh_0",
+                "inputSizeBits": 800000,
+                "outputSizeBits": 8000,
+                "cpuCycles": 600000000,
+                "deadlineSeconds": 1.0,
+                "metadataMarker": catalog["runtimeCompatibility"]["temporaryBootstrapTaskMarker"],
+            }
+        ],
+        "staticInfrastructure": {
+            "gateways": gateways,
+            "edgeNodes": edge_nodes,
+            "cloudNodes": [
+                {
+                    "executionNodeId": "cloud_regional",
+                    "mosaicServerRuntimeId": "server_0",
+                    "availableCpuCyclesPerSecond": compute["cloudCpuCyclesPerSecond"],
+                    "serverBaseDelaySeconds": infra["cloudBackhaulExtraDelaySeconds"],
+                }
+            ],
+        },
+    }
+    write_json(scenario_dir / "application" / "ma_ga_live_state_config.json", payload)
+    return payload
+
+
+def write_live_runtime_config(scenario_dir: Path) -> dict[str, Any]:
+    payload = {
+        "scenarioName": SCENARIO_NAME,
+        "coordinatorTickIntervalMs": 100,
+        "initialOptimizationDelayMs": 1000,
+        "gaPollingIntervalMs": 50,
+        "singleInFlightGaOnly": True,
+        "discardLateResult": True,
+        "keepLastAppliedStrategyWhileRunning": True,
+        "freshReoptimizationAfterTimeout": True,
+        "runtimeTraceEnabled": True,
+        "diagnosticArtificialGaDelayMs": 0,
+        "temporalInitialWindowSeconds": 1.0,
+        "configuredGaRuntimeEstimateSeconds": 0.01,
+        "configuredMaxWindowSeconds": 0.2,
+        "deltaTMaxComparisonEpsilonSeconds": 1.0e-9,
+        "publishedSnapshotCopyLimit": 32,
+    }
+    write_json(scenario_dir / "application" / "ma_ga_live_runtime_config.json", payload)
+    return payload
+
+
+def write_literature_runtime_configs(
+    scenario_dir: Path,
+    candidate: Candidate,
+    used_vtype_ids: list[str],
+    net_path: Path,
+    metadata: dict[str, Any],
+    catalog: dict[str, Any],
+    region_boundary: dict[str, Any],
+) -> dict[str, Any]:
+    mapping = write_mapping_config(scenario_dir, candidate, used_vtype_ids, net_path, metadata)
+    return {
+        "mapping": mapping,
+        "sns": write_sns_config(scenario_dir, catalog),
+        "cell": write_cell_configs(scenario_dir, catalog, region_boundary),
+        "application": write_application_config(scenario_dir),
+        "liveState": write_live_state_config(scenario_dir, candidate, catalog, mapping),
+        "liveRuntime": write_live_runtime_config(scenario_dir),
+    }
 
 
 def write_sumocfg(path: Path, net_file: str, route_file: str, step_length: float) -> None:
@@ -907,6 +1240,13 @@ def validate_generated_outputs(
     ]
     if not all(isinstance(value, (int, float)) and math.isfinite(float(value)) for value in values):
         errors.append("scenario_config.json projection contains non-numeric or empty values.")
+    projection_report = report.get("projection", {})
+    if projection_report.get("method") != "SUMOLIB_CONVERT_XY2LONLAT":
+        errors.append("Concrete literature configuration requires SUMOLIB_CONVERT_XY2LONLAT projection.")
+    if projection_report.get("fallback") is not None:
+        errors.append("Concrete literature configuration must not use projection fallback.")
+    if not projection_report.get("plausibleIngolstadtCoordinate"):
+        errors.append("Projection center is not plausible for Ingolstadt.")
 
     for density, output in route_outputs.items():
         route_path = Path(output["routeFile"])
@@ -929,6 +1269,20 @@ def validate_generated_outputs(
     if not selected.rsu_positions:
         errors.append("Selected candidate has no candidate RSU positions.")
 
+    required_generated = [
+        "mapping/mapping_config.json",
+        "sns/sns_config.json",
+        "cell/cell_config.json",
+        "cell/network.json",
+        "cell/regions.json",
+        "application/application_config.json",
+        "application/ma_ga_live_state_config.json",
+        "application/ma_ga_live_runtime_config.json",
+    ]
+    for relative in required_generated:
+        if not (scenario_dir / relative).exists():
+            errors.append(f"Required generated configuration missing: {relative}")
+
     sumocfg_path = scenario_dir / "sumo" / f"{SUBSCENARIO_NAME}.sumocfg"
     if sumocfg_path.exists():
         refs = sumocfg_references(sumocfg_path)
@@ -942,6 +1296,9 @@ def validate_generated_outputs(
     db_files = list(scenario_dir.rglob("*.db"))
     if db_files and not scenario_convert.get("available"):
         errors.append("Database file exists although scenario-convert is unavailable.")
+    jar_files = list(scenario_dir.rglob("*.jar"))
+    if jar_files:
+        errors.append("Generated literature scenario must not contain JAR files.")
 
     return {"errors": errors, "warnings": warnings}
 
@@ -956,10 +1313,17 @@ def sumocfg_references(sumocfg_path: Path) -> list[str]:
     return refs
 
 
-def write_metadata(path: Path, report: dict[str, Any]) -> None:
+def write_metadata(path: Path, report: dict[str, Any], catalog: dict[str, Any]) -> None:
     payload = {
         "scenarioName": SCENARIO_NAME,
         "materializationStatus": report["status"],
+        "selectedIntasCandidate": report.get("selectedCandidateId"),
+        "sourceCommit": report["source"].get("commit"),
+        "projection": {
+            "method": report.get("projection", {}).get("method"),
+            "fallback": report.get("projection", {}).get("fallback"),
+            "classification": "MODELLED_DIRECTLY",
+        },
         "mobility": {
             "source": "InTAS",
             "classification": "MODELLED_DIRECTLY",
@@ -970,11 +1334,53 @@ def write_metadata(path: Path, report: dict[str, Any]) -> None:
         "wirelessAssumptions": [
             {"name": "ITS-G5 / IEEE 802.11p", "classification": "CALIBRATED_ABSTRACTION"},
             {"name": "Carrier frequency 5.9 GHz", "classification": "DOCUMENTATION_ONLY"},
-            {"name": "Channel bandwidth 10 MHz", "classification": "DOCUMENTATION_ONLY"},
+            {"name": "Physical channel bandwidth 10 MHz", "classification": "DOCUMENTATION_ONLY"},
             {"name": "Transmit power 23 dBm", "classification": "DOCUMENTATION_ONLY"},
             {"name": "CAM payload 300 byte", "classification": "DOCUMENTATION_ONLY"},
             {"name": "PRR >= 90%", "classification": "DOCUMENTATION_ONLY"},
             {"name": "Nominal direct V2V radius 250 m", "classification": "CALIBRATED_ABSTRACTION"},
+            {"name": "SNS profile", "classification": "CALIBRATED_ABSTRACTION"},
+        ],
+        "cellProfiles": {
+            "configuredNominalProfile": "CELL_5G_AVEIRO_P50",
+            "configuredProfileSource": catalog["runtimeCompatibility"]["configuredCellProfileSource"],
+            "runtimeAccountingSource": catalog["runtimeCompatibility"]["cellDiagnosticAccountingSource"],
+            "relationship": "configured Cell profile and diagnostic runtime accounting are distinct concepts",
+            "classification": "CALIBRATED_ABSTRACTION",
+            "separateProfiles": ["CELL_5G_AVEIRO_DEGRADED", "CELL_LTE_AVEIRO_STRESS"],
+            "scenarioConvert": "MISSING_DATABASE_NOT_CREATED" if not report.get("scenarioConvert", {}).get("available") else "AVAILABLE",
+        },
+        "computeAssumptions": {
+            "localVehicleCpuCyclesPerSecond": {
+                "value": catalog["computeProfiles"]["localVehicleCpuCyclesPerSecond"],
+                "classification": catalog["computeProfiles"]["localCpuClassification"],
+            },
+            "remoteVehicleCpuCyclesPerSecondTarget": {
+                "value": catalog["computeProfiles"]["remoteVehicleCpuCyclesPerSecondTarget"],
+                "classification": catalog["computeProfiles"]["remoteVehicleCpuClassification"],
+                "status": "PENDING_LIVE_STATE_EXTENSION",
+            },
+            "edgeCpuCyclesPerSecond": {
+                "value": catalog["computeProfiles"]["edgeCpuCyclesPerSecond"],
+                "classification": catalog["computeProfiles"]["edgeCpuClassification"],
+            },
+            "cloudCpuCyclesPerSecond": {
+                "value": catalog["computeProfiles"]["cloudCpuCyclesPerSecond"],
+                "classification": catalog["computeProfiles"]["cloudCpuClassification"],
+            },
+            "cloudBackhaulExtraDelaySeconds": {
+                "value": catalog["infrastructure"]["cloudBackhaulExtraDelaySeconds"],
+                "classification": catalog["infrastructure"]["cloudBackhaulClassification"],
+            },
+        },
+        "temporaryWorkloadBoundary": {
+            "marker": catalog["runtimeCompatibility"]["temporaryBootstrapTaskMarker"],
+            "profileId": "bootstrap_medium_until_14C3",
+            "classification": "CONTROLLED_ASSUMPTION",
+            "nextPhase": catalog["runtimeCompatibility"]["workloadGeneratorPhase"],
+        },
+        "pendingLiveStateExtensions": [
+            "remoteVehicleCpuCyclesPerSecondTarget"
         ],
         "controlledAssumptions": {
             "sumoStepLengthSeconds": {"value": 0.1, "classification": "CONTROLLED_ASSUMPTION"}
@@ -1034,6 +1440,7 @@ def main() -> int:
     args = parse_args()
     targets = load_json(Path(args.targets))
     seeds = load_json(Path(args.seeds))["seeds"]
+    catalog = load_json(Path(args.catalog))
     intas_root = Path(args.intas_root).resolve()
     output_root = Path(args.output_root).resolve()
 
@@ -1060,6 +1467,7 @@ def main() -> int:
     selected_report = candidate_report(selected, metadata, len(routes), edges) if selected else None
     scenario_convert = find_scenario_convert(args.scenario_convert, Path("tmp/mosaic-25.2").resolve())
     projection = derive_projection(selected, net_path, metadata) if selected else {"valid": False, "method": "NO_SELECTED_CANDIDATE"}
+    region_boundary = sumolib_geographic_boundary(selected.bounds, net_path) if selected else {"valid": False}
 
     report: dict[str, Any] = {
         "scenarioName": SCENARIO_NAME,
@@ -1083,7 +1491,9 @@ def main() -> int:
         "selectedCandidate": selected_report,
         "candidates": candidate_reports,
         "projection": projection,
+        "cellRegionGeographicBoundary": region_boundary,
         "scenarioConvert": scenario_convert,
+        "textualConfigurationStatus": "NOT_GENERATED",
         "warnings": parse_warnings,
         "errors": [],
         "status": "READY_FOR_MATERIALIZATION" if selected else "NO_CANDIDATE_SATISFIES_REQUIREMENTS",
@@ -1101,11 +1511,23 @@ def main() -> int:
         write_markdown_report(report_dir / "intas_literature_materialization_report.md", report)
         print(json.dumps(report, indent=2, sort_keys=True))
         return 4
+    if projection.get("method") != "SUMOLIB_CONVERT_XY2LONLAT" or projection.get("fallback") is not None:
+        report["errors"].append("Phase 14C.2 requires SUMOLIB_CONVERT_XY2LONLAT projection without fallback.")
+        write_json(report_dir / "intas_literature_materialization_report.json", report)
+        write_markdown_report(report_dir / "intas_literature_materialization_report.md", report)
+        print(json.dumps(report, indent=2, sort_keys=True))
+        return 4
+    if not region_boundary.get("valid"):
+        report["errors"].append(f"Cannot derive valid Ingolstadt Cell region boundary: {region_boundary}")
+        write_json(report_dir / "intas_literature_materialization_report.json", report)
+        write_markdown_report(report_dir / "intas_literature_materialization_report.md", report)
+        print(json.dumps(report, indent=2, sort_keys=True))
+        return 4
 
-    for relative in ("application", "mapping", "sumo"):
+    for relative in ("application", "mapping", "sumo", "sns", "cell"):
         (output_scenario / relative).mkdir(parents=True, exist_ok=True)
 
-    write_scenario_files(output_scenario, selected, targets, args.duration_profile, net_path, metadata, projection)
+    write_scenario_files(output_scenario, selected, targets, args.duration_profile, projection)
 
     density_names = ["low_density", "nominal", "high_density"] if args.density == "all" else [args.density]
     duration = int(targets["durationsSeconds"]["nominal"])
@@ -1137,18 +1559,35 @@ def main() -> int:
     net_output = output_scenario / "sumo" / f"{SUBSCENARIO_NAME}.net.xml"
     edge_list = report_dir / "selected_edge_ids.txt"
     edge_list.write_text("\n".join(sorted(selected_subset_edges)) + "\n", encoding="utf-8")
+    used_vtype_ids = sorted(
+        {
+            vtype
+            for output in route_outputs.values()
+            for vtype in output["xmlPreservation"]["vTypeIdsWritten"]
+        }
+    )
+    report["usedVTypeIds"] = used_vtype_ids
+
+    netconvert = shutil.which("netconvert")
 
     if args.dry_run:
+        if not netconvert:
+            report["errors"].append("netconvert is required to produce concrete dry-run network files.")
+        else:
+            run_checked(
+                [netconvert, "--sumo-net-file", str(net_path), "--keep-edges.input-file", str(edge_list), "--output-file", str(net_output)],
+                output_scenario,
+            )
         write_sumocfg(
             output_scenario / "sumo" / f"{SUBSCENARIO_NAME}.sumocfg",
-            str(net_path),
+            net_output.name,
             concrete_route.name,
             targets["sumoStepLengthSeconds"],
         )
-        report["status"] = "DRY_RUN_COMPLETED"
+        report["status"] = "DRY_RUN_COMPLETED" if scenario_convert.get("available") else "PARTIAL_EXTERNAL_TOOL_REQUIRED"
+        report["dryRunStatus"] = "DRY_RUN_COMPLETED"
         report["routeSubsets"] = route_outputs
     else:
-        netconvert = shutil.which("netconvert")
         if not netconvert:
             report["status"] = "PARTIAL_EXTERNAL_TOOL_REQUIRED"
             report["errors"].append("netconvert is required to extract the reduced SUMO network.")
@@ -1175,7 +1614,19 @@ def main() -> int:
                     "scenario-convert not found. Use MOSAIC Extended Scenario-Convert before full materialization."
                 )
 
-    write_metadata(output_scenario / "application" / "ma_ga_calibration_metadata.json", report)
+    if not report["errors"]:
+        report["generatedConfigurations"] = write_literature_runtime_configs(
+            output_scenario,
+            selected,
+            used_vtype_ids,
+            net_path,
+            metadata,
+            catalog,
+            region_boundary,
+        )
+        report["textualConfigurationStatus"] = "GENERATED"
+
+    write_metadata(output_scenario / "application" / "ma_ga_calibration_metadata.json", report, catalog)
     generated_validation = validate_generated_outputs(output_scenario, report, selected, route_outputs, scenario_convert)
     report["generatedOutputValidation"] = generated_validation
     report["warnings"].extend(generated_validation["warnings"])
@@ -1183,6 +1634,25 @@ def main() -> int:
     if report["errors"]:
         report["status"] = "FAILED_OUTPUT_VALIDATION"
 
+    write_json(report_dir / "intas_literature_materialization_report.json", report)
+    write_markdown_report(report_dir / "intas_literature_materialization_report.md", report)
+    standalone_validator = TOOL_DIR / "validate_literature_configuration.py"
+    if not report["errors"] and standalone_validator.exists():
+        validator_result = subprocess.run(
+            [sys.executable, "-B", str(standalone_validator), "--scenario-root", str(output_scenario)],
+            text=True,
+            capture_output=True,
+        )
+        report["standaloneConfigurationValidator"] = {
+            "exitCode": validator_result.returncode,
+            "stdout": validator_result.stdout.strip(),
+            "stderr": validator_result.stderr.strip(),
+        }
+        if validator_result.returncode != 0:
+            report["errors"].append("Standalone literature configuration validator failed.")
+            report["status"] = "FAILED_OUTPUT_VALIDATION"
+        else:
+            report["textualConfigurationStatus"] = "GENERATED_AND_VALIDATED"
     write_json(report_dir / "intas_literature_materialization_report.json", report)
     write_markdown_report(report_dir / "intas_literature_materialization_report.md", report)
     print(json.dumps(report, indent=2, sort_keys=True))

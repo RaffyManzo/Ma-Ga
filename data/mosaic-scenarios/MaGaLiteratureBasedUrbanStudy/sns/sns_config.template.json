@@ -1,0 +1,17 @@
+{
+  "maximumTtl": 10,
+  "singlehopRadius": "${V2V_SINGLEHOP_RADIUS_METERS}",
+  "adhocTransmissionModel": {
+    "type": "SophisticatedAdhocTransmissionModel"
+  },
+  "singlehopDelay": {
+    "type": "SimpleRandomDelay",
+    "steps": 10,
+    "minDelay": "1 ms",
+    "maxDelay": "10 ms"
+  },
+  "singleHopTransmission": {
+    "lossProbability": 0.0,
+    "maxRetries": 0
+  }
+}

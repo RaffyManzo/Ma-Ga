@@ -1,0 +1,20 @@
+{
+  "messageCacheTime": "30s",
+  "encodePayloads": true,
+  "eventSchedulerThreads": 1,
+  "navigationConfiguration": {
+    "type": "database",
+    "databaseFile": "intas_literature_urban.db"
+  },
+  "perceptionConfiguration": {
+    "vehicleIndex": {
+      "enabled": true
+    },
+    "trafficLightIndex": {
+      "enabled": true
+    },
+    "wallIndex": {
+      "enabled": false
+    }
+  }
+}

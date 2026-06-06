@@ -1,0 +1,91 @@
+{
+  "scenarioName": "MaGaLiteratureBasedUrbanStudy",
+  "classificationDefinitions": {
+    "MODELLED_DIRECTLY": "Value comes directly from the source simulator assets.",
+    "CALIBRATED_ABSTRACTION": "Value is an explicit abstraction selected from literature-based ranges and must be calibrated before scientific claims.",
+    "DOCUMENTATION_ONLY": "Value documents the intended technology background but is not directly consumed by the runtime.",
+    "CONTROLLED_ASSUMPTION": "Value is a controlled engineering assumption for a bounded experiment.",
+    "PENDING_LIVE_STATE_EXTENSION": "Value is recorded for the calibration design but is not yet consumed by the live-state layer.",
+    "STRESS_PROFILE": "Alternative stress profile kept separate from the nominal scenario.",
+    "SEPARATE_STRESS_PROFILE": "Alternative technology stress profile not mixed into the nominal scenario."
+  },
+  "v2vProfiles": {
+    "nominal": {
+      "technology": "ITS-G5 / IEEE 802.11p",
+      "technologyClassification": "CALIBRATED_ABSTRACTION",
+      "singlehopRadiusMeters": 250,
+      "effectivePoolCapacityBitsPerSecond": 4700000,
+      "maGaFixedDelaySeconds": 0.002,
+      "snsDelay": {
+        "type": "SimpleRandomDelay",
+        "steps": 10,
+        "minDelay": "1 ms",
+        "maxDelay": "10 ms"
+      },
+      "lossProbability": 0.0,
+      "documentationOnly": {
+        "carrierFrequency": "5.9 GHz",
+        "physicalChannelBandwidth": "10 MHz",
+        "transmitPower": "23 dBm",
+        "camPayload": "300 byte",
+        "targetPrr": ">= 90%"
+      }
+    },
+    "degraded": {
+      "singlehopRadiusMeters": 150,
+      "effectivePoolCapacityBitsPerSecond": 3000000,
+      "maGaFixedDelaySeconds": 0.010
+    },
+    "optimistic": {
+      "singlehopRadiusMeters": 300,
+      "effectivePoolCapacityBitsPerSecond": 8000000,
+      "maGaFixedDelaySeconds": 0.00124
+    }
+  },
+  "cellProfiles": {
+    "CELL_5G_AVEIRO_P50": {
+      "technology": "5G",
+      "capacityBitsPerSecond": 49200000,
+      "measuredRttSeconds": 0.0522,
+      "symmetricOneWayDelaySeconds": 0.0261,
+      "classification": "CALIBRATED_ABSTRACTION"
+    },
+    "CELL_5G_AVEIRO_DEGRADED": {
+      "technology": "5G",
+      "capacityBitsPerSecond": 33500000,
+      "measuredRttSeconds": 0.431,
+      "symmetricOneWayDelaySeconds": 0.2155,
+      "classification": "STRESS_PROFILE"
+    },
+    "CELL_LTE_AVEIRO_STRESS": {
+      "technology": "LTE",
+      "capacityBitsPerSecond": 26000000,
+      "measuredRttSeconds": 0.733,
+      "symmetricOneWayDelaySeconds": 0.3665,
+      "classification": "SEPARATE_STRESS_PROFILE"
+    }
+  },
+  "computeProfiles": {
+    "localVehicleCpuCyclesPerSecond": 1000000000,
+    "localCpuClassification": "CONTROLLED_ASSUMPTION",
+    "remoteVehicleCpuCyclesPerSecondTarget": 1000000000,
+    "remoteVehicleCpuClassification": "PENDING_LIVE_STATE_EXTENSION",
+    "edgeCpuCyclesPerSecond": 5000000000,
+    "edgeCpuClassification": "CALIBRATED_ABSTRACTION",
+    "cloudCpuCyclesPerSecond": 100000000000,
+    "cloudCpuClassification": "CALIBRATED_ABSTRACTION"
+  },
+  "infrastructure": {
+    "nominalRsuCount": 2,
+    "nominalRsuCoverageRadiusMeters": 250,
+    "cloudBackhaulExtraDelaySeconds": 0.050,
+    "cloudBackhaulClassification": "CONTROLLED_ASSUMPTION",
+    "edgeBasePropagationDelaySeconds": 0.0357
+  },
+  "runtimeCompatibility": {
+    "cellDiagnosticAccountingSource": "DIAGNOSTIC_RUNTIME_ACCOUNTING_FROM_CONTROLLED_CELL_MESSAGES",
+    "configuredCellProfileSource": "LITERATURE_BASED_CONFIGURED_CELL_PROFILE",
+    "temporaryBootstrapTaskMarker": "TEMPORARY_COMPATIBILITY_TASK_NOT_FINAL_WORKLOAD",
+    "workloadGeneratorPhase": "14C.3"
+  }
+}

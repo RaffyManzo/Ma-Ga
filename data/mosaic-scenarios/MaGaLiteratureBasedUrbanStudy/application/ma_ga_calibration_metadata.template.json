@@ -1,11 +1,19 @@
 {
   "scenarioName": "MaGaLiteratureBasedUrbanStudy",
   "materializationStatus": "TEMPLATE_ONLY_UNTIL_INTAS_ASSETS_ARE_PROVIDED",
+  "selectedIntasCandidate": "candidate_0045",
+  "sourceCommit": "${INTAS_SOURCE_COMMIT}",
+  "projection": {
+    "method": "SUMOLIB_CONVERT_XY2LONLAT",
+    "fallback": null,
+    "classification": "MODELLED_DIRECTLY",
+    "note": "Concrete scenario generation must not use FALLBACK_LINEAR_BOUNDARY_INTERPOLATION."
+  },
   "mobility": {
     "source": "InTAS",
     "classification": "MODELLED_DIRECTLY",
     "repository": "https://github.com/silaslobo/InTAS",
-    "sourceCommitOrTag": "<detected-by-materializer>",
+    "sourceCommitOrTag": "${INTAS_SOURCE_COMMIT_OR_TAG}",
     "sourceFiles": [
       "scenario/ingolstadt.net.xml",
       "scenario/InTAS_buildings.sumocfg",
@@ -16,14 +24,14 @@
     {
       "name": "ITS-G5 / IEEE 802.11p",
       "classification": "CALIBRATED_ABSTRACTION",
-      "notes": "Technology family represented through the simplified SNS abstraction; numeric radio parameters remain documentation-only until calibration."
+      "notes": "Represented through the simplified SNS profile and calibrated MA-GA delay/bandwidth abstractions."
     },
     {
       "name": "Carrier frequency 5.9 GHz",
       "classification": "DOCUMENTATION_ONLY"
     },
     {
-      "name": "Channel bandwidth 10 MHz",
+      "name": "Physical channel bandwidth 10 MHz",
       "classification": "DOCUMENTATION_ONLY"
     },
     {
@@ -39,21 +47,63 @@
       "classification": "DOCUMENTATION_ONLY"
     },
     {
+      "name": "SNS profile",
+      "classification": "CALIBRATED_ABSTRACTION"
+    },
+    {
       "name": "Nominal direct V2V radius 250 m",
       "classification": "CALIBRATED_ABSTRACTION"
     }
   ],
+  "cellProfiles": {
+    "configuredNominalProfile": "CELL_5G_AVEIRO_P50",
+    "configuredProfileSource": "LITERATURE_BASED_CONFIGURED_CELL_PROFILE",
+    "runtimeAccountingSource": "DIAGNOSTIC_RUNTIME_ACCOUNTING_FROM_CONTROLLED_CELL_MESSAGES",
+    "relationship": "configured Cell profile and diagnostic runtime accounting are distinct concepts",
+    "classification": "CALIBRATED_ABSTRACTION",
+    "separateProfiles": [
+      "CELL_5G_AVEIRO_DEGRADED",
+      "CELL_LTE_AVEIRO_STRESS"
+    ],
+    "scenarioConvert": "MISSING_DATABASE_NOT_CREATED"
+  },
+  "computeAssumptions": {
+    "localVehicleCpuCyclesPerSecond": {
+      "value": 1000000000,
+      "classification": "CONTROLLED_ASSUMPTION"
+    },
+    "remoteVehicleCpuCyclesPerSecondTarget": {
+      "value": 1000000000,
+      "classification": "PENDING_LIVE_STATE_EXTENSION",
+      "status": "not emitted into live-state executable config in 14C.2"
+    },
+    "edgeCpuCyclesPerSecond": {
+      "value": 5000000000,
+      "classification": "CALIBRATED_ABSTRACTION"
+    },
+    "cloudCpuCyclesPerSecond": {
+      "value": 100000000000,
+      "classification": "CALIBRATED_ABSTRACTION"
+    },
+    "cloudBackhaulExtraDelaySeconds": {
+      "value": 0.05,
+      "classification": "CONTROLLED_ASSUMPTION"
+    }
+  },
+  "temporaryWorkloadBoundary": {
+    "marker": "TEMPORARY_COMPATIBILITY_TASK_NOT_FINAL_WORKLOAD",
+    "profileId": "bootstrap_medium_until_14C3",
+    "classification": "CONTROLLED_ASSUMPTION",
+    "nextPhase": "14C.3"
+  },
+  "pendingLiveStateExtensions": [
+    "remoteVehicleCpuCyclesPerSecondTarget",
+    "Poisson workload generator",
+    "separate source mode for configured Cell profile versus runtime accounting"
+  ],
   "controlledAssumptions": {
     "sumoStepLengthSeconds": {
       "value": 0.1,
-      "classification": "CONTROLLED_ASSUMPTION"
-    },
-    "initialCellCatalog": {
-      "value": "NOT_DEFINED_IN_PHASE_14C1",
-      "classification": "CONTROLLED_ASSUMPTION"
-    },
-    "vehicleCpuSeparation": {
-      "value": "NOT_DEFINED_IN_PHASE_14C1",
       "classification": "CONTROLLED_ASSUMPTION"
     }
   }

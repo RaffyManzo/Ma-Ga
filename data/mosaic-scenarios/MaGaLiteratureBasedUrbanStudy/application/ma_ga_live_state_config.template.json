@@ -1,0 +1,98 @@
+{
+  "tickIntervalMs": 1000,
+  "singlehopRadiusMeters": "${V2V_SINGLEHOP_RADIUS_METERS}",
+  "localCpuCyclesPerSecond": "${LOCAL_CPU_CYCLES_PER_SECOND}",
+  "localCpuSource": "LITERATURE_BASED_RANGE_CHOICE",
+  "v2vNominalBandwidthBitsPerSecond": "${V2V_POOL_CAPACITY_BITS_PER_SECOND}",
+  "v2vBandwidthSource": "LITERATURE_BASED_CALIBRATED_ABSTRACTION",
+  "v2vPropagationDelaySeconds": "${V2V_FIXED_DELAY_SECONDS}",
+  "cellDiagnosticAccounting": {
+    "bucketDurationMs": 1000,
+    "availableFromPolicy": "SAFE_AFTER_TIMESTAMP",
+    "bandwidthSource": "DIAGNOSTIC_RUNTIME_ACCOUNTING_FROM_CONTROLLED_CELL_MESSAGES",
+    "configuredCellProfileSource": "LITERATURE_BASED_CONFIGURED_CELL_PROFILE",
+    "destinationId": "server_0",
+    "requestPayloadBytes": 1000,
+    "responsePayloadBytes": 500,
+    "intervalMs": 1000,
+    "initialDelayMs": 1000,
+    "maxUplinkBitrate": "49.2 Mbps",
+    "maxDownlinkBitrate": "49.2 Mbps",
+    "gatewayPools": [
+      {
+        "poolId": "pool_rsu_0",
+        "nominalCapacityBitsPerSecond": "${CELL_CAPACITY_BITS_PER_SECOND}"
+      },
+      {
+        "poolId": "pool_rsu_1",
+        "nominalCapacityBitsPerSecond": "${CELL_CAPACITY_BITS_PER_SECOND}"
+      }
+    ]
+  },
+  "taskProfiles": [
+    {
+      "profileId": "bootstrap_medium_until_14C3",
+      "activationTimeMs": 7000,
+      "sourceVehicleId": "veh_0",
+      "inputSizeBits": 800000,
+      "outputSizeBits": 8000,
+      "cpuCycles": 600000000,
+      "deadlineSeconds": 1.0,
+      "metadataMarker": "TEMPORARY_COMPATIBILITY_TASK_NOT_FINAL_WORKLOAD"
+    }
+  ],
+  "staticInfrastructure": {
+    "gateways": [
+      {
+        "runtimeId": "rsu_0",
+        "gatewayId": "rsu_0",
+        "gatewayType": "RSU",
+        "projectedX": "${RSU_0_PROJECTED_X}",
+        "projectedY": "${RSU_0_PROJECTED_Y}",
+        "longitude": "${RSU_0_LONGITUDE}",
+        "latitude": "${RSU_0_LATITUDE}",
+        "coverageRadiusMeters": "${RSU_COVERAGE_RADIUS_METERS}",
+        "cellRegionId": "region_cell_5g_aveiro_p50",
+        "bandwidthPoolId": "pool_rsu_0"
+      },
+      {
+        "runtimeId": "rsu_1",
+        "gatewayId": "rsu_1",
+        "gatewayType": "RSU",
+        "projectedX": "${RSU_1_PROJECTED_X}",
+        "projectedY": "${RSU_1_PROJECTED_Y}",
+        "longitude": "${RSU_1_LONGITUDE}",
+        "latitude": "${RSU_1_LATITUDE}",
+        "coverageRadiusMeters": "${RSU_COVERAGE_RADIUS_METERS}",
+        "cellRegionId": "region_cell_5g_aveiro_p50",
+        "bandwidthPoolId": "pool_rsu_1"
+      }
+    ],
+    "edgeNodes": [
+      {
+        "executionNodeId": "edge_rsu_0",
+        "gatewayIds": [
+          "rsu_0"
+        ],
+        "availableCpuCyclesPerSecond": "${EDGE_CPU_CYCLES_PER_SECOND}",
+        "basePropagationDelaySeconds": "${EDGE_BASE_DELAY_SECONDS}"
+      },
+      {
+        "executionNodeId": "edge_rsu_1",
+        "gatewayIds": [
+          "rsu_1"
+        ],
+        "availableCpuCyclesPerSecond": "${EDGE_CPU_CYCLES_PER_SECOND}",
+        "basePropagationDelaySeconds": "${EDGE_BASE_DELAY_SECONDS}"
+      }
+    ],
+    "cloudNodes": [
+      {
+        "executionNodeId": "cloud_regional",
+        "mosaicServerRuntimeId": "server_0",
+        "availableCpuCyclesPerSecond": "${CLOUD_CPU_CYCLES_PER_SECOND}",
+        "serverBaseDelaySeconds": "${CLOUD_BACKHAUL_EXTRA_DELAY_SECONDS}"
+      }
+    ]
+  }
+}

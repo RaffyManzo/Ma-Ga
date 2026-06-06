@@ -1,0 +1,52 @@
+{
+  "regions": [
+    {
+      "id": "region_cell_5g_aveiro_p50",
+      "area": {
+        "nw": {
+          "lon": "${CELL_REGION_NW_LONGITUDE}",
+          "lat": "${CELL_REGION_NW_LATITUDE}"
+        },
+        "se": {
+          "lon": "${CELL_REGION_SE_LONGITUDE}",
+          "lat": "${CELL_REGION_SE_LATITUDE}"
+        }
+      },
+      "uplink": {
+        "delay": {
+          "type": "ConstantDelay",
+          "delay": "${CELL_ONE_WAY_DELAY_MS} ms"
+        },
+        "transmission": {
+          "lossProbability": 0.0,
+          "maxRetries": 0
+        },
+        "capacity": "${CELL_CAPACITY_BITS_PER_SECOND}"
+      },
+      "downlink": {
+        "unicast": {
+          "delay": {
+            "type": "ConstantDelay",
+            "delay": "${CELL_ONE_WAY_DELAY_MS} ms"
+          },
+          "transmission": {
+            "lossProbability": 0.0,
+            "maxRetries": 0
+          }
+        },
+        "multicast": {
+          "delay": {
+            "type": "ConstantDelay",
+            "delay": "${CELL_ONE_WAY_DELAY_MS} ms"
+          },
+          "transmission": {
+            "lossProbability": 0.0,
+            "maxRetries": 0
+          },
+          "usableCapacity": 0.6
+        },
+        "capacity": "${CELL_CAPACITY_BITS_PER_SECOND}"
+      }
+    }
+  ]
+}

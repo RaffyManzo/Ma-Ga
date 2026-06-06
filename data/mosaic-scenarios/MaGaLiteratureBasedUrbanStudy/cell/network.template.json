@@ -1,0 +1,68 @@
+{
+  "defaultDownlinkCapacity": "100 Gbps",
+  "defaultUplinkCapacity": "100 Gbps",
+  "globalNetwork": {
+    "uplink": {
+      "delay": {
+        "type": "ConstantDelay",
+        "delay": "${CELL_ONE_WAY_DELAY_MS} ms"
+      },
+      "transmission": {
+        "lossProbability": 0.0,
+        "maxRetries": 0
+      },
+      "capacity": "${CELL_CAPACITY_BITS_PER_SECOND}"
+    },
+    "downlink": {
+      "unicast": {
+        "delay": {
+          "type": "ConstantDelay",
+          "delay": "${CELL_ONE_WAY_DELAY_MS} ms"
+        },
+        "transmission": {
+          "lossProbability": 0.0,
+          "maxRetries": 0
+        }
+      },
+      "multicast": {
+        "delay": {
+          "type": "ConstantDelay",
+          "delay": "${CELL_ONE_WAY_DELAY_MS} ms"
+        },
+        "transmission": {
+          "lossProbability": 0.0,
+          "maxRetries": 0
+        },
+        "usableCapacity": 0.6
+      },
+      "capacity": "${CELL_CAPACITY_BITS_PER_SECOND}"
+    }
+  },
+  "servers": [
+    {
+      "id": "server_0",
+      "uplink": {
+        "delay": {
+          "type": "ConstantDelay",
+          "delay": "${CLOUD_BACKHAUL_EXTRA_DELAY_MS} ms"
+        },
+        "transmission": {
+          "lossProbability": 0.0,
+          "maxRetries": 0
+        }
+      },
+      "downlink": {
+        "unicast": {
+          "delay": {
+            "type": "ConstantDelay",
+            "delay": "${CLOUD_BACKHAUL_EXTRA_DELAY_MS} ms"
+          },
+          "transmission": {
+            "lossProbability": 0.0,
+            "maxRetries": 0
+          }
+        }
+      }
+    }
+  ]
+}
