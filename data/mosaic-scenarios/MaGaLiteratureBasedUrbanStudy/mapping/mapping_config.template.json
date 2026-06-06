@@ -1,0 +1,80 @@
+{
+  "config": {
+    "fixedOrder": true
+  },
+  "prototypes": [
+    {
+      "name": "Car",
+      "vehicleClass": "ElectricVehicle",
+      "accel": 2.6,
+      "decel": 4.5,
+      "emergencyDecel": 6.0,
+      "length": 5.0,
+      "maxSpeed": 70.0,
+      "minGap": 2.5,
+      "sigma": 0.5,
+      "tau": 1,
+      "speedFactor": 1.0,
+      "speedMode": "DEFAULT",
+      "laneChangeMode": "DEFAULT",
+      "deviations": {
+        "speedFactor": 0.0,
+        "length": 0.0,
+        "minGap": 0.0,
+        "maxSpeed": 0.0,
+        "accel": 0.0,
+        "decel": 0.0,
+        "tau": 0.0
+      }
+    }
+  ],
+  "rsus": [
+    {
+      "name": "rsu_0",
+      "group": "MaGaGateway",
+      "position": {
+        "longitude": "<derived-by-materializer>",
+        "latitude": "<derived-by-materializer>"
+      },
+      "applications": []
+    },
+    {
+      "name": "rsu_1",
+      "group": "MaGaGateway",
+      "position": {
+        "longitude": "<derived-by-materializer>",
+        "latitude": "<derived-by-materializer>"
+      },
+      "applications": []
+    }
+  ],
+  "servers": [
+    {
+      "name": "server_0",
+      "group": "MaGaLiveStateCoordinator",
+      "applications": [
+        "org.eclipse.mosaic.app.maga.liveruntime.MaGaLiveRuntimeCoordinatorApp",
+        "org.eclipse.mosaic.app.maga.livestate.MaGaLiveCellDiagnosticServerApp"
+      ]
+    }
+  ],
+  "vehicles": [
+    {
+      "startingTime": "0.0 s",
+      "targetFlow": "<derived-by-materializer>",
+      "maxNumberVehicles": "<derived-by-materializer>",
+      "route": "intas_subset",
+      "types": [
+        {
+          "applications": [
+            "org.eclipse.mosaic.app.maga.adhocradio.MaGaAdHocRadioDiagnosticApp",
+            "org.eclipse.mosaic.app.maga.livestate.MaGaLiveVehicleStateApp"
+          ],
+          "name": "Car",
+          "group": "LiteratureBasedPassengerVehicle",
+          "weight": 1.0
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,60 @@
+{
+  "scenarioName": "MaGaLiteratureBasedUrbanStudy",
+  "materializationStatus": "TEMPLATE_ONLY_UNTIL_INTAS_ASSETS_ARE_PROVIDED",
+  "mobility": {
+    "source": "InTAS",
+    "classification": "MODELLED_DIRECTLY",
+    "repository": "https://github.com/silaslobo/InTAS",
+    "sourceCommitOrTag": "<detected-by-materializer>",
+    "sourceFiles": [
+      "scenario/ingolstadt.net.xml",
+      "scenario/InTAS_buildings.sumocfg",
+      "scenario/routes/"
+    ]
+  },
+  "wirelessAssumptions": [
+    {
+      "name": "ITS-G5 / IEEE 802.11p",
+      "classification": "MODELLED_DIRECTLY",
+      "notes": "Technology family for direct V2V in the literature-based scenario."
+    },
+    {
+      "name": "Carrier frequency 5.9 GHz",
+      "classification": "DOCUMENTATION_ONLY"
+    },
+    {
+      "name": "Channel bandwidth 10 MHz",
+      "classification": "DOCUMENTATION_ONLY"
+    },
+    {
+      "name": "Transmit power 23 dBm",
+      "classification": "DOCUMENTATION_ONLY"
+    },
+    {
+      "name": "CAM payload 300 byte",
+      "classification": "DOCUMENTATION_ONLY"
+    },
+    {
+      "name": "PRR >= 90%",
+      "classification": "DOCUMENTATION_ONLY"
+    },
+    {
+      "name": "Nominal direct V2V radius 250 m",
+      "classification": "CALIBRATED_ABSTRACTION"
+    }
+  ],
+  "controlledAssumptions": {
+    "sumoStepLengthSeconds": {
+      "value": 0.1,
+      "classification": "CONTROLLED_ASSUMPTION"
+    },
+    "initialCellCatalog": {
+      "value": "NOT_DEFINED_IN_PHASE_14C1",
+      "classification": "CONTROLLED_ASSUMPTION"
+    },
+    "vehicleCpuSeparation": {
+      "value": "NOT_DEFINED_IN_PHASE_14C1",
+      "classification": "CONTROLLED_ASSUMPTION"
+    }
+  }
+}

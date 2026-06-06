@@ -1,0 +1,5 @@
+{
+  "sumoConfigurationFile": "<subscenario>.sumocfg",
+  "updateInterval": "0.1s",
+  "visualizer": false
+}
