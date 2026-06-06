@@ -10,6 +10,11 @@ final class LiveGaJob {
     private final String triggerType;
     private final SystemSnapshot snapshot;
     private final TemporalWindowState stateAtSubmission;
+    private final double deltaTMaxAtSubmissionSeconds;
+    private final long wallClockDeadlineNs;
+    private boolean timeoutDetectedBeforeCompletion;
+    private long waitCapDetectedWallClockNs;
+    private long waitCapDetectedSimulationTimeNs;
 
     LiveGaJob(
             int windowIndex,
@@ -17,7 +22,9 @@ final class LiveGaJob {
             long submissionWallClockNs,
             String triggerType,
             SystemSnapshot snapshot,
-            TemporalWindowState stateAtSubmission
+            TemporalWindowState stateAtSubmission,
+            double deltaTMaxAtSubmissionSeconds,
+            long wallClockDeadlineNs
     ) {
         this.windowIndex = windowIndex;
         this.submissionSimulationTimeNs = submissionSimulationTimeNs;
@@ -25,6 +32,8 @@ final class LiveGaJob {
         this.triggerType = triggerType;
         this.snapshot = snapshot;
         this.stateAtSubmission = stateAtSubmission;
+        this.deltaTMaxAtSubmissionSeconds = deltaTMaxAtSubmissionSeconds;
+        this.wallClockDeadlineNs = wallClockDeadlineNs;
     }
 
     int getWindowIndex() {
@@ -49,5 +58,35 @@ final class LiveGaJob {
 
     TemporalWindowState getStateAtSubmission() {
         return stateAtSubmission;
+    }
+
+    double getDeltaTMaxAtSubmissionSeconds() {
+        return deltaTMaxAtSubmissionSeconds;
+    }
+
+    long getWallClockDeadlineNs() {
+        return wallClockDeadlineNs;
+    }
+
+    boolean isTimeoutDetectedBeforeCompletion() {
+        return timeoutDetectedBeforeCompletion;
+    }
+
+    long getWaitCapDetectedWallClockNs() {
+        return waitCapDetectedWallClockNs;
+    }
+
+    long getWaitCapDetectedSimulationTimeNs() {
+        return waitCapDetectedSimulationTimeNs;
+    }
+
+    boolean detectTimeoutIfDeadlineReached(long wallClockNowNs, long simulationTimeNs) {
+        if (timeoutDetectedBeforeCompletion || wallClockNowNs < wallClockDeadlineNs) {
+            return false;
+        }
+        timeoutDetectedBeforeCompletion = true;
+        waitCapDetectedWallClockNs = wallClockNowNs;
+        waitCapDetectedSimulationTimeNs = simulationTimeNs;
+        return true;
     }
 }

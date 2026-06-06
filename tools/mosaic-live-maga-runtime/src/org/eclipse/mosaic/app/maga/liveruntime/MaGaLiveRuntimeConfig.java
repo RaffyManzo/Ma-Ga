@@ -25,6 +25,8 @@ public final class MaGaLiveRuntimeConfig {
     double temporalInitialWindowSeconds;
     double configuredGaRuntimeEstimateSeconds;
     double configuredMaxWindowSeconds;
+    double deltaTMaxComparisonEpsilonSeconds;
+    int publishedSnapshotCopyLimit;
 
     public static MaGaLiveRuntimeConfig load(File configurationPath) {
         if (configurationPath == null) {
@@ -70,6 +72,14 @@ public final class MaGaLiveRuntimeConfig {
         return configuredMaxWindowSeconds;
     }
 
+    public double getDeltaTMaxComparisonEpsilonSeconds() {
+        return deltaTMaxComparisonEpsilonSeconds;
+    }
+
+    public int getPublishedSnapshotCopyLimit() {
+        return publishedSnapshotCopyLimit;
+    }
+
     public String profileName() {
         return diagnosticArtificialGaDelayMs > 0 ? "diagnostic-overrun" : "normal";
     }
@@ -82,6 +92,10 @@ public final class MaGaLiveRuntimeConfig {
         requirePositive(temporalInitialWindowSeconds, "temporalInitialWindowSeconds", source);
         requirePositive(configuredGaRuntimeEstimateSeconds, "configuredGaRuntimeEstimateSeconds", source);
         requirePositive(configuredMaxWindowSeconds, "configuredMaxWindowSeconds", source);
+        requirePositive(deltaTMaxComparisonEpsilonSeconds, "deltaTMaxComparisonEpsilonSeconds", source);
+        if (publishedSnapshotCopyLimit < 1) {
+            throw new IllegalArgumentException(source + ": publishedSnapshotCopyLimit must be >= 1");
+        }
         if (!singleInFlightGaOnly) {
             throw new IllegalArgumentException(source + ": singleInFlightGaOnly must be true for Phase 13D");
         }

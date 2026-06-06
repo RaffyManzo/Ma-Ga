@@ -22,6 +22,7 @@ final class LiveGaExecutionCoordinator implements AutoCloseable {
     private final MaGaLiveMosaicSnapshotBridge bridge;
     private final LiveStrategyApplier strategyApplier;
     private final LiveRuntimeTraceWriter traceWriter;
+    private final LiveGaOverrunDeadlinePolicy deadlinePolicy;
     private final ExecutorService executor = Executors.newSingleThreadExecutor();
 
     private TemporalWindowState temporalState;
@@ -35,6 +36,7 @@ final class LiveGaExecutionCoordinator implements AutoCloseable {
     private int gaJobsApplied;
     private int gaJobsDiscardedAsStale;
     private int parallelGaViolations;
+    private int deltaTMaxMismatchViolations;
     private boolean waitCapReachedObserved;
     private boolean staleResultDiscardedObserved;
     private boolean freshReoptimizationRequestedObserved;
@@ -44,27 +46,30 @@ final class LiveGaExecutionCoordinator implements AutoCloseable {
             TemporalWindowManager manager,
             MaGaLiveMosaicSnapshotBridge bridge,
             LiveStrategyApplier strategyApplier,
-            LiveRuntimeTraceWriter traceWriter
+            LiveRuntimeTraceWriter traceWriter,
+            LiveGaOverrunDeadlinePolicy deadlinePolicy
     ) {
         this.config = config;
         this.manager = manager;
         this.bridge = bridge;
         this.strategyApplier = strategyApplier;
         this.traceWriter = traceWriter;
+        this.deadlinePolicy = deadlinePolicy;
     }
 
     void onTick(
             long simulationTimeNs,
             Optional<SystemSnapshot> maybeSnapshot
     ) throws IOException {
-        pollCompletion(simulationTimeNs);
-        if (runtimeState == LiveGaExecutionState.GA_RUNNING) {
+        if (inFlightFuture != null && !inFlightFuture.isDone()) {
+            detectTimeoutWhileRunning(simulationTimeNs);
             if (strategyApplier.hasLastAppliedStrategy()) {
                 lastAppliedStrategyPreservedWhileRunning = true;
             }
             writeRunningTrace(simulationTimeNs);
             return;
         }
+        pollCompletion(simulationTimeNs);
         if (maybeSnapshot.isEmpty()) {
             return;
         }
@@ -107,26 +112,24 @@ final class LiveGaExecutionCoordinator implements AutoCloseable {
             return;
         }
         if (temporalState == null) {
-            TemporalOperationalMetrics initialMetrics = TemporalOperationalMetrics.estimated(
-                    0.0,
-                    config.getConfiguredGaRuntimeEstimateSeconds(),
-                    0.05,
-                    1.0E-6
-            );
             temporalState = TemporalWindowState.initial(
                     snapshot.getTimeSeconds(),
                     config.getTemporalInitialWindowSeconds(),
-                    initialMetrics
+                    deadlinePolicy.initialOperationalMetrics()
             );
         }
-        bridge.publishSnapshot(snapshot);
+        long submissionWallClockNs = System.nanoTime();
+        LiveGaOverrunDeadlinePolicy.LiveGaDeadline deadline =
+                deadlinePolicy.computeDeadline(snapshot, temporalState, submissionWallClockNs);
         LiveGaJob job = new LiveGaJob(
                 temporalState.getWindowIndex(),
                 simulationTimeNs,
-                System.nanoTime(),
+                submissionWallClockNs,
                 triggerType,
                 snapshot,
-                temporalState
+                temporalState,
+                deadline.getDeltaTMaxAtSubmissionSeconds(),
+                deadline.getWallClockDeadlineNs()
         );
         inFlightJob = job;
         runtimeState = LiveGaExecutionState.GA_RUNNING;
@@ -145,11 +148,12 @@ final class LiveGaExecutionCoordinator implements AutoCloseable {
                 true,
                 false,
                 0.0,
-                0.0,
+                job.getDeltaTMaxAtSubmissionSeconds(),
                 false,
                 false,
                 lastAppliedSnapshotId(),
-                ""
+                "",
+                details(job, 0.0, 0.0)
         );
     }
 
@@ -201,11 +205,16 @@ final class LiveGaExecutionCoordinator implements AutoCloseable {
                     false,
                     false,
                     lastAppliedSnapshotId(),
-                    completion.hasError() ? completion.getError().getMessage() : "TemporalWindowManager returned null"
+                    completion.hasError() ? completion.getError().getMessage() : "TemporalWindowManager returned null",
+                    details(completion)
             );
             return;
         }
 
+        if (completion.getDeltaTMaxMismatchSeconds()
+                > config.getDeltaTMaxComparisonEpsilonSeconds()) {
+            deltaTMaxMismatchViolations++;
+        }
         if (completion.isStale()) {
             markStale(simulationTimeNs, completion);
             return;
@@ -227,7 +236,8 @@ final class LiveGaExecutionCoordinator implements AutoCloseable {
                 false,
                 false,
                 lastAppliedSnapshotId(),
-                ""
+                "",
+                details(completion)
         );
         LiveAppliedStrategy applied = strategyApplier.apply(completion.getStepResult(), simulationTimeNs);
         gaJobsApplied++;
@@ -249,42 +259,47 @@ final class LiveGaExecutionCoordinator implements AutoCloseable {
                 true,
                 false,
                 lastAppliedSnapshotId(),
-                ""
+                "",
+                details(completion)
         );
         temporalState = temporalState.afterStep(completion.getStepResult());
         runtimeState = LiveGaExecutionState.IDLE;
     }
 
     private void markStale(long simulationTimeNs, LiveGaCompletion completion) throws IOException {
-        waitCapReachedObserved = true;
-        runtimeState = LiveGaExecutionState.WAIT_CAP_REACHED;
-        traceWriter.writeOverrun(
-                simulationTimeNs,
-                completion.getJob().getWindowIndex(),
-                runtimeState,
-                completion.getStepResult().getSnapshot().getSnapshotId(),
-                completion.getWallClockRuntimeSeconds(),
-                completion.getDeltaTMaxSeconds(),
-                false
-        );
-        traceWriter.writeRuntime(
-                simulationTimeNs,
-                completion.getJob().getWindowIndex(),
-                runtimeState,
-                completion.getJob().getTriggerType(),
-                completion.getStepResult().getSnapshot().getSnapshotId(),
-                completion.getStepResult().getSnapshot().getTimeSeconds(),
-                completion.getStepResult().getSnapshot().getTasks().size(),
-                completion.getStepResult().getSnapshot().getCandidateNodes().size(),
-                false,
-                true,
-                completion.getWallClockRuntimeSeconds(),
-                completion.getDeltaTMaxSeconds(),
-                false,
-                false,
-                lastAppliedSnapshotId(),
-                ""
-        );
+        if (!completion.getJob().isTimeoutDetectedBeforeCompletion()) {
+            waitCapReachedObserved = true;
+            runtimeState = LiveGaExecutionState.WAIT_CAP_REACHED;
+            traceWriter.writeOverrun(
+                    simulationTimeNs,
+                    completion.getJob().getWindowIndex(),
+                    runtimeState,
+                    completion.getStepResult().getSnapshot().getSnapshotId(),
+                    completion.getWallClockRuntimeSeconds(),
+                    completion.getDeltaTMaxSeconds(),
+                    false,
+                    details(completion)
+            );
+            traceWriter.writeRuntime(
+                    simulationTimeNs,
+                    completion.getJob().getWindowIndex(),
+                    runtimeState,
+                    completion.getJob().getTriggerType(),
+                    completion.getStepResult().getSnapshot().getSnapshotId(),
+                    completion.getStepResult().getSnapshot().getTimeSeconds(),
+                    completion.getStepResult().getSnapshot().getTasks().size(),
+                    completion.getStepResult().getSnapshot().getCandidateNodes().size(),
+                    false,
+                    true,
+                    completion.getWallClockRuntimeSeconds(),
+                    completion.getDeltaTMaxSeconds(),
+                    false,
+                    false,
+                    lastAppliedSnapshotId(),
+                    "",
+                    details(completion)
+            );
+        }
 
         staleResultDiscardedObserved = true;
         gaJobsDiscardedAsStale++;
@@ -296,7 +311,8 @@ final class LiveGaExecutionCoordinator implements AutoCloseable {
                 completion.getStepResult().getSnapshot().getSnapshotId(),
                 completion.getWallClockRuntimeSeconds(),
                 completion.getDeltaTMaxSeconds(),
-                true
+                true,
+                details(completion)
         );
         traceWriter.writeRuntime(
                 simulationTimeNs,
@@ -314,7 +330,8 @@ final class LiveGaExecutionCoordinator implements AutoCloseable {
                 false,
                 true,
                 lastAppliedSnapshotId(),
-                ""
+                "",
+                details(completion)
         );
 
         freshReoptimizationRequestedObserved = true;
@@ -336,7 +353,8 @@ final class LiveGaExecutionCoordinator implements AutoCloseable {
                 false,
                 true,
                 lastAppliedSnapshotId(),
-                ""
+                "",
+                details(completion)
         );
     }
 
@@ -357,11 +375,82 @@ final class LiveGaExecutionCoordinator implements AutoCloseable {
                 false,
                 false,
                 0.0,
-                0.0,
+                job.getDeltaTMaxAtSubmissionSeconds(),
                 false,
                 false,
                 lastAppliedSnapshotId(),
-                ""
+                "",
+                details(job, 0.0, 0.0)
+        );
+    }
+
+    private void detectTimeoutWhileRunning(long simulationTimeNs) throws IOException {
+        LiveGaJob job = inFlightJob;
+        if (job == null || job.isTimeoutDetectedBeforeCompletion()) {
+            return;
+        }
+        if (!job.detectTimeoutIfDeadlineReached(System.nanoTime(), simulationTimeNs)) {
+            return;
+        }
+        waitCapReachedObserved = true;
+        runtimeState = LiveGaExecutionState.WAIT_CAP_REACHED;
+        traceWriter.writeOverrun(
+                simulationTimeNs,
+                job.getWindowIndex(),
+                runtimeState,
+                job.getSnapshot().getSnapshotId(),
+                0.0,
+                job.getDeltaTMaxAtSubmissionSeconds(),
+                false,
+                details(job, 0.0, 0.0)
+        );
+        traceWriter.writeRuntime(
+                simulationTimeNs,
+                job.getWindowIndex(),
+                runtimeState,
+                job.getTriggerType(),
+                job.getSnapshot().getSnapshotId(),
+                job.getSnapshot().getTimeSeconds(),
+                job.getSnapshot().getTasks().size(),
+                job.getSnapshot().getCandidateNodes().size(),
+                false,
+                false,
+                0.0,
+                job.getDeltaTMaxAtSubmissionSeconds(),
+                false,
+                false,
+                lastAppliedSnapshotId(),
+                "",
+                details(job, 0.0, 0.0)
+        );
+    }
+
+    private LiveRuntimeTraceDetails details(LiveGaCompletion completion) {
+        return details(
+                completion.getJob(),
+                completion.getDeltaTMaxSeconds(),
+                completion.getDeltaTMaxMismatchSeconds()
+        );
+    }
+
+    private LiveRuntimeTraceDetails details(
+            LiveGaJob job,
+            double deltaTMaxFromCompletedStepSeconds,
+            double deltaTMaxMismatchSeconds
+    ) {
+        if (job == null) {
+            return LiveRuntimeTraceDetails.EMPTY;
+        }
+        return new LiveRuntimeTraceDetails(
+                job.getDeltaTMaxAtSubmissionSeconds(),
+                deltaTMaxFromCompletedStepSeconds,
+                deltaTMaxMismatchSeconds,
+                job.getWallClockDeadlineNs(),
+                job.isTimeoutDetectedBeforeCompletion(),
+                job.getWaitCapDetectedWallClockNs(),
+                job.getWaitCapDetectedSimulationTimeNs(),
+                bridge.getInvalidPoolBandwidthViolations(),
+                bridge.getFuturePoolViolations()
         );
     }
 
@@ -404,6 +493,27 @@ final class LiveGaExecutionCoordinator implements AutoCloseable {
 
     boolean isFreshReoptimizationRequestedObserved() {
         return freshReoptimizationRequestedObserved;
+    }
+
+    int getDeltaTMaxMismatchViolations() {
+        return deltaTMaxMismatchViolations;
+    }
+
+    void finishOnShutdown(long simulationTimeNs) throws IOException {
+        if (inFlightFuture != null && !inFlightFuture.isDone()) {
+            detectTimeoutWhileRunning(simulationTimeNs);
+        }
+        long deadline = System.nanoTime() + TimeUnit.SECONDS.toNanos(5);
+        while (inFlightFuture != null && !inFlightFuture.isDone()
+                && System.nanoTime() < deadline) {
+            try {
+                Thread.sleep(10L);
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+                break;
+            }
+        }
+        pollCompletion(simulationTimeNs);
     }
 
     @Override

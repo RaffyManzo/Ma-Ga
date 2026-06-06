@@ -1,9 +1,10 @@
 package org.eclipse.mosaic.app.maga.liveruntime;
 
-import model.snapshot.BandwidthPoolSnapshot;
 import model.snapshot.SystemSnapshot;
+import org.eclipse.mosaic.app.maga.livestate.LiveStateLayerRuntimeFacade;
 import window.source.MosaicSnapshotBridge;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentSkipListMap;
@@ -15,21 +16,36 @@ public final class MaGaLiveMosaicSnapshotBridge implements MosaicSnapshotBridge 
     private static final double EPSILON_SECONDS = 1.0E-9;
 
     private final ConcurrentSkipListMap<Double, SystemSnapshot> snapshotsByTime = new ConcurrentSkipListMap<>();
+    private final Map<String, LiveStateLayerRuntimeFacade.LivePublishedSnapshotAudit> auditsBySnapshotId =
+            new HashMap<>();
     private final AtomicInteger snapshotsRequested = new AtomicInteger();
     private final AtomicInteger snapshotsResolved = new AtomicInteger();
     private final AtomicInteger emptyResponses = new AtomicInteger();
     private final AtomicInteger futureSnapshotViolations = new AtomicInteger();
     private final AtomicInteger futurePoolViolations = new AtomicInteger();
+    private final AtomicInteger invalidPoolBandwidthViolations = new AtomicInteger();
 
-    public void publishSnapshot(SystemSnapshot snapshot) {
+    public synchronized void publishSnapshot(
+            SystemSnapshot snapshot,
+            LiveStateLayerRuntimeFacade.LivePublishedSnapshotAudit audit
+    ) {
         if (snapshot == null) {
             return;
+        }
+        if (audit != null) {
+            if (!snapshot.getSnapshotId().equals(audit.getSnapshotId())) {
+                futureSnapshotViolations.incrementAndGet();
+                return;
+            }
+            futurePoolViolations.addAndGet(audit.getFuturePoolViolations());
+            invalidPoolBandwidthViolations.addAndGet(audit.getInvalidPoolBandwidthViolations());
+            auditsBySnapshotId.put(snapshot.getSnapshotId(), audit);
         }
         snapshotsByTime.put(snapshot.getTimeSeconds(), snapshot);
     }
 
     @Override
-    public Optional<SystemSnapshot> readSnapshot(double observationTimeSeconds) {
+    public synchronized Optional<SystemSnapshot> readSnapshot(double observationTimeSeconds) {
         snapshotsRequested.incrementAndGet();
         Map.Entry<Double, SystemSnapshot> entry =
                 snapshotsByTime.floorEntry(observationTimeSeconds + EPSILON_SECONDS);
@@ -43,10 +59,11 @@ public final class MaGaLiveMosaicSnapshotBridge implements MosaicSnapshotBridge 
             emptyResponses.incrementAndGet();
             return Optional.empty();
         }
-        for (BandwidthPoolSnapshot pool : snapshot.getBandwidthPools()) {
-            if (pool.getAvailableBandwidth() <= 0.0) {
-                futurePoolViolations.incrementAndGet();
-            }
+        LiveStateLayerRuntimeFacade.LivePublishedSnapshotAudit audit =
+                auditsBySnapshotId.get(snapshot.getSnapshotId());
+        if (audit != null) {
+            futurePoolViolations.addAndGet(audit.getFuturePoolViolations());
+            invalidPoolBandwidthViolations.addAndGet(audit.getInvalidPoolBandwidthViolations());
         }
         snapshotsResolved.incrementAndGet();
         return Optional.of(snapshot);
@@ -75,5 +92,9 @@ public final class MaGaLiveMosaicSnapshotBridge implements MosaicSnapshotBridge 
 
     public int getFuturePoolViolations() {
         return futurePoolViolations.get();
+    }
+
+    public int getInvalidPoolBandwidthViolations() {
+        return invalidPoolBandwidthViolations.get();
     }
 }

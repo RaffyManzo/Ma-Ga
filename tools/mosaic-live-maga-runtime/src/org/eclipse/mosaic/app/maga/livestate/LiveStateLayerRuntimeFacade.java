@@ -14,8 +14,11 @@ import validation.snapshot.SnapshotValidator;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
@@ -102,6 +105,15 @@ public final class LiveStateLayerRuntimeFacade {
         candidates.addAll(v2vCandidates);
         candidates.addAll(remoteCandidates);
 
+        LivePublishedSnapshotAudit audit = buildAudit(
+                "live_runtime_snapshot_t_" + tickTimeNs,
+                tickTimeNs,
+                localAndV2v.getV2vPools(),
+                v2vPoolIds,
+                infrastructure.getGatewayPools(),
+                remotePoolIds
+        );
+
         if (vehicles.isEmpty() || bandwidthPools.isEmpty()) {
             return RuntimeSnapshot.empty(
                     tickTimeNs,
@@ -111,7 +123,8 @@ public final class LiveStateLayerRuntimeFacade {
                     gateways.size(),
                     accessLinks.size(),
                     bandwidthPools.size(),
-                    safeBuckets.size()
+                    safeBuckets.size(),
+                    audit
             );
         }
 
@@ -127,7 +140,7 @@ public final class LiveStateLayerRuntimeFacade {
         );
         snapshotValidator.validate(snapshot);
         localCandidateValidator.validate(snapshot);
-        return RuntimeSnapshot.resolved(snapshot, tickTimeNs, safeBuckets.size());
+        return RuntimeSnapshot.resolved(snapshot, tickTimeNs, safeBuckets.size(), audit);
     }
 
     private List<VehicleSnapshot> vehicles(LiveStateSnapshotView view) {
@@ -321,6 +334,58 @@ public final class LiveStateLayerRuntimeFacade {
         return rows;
     }
 
+    private LivePublishedSnapshotAudit buildAudit(
+            String snapshotId,
+            long tickTimeNs,
+            List<LiveV2vBandwidthPoolPreview> directPools,
+            Set<String> referencedDirectPoolIds,
+            List<LiveGatewayBandwidthPoolPreview> gatewayPools,
+            Set<String> referencedGatewayPoolIds
+    ) {
+        double snapshotTimeSeconds = tickTimeNs / NANOSECONDS_PER_SECOND;
+        Map<String, Double> gatewayPoolAvailableFromTimes = new LinkedHashMap<>();
+        Map<String, Double> directV2vPoolSourceTimes = new LinkedHashMap<>();
+        int futurePoolViolations = 0;
+        int invalidPoolBandwidthViolations = 0;
+
+        for (LiveV2vBandwidthPoolPreview pool : directPools) {
+            if (!referencedDirectPoolIds.contains(pool.poolId)) {
+                continue;
+            }
+            double sourceTimeSeconds = pool.timeNs / NANOSECONDS_PER_SECOND;
+            directV2vPoolSourceTimes.put(pool.poolId, sourceTimeSeconds);
+            if (sourceTimeSeconds > snapshotTimeSeconds + 1.0E-9) {
+                futurePoolViolations++;
+            }
+            if (pool.availableBandwidthBitsPerSecond <= 0) {
+                invalidPoolBandwidthViolations++;
+            }
+        }
+
+        for (LiveGatewayBandwidthPoolPreview pool : gatewayPools) {
+            if (!referencedGatewayPoolIds.contains(pool.poolId)) {
+                continue;
+            }
+            double availableFromSeconds = pool.availableFromNs / NANOSECONDS_PER_SECOND;
+            gatewayPoolAvailableFromTimes.put(pool.poolId, availableFromSeconds);
+            if (availableFromSeconds > snapshotTimeSeconds + 1.0E-9) {
+                futurePoolViolations++;
+            }
+            if (pool.availableBandwidthBitsPerSecond <= 0.0) {
+                invalidPoolBandwidthViolations++;
+            }
+        }
+
+        return new LivePublishedSnapshotAudit(
+                snapshotId,
+                snapshotTimeSeconds,
+                gatewayPoolAvailableFromTimes,
+                directV2vPoolSourceTimes,
+                futurePoolViolations,
+                invalidPoolBandwidthViolations
+        );
+    }
+
     private static Set<String> vehicleIds(List<VehicleSnapshot> vehicles) {
         Set<String> ids = new HashSet<>();
         for (VehicleSnapshot vehicle : vehicles) {
@@ -377,6 +442,7 @@ public final class LiveStateLayerRuntimeFacade {
         private final int accessLinks;
         private final int bandwidthPools;
         private final int safeCellBuckets;
+        private final LivePublishedSnapshotAudit audit;
 
         private RuntimeSnapshot(
                 long tickTimeNs,
@@ -387,7 +453,8 @@ public final class LiveStateLayerRuntimeFacade {
                 int accessGateways,
                 int accessLinks,
                 int bandwidthPools,
-                int safeCellBuckets
+                int safeCellBuckets,
+                LivePublishedSnapshotAudit audit
         ) {
             this.tickTimeNs = tickTimeNs;
             this.snapshot = snapshot;
@@ -398,9 +465,15 @@ public final class LiveStateLayerRuntimeFacade {
             this.accessLinks = accessLinks;
             this.bandwidthPools = bandwidthPools;
             this.safeCellBuckets = safeCellBuckets;
+            this.audit = audit;
         }
 
-        static RuntimeSnapshot resolved(SystemSnapshot snapshot, long tickTimeNs, int safeCellBuckets) {
+        static RuntimeSnapshot resolved(
+                SystemSnapshot snapshot,
+                long tickTimeNs,
+                int safeCellBuckets,
+                LivePublishedSnapshotAudit audit
+        ) {
             return new RuntimeSnapshot(
                     tickTimeNs,
                     snapshot,
@@ -410,7 +483,8 @@ public final class LiveStateLayerRuntimeFacade {
                     snapshot.getAccessGateways().size(),
                     snapshot.getAccessLinks().size(),
                     snapshot.getBandwidthPools().size(),
-                    safeCellBuckets
+                    safeCellBuckets,
+                    audit
             );
         }
 
@@ -422,7 +496,8 @@ public final class LiveStateLayerRuntimeFacade {
                 int accessGateways,
                 int accessLinks,
                 int bandwidthPools,
-                int safeCellBuckets
+                int safeCellBuckets,
+                LivePublishedSnapshotAudit audit
         ) {
             return new RuntimeSnapshot(
                     tickTimeNs,
@@ -433,7 +508,8 @@ public final class LiveStateLayerRuntimeFacade {
                     accessGateways,
                     accessLinks,
                     bandwidthPools,
-                    safeCellBuckets
+                    safeCellBuckets,
+                    audit
             );
         }
 
@@ -471,6 +547,63 @@ public final class LiveStateLayerRuntimeFacade {
 
         public int getSafeCellBuckets() {
             return safeCellBuckets;
+        }
+
+        public LivePublishedSnapshotAudit getAudit() {
+            return audit;
+        }
+    }
+
+    public static final class LivePublishedSnapshotAudit {
+        private final String snapshotId;
+        private final double snapshotTimeSeconds;
+        private final Map<String, Double> gatewayPoolAvailableFromTimes;
+        private final Map<String, Double> directV2vPoolSourceTimes;
+        private final int futurePoolViolations;
+        private final int invalidPoolBandwidthViolations;
+
+        LivePublishedSnapshotAudit(
+                String snapshotId,
+                double snapshotTimeSeconds,
+                Map<String, Double> gatewayPoolAvailableFromTimes,
+                Map<String, Double> directV2vPoolSourceTimes,
+                int futurePoolViolations,
+                int invalidPoolBandwidthViolations
+        ) {
+            this.snapshotId = snapshotId;
+            this.snapshotTimeSeconds = snapshotTimeSeconds;
+            this.gatewayPoolAvailableFromTimes = Collections.unmodifiableMap(
+                    new LinkedHashMap<>(gatewayPoolAvailableFromTimes)
+            );
+            this.directV2vPoolSourceTimes = Collections.unmodifiableMap(
+                    new LinkedHashMap<>(directV2vPoolSourceTimes)
+            );
+            this.futurePoolViolations = futurePoolViolations;
+            this.invalidPoolBandwidthViolations = invalidPoolBandwidthViolations;
+        }
+
+        public String getSnapshotId() {
+            return snapshotId;
+        }
+
+        public double getSnapshotTimeSeconds() {
+            return snapshotTimeSeconds;
+        }
+
+        public Map<String, Double> getGatewayPoolAvailableFromTimes() {
+            return gatewayPoolAvailableFromTimes;
+        }
+
+        public Map<String, Double> getDirectV2vPoolSourceTimes() {
+            return directV2vPoolSourceTimes;
+        }
+
+        public int getFuturePoolViolations() {
+            return futurePoolViolations;
+        }
+
+        public int getInvalidPoolBandwidthViolations() {
+            return invalidPoolBandwidthViolations;
         }
     }
 }

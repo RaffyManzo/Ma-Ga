@@ -45,7 +45,11 @@ public class MaGaLiveRuntimeCoordinatorApp extends AbstractApplication<ServerOpe
 
         try {
             runDirectory = resolveRunDirectory();
-            traceWriter = new LiveRuntimeTraceWriter(runDirectory, runtimeConfig.profileName());
+            traceWriter = new LiveRuntimeTraceWriter(
+                    runDirectory,
+                    runtimeConfig.profileName(),
+                    runtimeConfig.getPublishedSnapshotCopyLimit()
+            );
         } catch (IOException e) {
             throw new IllegalStateException("Unable to open live MA-GA runtime traces", e);
         }
@@ -72,12 +76,15 @@ public class MaGaLiveRuntimeCoordinatorApp extends AbstractApplication<ServerOpe
                 systemStateSource,
                 maGaConfig.getGeneticAlgorithmConfig().getPopulationSize()
         );
+        LiveGaOverrunDeadlinePolicy deadlinePolicy =
+                new LiveGaOverrunDeadlinePolicy(temporalConfig, maGaConfig.getMobilityConfig());
         executionCoordinator = new LiveGaExecutionCoordinator(
                 runtimeConfig,
                 manager,
                 bridge,
                 strategyApplier,
-                traceWriter
+                traceWriter,
+                deadlinePolicy
         );
 
         getLog().infoSimTime(
@@ -100,7 +107,9 @@ public class MaGaLiveRuntimeCoordinatorApp extends AbstractApplication<ServerOpe
                 stateFacade.buildSnapshotAt(tickTimeNs);
         try {
             traceWriter.writeBridgeSnapshot(tickTimeNs, runtimeSnapshot);
-            runtimeSnapshot.getSnapshot().ifPresent(bridge::publishSnapshot);
+            runtimeSnapshot.getSnapshot().ifPresent(
+                    snapshot -> bridge.publishSnapshot(snapshot, runtimeSnapshot.getAudit())
+            );
             executionCoordinator.onTick(tickTimeNs, runtimeSnapshot.getSnapshot());
         } catch (IOException e) {
             throw new IllegalStateException("Unable to write live MA-GA runtime trace", e);
@@ -128,7 +137,7 @@ public class MaGaLiveRuntimeCoordinatorApp extends AbstractApplication<ServerOpe
         long shutdownTimeNs = getOs().getSimulationTime();
         try {
             if (executionCoordinator != null) {
-                executionCoordinator.onTick(shutdownTimeNs, Optional.empty());
+                executionCoordinator.finishOnShutdown(shutdownTimeNs);
                 executionCoordinator.close();
             }
         } catch (IOException e) {
@@ -155,6 +164,9 @@ public class MaGaLiveRuntimeCoordinatorApp extends AbstractApplication<ServerOpe
                         + "|gaJobsApplied=" + executionCoordinator.getGaJobsApplied()
                         + "|gaJobsDiscardedAsStale=" + executionCoordinator.getGaJobsDiscardedAsStale()
                         + "|parallelGaViolations=" + executionCoordinator.getParallelGaViolations()
+                        + "|deltaTMaxMismatchViolations=" + executionCoordinator.getDeltaTMaxMismatchViolations()
+                        + "|futurePoolViolations=" + bridge.getFuturePoolViolations()
+                        + "|invalidPoolBandwidthViolations=" + bridge.getInvalidPoolBandwidthViolations()
         );
     }
 

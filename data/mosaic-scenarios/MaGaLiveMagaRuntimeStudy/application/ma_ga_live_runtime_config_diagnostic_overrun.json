@@ -10,5 +10,7 @@
   "diagnosticArtificialGaDelayMs": 250,
   "temporalInitialWindowSeconds": 1.0,
   "configuredGaRuntimeEstimateSeconds": 0.01,
-  "configuredMaxWindowSeconds": 0.08
+  "configuredMaxWindowSeconds": 0.08,
+  "deltaTMaxComparisonEpsilonSeconds": 1.0E-9,
+  "publishedSnapshotCopyLimit": 32
 }
