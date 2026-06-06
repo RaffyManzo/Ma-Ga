@@ -1,0 +1,14 @@
+{
+  "coordinatorTickIntervalMs": 100,
+  "initialOptimizationDelayMs": 1000,
+  "gaPollingIntervalMs": 50,
+  "singleInFlightGaOnly": true,
+  "discardLateResult": true,
+  "keepLastAppliedStrategyWhileRunning": true,
+  "freshReoptimizationAfterTimeout": true,
+  "runtimeTraceEnabled": true,
+  "diagnosticArtificialGaDelayMs": 0,
+  "temporalInitialWindowSeconds": 1.0,
+  "configuredGaRuntimeEstimateSeconds": 0.01,
+  "configuredMaxWindowSeconds": 0.2
+}

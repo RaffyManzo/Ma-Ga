@@ -238,6 +238,19 @@ pool `GATEWAY`, candidati `EDGE`/`CLOUD` e snapshot JSON live compatibili con
 La banda Cell resta diagnostica, non una misura diretta del federate; bridge
 concreto, `TemporalWindowManager` live e MA-GA live restano fuori scope.
 
+### Fase 13D - bridge MA-GA operativo live
+
+La Fase 13D introduce lo scenario isolato `MaGaLiveMagaRuntimeStudy` e il tool
+`tools/mosaic-live-maga-runtime/`. Il runtime usa un
+`MosaicSnapshotBridge` concreto, la `MosaicSystemStateSource` esistente, il
+`TemporalWindowManager` invariato e un worker single-thread per eseguire MA-GA
+su snapshot live causali costruiti in memoria. Produce trace runtime locali e
+la diagnostica
+`data/mosaic-study/diagnostics/phase_13d_live_maga_runtime_validation.json`.
+La strategy application resta diagnostica: task execution reale, migrazione,
+checkpoint e scenario finale realistico restano fuori scope per le fasi
+successive.
+
 ### Batch statico GA
 
 Main class:

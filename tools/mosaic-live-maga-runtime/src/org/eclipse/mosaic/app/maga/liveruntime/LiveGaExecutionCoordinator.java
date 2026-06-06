@@ -1,0 +1,418 @@
+package org.eclipse.mosaic.app.maga.liveruntime;
+
+import model.snapshot.SystemSnapshot;
+import window.core.TemporalWindowManager;
+import window.state.TemporalStepResult;
+import window.state.TemporalWindowState;
+import window.timing.TemporalOperationalMetrics;
+
+import java.io.IOException;
+import java.util.Optional;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
+
+final class LiveGaExecutionCoordinator implements AutoCloseable {
+
+    private static final double NANOSECONDS_PER_SECOND = 1_000_000_000.0;
+
+    private final MaGaLiveRuntimeConfig config;
+    private final TemporalWindowManager manager;
+    private final MaGaLiveMosaicSnapshotBridge bridge;
+    private final LiveStrategyApplier strategyApplier;
+    private final LiveRuntimeTraceWriter traceWriter;
+    private final ExecutorService executor = Executors.newSingleThreadExecutor();
+
+    private TemporalWindowState temporalState;
+    private Future<LiveGaCompletion> inFlightFuture;
+    private LiveGaJob inFlightJob;
+    private LiveGaExecutionState runtimeState = LiveGaExecutionState.IDLE;
+    private boolean freshReoptimizationRequested;
+    private boolean lastAppliedStrategyPreservedWhileRunning;
+    private int gaJobsSubmitted;
+    private int gaJobsCompleted;
+    private int gaJobsApplied;
+    private int gaJobsDiscardedAsStale;
+    private int parallelGaViolations;
+    private boolean waitCapReachedObserved;
+    private boolean staleResultDiscardedObserved;
+    private boolean freshReoptimizationRequestedObserved;
+
+    LiveGaExecutionCoordinator(
+            MaGaLiveRuntimeConfig config,
+            TemporalWindowManager manager,
+            MaGaLiveMosaicSnapshotBridge bridge,
+            LiveStrategyApplier strategyApplier,
+            LiveRuntimeTraceWriter traceWriter
+    ) {
+        this.config = config;
+        this.manager = manager;
+        this.bridge = bridge;
+        this.strategyApplier = strategyApplier;
+        this.traceWriter = traceWriter;
+    }
+
+    void onTick(
+            long simulationTimeNs,
+            Optional<SystemSnapshot> maybeSnapshot
+    ) throws IOException {
+        pollCompletion(simulationTimeNs);
+        if (runtimeState == LiveGaExecutionState.GA_RUNNING) {
+            if (strategyApplier.hasLastAppliedStrategy()) {
+                lastAppliedStrategyPreservedWhileRunning = true;
+            }
+            writeRunningTrace(simulationTimeNs);
+            return;
+        }
+        if (maybeSnapshot.isEmpty()) {
+            return;
+        }
+        SystemSnapshot snapshot = maybeSnapshot.get();
+        if (!shouldSubmit(simulationTimeNs, snapshot)) {
+            return;
+        }
+        submit(simulationTimeNs, snapshot, triggerType(simulationTimeNs));
+    }
+
+    private boolean shouldSubmit(long simulationTimeNs, SystemSnapshot snapshot) {
+        if (inFlightFuture != null && !inFlightFuture.isDone()) {
+            parallelGaViolations++;
+            return false;
+        }
+        if (freshReoptimizationRequested) {
+            return true;
+        }
+        if (temporalState == null) {
+            return simulationTimeNs >= config.getInitialOptimizationDelayNs();
+        }
+        long nextScheduledNs = Math.round(temporalState.getNextScheduledTimeSeconds() * NANOSECONDS_PER_SECOND);
+        return simulationTimeNs >= nextScheduledNs
+                && snapshot.getTimeSeconds() + 1.0E-9 >= temporalState.getNextScheduledTimeSeconds();
+    }
+
+    private String triggerType(long simulationTimeNs) {
+        if (freshReoptimizationRequested) {
+            return "FRESH_REOPTIMIZATION_REQUESTED";
+        }
+        if (temporalState == null) {
+            return "FIRST_RUN";
+        }
+        return "SCHEDULED_WINDOW_EXPIRATION";
+    }
+
+    private void submit(long simulationTimeNs, SystemSnapshot snapshot, String triggerType) throws IOException {
+        if (inFlightFuture != null && !inFlightFuture.isDone()) {
+            parallelGaViolations++;
+            return;
+        }
+        if (temporalState == null) {
+            TemporalOperationalMetrics initialMetrics = TemporalOperationalMetrics.estimated(
+                    0.0,
+                    config.getConfiguredGaRuntimeEstimateSeconds(),
+                    0.05,
+                    1.0E-6
+            );
+            temporalState = TemporalWindowState.initial(
+                    snapshot.getTimeSeconds(),
+                    config.getTemporalInitialWindowSeconds(),
+                    initialMetrics
+            );
+        }
+        bridge.publishSnapshot(snapshot);
+        LiveGaJob job = new LiveGaJob(
+                temporalState.getWindowIndex(),
+                simulationTimeNs,
+                System.nanoTime(),
+                triggerType,
+                snapshot,
+                temporalState
+        );
+        inFlightJob = job;
+        runtimeState = LiveGaExecutionState.GA_RUNNING;
+        freshReoptimizationRequested = false;
+        gaJobsSubmitted++;
+        inFlightFuture = executor.submit(() -> executeJob(job));
+        traceWriter.writeRuntime(
+                simulationTimeNs,
+                job.getWindowIndex(),
+                runtimeState,
+                triggerType,
+                snapshot.getSnapshotId(),
+                snapshot.getTimeSeconds(),
+                snapshot.getTasks().size(),
+                snapshot.getCandidateNodes().size(),
+                true,
+                false,
+                0.0,
+                0.0,
+                false,
+                false,
+                lastAppliedSnapshotId(),
+                ""
+        );
+    }
+
+    private LiveGaCompletion executeJob(LiveGaJob job) {
+        try {
+            if (config.getDiagnosticArtificialGaDelayMs() > 0) {
+                Thread.sleep(config.getDiagnosticArtificialGaDelayMs());
+            }
+            TemporalStepResult stepResult = manager.executeNextStepOrNull(job.getStateAtSubmission());
+            double runtimeSeconds =
+                    (System.nanoTime() - job.getSubmissionWallClockNs()) / NANOSECONDS_PER_SECOND;
+            return LiveGaCompletion.success(job, stepResult, runtimeSeconds);
+        } catch (Throwable error) {
+            double runtimeSeconds =
+                    (System.nanoTime() - job.getSubmissionWallClockNs()) / NANOSECONDS_PER_SECOND;
+            return LiveGaCompletion.failure(job, error, runtimeSeconds);
+        }
+    }
+
+    private void pollCompletion(long simulationTimeNs) throws IOException {
+        if (inFlightFuture == null || !inFlightFuture.isDone()) {
+            return;
+        }
+        LiveGaCompletion completion;
+        try {
+            completion = inFlightFuture.get();
+        } catch (Exception e) {
+            completion = LiveGaCompletion.failure(inFlightJob, e, 0.0);
+        }
+        inFlightFuture = null;
+        inFlightJob = null;
+        gaJobsCompleted++;
+
+        if (completion.hasError() || completion.getStepResult() == null) {
+            runtimeState = LiveGaExecutionState.IDLE;
+            traceWriter.writeRuntime(
+                    simulationTimeNs,
+                    completion.getJob().getWindowIndex(),
+                    runtimeState,
+                    completion.getJob().getTriggerType(),
+                    completion.getJob().getSnapshot().getSnapshotId(),
+                    completion.getJob().getSnapshot().getTimeSeconds(),
+                    completion.getJob().getSnapshot().getTasks().size(),
+                    completion.getJob().getSnapshot().getCandidateNodes().size(),
+                    false,
+                    true,
+                    completion.getWallClockRuntimeSeconds(),
+                    completion.getDeltaTMaxSeconds(),
+                    false,
+                    false,
+                    lastAppliedSnapshotId(),
+                    completion.hasError() ? completion.getError().getMessage() : "TemporalWindowManager returned null"
+            );
+            return;
+        }
+
+        if (completion.isStale()) {
+            markStale(simulationTimeNs, completion);
+            return;
+        }
+        runtimeState = LiveGaExecutionState.RESULT_READY_WITHIN_BOUND;
+        traceWriter.writeRuntime(
+                simulationTimeNs,
+                completion.getJob().getWindowIndex(),
+                runtimeState,
+                completion.getJob().getTriggerType(),
+                completion.getStepResult().getSnapshot().getSnapshotId(),
+                completion.getStepResult().getSnapshot().getTimeSeconds(),
+                completion.getStepResult().getSnapshot().getTasks().size(),
+                completion.getStepResult().getSnapshot().getCandidateNodes().size(),
+                false,
+                true,
+                completion.getWallClockRuntimeSeconds(),
+                completion.getDeltaTMaxSeconds(),
+                false,
+                false,
+                lastAppliedSnapshotId(),
+                ""
+        );
+        LiveAppliedStrategy applied = strategyApplier.apply(completion.getStepResult(), simulationTimeNs);
+        gaJobsApplied++;
+        runtimeState = LiveGaExecutionState.RESULT_APPLIED;
+        traceWriter.writeStrategy(simulationTimeNs, completion.getJob().getWindowIndex(), applied);
+        traceWriter.writeRuntime(
+                simulationTimeNs,
+                completion.getJob().getWindowIndex(),
+                runtimeState,
+                completion.getJob().getTriggerType(),
+                completion.getStepResult().getSnapshot().getSnapshotId(),
+                completion.getStepResult().getSnapshot().getTimeSeconds(),
+                completion.getStepResult().getSnapshot().getTasks().size(),
+                completion.getStepResult().getSnapshot().getCandidateNodes().size(),
+                false,
+                true,
+                completion.getWallClockRuntimeSeconds(),
+                completion.getDeltaTMaxSeconds(),
+                true,
+                false,
+                lastAppliedSnapshotId(),
+                ""
+        );
+        temporalState = temporalState.afterStep(completion.getStepResult());
+        runtimeState = LiveGaExecutionState.IDLE;
+    }
+
+    private void markStale(long simulationTimeNs, LiveGaCompletion completion) throws IOException {
+        waitCapReachedObserved = true;
+        runtimeState = LiveGaExecutionState.WAIT_CAP_REACHED;
+        traceWriter.writeOverrun(
+                simulationTimeNs,
+                completion.getJob().getWindowIndex(),
+                runtimeState,
+                completion.getStepResult().getSnapshot().getSnapshotId(),
+                completion.getWallClockRuntimeSeconds(),
+                completion.getDeltaTMaxSeconds(),
+                false
+        );
+        traceWriter.writeRuntime(
+                simulationTimeNs,
+                completion.getJob().getWindowIndex(),
+                runtimeState,
+                completion.getJob().getTriggerType(),
+                completion.getStepResult().getSnapshot().getSnapshotId(),
+                completion.getStepResult().getSnapshot().getTimeSeconds(),
+                completion.getStepResult().getSnapshot().getTasks().size(),
+                completion.getStepResult().getSnapshot().getCandidateNodes().size(),
+                false,
+                true,
+                completion.getWallClockRuntimeSeconds(),
+                completion.getDeltaTMaxSeconds(),
+                false,
+                false,
+                lastAppliedSnapshotId(),
+                ""
+        );
+
+        staleResultDiscardedObserved = true;
+        gaJobsDiscardedAsStale++;
+        runtimeState = LiveGaExecutionState.STALE_RESULT_DISCARDED;
+        traceWriter.writeOverrun(
+                simulationTimeNs,
+                completion.getJob().getWindowIndex(),
+                runtimeState,
+                completion.getStepResult().getSnapshot().getSnapshotId(),
+                completion.getWallClockRuntimeSeconds(),
+                completion.getDeltaTMaxSeconds(),
+                true
+        );
+        traceWriter.writeRuntime(
+                simulationTimeNs,
+                completion.getJob().getWindowIndex(),
+                runtimeState,
+                completion.getJob().getTriggerType(),
+                completion.getStepResult().getSnapshot().getSnapshotId(),
+                completion.getStepResult().getSnapshot().getTimeSeconds(),
+                completion.getStepResult().getSnapshot().getTasks().size(),
+                completion.getStepResult().getSnapshot().getCandidateNodes().size(),
+                false,
+                true,
+                completion.getWallClockRuntimeSeconds(),
+                completion.getDeltaTMaxSeconds(),
+                false,
+                true,
+                lastAppliedSnapshotId(),
+                ""
+        );
+
+        freshReoptimizationRequestedObserved = true;
+        freshReoptimizationRequested = true;
+        runtimeState = LiveGaExecutionState.FRESH_REOPTIMIZATION_REQUESTED;
+        traceWriter.writeRuntime(
+                simulationTimeNs,
+                completion.getJob().getWindowIndex(),
+                runtimeState,
+                completion.getJob().getTriggerType(),
+                completion.getStepResult().getSnapshot().getSnapshotId(),
+                completion.getStepResult().getSnapshot().getTimeSeconds(),
+                completion.getStepResult().getSnapshot().getTasks().size(),
+                completion.getStepResult().getSnapshot().getCandidateNodes().size(),
+                false,
+                true,
+                completion.getWallClockRuntimeSeconds(),
+                completion.getDeltaTMaxSeconds(),
+                false,
+                true,
+                lastAppliedSnapshotId(),
+                ""
+        );
+    }
+
+    private void writeRunningTrace(long simulationTimeNs) throws IOException {
+        LiveGaJob job = inFlightJob;
+        if (job == null) {
+            return;
+        }
+        traceWriter.writeRuntime(
+                simulationTimeNs,
+                job.getWindowIndex(),
+                runtimeState,
+                job.getTriggerType(),
+                job.getSnapshot().getSnapshotId(),
+                job.getSnapshot().getTimeSeconds(),
+                job.getSnapshot().getTasks().size(),
+                job.getSnapshot().getCandidateNodes().size(),
+                false,
+                false,
+                0.0,
+                0.0,
+                false,
+                false,
+                lastAppliedSnapshotId(),
+                ""
+        );
+    }
+
+    private String lastAppliedSnapshotId() {
+        LiveAppliedStrategy strategy = strategyApplier.getLastAppliedStrategy();
+        return strategy == null ? "" : strategy.getSnapshotId();
+    }
+
+    int getGaJobsSubmitted() {
+        return gaJobsSubmitted;
+    }
+
+    int getGaJobsCompleted() {
+        return gaJobsCompleted;
+    }
+
+    int getGaJobsApplied() {
+        return gaJobsApplied;
+    }
+
+    int getGaJobsDiscardedAsStale() {
+        return gaJobsDiscardedAsStale;
+    }
+
+    int getParallelGaViolations() {
+        return parallelGaViolations;
+    }
+
+    boolean isLastAppliedStrategyPreservedWhileRunning() {
+        return lastAppliedStrategyPreservedWhileRunning;
+    }
+
+    boolean isWaitCapReachedObserved() {
+        return waitCapReachedObserved;
+    }
+
+    boolean isStaleResultDiscardedObserved() {
+        return staleResultDiscardedObserved;
+    }
+
+    boolean isFreshReoptimizationRequestedObserved() {
+        return freshReoptimizationRequestedObserved;
+    }
+
+    @Override
+    public void close() {
+        executor.shutdown();
+        try {
+            executor.awaitTermination(5, TimeUnit.SECONDS);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
+    }
+}

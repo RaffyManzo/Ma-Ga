@@ -1,0 +1,50 @@
+﻿{
+    "phase":  "13D_LIVE_MAGA_RUNTIME_BRIDGE_AND_OVERRUN_POLICY",
+    "sourceRun":  "log-20260606-101627-MaGaLiveMagaRuntimeStudy",
+    "sourceRunName":  "log-20260606-101627-MaGaLiveMagaRuntimeStudy",
+    "sourceRunRelativeDir":  "tmp/mosaic-25.2/logs/log-20260606-101627-MaGaLiveMagaRuntimeStudy",
+    "normalRunName":  "log-20260606-101604-MaGaLiveMagaRuntimeStudy",
+    "overrunRunName":  "log-20260606-101627-MaGaLiveMagaRuntimeStudy",
+    "scenarioName":  "MaGaLiveMagaRuntimeStudy",
+    "simulationCompleted":  true,
+    "bridgeDescription":  "LIVE_CAUSAL_MOSAIC_SNAPSHOT_BRIDGE",
+    "mosaicSystemStateSourceMode":  "MOSAIC_LIVE",
+    "coordinatorTicks":  1200,
+    "snapshotsRequested":  115,
+    "snapshotsResolved":  115,
+    "snapshotEmptyResponses":  78,
+    "gaJobsSubmitted":  115,
+    "gaJobsCompleted":  113,
+    "gaJobsApplied":  111,
+    "gaJobsDiscardedAsStale":  2,
+    "parallelGaViolations":  0,
+    "futureSnapshotViolations":  0,
+    "futurePoolViolations":  0,
+    "strategyApplications":  111,
+    "localAssignments":  96,
+    "vehicleAssignments":  0,
+    "edgeAssignments":  0,
+    "cloudAssignments":  0,
+    "lastAppliedStrategyPreservedWhileRunning":  true,
+    "normalRunValidated":  true,
+    "overrunRunValidated":  true,
+    "waitCapReachedObserved":  true,
+    "staleResultDiscardedObserved":  true,
+    "freshReoptimizationRequestedObserved":  true,
+    "absolutePathsInVersionedDiagnostics":  0,
+    "absolutePathFiles":  [
+
+                          ],
+    "warnings":  [
+                     "WARNING_STRATEGY_APPLICATION_IS_DIAGNOSTIC_NOT_TASK_EXECUTION",
+                     "WARNING_CELL_BANDWIDTH_IS_DIAGNOSTIC_RUNTIME_ACCOUNTING_NOT_FEDERATE_MEASUREMENT",
+                     "WARNING_REUSED_STRATEGY_MAY_BECOME_STALE_DURING_GA_OVERRUN",
+                     "WARNING_DIAGNOSTIC_ARTIFICIAL_GA_DELAY_USED_ONLY_FOR_OVERRUN_TEST",
+                     "WARNING_DIAGNOSTIC_CPU_AND_V2V_BANDWIDTH_REQUIRE_FUTURE_CALIBRATION"
+                 ],
+    "errors":  [
+
+               ],
+    "phase13dStatus":  "COMPLETED",
+    "readyForPhase13E":  true
+}

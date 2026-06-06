@@ -1,0 +1,140 @@
+# MOSAIC live MA-GA runtime
+
+Tool diagnostico versionabile per la Fase 13D. Collega il layer live 13C al
+core MA-GA esistente usando un `MosaicSnapshotBridge` concreto, la
+`MosaicSystemStateSource` invariata, `TemporalWindowManager.executeNextStepOrNull`
+e un worker single-thread.
+
+Non implementa esecuzione reale dei task, migrazione live, checkpoint,
+strategy control operativo o scenario finale realistico. Lo strategy applier e'
+diagnostico.
+
+## Scenario
+
+Scenario versionabile:
+
+```text
+data/mosaic-scenarios/MaGaLiveMagaRuntimeStudy
+```
+
+Deriva da `MaGaLiveInfrastructureSnapshotStudy`, mantiene SUMO, SNS, Cell,
+server coordinator, veicoli, RSU e accounting Cell diagnostico controllato. Il
+coordinator app e' sostituito con:
+
+```text
+org.eclipse.mosaic.app.maga.liveruntime.MaGaLiveRuntimeCoordinatorApp
+```
+
+## Build
+
+```powershell
+powershell -NoProfile -ExecutionPolicy Bypass `
+  -File .\tools\mosaic-live-maga-runtime\build.ps1
+```
+
+Il build compila:
+
+```text
+src/
+tools/mosaic-live-state-layer/src/
+tools/mosaic-live-maga-runtime/src/
+```
+
+e crea:
+
+```text
+tools/mosaic-live-maga-runtime/out/maga-live-maga-runtime.jar
+```
+
+Il JAR viene copiato solo in:
+
+```text
+data/mosaic-scenarios/MaGaLiveMagaRuntimeStudy/application/
+```
+
+## Deploy
+
+```powershell
+powershell -NoProfile -ExecutionPolicy Bypass `
+  -File .\tools\mosaic-live-maga-runtime\deploy.ps1 `
+  -MosaicRoot ".\tmp\mosaic-25.2"
+```
+
+Il deploy sostituisce solo:
+
+```text
+tmp/mosaic-25.2/scenarios/MaGaLiveMagaRuntimeStudy/
+```
+
+## Run normale
+
+```powershell
+powershell -NoProfile -ExecutionPolicy Bypass `
+  -File .\tools\mosaic-live-maga-runtime\run.ps1 `
+  -MosaicRoot ".\tmp\mosaic-25.2" `
+  -Profile "normal"
+```
+
+## Run overrun diagnostico
+
+```powershell
+powershell -NoProfile -ExecutionPolicy Bypass `
+  -File .\tools\mosaic-live-maga-runtime\run.ps1 `
+  -MosaicRoot ".\tmp\mosaic-25.2" `
+  -Profile "diagnostic-overrun"
+```
+
+Il profilo overrun copia nel solo scenario deployato una configurazione con
+`diagnosticArtificialGaDelayMs > 0`. Il ritardo e' marcato come diagnostico e
+serve esclusivamente a osservare `WAIT_CAP_REACHED`,
+`STALE_RESULT_DISCARDED` e `FRESH_REOPTIMIZATION_REQUESTED`.
+
+## Validate
+
+```powershell
+powershell -NoProfile -ExecutionPolicy Bypass `
+  -File .\tools\mosaic-live-maga-runtime\validate.ps1 `
+  -MosaicRoot ".\tmp\mosaic-25.2"
+```
+
+Il validator legge la run normale e la run overrun piu' recenti e genera:
+
+```text
+data/mosaic-study/diagnostics/phase_13d_live_maga_runtime_validation.json
+```
+
+## Output locali
+
+Le trace runtime sono scritte in:
+
+```text
+tmp/mosaic-25.2/logs/<run>/live-maga-runtime/
+```
+
+File:
+
+```text
+live_ga_runtime_trace.csv
+live_strategy_application_trace.csv
+live_bridge_snapshot_trace.csv
+live_overrun_trace.csv
+```
+
+Questi file sono derivati e non vanno versionati.
+
+## Policy
+
+- Bridge: `LIVE_CAUSAL_MOSAIC_SNAPSHOT_BRIDGE`.
+- Source mode: `MOSAIC_LIVE` tramite `MosaicSystemStateSource`.
+- Worker: single-thread, nessuna chiamata MOSAIC dal worker.
+- Snapshot: costruito prima della submission e letto dal bridge in memoria.
+- Parallel GA: `SINGLE_IN_FLIGHT_GA_ONLY`.
+- Strategia durante GA: `KEEP_LAST_APPLIED_STRATEGY`.
+- Late result: `DISCARD_RESULT_IF_COMPLETED_AFTER_DELTA_T_MAX`.
+- Recovery: `REQUEST_FRESH_SNAPSHOT_AND_REOPTIMIZE_AT_FIRST_SAFE_INSTANT`.
+
+## Limiti
+
+La strategy application e' solo diagnostica. La banda Cell resta accounting
+diagnostico runtime da messaggi controllati, non misura diretta del federate
+Cell. CPU diagnostica e banda V2V richiedono calibrazione futura.
