@@ -1,14 +1,16 @@
 #!/usr/bin/env python3
 """Materialize a deterministic InTAS-derived MOSAIC scenario scaffold.
 
-The script intentionally does not bundle InTAS into this repository. It reads an
-external checkout passed via --intas-root and writes generated scenario assets to
-an explicit --output-root.
+The script reads an external InTAS checkout passed through ``--intas-root`` and
+writes generated artifacts only to the explicit ``--output-root``. It preserves
+SUMO ``vType`` and vehicle XML attributes used by selected vehicles; no InTAS
+asset is vendored into this repository.
 """
 
 from __future__ import annotations
 
 import argparse
+import copy
 import hashlib
 import json
 import math
@@ -31,7 +33,7 @@ DEFAULT_TARGETS = TOOL_DIR / "config" / "literature_scenario_targets.json"
 DEFAULT_SEEDS = TOOL_DIR / "config" / "reproducibility_seeds.json"
 SCENARIO_NAME = "MaGaLiteratureBasedUrbanStudy"
 SUBSCENARIO_NAME = "intas_literature_urban"
-NS = "http://sumo.dlr.de/xsd/routes_file.xsd"
+SUPPORTED_PRESERVED_VEHICLE_CHILDREN = {"route", "routeDistribution", "stop", "param"}
 
 
 @dataclass(frozen=True)
@@ -59,13 +61,26 @@ class Junction:
 
 
 @dataclass(frozen=True)
+class VTypeDefinition:
+    type_id: str
+    attributes: dict[str, str]
+    children_xml: tuple[str, ...]
+
+
+@dataclass(frozen=True)
 class RouteVehicle:
     vehicle_id: str
     depart: float
-    route_edges: tuple[str, ...]
+    representative_edges: tuple[str, ...]
+    all_route_edges: tuple[str, ...]
     vtype: str | None
     vclass: str
     estimated_duration: float
+    attributes: dict[str, str]
+    children_xml: tuple[str, ...]
+    source_file: str
+    preserved_child_tags: tuple[str, ...]
+    unsupported_child_tags: tuple[str, ...]
 
 
 @dataclass(frozen=True)
@@ -92,7 +107,7 @@ class Candidate:
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(
-        description="Build a deterministic MOSAIC scenario from an external InTAS checkout."
+        description="Build or dry-run a deterministic MOSAIC scenario from an external InTAS checkout."
     )
     parser.add_argument("--intas-root", required=True, help="External InTAS checkout root.")
     parser.add_argument("--output-root", required=True, help="Directory where generated scenario assets are written.")
@@ -109,14 +124,22 @@ def parse_args() -> argparse.Namespace:
         "--duration-profile",
         choices=["smoke", "nominal", "extended"],
         default="nominal",
-        help="Duration written to the concrete MOSAIC scenario_config.json.",
+        help="Duration written to scenario_config.json.",
     )
-    parser.add_argument("--dry-run", action="store_true", help="Evaluate and report candidates without running netconvert or scenario-convert.")
+    parser.add_argument(
+        "--dry-run",
+        action="store_true",
+        help="Analyze InTAS and write reports/route subsets without netconvert or scenario-convert.",
+    )
     return parser.parse_args()
 
 
 def load_json(path: Path) -> dict[str, Any]:
     return json.loads(path.read_text(encoding="utf-8"))
+
+
+def strip_ns(tag: str) -> str:
+    return tag.split("}", 1)[-1]
 
 
 def split_shape(value: str) -> tuple[Point, ...]:
@@ -186,61 +209,136 @@ def parse_network(net_path: Path) -> tuple[dict[str, Edge], dict[str, Junction],
     return edges, junctions, metadata
 
 
-def parse_route_files(route_paths: list[Path], edge_lookup: dict[str, Edge]) -> tuple[dict[str, str], list[RouteVehicle]]:
-    vclasses: dict[str, str] = {}
+def parse_route_files(
+    route_paths: list[Path],
+    edge_lookup: dict[str, Edge],
+    max_depart_seconds: int,
+) -> tuple[dict[str, VTypeDefinition], list[RouteVehicle], list[str]]:
+    vtypes: dict[str, VTypeDefinition] = {}
     vehicles: list[RouteVehicle] = []
+    warnings: list[str] = []
+
     for route_path in route_paths:
-        tree = ET.parse(route_path)
-        root = tree.getroot()
-        for vtype in root.iter():
-            if strip_ns(vtype.tag) == "vType":
-                type_id = vtype.attrib.get("id")
-                if type_id:
-                    vclasses[type_id] = vtype.attrib.get("vClass", "passenger")
-        for vehicle in root.iter():
-            if strip_ns(vehicle.tag) != "vehicle":
-                continue
-            vehicle_id = vehicle.attrib.get("id")
-            if not vehicle_id:
-                continue
-            vtype = vehicle.attrib.get("type")
-            vclass = vclasses.get(vtype or "", "passenger")
-            if vclass in {"pedestrian", "bicycle", "bus"}:
-                continue
-            route_edges = extract_route_edges(vehicle)
-            if not route_edges:
-                continue
-            depart = parse_depart(vehicle.attrib.get("depart", "0"))
-            duration = sum(edge_lookup[e].length / edge_lookup[e].speed for e in route_edges if e in edge_lookup)
-            vehicles.append(
-                RouteVehicle(
-                    vehicle_id=vehicle_id,
-                    depart=depart,
-                    route_edges=tuple(route_edges),
-                    vtype=vtype,
-                    vclass=vclass,
-                    estimated_duration=max(duration, 1.0),
-                )
-            )
-    return vclasses, vehicles
+        try:
+            context = ET.iterparse(route_path, events=("end",))
+            for _, element in context:
+                tag = strip_ns(element.tag)
+                if tag == "vType":
+                    type_id = element.attrib.get("id")
+                    if type_id:
+                        definition = VTypeDefinition(
+                            type_id=type_id,
+                            attributes=dict(element.attrib),
+                            children_xml=tuple(ET.tostring(child, encoding="unicode") for child in list(element)),
+                        )
+                        if type_id in vtypes and vtypes[type_id].attributes != definition.attributes:
+                            warnings.append(f"vType {type_id} has conflicting definitions; preserving the first one.")
+                        else:
+                            vtypes.setdefault(type_id, definition)
+                    element.clear()
+                    continue
+                if tag != "vehicle":
+                    continue
+
+                vehicle = build_route_vehicle(element, route_path, edge_lookup, vtypes, warnings)
+                element.clear()
+                if vehicle is None:
+                    continue
+                if vehicle.depart > max_depart_seconds:
+                    continue
+                if vehicle.vclass in {"pedestrian", "bicycle", "bus"}:
+                    continue
+                vehicles.append(vehicle)
+        except ET.ParseError as exc:
+            warnings.append(f"Failed to parse route file {route_path}: {exc}")
+
+    return vtypes, vehicles, warnings
 
 
-def strip_ns(tag: str) -> str:
-    return tag.split("}", 1)[-1]
+def build_route_vehicle(
+    element: ET.Element,
+    route_path: Path,
+    edge_lookup: dict[str, Edge],
+    vtypes: dict[str, VTypeDefinition],
+    warnings: list[str],
+) -> RouteVehicle | None:
+    vehicle_id = element.attrib.get("id")
+    if not vehicle_id:
+        return None
+    depart = parse_depart(element.attrib.get("depart", "0"))
+    vtype = element.attrib.get("type")
+    vclass = vtypes.get(vtype or "", VTypeDefinition("", {"vClass": "passenger"}, ())).attributes.get("vClass", "passenger")
 
+    child_tags = tuple(strip_ns(child.tag) for child in list(element))
+    unsupported = tuple(sorted({tag for tag in child_tags if tag not in SUPPORTED_PRESERVED_VEHICLE_CHILDREN}))
+    if unsupported:
+        warnings.append(
+            f"Vehicle {vehicle_id} contains nested tags {unsupported}; XML is preserved in the route subset."
+        )
 
-def extract_route_edges(vehicle: ET.Element) -> list[str]:
-    for child in vehicle:
-        if strip_ns(child.tag) == "route":
-            return [edge for edge in child.attrib.get("edges", "").split() if edge]
-    value = vehicle.attrib.get("route")
-    return [value] if value else []
+    representative = choose_representative_route(element)
+    if not representative:
+        return None
+    all_edges = collect_all_route_edges(element)
+    duration = estimate_duration(representative, edge_lookup)
+    return RouteVehicle(
+        vehicle_id=vehicle_id,
+        depart=depart,
+        representative_edges=tuple(representative),
+        all_route_edges=tuple(sorted(set(all_edges))),
+        vtype=vtype,
+        vclass=vclass,
+        estimated_duration=max(duration, 1.0),
+        attributes=dict(element.attrib),
+        children_xml=tuple(ET.tostring(child, encoding="unicode") for child in list(element)),
+        source_file=route_path.name,
+        preserved_child_tags=child_tags,
+        unsupported_child_tags=unsupported,
+    )
 
 
 def parse_depart(value: str) -> float:
     if value in {"triggered", "containerTriggered"}:
         return 0.0
     return float(value)
+
+
+def route_edges_from_route_node(route: ET.Element) -> list[str]:
+    return [edge for edge in route.attrib.get("edges", "").split() if edge]
+
+
+def choose_representative_route(vehicle: ET.Element) -> list[str]:
+    direct_routes = [child for child in list(vehicle) if strip_ns(child.tag) == "route"]
+    if direct_routes:
+        return route_edges_from_route_node(direct_routes[0])
+    distributions = [child for child in list(vehicle) if strip_ns(child.tag) == "routeDistribution"]
+    if not distributions:
+        return []
+    routes = [child for child in list(distributions[0]) if strip_ns(child.tag) == "route"]
+    if not routes:
+        return []
+    last = distributions[0].attrib.get("last")
+    if last is not None:
+        try:
+            index = int(last)
+            if 0 <= index < len(routes):
+                return route_edges_from_route_node(routes[index])
+        except ValueError:
+            pass
+    chosen = max(routes, key=lambda route: float(route.attrib.get("probability", "0")))
+    return route_edges_from_route_node(chosen)
+
+
+def collect_all_route_edges(vehicle: ET.Element) -> list[str]:
+    edges: list[str] = []
+    for child in vehicle.iter():
+        if strip_ns(child.tag) == "route":
+            edges.extend(route_edges_from_route_node(child))
+    return edges
+
+
+def estimate_duration(edge_ids: Iterable[str], edge_lookup: dict[str, Edge]) -> float:
+    return sum(edge_lookup[edge].length / edge_lookup[edge].speed for edge in edge_ids if edge in edge_lookup)
 
 
 def compute_bounds(edges: Iterable[Edge]) -> tuple[float, float, float, float]:
@@ -257,8 +355,8 @@ def edge_inside(edge: Edge, bounds: tuple[float, float, float, float]) -> bool:
     return any(in_bounds(point, bounds) for point in edge.shape)
 
 
-def route_inside(route: RouteVehicle, selected_edges: set[str]) -> bool:
-    return bool(route.route_edges) and all(edge in selected_edges for edge in route.route_edges)
+def route_intersects(route: RouteVehicle, selected_edges: set[str]) -> bool:
+    return any(edge in selected_edges for edge in route.representative_edges)
 
 
 def connected_components(selected_edges: Iterable[Edge]) -> tuple[int, float]:
@@ -302,7 +400,7 @@ def active_counts(routes: Iterable[RouteVehicle], duration_seconds: int) -> dict
 def route_crosses_both(route: RouteVehicle, edges: dict[str, Edge], a: Point, b: Point, radius: float) -> bool:
     near_a = False
     near_b = False
-    for edge_id in route.route_edges:
+    for edge_id in route.representative_edges:
         edge = edges.get(edge_id)
         if not edge:
             continue
@@ -336,12 +434,11 @@ def choose_rsus(
     return best[0], best[1], best[2], best[3]
 
 
-def candidate_grid(edges: dict[str, Edge], targets: dict[str, Any]) -> list[tuple[float, float, float, float]]:
+def candidate_windows(edges: dict[str, Edge], targets: dict[str, Any]) -> list[tuple[float, float, float, float]]:
     min_x, min_y, max_x, max_y = compute_bounds(edges.values())
     grid_cfg = targets.get("materialization", {}).get("candidateGrid", {})
     size = float(grid_cfg.get("windowSizeMeters", 900))
     stride = float(grid_cfg.get("strideMeters", 300))
-    max_candidates = int(grid_cfg.get("maxCandidates", 64))
     windows: list[tuple[float, float, float, float]] = []
     y = min_y
     while y + size <= max_y + 1e-9:
@@ -352,8 +449,7 @@ def candidate_grid(edges: dict[str, Edge], targets: dict[str, Any]) -> list[tupl
         y += stride
     if not windows:
         windows.append((min_x, min_y, max_x, max_y))
-    digest_sorted = sorted(windows, key=lambda b: hashlib.sha256(repr(b).encode("ascii")).hexdigest())
-    return digest_sorted[:max_candidates]
+    return sorted(windows, key=lambda b: hashlib.sha256(repr(b).encode("ascii")).hexdigest())
 
 
 def evaluate_candidates(
@@ -361,13 +457,14 @@ def evaluate_candidates(
     junctions: dict[str, Junction],
     routes: list[RouteVehicle],
     targets: dict[str, Any],
+    windows: list[tuple[float, float, float, float]],
 ) -> list[Candidate]:
     requirements = targets["subscenarioSelection"]["requirements"]
     radius = float(requirements["nominalRsuRadiusMeters"])
     duration = int(targets["durationsSeconds"]["nominal"])
     target_active = int(targets["activeVehicleTargets"]["nominal"])
     candidates: list[Candidate] = []
-    for index, bounds in enumerate(candidate_grid(edges, targets)):
+    for index, bounds in enumerate(windows):
         selected_edges = [edge for edge in edges.values() if edge_inside(edge, bounds)]
         selected_edge_ids = {edge.edge_id for edge in selected_edges}
         candidate_junctions = [
@@ -375,7 +472,7 @@ def evaluate_candidates(
             for junction in junctions.values()
             if in_bounds(Point(junction.x, junction.y), bounds)
         ]
-        selected_routes = [route for route in routes if route_inside(route, selected_edge_ids)]
+        selected_routes = [route for route in routes if route_intersects(route, selected_edge_ids)]
         components, largest_share = connected_components(selected_edges)
         counts = active_counts(selected_routes, duration)
         mean_active = sum(counts.values()) / max(len(counts), 1)
@@ -395,7 +492,7 @@ def evaluate_candidates(
         if not switch:
             rejection.append("NO_GATEWAY_SWITCH_POTENTIAL")
         if not selected_routes:
-            rejection.append("NO_PASSENGER_ROUTES_INSIDE_CANDIDATE")
+            rejection.append("NO_PASSENGER_ROUTES_INTERSECT_CANDIDATE")
         score = (
             (tls_count * 2.0)
             + (largest_share * 3.0)
@@ -406,7 +503,7 @@ def evaluate_candidates(
         )
         candidates.append(
             Candidate(
-                candidate_id=f"candidate_{index:03d}",
+                candidate_id=f"candidate_{index:04d}",
                 bounds=bounds,
                 edge_ids=tuple(sorted(selected_edge_ids)),
                 junction_ids=tuple(sorted(j.junction_id for j in candidate_junctions)),
@@ -429,6 +526,33 @@ def evaluate_candidates(
     return sorted(candidates, key=lambda c: (-c.score, c.candidate_id))
 
 
+def progressive_evaluate(
+    edges: dict[str, Edge],
+    junctions: dict[str, Junction],
+    routes: list[RouteVehicle],
+    targets: dict[str, Any],
+) -> tuple[list[Candidate], Candidate | None, list[dict[str, int]]]:
+    all_windows = candidate_windows(edges, targets)
+    initial = int(targets.get("materialization", {}).get("candidateGrid", {}).get("maxCandidates", 64))
+    limits: list[int] = []
+    limit = max(1, min(initial, len(all_windows)))
+    while limit < len(all_windows):
+        limits.append(limit)
+        limit = min(limit * 2, len(all_windows))
+    limits.append(len(all_windows))
+
+    expansions: list[dict[str, int]] = []
+    best_candidates: list[Candidate] = []
+    for limit in dict.fromkeys(limits):
+        candidates = evaluate_candidates(edges, junctions, routes, targets, all_windows[:limit])
+        accepted = [candidate for candidate in candidates if not candidate.rejection_reasons]
+        expansions.append({"windowsEvaluated": limit, "acceptedCandidates": len(accepted)})
+        best_candidates = candidates
+        if accepted:
+            return candidates, accepted[0], expansions
+    return best_candidates, None, expansions
+
+
 def select_route_subset(routes: tuple[RouteVehicle, ...], target: int, duration: int, seed: int) -> tuple[RouteVehicle, ...]:
     ordered = list(routes)
     random.Random(seed).shuffle(ordered)
@@ -448,21 +572,34 @@ def select_route_subset(routes: tuple[RouteVehicle, ...], target: int, duration:
     return tuple(sorted(best, key=lambda r: (r.depart, r.vehicle_id)))
 
 
-def write_route_file(path: Path, vehicles: tuple[RouteVehicle, ...], vclasses: dict[str, str]) -> None:
+def write_route_file(path: Path, vehicles: tuple[RouteVehicle, ...], vtypes: dict[str, VTypeDefinition]) -> dict[str, Any]:
     routes = ET.Element("routes")
     emitted_types: set[str] = set()
+    missing_types: list[str] = []
     for vehicle in vehicles:
         if vehicle.vtype and vehicle.vtype not in emitted_types:
-            ET.SubElement(routes, "vType", {"id": vehicle.vtype, "vClass": vclasses.get(vehicle.vtype, "passenger")})
+            definition = vtypes.get(vehicle.vtype)
+            if definition:
+                node = ET.SubElement(routes, "vType", dict(definition.attributes))
+                for child_xml in definition.children_xml:
+                    node.append(ET.fromstring(child_xml))
+            else:
+                missing_types.append(vehicle.vtype)
             emitted_types.add(vehicle.vtype)
     for vehicle in vehicles:
-        attrs = {"id": vehicle.vehicle_id, "depart": f"{vehicle.depart:.2f}"}
-        if vehicle.vtype:
-            attrs["type"] = vehicle.vtype
-        node = ET.SubElement(routes, "vehicle", attrs)
-        ET.SubElement(node, "route", {"edges": " ".join(vehicle.route_edges)})
+        node = ET.SubElement(routes, "vehicle", dict(vehicle.attributes))
+        for child_xml in vehicle.children_xml:
+            node.append(ET.fromstring(child_xml))
     indent(routes)
     ET.ElementTree(routes).write(path, encoding="utf-8", xml_declaration=True)
+    return {
+        "vTypeIdsWritten": sorted(emitted_types),
+        "missingVTypeDefinitions": sorted(set(missing_types)),
+        "vehicleCount": len(vehicles),
+        "preservedVehicleAttributeKeys": sorted({key for vehicle in vehicles for key in vehicle.attributes}),
+        "preservedNestedTags": sorted({tag for vehicle in vehicles for tag in vehicle.preserved_child_tags}),
+        "unsupportedNestedTagsPreserved": sorted({tag for vehicle in vehicles for tag in vehicle.unsupported_child_tags}),
+    }
 
 
 def indent(element: ET.Element, level: int = 0) -> None:
@@ -478,9 +615,27 @@ def indent(element: ET.Element, level: int = 0) -> None:
         element.tail = spacer
 
 
-def find_scenario_convert(arg: str | None) -> str | None:
-    candidates = [arg, os.environ.get("SCENARIO_CONVERT"), shutil.which("scenario-convert.sh"), shutil.which("scenario-convert.bat"), shutil.which("scenario-convert")]
-    return next((candidate for candidate in candidates if candidate), None)
+def find_scenario_convert(arg: str | None, mosaic_root: Path | None = None) -> dict[str, Any]:
+    candidates = [
+        ("argument", arg),
+        ("SCENARIO_CONVERT", os.environ.get("SCENARIO_CONVERT")),
+        ("PATH:scenario-convert.sh", shutil.which("scenario-convert.sh")),
+        ("PATH:scenario-convert.bat", shutil.which("scenario-convert.bat")),
+        ("PATH:scenario-convert", shutil.which("scenario-convert")),
+    ]
+    if mosaic_root and mosaic_root.exists():
+        for pattern in ("scenario-convert.sh", "scenario-convert.bat", "scenario-convert"):
+            for match in mosaic_root.rglob(pattern):
+                candidates.append((f"mosaic-root:{pattern}", str(match)))
+    for source, candidate in candidates:
+        if candidate:
+            return {"available": True, "source": source, "path": candidate}
+    return {
+        "available": False,
+        "source": None,
+        "path": None,
+        "requiredAction": "Install/configure MOSAIC Extended Scenario-Convert and pass --scenario-convert or SCENARIO_CONVERT.",
+    }
 
 
 def run_checked(command: list[str], cwd: Path) -> None:
@@ -488,7 +643,74 @@ def run_checked(command: list[str], cwd: Path) -> None:
 
 
 def write_json(path: Path, payload: dict[str, Any]) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(json.dumps(payload, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+
+
+def load_sumolib_net(net_path: Path):
+    sumo_home = os.environ.get("SUMO_HOME")
+    if sumo_home:
+        tools_path = Path(sumo_home) / "tools"
+        if tools_path.exists():
+            sys.path.insert(0, str(tools_path))
+    try:
+        import sumolib  # type: ignore
+
+        return sumolib.net.readNet(str(net_path)), "SUMOLIB_CONVERT_XY2LONLAT"
+    except Exception as exc:  # noqa: BLE001 - report exact fallback reason.
+        return None, f"SUMOLIB_UNAVAILABLE: {exc}"
+
+
+def parse_net_offset(metadata: dict[str, Any]) -> tuple[float, float] | None:
+    value = metadata.get("location", {}).get("netOffset")
+    if not value:
+        return None
+    parts = [float(part) for part in value.split(",")]
+    if len(parts) != 2:
+        return None
+    return parts[0], parts[1]
+
+
+def derive_projection(
+    selected: Candidate,
+    net_path: Path,
+    metadata: dict[str, Any],
+) -> dict[str, Any]:
+    min_x, min_y, max_x, max_y = selected.bounds
+    center = Point((min_x + max_x) / 2.0, (min_y + max_y) / 2.0)
+    net, method = load_sumolib_net(net_path)
+    offset = parse_net_offset(metadata)
+    if net is not None and offset is not None:
+        try:
+            lon, lat = net.convertXY2LonLat(center.x, center.y)
+            return {
+                "method": method,
+                "centerCoordinates": {"longitude": lon, "latitude": lat},
+                "cartesianOffset": {"x": offset[0], "y": offset[1]},
+                "fallback": None,
+                "valid": all(math.isfinite(value) for value in [lon, lat, offset[0], offset[1]]),
+            }
+        except Exception as exc:  # noqa: BLE001 - pyproj may be absent on local SUMO installs.
+            method = f"{method}_FAILED: {exc}"
+    fallback = geographic_boundary(selected.bounds, metadata)
+    offset = offset or (0.0, 0.0)
+    if fallback.get("method") == "LINEAR_INTERPOLATION_FROM_SUMO_LOCATION_BOUNDARIES":
+        lon = (fallback["minLongitude"] + fallback["maxLongitude"]) / 2.0
+        lat = (fallback["minLatitude"] + fallback["maxLatitude"]) / 2.0
+        return {
+            "method": "FALLBACK_LINEAR_BOUNDARY_INTERPOLATION",
+            "centerCoordinates": {"longitude": lon, "latitude": lat},
+            "cartesianOffset": {"x": offset[0], "y": offset[1]},
+            "fallback": method,
+            "valid": all(math.isfinite(value) for value in [lon, lat, offset[0], offset[1]]),
+        }
+    return {
+        "method": "UNAVAILABLE",
+        "centerCoordinates": None,
+        "cartesianOffset": None,
+        "fallback": method,
+        "valid": False,
+    }
 
 
 def geographic_boundary(bounds: tuple[float, float, float, float], metadata: dict[str, Any]) -> dict[str, Any]:
@@ -500,10 +722,13 @@ def geographic_boundary(bounds: tuple[float, float, float, float], metadata: dic
             min_x, min_y, max_x, max_y = bounds
             lon0, lat0, lon1, lat1 = orig
             cx0, cy0, cx1, cy1 = conv
+
             def interp_x(x: float) -> float:
                 return lon0 + ((x - cx0) / (cx1 - cx0)) * (lon1 - lon0)
+
             def interp_y(y: float) -> float:
                 return lat0 + ((y - cy0) / (cy1 - cy0)) * (lat1 - lat0)
+
             return {
                 "method": "LINEAR_INTERPOLATION_FROM_SUMO_LOCATION_BOUNDARIES",
                 "minLongitude": interp_x(min_x),
@@ -516,24 +741,27 @@ def geographic_boundary(bounds: tuple[float, float, float, float], metadata: dic
     return {"method": "UNAVAILABLE_FROM_NET_LOCATION_METADATA"}
 
 
-def point_position_for_mapping(point: Point, metadata: dict[str, Any]) -> dict[str, Any]:
-    location = metadata.get("location", {})
-    try:
-        conv = [float(v) for v in location.get("convBoundary", "").split(",")]
-        orig = [float(v) for v in location.get("origBoundary", "").split(",")]
-        if len(conv) == 4 and len(orig) == 4:
-            lon0, lat0, lon1, lat1 = orig
-            cx0, cy0, cx1, cy1 = conv
-            longitude = lon0 + ((point.x - cx0) / (cx1 - cx0)) * (lon1 - lon0)
-            latitude = lat0 + ((point.y - cy0) / (cy1 - cy0)) * (lat1 - lat0)
-            return {"longitude": longitude, "latitude": latitude}
-    except (ValueError, ZeroDivisionError):
-        pass
+def point_position_for_mapping(point: Point, net_path: Path, metadata: dict[str, Any]) -> dict[str, Any]:
+    net, method = load_sumolib_net(net_path)
+    if net is not None:
+        try:
+            lon, lat = net.convertXY2LonLat(point.x, point.y)
+            return {"longitude": lon, "latitude": lat, "conversionMethod": method}
+        except Exception as exc:  # noqa: BLE001 - report fallback reason.
+            method = f"{method}_FAILED: {exc}"
+    fallback = geographic_boundary((point.x, point.y, point.x, point.y), metadata)
+    if fallback.get("method") == "LINEAR_INTERPOLATION_FROM_SUMO_LOCATION_BOUNDARIES":
+        return {
+            "longitude": fallback["minLongitude"],
+            "latitude": fallback["minLatitude"],
+            "conversionMethod": f"FALLBACK_LINEAR_BOUNDARY_INTERPOLATION_AFTER_{method}",
+        }
     return {
-        "longitude": "<projection-unavailable-review-required>",
-        "latitude": "<projection-unavailable-review-required>",
+        "longitude": None,
+        "latitude": None,
         "cartesianX": point.x,
         "cartesianY": point.y,
+        "conversionMethod": "UNAVAILABLE",
     }
 
 
@@ -567,9 +795,7 @@ def candidate_report(
             "meanMetersPerSecond": (sum(speeds) / len(speeds)) if speeds else None,
             "maxMetersPerSecond": max(speeds) if speeds else None,
         },
-        "candidateRsuPositions": [
-            {"x": point.x, "y": point.y} for point in candidate.rsu_positions
-        ],
+        "candidateRsuPositions": [{"x": point.x, "y": point.y} for point in candidate.rsu_positions],
         "rsuPairDistanceMeters": candidate.rsu_pair_distance,
         "rsuCoverageOverlapEstimated": candidate.overlap_estimated,
         "gatewaySwitchPotential": candidate.gateway_switch_potential,
@@ -578,13 +804,17 @@ def candidate_report(
     }
 
 
-def write_templates(
+def write_scenario_files(
     scenario_dir: Path,
     candidate: Candidate,
     targets: dict[str, Any],
     duration_profile: str,
+    net_path: Path,
     metadata: dict[str, Any],
+    projection: dict[str, Any],
 ) -> None:
+    if not projection.get("valid"):
+        raise ValueError("Cannot write scenario_config.json without a valid numeric projection.")
     duration = targets["durationsSeconds"][duration_profile]
     scenario = {
         "simulation": {
@@ -592,8 +822,14 @@ def write_templates(
             "duration": f"{duration}s",
             "randomSeed": 104729,
             "projection": {
-                "centerCoordinates": {"latitude": "<derived-by-scenario-convert>", "longitude": "<derived-by-scenario-convert>"},
-                "cartesianOffset": {"x": "<derived-by-scenario-convert>", "y": "<derived-by-scenario-convert>"},
+                "centerCoordinates": {
+                    "latitude": projection["centerCoordinates"]["latitude"],
+                    "longitude": projection["centerCoordinates"]["longitude"],
+                },
+                "cartesianOffset": {
+                    "x": projection["cartesianOffset"]["x"],
+                    "y": projection["cartesianOffset"]["y"],
+                },
             },
             "network": {
                 "netMask": "255.255.0.0",
@@ -628,7 +864,7 @@ def write_templates(
             {
                 "name": f"rsu_{index}",
                 "group": "MaGaGateway",
-                "position": point_position_for_mapping(point, metadata),
+                "position": point_position_for_mapping(point, net_path, metadata),
                 "applications": [],
             }
             for index, point in enumerate(candidate.rsu_positions)
@@ -641,132 +877,6 @@ def write_templates(
     write_json(scenario_dir / "mapping" / "mapping_config.json", mapping)
 
 
-def main() -> int:
-    args = parse_args()
-    targets = load_json(Path(args.targets))
-    seeds = load_json(Path(args.seeds))["seeds"]
-    intas_root = Path(args.intas_root).resolve()
-    output_root = Path(args.output_root).resolve()
-
-    validation, validation_exit = validate(intas_root)
-    if validation_exit != 0:
-        print(json.dumps(validation, indent=2, sort_keys=True))
-        return validation_exit
-
-    scenario_dir = intas_root / "scenario"
-    net_path = scenario_dir / "ingolstadt.net.xml"
-    sumocfg_path = scenario_dir / "InTAS_buildings.sumocfg"
-    route_paths = [(sumocfg_path.parent / route).resolve() for route in read_sumocfg_routes(sumocfg_path)]
-
-    edges, junctions, metadata = parse_network(net_path)
-    vclasses, routes = parse_route_files(route_paths, edges)
-    candidates = evaluate_candidates(edges, junctions, routes, targets)
-    accepted = [candidate for candidate in candidates if not candidate.rejection_reasons]
-    selected = accepted[0] if accepted else None
-
-    output_scenario = output_root / SCENARIO_NAME
-    report_dir = output_scenario / "reports"
-    report_dir.mkdir(parents=True, exist_ok=True)
-
-    candidate_reports = [candidate_report(candidate, metadata, len(routes), edges) for candidate in candidates]
-    materialization_status = "READY_FOR_MATERIALIZATION" if selected else "NO_CANDIDATE_SATISFIES_REQUIREMENTS"
-
-    report: dict[str, Any] = {
-        "scenarioName": SCENARIO_NAME,
-        "source": {
-            "name": "InTAS",
-            "repository": "https://github.com/silaslobo/InTAS",
-            "root": str(intas_root),
-            "commit": git_value(intas_root, "rev-parse", "HEAD"),
-            "tag": git_value(intas_root, "describe", "--tags", "--exact-match", "HEAD"),
-            "license": detect_license(intas_root),
-            "sourceFiles": [str(path.relative_to(intas_root)).replace("\\", "/") for path in [net_path, sumocfg_path, *route_paths]],
-        },
-        "generatedAtUtc": datetime.now(timezone.utc).isoformat(),
-        "targets": targets,
-        "seeds": seeds,
-        "candidateCount": len(candidates),
-        "selectedCandidateId": selected.candidate_id if selected else None,
-        "candidates": candidate_reports,
-        "status": materialization_status,
-        "warnings": [],
-        "errors": [],
-    }
-
-    if not selected:
-        report["errors"].append("No candidate satisfies all deterministic urban subscenario requirements.")
-        write_json(report_dir / "intas_literature_materialization_report.json", report)
-        write_markdown_report(report_dir / "intas_literature_materialization_report.md", report)
-        print(json.dumps(report, indent=2, sort_keys=True))
-        return 3
-
-    (output_scenario / "application").mkdir(exist_ok=True)
-    (output_scenario / "mapping").mkdir(exist_ok=True)
-    (output_scenario / "sumo").mkdir(exist_ok=True)
-    write_templates(output_scenario, selected, targets, args.duration_profile, metadata)
-
-    density_names = ["low_density", "nominal", "high_density"] if args.density == "all" else [args.density]
-    duration = int(targets["durationsSeconds"]["nominal"])
-    route_outputs: dict[str, Any] = {}
-    for density in density_names:
-        target = int(targets["activeVehicleTargets"][density])
-        seed = int(seeds[density_names.index(density) % len(seeds)])
-        subset = select_route_subset(selected.routes, target, duration, seed)
-        route_path = output_scenario / "sumo" / f"{SUBSCENARIO_NAME}_{density}.rou.xml"
-        write_route_file(route_path, subset, vclasses)
-        counts = active_counts(subset, duration)
-        route_outputs[density] = {
-            "routeFile": str(route_path),
-            "targetMeanActiveVehicles": target,
-            "meanActiveVehicles": sum(counts.values()) / max(len(counts), 1),
-            "maxActiveVehicles": max(counts.values()) if counts else 0,
-            "vehicleCount": len(subset),
-            "seed": seed,
-        }
-
-    concrete_route = output_scenario / "sumo" / f"{SUBSCENARIO_NAME}_nominal.rou.xml"
-    if not concrete_route.exists():
-        concrete_route = output_scenario / "sumo" / f"{SUBSCENARIO_NAME}_{density_names[0]}.rou.xml"
-
-    net_output = output_scenario / "sumo" / f"{SUBSCENARIO_NAME}.net.xml"
-    edge_list = report_dir / "selected_edge_ids.txt"
-    edge_list.write_text("\n".join(selected.edge_ids) + "\n", encoding="utf-8")
-
-    scenario_convert = find_scenario_convert(args.scenario_convert)
-    netconvert = shutil.which("netconvert")
-    if args.dry_run:
-        report["status"] = "DRY_RUN_COMPLETED"
-        report["routeSubsets"] = route_outputs
-    elif not netconvert:
-        report["status"] = "PARTIAL_EXTERNAL_TOOL_REQUIRED"
-        report["errors"].append("netconvert is required to extract the reduced SUMO network.")
-    else:
-        run_checked([netconvert, "--sumo-net-file", str(net_path), "--keep-edges.input-file", str(edge_list), "--output-file", str(net_output)], output_scenario)
-        write_sumocfg(output_scenario / "sumo" / f"{SUBSCENARIO_NAME}.sumocfg", net_output.name, concrete_route.name, targets["sumoStepLengthSeconds"])
-        report["routeSubsets"] = route_outputs
-        report["reducedNetwork"] = str(net_output)
-        if scenario_convert:
-            db_path = output_scenario / "application" / f"{SUBSCENARIO_NAME}.db"
-            run_checked([scenario_convert, "--sumo2db", "-i", str(net_output)], output_scenario)
-            generated_default = output_scenario / "sumo" / f"{SUBSCENARIO_NAME}.db"
-            if generated_default.exists() and generated_default != db_path:
-                shutil.move(str(generated_default), str(db_path))
-            run_checked([scenario_convert, "--sumo2db", "-i", str(concrete_route), "-d", str(db_path)], output_scenario)
-            report["database"] = str(db_path)
-            report["status"] = "COMPLETED"
-        else:
-            report["status"] = "PARTIAL_EXTERNAL_TOOL_REQUIRED"
-            report["warnings"].append(
-                "scenario-convert not found. Run scenario-convert.sh --sumo2db after configuring MOSAIC extended tools."
-            )
-
-    write_metadata(output_scenario / "application" / "ma_ga_calibration_metadata.json", report)
-    write_json(report_dir / "intas_literature_materialization_report.json", report)
-    write_markdown_report(report_dir / "intas_literature_materialization_report.md", report)
-    print(json.dumps(report, indent=2, sort_keys=True))
-    return 0 if report["status"] in {"COMPLETED", "DRY_RUN_COMPLETED", "PARTIAL_EXTERNAL_TOOL_REQUIRED"} else 4
-
-
 def write_sumocfg(path: Path, net_file: str, route_file: str, step_length: float) -> None:
     configuration = ET.Element("configuration")
     input_node = ET.SubElement(configuration, "input")
@@ -776,6 +886,74 @@ def write_sumocfg(path: Path, net_file: str, route_file: str, step_length: float
     ET.SubElement(time_node, "step-length", {"value": str(step_length)})
     indent(configuration)
     ET.ElementTree(configuration).write(path, encoding="utf-8", xml_declaration=True)
+
+
+def validate_generated_outputs(
+    scenario_dir: Path,
+    report: dict[str, Any],
+    selected: Candidate,
+    route_outputs: dict[str, Any],
+    scenario_convert: dict[str, Any],
+) -> dict[str, Any]:
+    errors: list[str] = []
+    warnings: list[str] = []
+    scenario = load_json(scenario_dir / "scenario_config.json")
+    projection = scenario["simulation"]["projection"]
+    values = [
+        projection["centerCoordinates"]["latitude"],
+        projection["centerCoordinates"]["longitude"],
+        projection["cartesianOffset"]["x"],
+        projection["cartesianOffset"]["y"],
+    ]
+    if not all(isinstance(value, (int, float)) and math.isfinite(float(value)) for value in values):
+        errors.append("scenario_config.json projection contains non-numeric or empty values.")
+
+    for density, output in route_outputs.items():
+        route_path = Path(output["routeFile"])
+        if not route_path.exists():
+            errors.append(f"Route subset missing for {density}: {route_path}")
+            continue
+        try:
+            tree = ET.parse(route_path)
+            root = tree.getroot()
+            used_types = {node.attrib.get("type") for node in root.iter() if strip_ns(node.tag) == "vehicle" and node.attrib.get("type")}
+            written_types = {node.attrib.get("id") for node in root.iter() if strip_ns(node.tag) == "vType"}
+            if used_types - written_types:
+                errors.append(f"Route subset {density} misses vType definitions: {sorted(used_types - written_types)}")
+        except ET.ParseError as exc:
+            errors.append(f"Route subset XML invalid for {density}: {exc}")
+        target = float(output["targetMeanActiveVehicles"])
+        mean = float(output["meanActiveVehicles"])
+        output["targetError"] = abs(mean - target)
+
+    if not selected.rsu_positions:
+        errors.append("Selected candidate has no candidate RSU positions.")
+
+    sumocfg_path = scenario_dir / "sumo" / f"{SUBSCENARIO_NAME}.sumocfg"
+    if sumocfg_path.exists():
+        refs = sumocfg_references(sumocfg_path)
+        for ref in refs:
+            ref_path = (sumocfg_path.parent / ref).resolve()
+            if not ref_path.exists():
+                errors.append(f"sumocfg reference does not exist: {ref}")
+    else:
+        warnings.append("No sumocfg produced in this mode.")
+
+    db_files = list(scenario_dir.rglob("*.db"))
+    if db_files and not scenario_convert.get("available"):
+        errors.append("Database file exists although scenario-convert is unavailable.")
+
+    return {"errors": errors, "warnings": warnings}
+
+
+def sumocfg_references(sumocfg_path: Path) -> list[str]:
+    tree = ET.parse(sumocfg_path)
+    refs: list[str] = []
+    for node in tree.getroot().iter():
+        tag = strip_ns(node.tag)
+        if tag in {"net-file", "route-files", "additional-files"}:
+            refs.extend([item.strip() for item in node.attrib.get("value", "").split(",") if item.strip()])
+    return refs
 
 
 def write_metadata(path: Path, report: dict[str, Any]) -> None:
@@ -790,7 +968,7 @@ def write_metadata(path: Path, report: dict[str, Any]) -> None:
             "sourceFiles": report["source"]["sourceFiles"],
         },
         "wirelessAssumptions": [
-            {"name": "ITS-G5 / IEEE 802.11p", "classification": "MODELLED_DIRECTLY"},
+            {"name": "ITS-G5 / IEEE 802.11p", "classification": "CALIBRATED_ABSTRACTION"},
             {"name": "Carrier frequency 5.9 GHz", "classification": "DOCUMENTATION_ONLY"},
             {"name": "Channel bandwidth 10 MHz", "classification": "DOCUMENTATION_ONLY"},
             {"name": "Transmit power 23 dBm", "classification": "DOCUMENTATION_ONLY"},
@@ -815,12 +993,31 @@ def write_markdown_report(path: Path, report: dict[str, Any]) -> None:
         f"- source: {report['source']['repository']}",
         f"- selected candidate: `{selected}`",
         f"- candidates evaluated: {report['candidateCount']}",
-        "",
-        "## Notes",
-        "",
-        "Generated assets are derived from an external InTAS checkout and must be reviewed for redistribution before committing.",
+        f"- scenario-convert available: `{report['scenarioConvert']['available']}`",
         "",
     ]
+    if report.get("selectedCandidate"):
+        candidate = report["selectedCandidate"]
+        lines.extend(
+            [
+                "## Selected Candidate",
+                "",
+                f"- traffic lights: {candidate['trafficLightCount']}",
+                f"- mean active vehicles: {candidate['meanActiveVehicleCount']:.3f}",
+                f"- max active vehicles: {candidate['maxActiveVehicleCount']}",
+                f"- RSU positions: `{candidate['candidateRsuPositions']}`",
+                "",
+            ]
+        )
+    if report.get("routeSubsets"):
+        lines.append("## Route Subsets")
+        lines.append("")
+        for name, subset in report["routeSubsets"].items():
+            lines.append(
+                f"- `{name}`: mean={subset['meanActiveVehicles']:.3f}, "
+                f"max={subset['maxActiveVehicles']}, vehicles={subset['vehicleCount']}"
+            )
+        lines.append("")
     if report.get("warnings"):
         lines.append("## Warnings")
         lines.extend(f"- {warning}" for warning in report["warnings"])
@@ -829,7 +1026,167 @@ def write_markdown_report(path: Path, report: dict[str, Any]) -> None:
         lines.append("## Errors")
         lines.extend(f"- {error}" for error in report["errors"])
         lines.append("")
-    path.write_text("\n".join(lines), encoding="utf-8")
+    lines.append("Generated assets are derived from an external InTAS checkout and must be reviewed for redistribution before committing.")
+    path.write_text("\n".join(lines) + "\n", encoding="utf-8")
+
+
+def main() -> int:
+    args = parse_args()
+    targets = load_json(Path(args.targets))
+    seeds = load_json(Path(args.seeds))["seeds"]
+    intas_root = Path(args.intas_root).resolve()
+    output_root = Path(args.output_root).resolve()
+
+    validation, validation_exit = validate(intas_root)
+    if validation_exit != 0:
+        print(json.dumps(validation, indent=2, sort_keys=True))
+        return validation_exit
+
+    scenario_dir = intas_root / "scenario"
+    net_path = scenario_dir / "ingolstadt.net.xml"
+    sumocfg_path = scenario_dir / "InTAS_buildings.sumocfg"
+    route_paths = [(sumocfg_path.parent / route).resolve() for route in read_sumocfg_routes(sumocfg_path)]
+    max_depart = max(int(value) for value in targets["durationsSeconds"].values())
+
+    edges, junctions, metadata = parse_network(net_path)
+    vtypes, routes, parse_warnings = parse_route_files(route_paths, edges, max_depart)
+    candidates, selected, expansions = progressive_evaluate(edges, junctions, routes, targets)
+
+    output_scenario = output_root / SCENARIO_NAME
+    report_dir = output_scenario / "reports"
+    report_dir.mkdir(parents=True, exist_ok=True)
+
+    candidate_reports = [candidate_report(candidate, metadata, len(routes), edges) for candidate in candidates]
+    selected_report = candidate_report(selected, metadata, len(routes), edges) if selected else None
+    scenario_convert = find_scenario_convert(args.scenario_convert, Path("tmp/mosaic-25.2").resolve())
+    projection = derive_projection(selected, net_path, metadata) if selected else {"valid": False, "method": "NO_SELECTED_CANDIDATE"}
+
+    report: dict[str, Any] = {
+        "scenarioName": SCENARIO_NAME,
+        "source": {
+            "name": "InTAS",
+            "repository": "https://github.com/silaslobo/InTAS",
+            "root": str(intas_root),
+            "commit": git_value(intas_root, "rev-parse", "HEAD"),
+            "tag": git_value(intas_root, "describe", "--tags", "--exact-match", "HEAD"),
+            "license": detect_license(intas_root),
+            "sourceFiles": [str(path.relative_to(intas_root)).replace("\\", "/") for path in [net_path, sumocfg_path, *route_paths]],
+        },
+        "generatedAtUtc": datetime.now(timezone.utc).isoformat(),
+        "targets": targets,
+        "seeds": seeds,
+        "routeVehicleParseWindowSeconds": max_depart,
+        "routeCountBeforeFiltering": len(routes),
+        "candidateSearchExpansions": expansions,
+        "candidateCount": len(candidates),
+        "selectedCandidateId": selected.candidate_id if selected else None,
+        "selectedCandidate": selected_report,
+        "candidates": candidate_reports,
+        "projection": projection,
+        "scenarioConvert": scenario_convert,
+        "warnings": parse_warnings,
+        "errors": [],
+        "status": "READY_FOR_MATERIALIZATION" if selected else "NO_CANDIDATE_SATISFIES_REQUIREMENTS",
+    }
+
+    if not selected:
+        report["errors"].append("No candidate satisfies all deterministic urban subscenario requirements.")
+        write_json(report_dir / "intas_literature_materialization_report.json", report)
+        write_markdown_report(report_dir / "intas_literature_materialization_report.md", report)
+        print(json.dumps(report, indent=2, sort_keys=True))
+        return 3
+    if not projection.get("valid"):
+        report["errors"].append("Cannot derive a valid numeric MOSAIC projection from InTAS network metadata.")
+        write_json(report_dir / "intas_literature_materialization_report.json", report)
+        write_markdown_report(report_dir / "intas_literature_materialization_report.md", report)
+        print(json.dumps(report, indent=2, sort_keys=True))
+        return 4
+
+    for relative in ("application", "mapping", "sumo"):
+        (output_scenario / relative).mkdir(parents=True, exist_ok=True)
+
+    write_scenario_files(output_scenario, selected, targets, args.duration_profile, net_path, metadata, projection)
+
+    density_names = ["low_density", "nominal", "high_density"] if args.density == "all" else [args.density]
+    duration = int(targets["durationsSeconds"]["nominal"])
+    route_outputs: dict[str, Any] = {}
+    selected_subset_edges = set(selected.edge_ids)
+    for density in density_names:
+        target = int(targets["activeVehicleTargets"][density])
+        seed = int(seeds[density_names.index(density) % len(seeds)])
+        subset = select_route_subset(selected.routes, target, duration, seed)
+        route_path = output_scenario / "sumo" / f"{SUBSCENARIO_NAME}_{density}.rou.xml"
+        preservation = write_route_file(route_path, subset, vtypes)
+        counts = active_counts(subset, duration)
+        for vehicle in subset:
+            selected_subset_edges.update(vehicle.all_route_edges)
+        route_outputs[density] = {
+            "routeFile": str(route_path),
+            "targetMeanActiveVehicles": target,
+            "meanActiveVehicles": sum(counts.values()) / max(len(counts), 1),
+            "maxActiveVehicles": max(counts.values()) if counts else 0,
+            "vehicleCount": len(subset),
+            "seed": seed,
+            "xmlPreservation": preservation,
+        }
+
+    concrete_route = output_scenario / "sumo" / f"{SUBSCENARIO_NAME}_nominal.rou.xml"
+    if not concrete_route.exists():
+        concrete_route = output_scenario / "sumo" / f"{SUBSCENARIO_NAME}_{density_names[0]}.rou.xml"
+
+    net_output = output_scenario / "sumo" / f"{SUBSCENARIO_NAME}.net.xml"
+    edge_list = report_dir / "selected_edge_ids.txt"
+    edge_list.write_text("\n".join(sorted(selected_subset_edges)) + "\n", encoding="utf-8")
+
+    if args.dry_run:
+        write_sumocfg(
+            output_scenario / "sumo" / f"{SUBSCENARIO_NAME}.sumocfg",
+            str(net_path),
+            concrete_route.name,
+            targets["sumoStepLengthSeconds"],
+        )
+        report["status"] = "DRY_RUN_COMPLETED"
+        report["routeSubsets"] = route_outputs
+    else:
+        netconvert = shutil.which("netconvert")
+        if not netconvert:
+            report["status"] = "PARTIAL_EXTERNAL_TOOL_REQUIRED"
+            report["errors"].append("netconvert is required to extract the reduced SUMO network.")
+        else:
+            run_checked(
+                [netconvert, "--sumo-net-file", str(net_path), "--keep-edges.input-file", str(edge_list), "--output-file", str(net_output)],
+                output_scenario,
+            )
+            write_sumocfg(output_scenario / "sumo" / f"{SUBSCENARIO_NAME}.sumocfg", net_output.name, concrete_route.name, targets["sumoStepLengthSeconds"])
+            report["routeSubsets"] = route_outputs
+            report["reducedNetwork"] = str(net_output)
+            if scenario_convert.get("available"):
+                db_path = output_scenario / "application" / f"{SUBSCENARIO_NAME}.db"
+                run_checked([scenario_convert["path"], "--sumo2db", "-i", str(net_output)], output_scenario)
+                generated_default = output_scenario / "sumo" / f"{SUBSCENARIO_NAME}.db"
+                if generated_default.exists() and generated_default != db_path:
+                    shutil.move(str(generated_default), str(db_path))
+                run_checked([scenario_convert["path"], "--sumo2db", "-i", str(concrete_route), "-d", str(db_path)], output_scenario)
+                report["database"] = str(db_path)
+                report["status"] = "COMPLETED"
+            else:
+                report["status"] = "PARTIAL_EXTERNAL_TOOL_REQUIRED"
+                report["warnings"].append(
+                    "scenario-convert not found. Use MOSAIC Extended Scenario-Convert before full materialization."
+                )
+
+    write_metadata(output_scenario / "application" / "ma_ga_calibration_metadata.json", report)
+    generated_validation = validate_generated_outputs(output_scenario, report, selected, route_outputs, scenario_convert)
+    report["generatedOutputValidation"] = generated_validation
+    report["warnings"].extend(generated_validation["warnings"])
+    report["errors"].extend(generated_validation["errors"])
+    if report["errors"]:
+        report["status"] = "FAILED_OUTPUT_VALIDATION"
+
+    write_json(report_dir / "intas_literature_materialization_report.json", report)
+    write_markdown_report(report_dir / "intas_literature_materialization_report.md", report)
+    print(json.dumps(report, indent=2, sort_keys=True))
+    return 0 if report["status"] in {"COMPLETED", "DRY_RUN_COMPLETED", "PARTIAL_EXTERNAL_TOOL_REQUIRED"} else 5
 
 
 if __name__ == "__main__":

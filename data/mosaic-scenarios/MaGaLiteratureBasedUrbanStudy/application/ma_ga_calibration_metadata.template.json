@@ -15,8 +15,8 @@
   "wirelessAssumptions": [
     {
       "name": "ITS-G5 / IEEE 802.11p",
-      "classification": "MODELLED_DIRECTLY",
-      "notes": "Technology family for direct V2V in the literature-based scenario."
+      "classification": "CALIBRATED_ABSTRACTION",
+      "notes": "Technology family represented through the simplified SNS abstraction; numeric radio parameters remain documentation-only until calibration."
     },
     {
       "name": "Carrier frequency 5.9 GHz",

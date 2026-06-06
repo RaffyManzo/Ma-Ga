@@ -44,8 +44,9 @@ def git_value(root: Path, *args: str) -> str | None:
     if not (root / ".git").exists():
         return None
     try:
+        safe_root = root.resolve().as_posix()
         result = subprocess.run(
-            ["git", "-C", str(root), *args],
+            ["git", "-c", f"safe.directory={safe_root}", "-C", str(root), *args],
             check=True,
             text=True,
             capture_output=True,
