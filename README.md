@@ -119,8 +119,9 @@ AdaptiveWindowMain [sourceMode] [runtimeProfile] [folder] [maxSteps]
 
 Argomenti:
 
-- `sourceMode`: `JSON_TIME`, `JSON_SEQUENCE`; `MOSAIC` e' dichiarato ma richiede
-  una implementazione concreta di `MosaicSnapshotBridge`;
+- `sourceMode`: `JSON_TIME`, `JSON_SEQUENCE`; il flusso `MOSAIC_LIVE` e'
+  esercitato dal tool runtime live tramite `MosaicSystemStateSource` e un
+  `MosaicSnapshotBridge` concreto esterno al main CLI;
 - `runtimeProfile`: `OBSERVED_RUNTIME` o `CONFIGURED_RUNTIME`;
 - `folder`: cartella di snapshot temporali;
 - `maxSteps`: numero massimo di finestre da eseguire.
@@ -191,9 +192,11 @@ offline, valida gli snapshot con Java, esegue `JSON_SEQUENCE` e valida
 `JSON_TIME` fino a `FULL_TIME_HORIZON_REACHED`. Produce manifest con SHA-256,
 log per stage e diagnostica Fase 11 sotto `data/mosaic-study/diagnostics/`.
 
-Il bridge live MOSAIC non e' ancora implementato. Restano aperti i warning
-sperimentali della baseline diagnostica: scenario non ancora stressante per
-offloading, decisioni osservate tutte locali e `FULL_OFFLOADING` non osservato.
+Il bridge live MOSAIC e' stato implementato e validato nelle Fasi 13D-13E in
+uno scenario runtime isolato. Restano aperti i warning sperimentali: strategy
+application diagnostica, banda Cell diagnostica da accounting controllato,
+scenario non ancora calibrato per offloading non locale e calibrazione
+scientifica ancora necessaria.
 
 ### Fase 12 - design bridge live
 
@@ -201,9 +204,8 @@ La Fase 11 offline e' completata sulla baseline
 `log-20260604-220216-MaGaIntegratedStudy`. La Fase 12 ha completato il design
 architetturale del bridge live MOSAIC -> SystemSnapshot -> MA-GA, documentando
 API MOSAIC verificate, cache causali, policy snapshot, gestione task pendenti e
-overrun GA su `DeltaT_max`. Il bridge live non e' ancora implementato; la Fase
-13 e' la prossima attivita' per skeleton runtime, adapter Cell, assembler live e
-coordinatore GA.
+overrun GA su `DeltaT_max`. Il design e' stato poi realizzato in modo
+diagnostico e isolato nelle sottofasi 13A-13E.
 
 ### Fase 13A - probe runtime MOSAIC
 
@@ -250,6 +252,19 @@ la diagnostica
 La strategy application resta diagnostica: task execution reale, migrazione,
 checkpoint e scenario finale realistico restano fuori scope per le fasi
 successive.
+
+### Fase 13E - validazione finale bridge live
+
+La Fase 13E stabilizza il bridge live e conclude la Fase 13. Il runtime ora
+rileva `WAIT_CAP_REACHED` durante `GA_RUNNING`, calcolando `DeltaT_max` prima
+della submission tramite `TemporalWindowBoundsCalculator.compute(...)`; i
+risultati tardivi sono scartati, la strategia precedente resta attiva e viene
+richiesta una fresh reoptimization. La diagnostica separa
+`futurePoolViolations` da `invalidPoolBandwidthViolations` e valida copie JSON
+degli snapshot pubblicati con `JsonSnapshotFolderLoader` e `SnapshotValidator`.
+La validazione produce
+`data/mosaic-study/diagnostics/phase_13e_live_bridge_end_to_end_validation.json`
+con `phase13Status = COMPLETED` e `readyForCalibration = true`.
 
 ### Batch statico GA
 
@@ -342,13 +357,22 @@ del pool di banda; il collo di bottiglia e' spesso il link cloud per-candidato.
 
 ## Limiti ancora aperti
 
-- `MOSAIC`/`MOSAIC_LIVE` richiede ancora un bridge concreto.
+- La strategy application del bridge live resta diagnostica e non controlla
+  ancora l'esecuzione reale dei task.
+- La banda Cell live resta accounting diagnostico runtime da messaggi
+  controllati, non misura diretta scientifica del federate Cell.
+- Task execution reale, live migration, checkpoint, ripresa upload/download e
+  persistenza remota restano fuori scope.
+- Lo scenario live non e' ancora calibrato per stressare offloading non locale.
+- La calibrazione scientifica di CPU, banda V2V, workload e scenario resta
+  necessaria.
 - Il modello V2V usa distanza euclidea e velocita' relativa scalare
   `abs(v_source - v_target)`, senza vettori di traiettoria o heading.
 - Il repair best-effort valuta un insieme limitato di alternative: non dimostra
   infeasibilita' globale.
 - In scenari con finestre molto corte, il runtime osservato del GA puo' superare
-  la finestra logica; l'integrazione live richiede una policy esplicita.
+  la finestra logica; l'integrazione live ora applica la policy
+  `DEFER_NEXT_WINDOW_UNTIL_GA_COMPLETES_CAPPED_BY_DELTA_T_MAX`.
 - `FULL_OFFLOADING` puo' non comparire in alcuni scenari: se e' atteso, vanno
   controllate inizializzazione, mutazione e repair di `offloadingRatio`.
 

@@ -1,6 +1,6 @@
 # MOSAIC live MA-GA runtime
 
-Tool diagnostico versionabile per la Fase 13D. Collega il layer live 13C al
+Tool diagnostico versionabile per le Fasi 13D-13E. Collega il layer live 13C al
 core MA-GA esistente usando un `MosaicSnapshotBridge` concreto, la
 `MosaicSystemStateSource` invariata, `TemporalWindowManager.executeNextStepOrNull`
 e un worker single-thread.
@@ -100,8 +100,21 @@ powershell -NoProfile -ExecutionPolicy Bypass `
 Il validator legge la run normale e la run overrun piu' recenti e genera:
 
 ```text
-data/mosaic-study/diagnostics/phase_13d_live_maga_runtime_validation.json
+data/mosaic-study/diagnostics/phase_13e_live_bridge_end_to_end_validation.json
 ```
+
+La validazione finale controlla:
+
+- bridge `LIVE_CAUSAL_MOSAIC_SNAPSHOT_BRIDGE`;
+- uso di `MosaicSystemStateSource`;
+- assenza di GA concorrenti;
+- `WAIT_CAP_REACHED` rilevato prima del completamento del worker;
+- stale result mai applicato;
+- fresh reoptimization richiesta;
+- `futurePoolViolations` separato da `invalidPoolBandwidthViolations`;
+- copie JSON degli snapshot pubblicati caricate con `JsonSnapshotFolderLoader`;
+- `SnapshotValidator` e `LocalCandidateInvariantValidator`;
+- parity tra snapshot pubblicato in memoria e copia JSON diagnostica.
 
 ## Output locali
 
@@ -118,6 +131,8 @@ live_ga_runtime_trace.csv
 live_strategy_application_trace.csv
 live_bridge_snapshot_trace.csv
 live_overrun_trace.csv
+live_published_snapshot_manifest.csv
+published-snapshots/
 ```
 
 Questi file sono derivati e non vanno versionati.
@@ -128,13 +143,18 @@ Questi file sono derivati e non vanno versionati.
 - Source mode: `MOSAIC_LIVE` tramite `MosaicSystemStateSource`.
 - Worker: single-thread, nessuna chiamata MOSAIC dal worker.
 - Snapshot: costruito prima della submission e letto dal bridge in memoria.
+- Deadline overrun: `DeltaT_max` calcolato prima della submission tramite
+  `TemporalWindowBoundsCalculator.compute(...)`.
 - Parallel GA: `SINGLE_IN_FLIGHT_GA_ONLY`.
 - Strategia durante GA: `KEEP_LAST_APPLIED_STRATEGY`.
 - Late result: `DISCARD_RESULT_IF_COMPLETED_AFTER_DELTA_T_MAX`.
 - Recovery: `REQUEST_FRESH_SNAPSHOT_AND_REOPTIMIZE_AT_FIRST_SAFE_INSTANT`.
+- Snapshot copies: solo diagnostiche post-run, mai lette durante la simulazione.
 
 ## Limiti
 
 La strategy application e' solo diagnostica. La banda Cell resta accounting
 diagnostico runtime da messaggi controllati, non misura diretta del federate
-Cell. CPU diagnostica e banda V2V richiedono calibrazione futura.
+Cell. CPU diagnostica e banda V2V richiedono calibrazione futura. Task
+execution reale, live migration, checkpoint e ripresa upload/download restano
+fuori scope.
