@@ -20,11 +20,15 @@ final class MaGaLiveStateConfig {
     double singlehopRadiusMeters;
     long localCpuCyclesPerSecond;
     String localCpuSource;
+    long remoteVehicleCpuCyclesPerSecond;
+    String remoteVehicleCpuSource;
     long v2vNominalBandwidthBitsPerSecond;
     String v2vBandwidthSource;
     double v2vPropagationDelaySeconds;
+    ConfiguredCellProfile configuredCellProfile;
     CellDiagnosticAccounting cellDiagnosticAccounting;
     List<TaskProfile> taskProfiles;
+    WorkloadGeneration workloadGeneration;
     StaticInfrastructure staticInfrastructure;
 
     static MaGaLiveStateConfig load(File configurationPath) {
@@ -67,6 +71,14 @@ final class MaGaLiveStateConfig {
         return localCpuSource;
     }
 
+    long getRemoteVehicleCpuCyclesPerSecond() {
+        return remoteVehicleCpuCyclesPerSecond;
+    }
+
+    String getRemoteVehicleCpuSource() {
+        return remoteVehicleCpuSource;
+    }
+
     long getV2vNominalBandwidthBitsPerSecond() {
         return v2vNominalBandwidthBitsPerSecond;
     }
@@ -83,8 +95,30 @@ final class MaGaLiveStateConfig {
         return Collections.unmodifiableList(taskProfiles);
     }
 
+    boolean hasWorkloadGenerationEnabled() {
+        return workloadGeneration != null && workloadGeneration.enabled;
+    }
+
+    WorkloadGeneration getWorkloadGeneration() {
+        if (workloadGeneration == null) {
+            throw new IllegalStateException("workloadGeneration is not configured");
+        }
+        return workloadGeneration;
+    }
+
     StaticInfrastructure getStaticInfrastructure() {
         return staticInfrastructure;
+    }
+
+    boolean hasConfiguredCellProfile() {
+        return configuredCellProfile != null;
+    }
+
+    ConfiguredCellProfile getConfiguredCellProfile() {
+        if (configuredCellProfile == null) {
+            throw new IllegalStateException("configuredCellProfile is not configured");
+        }
+        return configuredCellProfile;
     }
 
     boolean hasCellDiagnosticAccounting() {
@@ -104,14 +138,31 @@ final class MaGaLiveStateConfig {
         requireFinitePositive(singlehopRadiusMeters, "singlehopRadiusMeters", source);
         requirePositive(localCpuCyclesPerSecond, "localCpuCyclesPerSecond", source);
         requireText(localCpuSource, "localCpuSource", source);
+        if (remoteVehicleCpuCyclesPerSecond <= 0) {
+            remoteVehicleCpuCyclesPerSecond = localCpuCyclesPerSecond;
+        }
+        if (remoteVehicleCpuSource == null || remoteVehicleCpuSource.trim().isEmpty()) {
+            remoteVehicleCpuSource = localCpuSource;
+        }
+        requirePositive(remoteVehicleCpuCyclesPerSecond, "remoteVehicleCpuCyclesPerSecond", source);
+        requireText(remoteVehicleCpuSource, "remoteVehicleCpuSource", source);
         requirePositive(v2vNominalBandwidthBitsPerSecond, "v2vNominalBandwidthBitsPerSecond", source);
         requireText(v2vBandwidthSource, "v2vBandwidthSource", source);
         requireFiniteNonNegative(v2vPropagationDelaySeconds, "v2vPropagationDelaySeconds", source);
+        if (configuredCellProfile != null) {
+            configuredCellProfile.validate(source);
+        }
         if (cellDiagnosticAccounting != null) {
             cellDiagnosticAccounting.validate(source);
         }
-        if (taskProfiles == null || taskProfiles.isEmpty()) {
-            throw new IllegalArgumentException(source + ": taskProfiles must not be empty");
+        if (workloadGeneration != null) {
+            workloadGeneration.validate(source);
+        }
+        if (taskProfiles == null) {
+            taskProfiles = Collections.emptyList();
+        }
+        if (taskProfiles.isEmpty() && !hasWorkloadGenerationEnabled()) {
+            throw new IllegalArgumentException(source + ": taskProfiles must not be empty unless workloadGeneration.enabled is true");
         }
         List<TaskProfile> normalizedProfiles = new ArrayList<>();
         for (int i = 0; i < taskProfiles.size(); i++) {
@@ -138,6 +189,12 @@ final class MaGaLiveStateConfig {
         }
     }
 
+    private static void requireNonNegative(long value, String field, String source) {
+        if (value < 0) {
+            throw new IllegalArgumentException(source + ": " + field + " must be >= 0");
+        }
+    }
+
     private static void requireFinitePositive(double value, String field, String source) {
         if (!Double.isFinite(value) || value <= 0.0) {
             throw new IllegalArgumentException(source + ": " + field + " must be finite and > 0");
@@ -147,6 +204,103 @@ final class MaGaLiveStateConfig {
     private static void requireFiniteNonNegative(double value, String field, String source) {
         if (!Double.isFinite(value) || value < 0.0) {
             throw new IllegalArgumentException(source + ": " + field + " must be finite and >= 0");
+        }
+    }
+
+    static final class ConfiguredCellProfile {
+        String profileId;
+        String technology;
+        String source;
+        String classification;
+        long capacityBitsPerSecond;
+        double measuredRttSeconds;
+        double symmetricOneWayDelaySeconds;
+
+        void validate(String configSource) {
+            requireText(profileId, "configuredCellProfile.profileId", configSource);
+            requireText(technology, "configuredCellProfile.technology", configSource);
+            requireText(source, "configuredCellProfile.source", configSource);
+            if (!"LITERATURE_BASED_CONFIGURED_CELL_PROFILE".equals(source)) {
+                throw new IllegalArgumentException(configSource + ": configuredCellProfile.source must be LITERATURE_BASED_CONFIGURED_CELL_PROFILE");
+            }
+            requireText(classification, "configuredCellProfile.classification", configSource);
+            requirePositive(capacityBitsPerSecond, "configuredCellProfile.capacityBitsPerSecond", configSource);
+            requireFiniteNonNegative(measuredRttSeconds, "configuredCellProfile.measuredRttSeconds", configSource);
+            requireFiniteNonNegative(symmetricOneWayDelaySeconds, "configuredCellProfile.symmetricOneWayDelaySeconds", configSource);
+        }
+    }
+
+    static final class WorkloadGeneration {
+        boolean enabled;
+        String mode;
+        long randomSeed;
+        long startTimeMs;
+        double arrivalRateTasksPerSecondPerActiveVehicle;
+        int maxGeneratedTasksPerTickPerVehicle;
+        List<GeneratedTaskProfile> profiles;
+
+        long getStartTimeNs() {
+            return startTimeMs * NANOSECONDS_PER_MILLISECOND;
+        }
+
+        List<GeneratedTaskProfile> getProfiles() {
+            return Collections.unmodifiableList(profiles);
+        }
+
+        void validate(String source) {
+            if (!enabled) {
+                if (profiles == null) {
+                    profiles = Collections.emptyList();
+                }
+                return;
+            }
+            requireText(mode, "workloadGeneration.mode", source);
+            if (!"SEEDED_POISSON_PER_ACTIVE_VEHICLE".equals(mode)) {
+                throw new IllegalArgumentException(source + ": workloadGeneration.mode must be SEEDED_POISSON_PER_ACTIVE_VEHICLE");
+            }
+            requireNonNegative(startTimeMs, "workloadGeneration.startTimeMs", source);
+            requireFiniteNonNegative(
+                    arrivalRateTasksPerSecondPerActiveVehicle,
+                    "workloadGeneration.arrivalRateTasksPerSecondPerActiveVehicle",
+                    source
+            );
+            if (maxGeneratedTasksPerTickPerVehicle <= 0) {
+                throw new IllegalArgumentException(source + ": workloadGeneration.maxGeneratedTasksPerTickPerVehicle must be > 0");
+            }
+            if (profiles == null || profiles.isEmpty()) {
+                throw new IllegalArgumentException(source + ": workloadGeneration.profiles must not be empty when enabled");
+            }
+            double weightSum = 0.0;
+            List<GeneratedTaskProfile> normalizedProfiles = new ArrayList<>();
+            for (int i = 0; i < profiles.size(); i++) {
+                GeneratedTaskProfile profile = profiles.get(i);
+                profile.validate(source, i);
+                weightSum += profile.weight;
+                normalizedProfiles.add(profile);
+            }
+            if (Math.abs(weightSum - 1.0) > 1.0e-9) {
+                throw new IllegalArgumentException(source + ": workloadGeneration.profiles weights must sum to 1.0");
+            }
+            profiles = normalizedProfiles;
+        }
+    }
+
+    static final class GeneratedTaskProfile {
+        String profileId;
+        double weight;
+        long inputSizeBits;
+        long outputSizeBits;
+        long cpuCycles;
+        double deadlineSeconds;
+
+        void validate(String source, int index) {
+            String prefix = "workloadGeneration.profiles[" + index + "]";
+            requireText(profileId, prefix + ".profileId", source);
+            requireFinitePositive(weight, prefix + ".weight", source);
+            requirePositive(inputSizeBits, prefix + ".inputSizeBits", source);
+            requirePositive(outputSizeBits, prefix + ".outputSizeBits", source);
+            requirePositive(cpuCycles, prefix + ".cpuCycles", source);
+            requireFinitePositive(deadlineSeconds, prefix + ".deadlineSeconds", source);
         }
     }
 

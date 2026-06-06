@@ -6,6 +6,7 @@
     "DOCUMENTATION_ONLY": "Value documents the intended technology background but is not directly consumed by the runtime.",
     "CONTROLLED_ASSUMPTION": "Value is a controlled engineering assumption for a bounded experiment.",
     "PENDING_LIVE_STATE_EXTENSION": "Value is recorded for the calibration design but is not yet consumed by the live-state layer.",
+    "IMPLEMENTED_CONFIGURABLE_LITERATURE_BASED_PROFILE": "Value is consumed by the live-state layer as a configurable literature-based profile.",
     "STRESS_PROFILE": "Alternative stress profile kept separate from the nominal scenario.",
     "SEPARATE_STRESS_PROFILE": "Alternative technology stress profile not mixed into the nominal scenario."
   },
@@ -69,7 +70,7 @@
     "localVehicleCpuCyclesPerSecond": 1000000000,
     "localCpuClassification": "CONTROLLED_ASSUMPTION",
     "remoteVehicleCpuCyclesPerSecondTarget": 1000000000,
-    "remoteVehicleCpuClassification": "PENDING_LIVE_STATE_EXTENSION",
+    "remoteVehicleCpuClassification": "IMPLEMENTED_CONFIGURABLE_LITERATURE_BASED_PROFILE",
     "edgeCpuCyclesPerSecond": 5000000000,
     "edgeCpuClassification": "CALIBRATED_ABSTRACTION",
     "cloudCpuCyclesPerSecond": 100000000000,
@@ -85,7 +86,42 @@
   "runtimeCompatibility": {
     "cellDiagnosticAccountingSource": "DIAGNOSTIC_RUNTIME_ACCOUNTING_FROM_CONTROLLED_CELL_MESSAGES",
     "configuredCellProfileSource": "LITERATURE_BASED_CONFIGURED_CELL_PROFILE",
-    "temporaryBootstrapTaskMarker": "TEMPORARY_COMPATIBILITY_TASK_NOT_FINAL_WORKLOAD",
-    "workloadGeneratorPhase": "14C.3"
+    "workloadGeneratorStatus": "IMPLEMENTED_IN_14C3"
+  },
+  "workloadGeneration": {
+    "enabled": true,
+    "mode": "SEEDED_POISSON_PER_ACTIVE_VEHICLE",
+    "classification": "IMPLEMENTED_CONFIGURABLE_LITERATURE_BASED_PROFILE",
+    "randomSeed": 104729,
+    "startTimeMs": 7000,
+    "arrivalRateTasksPerSecondPerActiveVehicle": 1.0,
+    "maxGeneratedTasksPerTickPerVehicle": 10,
+    "outputSizeBitsClassification": "CONTROLLED_ASSUMPTION",
+    "profiles": [
+      {
+        "profileId": "light",
+        "weight": 0.50,
+        "inputSizeBits": 160000,
+        "outputSizeBits": 8000,
+        "cpuCycles": 200000000,
+        "deadlineSeconds": 0.5
+      },
+      {
+        "profileId": "medium",
+        "weight": 0.35,
+        "inputSizeBits": 800000,
+        "outputSizeBits": 8000,
+        "cpuCycles": 600000000,
+        "deadlineSeconds": 1.0
+      },
+      {
+        "profileId": "heavy",
+        "weight": 0.15,
+        "inputSizeBits": 8000000,
+        "outputSizeBits": 8000,
+        "cpuCycles": 3200000000,
+        "deadlineSeconds": 4.0
+      }
+    ]
   }
 }

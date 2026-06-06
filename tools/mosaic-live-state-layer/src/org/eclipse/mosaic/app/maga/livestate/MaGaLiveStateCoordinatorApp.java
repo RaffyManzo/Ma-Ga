@@ -31,6 +31,7 @@ public class MaGaLiveStateCoordinatorApp extends AbstractApplication<ServerOpera
             new LiveSystemSnapshotAssembler();
 
     private MaGaLiveStateConfig config;
+    private LiveSeededPoissonWorkloadGenerator workloadGenerator;
     private LiveStaticInfrastructureCatalog staticInfrastructureCatalog;
     private Path runDirectory;
     private Path outputDir;
@@ -49,6 +50,7 @@ public class MaGaLiveStateCoordinatorApp extends AbstractApplication<ServerOpera
     private BufferedWriter snapshotManifestWriter;
     private final Set<String> writtenCellEventIds = new HashSet<>();
     private long tickCount;
+    private long tasksGenerated;
     private long tasksActivated;
     private boolean infrastructureSnapshotEnabled;
 
@@ -57,12 +59,16 @@ public class MaGaLiveStateCoordinatorApp extends AbstractApplication<ServerOpera
         config = MaGaLiveStateConfig.load(getOs().getConfigurationPath());
         staticInfrastructureCatalog = LiveStaticInfrastructureCatalog.fromConfig(config);
         infrastructureSnapshotEnabled = config.hasCellDiagnosticAccounting();
+        workloadGenerator = config.hasWorkloadGenerationEnabled()
+                ? new LiveSeededPoissonWorkloadGenerator(config.getWorkloadGeneration(), config.getTickIntervalNs())
+                : null;
         cache.reset();
         if (infrastructureSnapshotEnabled) {
             cellAccounting.reset();
         }
         cache.installTaskDefinitions(toTaskDefinitions(config));
         tickCount = 0L;
+        tasksGenerated = 0L;
         tasksActivated = 0L;
         writtenCellEventIds.clear();
         boolean immutableViewSelfTest = LiveStateCache.runImmutableSnapshotViewSelfTest();
@@ -98,6 +104,24 @@ public class MaGaLiveStateCoordinatorApp extends AbstractApplication<ServerOpera
                         + "|edgeNodes=" + staticInfrastructureCatalog.getEdgeNodeCount()
                         + "|cloudNodes=" + staticInfrastructureCatalog.getCloudNodeCount()
         );
+        if (config.hasConfiguredCellProfile()) {
+            MaGaLiveStateConfig.ConfiguredCellProfile profile = config.getConfiguredCellProfile();
+            String runtimeAccountingSource = infrastructureSnapshotEnabled
+                    ? config.getCellDiagnosticAccounting().bandwidthSource
+                    : "NOT_CONFIGURED";
+            getLog().infoSimTime(
+                    this,
+                    "LIVE_STATE_CONFIGURED_CELL_PROFILE_LOADED"
+                            + "|profileId=" + profile.profileId
+                            + "|technology=" + profile.technology
+                            + "|source=" + profile.source
+                            + "|classification=" + profile.classification
+                            + "|capacityBitsPerSecond=" + profile.capacityBitsPerSecond
+                            + "|measuredRttSeconds=" + profile.measuredRttSeconds
+                            + "|symmetricOneWayDelaySeconds=" + profile.symmetricOneWayDelaySeconds
+                            + "|runtimeAccountingSource=" + runtimeAccountingSource
+            );
+        }
         getLog().infoSimTime(
                 this,
                 "LIVE_STATE_IMMUTABLE_VIEW_TEST"
@@ -110,6 +134,14 @@ public class MaGaLiveStateCoordinatorApp extends AbstractApplication<ServerOpera
     public void processEvent(Event event) {
         long tickTimeNs = getOs().getSimulationTime();
         tickCount++;
+        LiveStateSnapshotView vehicleObservationView = cache.snapshotAtOrBefore(tickTimeNs);
+        int newlyGeneratedTasks = 0;
+        if (workloadGenerator != null) {
+            newlyGeneratedTasks = cache.installGeneratedTaskDefinitions(
+                    workloadGenerator.generate(tickTimeNs, vehicleObservationView.getActiveVehicles())
+            );
+            tasksGenerated += newlyGeneratedTasks;
+        }
         int newlyActivatedTasks = cache.activateDueTasks(tickTimeNs);
         tasksActivated += newlyActivatedTasks;
         LiveStateSnapshotView view = cache.snapshotAtOrBefore(tickTimeNs);
@@ -158,7 +190,9 @@ public class MaGaLiveStateCoordinatorApp extends AbstractApplication<ServerOpera
                         + "|tickCount=" + tickCount
                         + "|activeVehicles=" + view.getActiveVehicles().size()
                         + "|pendingTasks=" + view.getPendingTasks().size()
+                        + "|newlyGeneratedTasks=" + newlyGeneratedTasks
                         + "|newlyActivatedTasks=" + newlyActivatedTasks
+                        + "|totalGeneratedTasks=" + tasksGenerated
                         + "|localCandidates=" + preview.getLocalCandidates().size()
                         + "|v2vCandidates=" + preview.getV2vCandidates().size()
                         + "|v2vPools=" + preview.getV2vPools().size()
@@ -179,6 +213,7 @@ public class MaGaLiveStateCoordinatorApp extends AbstractApplication<ServerOpera
                         + "|simulationTime=" + getOs().getSimulationTime()
                         + "|serverId=" + getOs().getId()
                         + "|tickCount=" + tickCount
+                        + "|tasksGenerated=" + tasksGenerated
                         + "|tasksActivated=" + tasksActivated
         );
     }

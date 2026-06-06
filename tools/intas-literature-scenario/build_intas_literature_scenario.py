@@ -1118,9 +1118,20 @@ def write_live_state_config(
         "singlehopRadiusMeters": v2v["singlehopRadiusMeters"],
         "localCpuCyclesPerSecond": compute["localVehicleCpuCyclesPerSecond"],
         "localCpuSource": "LITERATURE_BASED_RANGE_CHOICE",
+        "remoteVehicleCpuCyclesPerSecond": compute["remoteVehicleCpuCyclesPerSecondTarget"],
+        "remoteVehicleCpuSource": "LITERATURE_BASED_RANGE_CHOICE",
         "v2vNominalBandwidthBitsPerSecond": v2v["effectivePoolCapacityBitsPerSecond"],
         "v2vBandwidthSource": "LITERATURE_BASED_CALIBRATED_ABSTRACTION",
         "v2vPropagationDelaySeconds": v2v["maGaFixedDelaySeconds"],
+        "configuredCellProfile": {
+            "profileId": "CELL_5G_AVEIRO_P50",
+            "technology": cell["technology"],
+            "source": catalog["runtimeCompatibility"]["configuredCellProfileSource"],
+            "classification": cell["classification"],
+            "capacityBitsPerSecond": cell["capacityBitsPerSecond"],
+            "measuredRttSeconds": cell["measuredRttSeconds"],
+            "symmetricOneWayDelaySeconds": cell["symmetricOneWayDelaySeconds"],
+        },
         "cellDiagnosticAccounting": {
             "bucketDurationMs": 1000,
             "availableFromPolicy": "SAFE_AFTER_TIMESTAMP",
@@ -1139,18 +1150,8 @@ def write_live_state_config(
                 {"poolId": "pool_rsu_1", "nominalCapacityBitsPerSecond": cell["capacityBitsPerSecond"]},
             ],
         },
-        "taskProfiles": [
-            {
-                "profileId": "bootstrap_medium_until_14C3",
-                "activationTimeMs": 7000,
-                "sourceVehicleId": "veh_0",
-                "inputSizeBits": 800000,
-                "outputSizeBits": 8000,
-                "cpuCycles": 600000000,
-                "deadlineSeconds": 1.0,
-                "metadataMarker": catalog["runtimeCompatibility"]["temporaryBootstrapTaskMarker"],
-            }
-        ],
+        "taskProfiles": [],
+        "workloadGeneration": catalog["workloadGeneration"],
         "staticInfrastructure": {
             "gateways": gateways,
             "edgeNodes": edge_nodes,
@@ -1358,7 +1359,7 @@ def write_metadata(path: Path, report: dict[str, Any], catalog: dict[str, Any]) 
             "remoteVehicleCpuCyclesPerSecondTarget": {
                 "value": catalog["computeProfiles"]["remoteVehicleCpuCyclesPerSecondTarget"],
                 "classification": catalog["computeProfiles"]["remoteVehicleCpuClassification"],
-                "status": "PENDING_LIVE_STATE_EXTENSION",
+                "status": "emitted into live-state executable config from 14C.3",
             },
             "edgeCpuCyclesPerSecond": {
                 "value": catalog["computeProfiles"]["edgeCpuCyclesPerSecond"],
@@ -1373,14 +1374,23 @@ def write_metadata(path: Path, report: dict[str, Any], catalog: dict[str, Any]) 
                 "classification": catalog["infrastructure"]["cloudBackhaulClassification"],
             },
         },
-        "temporaryWorkloadBoundary": {
-            "marker": catalog["runtimeCompatibility"]["temporaryBootstrapTaskMarker"],
-            "profileId": "bootstrap_medium_until_14C3",
-            "classification": "CONTROLLED_ASSUMPTION",
-            "nextPhase": catalog["runtimeCompatibility"]["workloadGeneratorPhase"],
+        "workloadGeneration": {
+            "workloadMode": catalog["workloadGeneration"]["mode"],
+            "randomSeed": catalog["workloadGeneration"]["randomSeed"],
+            "arrivalRateTasksPerSecondPerActiveVehicle": catalog["workloadGeneration"]["arrivalRateTasksPerSecondPerActiveVehicle"],
+            "profileWeights": {
+                profile["profileId"]: profile["weight"]
+                for profile in catalog["workloadGeneration"]["profiles"]
+            },
+            "outputSizeBits": {
+                "value": 8000,
+                "classification": catalog["workloadGeneration"]["outputSizeBitsClassification"],
+            },
+            "classification": catalog["workloadGeneration"]["classification"],
         },
         "pendingLiveStateExtensions": [
-            "remoteVehicleCpuCyclesPerSecondTarget"
+            "calibrated workload rate matrix",
+            "40 replicate runner",
         ],
         "controlledAssumptions": {
             "sumoStepLengthSeconds": {"value": 0.1, "classification": "CONTROLLED_ASSUMPTION"}

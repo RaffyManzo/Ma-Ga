@@ -96,12 +96,16 @@ public class MaGaLiveRuntimeCoordinatorApp extends AbstractApplication<ServerOpe
                         + "|sourceMode=" + systemStateSource.getMode()
                         + "|traceDir=" + traceWriter.getOutputDir().getFileName()
         );
+        stateFacade.configuredCellProfileLogFields().ifPresent(fields ->
+                getLog().infoSimTime(this, "LIVE_STATE_CONFIGURED_CELL_PROFILE_LOADED" + fields)
+        );
         scheduleNext(runtimeConfig.getCoordinatorTickIntervalNs());
     }
 
     @Override
     public void processEvent(Event event) {
         long tickTimeNs = getOs().getSimulationTime();
+        int generatedTasks = stateFacade.generateWorkloadTasks(tickTimeNs);
         int activatedTasks = stateFacade.activateDueTasks(tickTimeNs);
         LiveStateLayerRuntimeFacade.RuntimeSnapshot runtimeSnapshot =
                 stateFacade.buildSnapshotAt(tickTimeNs);
@@ -120,6 +124,7 @@ public class MaGaLiveRuntimeCoordinatorApp extends AbstractApplication<ServerOpe
                 "LIVE_MAGA_RUNTIME_COORDINATOR_TICK"
                         + "|simulationTime=" + tickTimeNs
                         + "|profile=" + runtimeConfig.profileName()
+                        + "|generatedTasks=" + generatedTasks
                         + "|activatedTasks=" + activatedTasks
                         + "|snapshotResolved=" + runtimeSnapshot.getSnapshot().isPresent()
                         + "|snapshotsRequested=" + bridge.getSnapshotsRequested()

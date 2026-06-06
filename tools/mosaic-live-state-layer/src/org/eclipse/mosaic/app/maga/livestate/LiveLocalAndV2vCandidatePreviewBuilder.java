@@ -98,7 +98,7 @@ final class LiveLocalAndV2vCandidatePreviewBuilder {
                         source.getVehicleId(),
                         target.getVehicleId(),
                         distance,
-                        config.getLocalCpuCyclesPerSecond(),
+                        config.getRemoteVehicleCpuCyclesPerSecond(),
                         poolId,
                         config.getV2vNominalBandwidthBitsPerSecond(),
                         config.getV2vBandwidthSource(),

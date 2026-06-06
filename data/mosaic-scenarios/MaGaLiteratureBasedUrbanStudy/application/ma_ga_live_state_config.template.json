@@ -3,9 +3,20 @@
   "singlehopRadiusMeters": "${V2V_SINGLEHOP_RADIUS_METERS}",
   "localCpuCyclesPerSecond": "${LOCAL_CPU_CYCLES_PER_SECOND}",
   "localCpuSource": "LITERATURE_BASED_RANGE_CHOICE",
+  "remoteVehicleCpuCyclesPerSecond": "${REMOTE_VEHICLE_CPU_CYCLES_PER_SECOND}",
+  "remoteVehicleCpuSource": "LITERATURE_BASED_RANGE_CHOICE",
   "v2vNominalBandwidthBitsPerSecond": "${V2V_POOL_CAPACITY_BITS_PER_SECOND}",
   "v2vBandwidthSource": "LITERATURE_BASED_CALIBRATED_ABSTRACTION",
   "v2vPropagationDelaySeconds": "${V2V_FIXED_DELAY_SECONDS}",
+  "configuredCellProfile": {
+    "profileId": "CELL_5G_AVEIRO_P50",
+    "technology": "5G",
+    "source": "LITERATURE_BASED_CONFIGURED_CELL_PROFILE",
+    "classification": "CALIBRATED_ABSTRACTION",
+    "capacityBitsPerSecond": "${CELL_CAPACITY_BITS_PER_SECOND}",
+    "measuredRttSeconds": 0.0522,
+    "symmetricOneWayDelaySeconds": 0.0261
+  },
   "cellDiagnosticAccounting": {
     "bucketDurationMs": 1000,
     "availableFromPolicy": "SAFE_AFTER_TIMESTAMP",
@@ -29,18 +40,41 @@
       }
     ]
   },
-  "taskProfiles": [
-    {
-      "profileId": "bootstrap_medium_until_14C3",
-      "activationTimeMs": 7000,
-      "sourceVehicleId": "veh_0",
-      "inputSizeBits": 800000,
-      "outputSizeBits": 8000,
-      "cpuCycles": 600000000,
-      "deadlineSeconds": 1.0,
-      "metadataMarker": "TEMPORARY_COMPATIBILITY_TASK_NOT_FINAL_WORKLOAD"
-    }
-  ],
+  "taskProfiles": [],
+  "workloadGeneration": {
+    "enabled": true,
+    "mode": "SEEDED_POISSON_PER_ACTIVE_VEHICLE",
+    "randomSeed": 104729,
+    "startTimeMs": 7000,
+    "arrivalRateTasksPerSecondPerActiveVehicle": 1.0,
+    "maxGeneratedTasksPerTickPerVehicle": 10,
+    "profiles": [
+      {
+        "profileId": "light",
+        "weight": 0.50,
+        "inputSizeBits": 160000,
+        "outputSizeBits": 8000,
+        "cpuCycles": 200000000,
+        "deadlineSeconds": 0.5
+      },
+      {
+        "profileId": "medium",
+        "weight": 0.35,
+        "inputSizeBits": 800000,
+        "outputSizeBits": 8000,
+        "cpuCycles": 600000000,
+        "deadlineSeconds": 1.0
+      },
+      {
+        "profileId": "heavy",
+        "weight": 0.15,
+        "inputSizeBits": 8000000,
+        "outputSizeBits": 8000,
+        "cpuCycles": 3200000000,
+        "deadlineSeconds": 4.0
+      }
+    ]
+  },
   "staticInfrastructure": {
     "gateways": [
       {

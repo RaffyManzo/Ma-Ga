@@ -139,7 +139,6 @@ foreach ($ExpectedClassFile in $ExpectedClassFiles) {
 }
 
 foreach ($ProtectedPath in @(
-    "tools/mosaic-live-state-layer",
     "src"
 )) {
     $Status = git -c safe.directory="$SafeRepoRoot" status --short $ProtectedPath

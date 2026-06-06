@@ -7,6 +7,13 @@ direct single-hop e pool condivisi `DIRECT_V2V`, e nello scenario 13C aggiunge
 access link, gateway pool, candidati `EDGE`/`CLOUD` e `SystemSnapshot` JSON
 live.
 
+Dalla Fase 14C.3 il layer supporta anche:
+
+- CPU remota `VEHICLE` configurabile separatamente dalla CPU `LOCAL`;
+- generazione workload opzionale `SEEDED_POISSON_PER_ACTIVE_VEHICLE`;
+- profilo Cell configurato literature-based distinto dall'accounting
+  diagnostico runtime.
+
 Il tool non invoca MA-GA e non implementa bridge concreto, strategy applier,
 worker o policy overrun.
 
@@ -42,11 +49,20 @@ Il build crea:
 tools/mosaic-live-state-layer/out/maga-live-state-layer.jar
 ```
 
-e copia il JAR nello scenario 13C versionabile:
+Il JAR resta un artefatto generato sotto `out/` e non viene copiato in scenari
+versionabili.
 
-```text
-data/mosaic-scenarios/MaGaLiveInfrastructureSnapshotStudy/application/
+## Phase 14C.3 harness
+
+```powershell
+powershell -NoProfile -ExecutionPolicy Bypass `
+  -File .\tools\mosaic-live-state-layer\harness\run_phase14c3_harness.ps1
 ```
+
+Il harness controlla determinismo del generatore Poisson, seed differenti,
+rate zero, assenza di veicoli attivi, generazione solo per veicoli attivi,
+causalita' `activationTimeNs <= tickTimeNs`, uso della CPU remota sui candidati
+V2V e separazione tra profilo Cell configurato e accounting diagnostico.
 
 ## Deploy
 
@@ -148,6 +164,8 @@ Java e `SnapshotValidator`.
 - Access link: `NEAREST_AVAILABLE_GATEWAY_BY_PROJECTED_DISTANCE`.
 - Gateway pool: `LATEST_SAFE_AVAILABLE_CELL_BUCKET`.
 - Remote: `EDGE_AND_CLOUD_REQUIRE_ACTIVE_GATEWAY_AND_SAFE_POOL`.
+- Workload 14C.3: `SEEDED_POISSON_PER_ACTIVE_VEHICLE`, opzionale e
+  retrocompatibile con i `taskProfiles` statici.
 
 ## Limiti
 

@@ -33,6 +33,7 @@ public final class LiveStateLayerRuntimeFacade {
     private final LiveInfrastructurePreviewBuilder infrastructureBuilder;
     private final SnapshotValidator snapshotValidator;
     private final LocalCandidateInvariantValidator localCandidateValidator;
+    private LiveSeededPoissonWorkloadGenerator workloadGenerator;
 
     private LiveStateLayerRuntimeFacade(MaGaLiveStateConfig config) {
         this.config = config;
@@ -53,6 +54,9 @@ public final class LiveStateLayerRuntimeFacade {
         if (config.hasCellDiagnosticAccounting()) {
             cellAccounting.reset();
         }
+        workloadGenerator = config.hasWorkloadGenerationEnabled()
+                ? new LiveSeededPoissonWorkloadGenerator(config.getWorkloadGeneration(), config.getTickIntervalNs())
+                : null;
         List<LiveTaskState> taskDefinitions = new ArrayList<>();
         List<MaGaLiveStateConfig.TaskProfile> profiles = config.getTaskProfiles();
         for (int i = 0; i < profiles.size(); i++) {
@@ -61,8 +65,38 @@ public final class LiveStateLayerRuntimeFacade {
         cache.installTaskDefinitions(taskDefinitions);
     }
 
+    public int generateWorkloadTasks(long tickTimeNs) {
+        if (workloadGenerator == null) {
+            return 0;
+        }
+        LiveStateSnapshotView vehicleObservationView = cache.snapshotAtOrBefore(tickTimeNs);
+        return cache.installGeneratedTaskDefinitions(
+                workloadGenerator.generate(tickTimeNs, vehicleObservationView.getActiveVehicles())
+        );
+    }
+
     public int activateDueTasks(long tickTimeNs) {
         return cache.activateDueTasks(tickTimeNs);
+    }
+
+    public Optional<String> configuredCellProfileLogFields() {
+        if (!config.hasConfiguredCellProfile()) {
+            return Optional.empty();
+        }
+        MaGaLiveStateConfig.ConfiguredCellProfile profile = config.getConfiguredCellProfile();
+        String runtimeAccountingSource = config.hasCellDiagnosticAccounting()
+                ? config.getCellDiagnosticAccounting().bandwidthSource
+                : "NOT_CONFIGURED";
+        return Optional.of(
+                "|profileId=" + profile.profileId
+                        + "|technology=" + profile.technology
+                        + "|source=" + profile.source
+                        + "|classification=" + profile.classification
+                        + "|capacityBitsPerSecond=" + profile.capacityBitsPerSecond
+                        + "|measuredRttSeconds=" + profile.measuredRttSeconds
+                        + "|symmetricOneWayDelaySeconds=" + profile.symmetricOneWayDelaySeconds
+                        + "|runtimeAccountingSource=" + runtimeAccountingSource
+        );
     }
 
     public RuntimeSnapshot buildSnapshotAt(long tickTimeNs) {

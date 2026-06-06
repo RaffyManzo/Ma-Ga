@@ -43,6 +43,19 @@ final class LiveStateCache {
         }
     }
 
+    int installGeneratedTaskDefinitions(List<LiveTaskState> tasks) {
+        int inserted = 0;
+        for (LiveTaskState task : tasks) {
+            if (task == null || task.getActivationTimeNs() < 0) {
+                continue;
+            }
+            if (taskDefinitions.putIfAbsent(task.getTaskId(), task) == null) {
+                inserted++;
+            }
+        }
+        return inserted;
+    }
+
     void registerVehicleStarted(String vehicleId, long timeNs, boolean adHocEnabled) {
         vehicles.put(
                 vehicleId,

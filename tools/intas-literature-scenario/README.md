@@ -103,7 +103,14 @@ tools/intas-literature-scenario/config/literature_calibration_catalog.json
 The catalog keeps V2V, Cell, compute and infrastructure assumptions separate
 from generated scenario files. It distinguishes `MODELLED_DIRECTLY`,
 `CALIBRATED_ABSTRACTION`, `DOCUMENTATION_ONLY`, `CONTROLLED_ASSUMPTION` and
-`PENDING_LIVE_STATE_EXTENSION` metadata classes.
+`IMPLEMENTED_CONFIGURABLE_LITERATURE_BASED_PROFILE` metadata classes.
+
+Phase 14C.3 adds executable text configuration for:
+
+- `remoteVehicleCpuCyclesPerSecond` separate from local CPU;
+- `workloadGeneration.mode = SEEDED_POISSON_PER_ACTIVE_VEHICLE`;
+- light, medium and heavy task profiles;
+- `configuredCellProfile` distinct from `cellDiagnosticAccounting`.
 
 ## Validate Generated Text Configuration
 
@@ -144,10 +151,9 @@ repository scaffold. They are derived from the external InTAS assets.
 ## Current Phase Boundary
 
 Phase 14C.2 prepares literature-based radio, Cell, RSU/gateway and compute
-configuration. It does not implement:
+configuration. Phase 14C.3 adds the deterministic workload and remote VEHICLE
+CPU configuration. It does not implement:
 
-- final workload generator extensions;
-- executable separated remote VEHICLE CPU in the Java live-state layer;
 - 40-replicate runner;
 - MOSAIC end-to-end execution for the literature scenario;
 - scientific calibration.

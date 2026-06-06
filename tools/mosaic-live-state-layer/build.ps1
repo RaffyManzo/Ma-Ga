@@ -7,9 +7,6 @@ $ErrorActionPreference = "Stop"
 $ToolRoot = $PSScriptRoot
 $RepoRoot = Split-Path -Parent (Split-Path -Parent $ToolRoot)
 $ResolvedMosaicRoot = (Resolve-Path -LiteralPath (Join-Path $RepoRoot $MosaicRoot)).Path
-$VersionedScenarios = @(
-    "MaGaLiveInfrastructureSnapshotStudy"
-)
 $SourceRoot = Join-Path $ToolRoot "src"
 $OutRoot = Join-Path $ToolRoot "out"
 $ClassesDir = Join-Path $OutRoot "classes"
@@ -19,12 +16,6 @@ $SourcesFile = Join-Path $OutRoot "sources.txt"
 
 if (-not (Test-Path -LiteralPath $ResolvedMosaicRoot -PathType Container)) {
     throw "MOSAIC root not found: $ResolvedMosaicRoot"
-}
-foreach ($ScenarioName in $VersionedScenarios) {
-    $ScenarioApplicationDir = Join-Path $RepoRoot "data\mosaic-scenarios\$ScenarioName\application"
-    if (-not (Test-Path -LiteralPath $ScenarioApplicationDir -PathType Container)) {
-        throw "Live state scenario application directory not found: $ScenarioApplicationDir"
-    }
 }
 if (-not (Get-Command javac -ErrorAction SilentlyContinue)) {
     throw "javac not found in PATH"
@@ -109,6 +100,7 @@ $ExpectedClassFiles = @(
     "org\eclipse\mosaic\app\maga\livestate\LiveCellTrafficEvent.class",
     "org\eclipse\mosaic\app\maga\livestate\LiveCellBandwidthBucket.class",
     "org\eclipse\mosaic\app\maga\livestate\LiveCellTrafficAccountingCache.class",
+    "org\eclipse\mosaic\app\maga\livestate\LiveSeededPoissonWorkloadGenerator.class",
     "org\eclipse\mosaic\app\maga\livestate\MaGaLiveCellDiagnosticRequestMessage.class",
     "org\eclipse\mosaic\app\maga\livestate\MaGaLiveCellDiagnosticResponseMessage.class",
     "org\eclipse\mosaic\app\maga\livestate\MaGaLiveCellDiagnosticVehicleApp.class",
@@ -144,10 +136,5 @@ foreach ($ExpectedClassFile in $ExpectedClassFiles) {
     }
 }
 
-foreach ($ScenarioName in $VersionedScenarios) {
-    $ScenarioApplicationDir = Join-Path $RepoRoot "data\mosaic-scenarios\$ScenarioName\application"
-    $ScenarioJar = Join-Path $ScenarioApplicationDir "maga-live-state-layer.jar"
-    Copy-Item -LiteralPath $JarFile -Destination $ScenarioJar -Force
-    Write-Host "Copied live state layer JAR to versioned scenario: $ScenarioJar"
-}
 Write-Host "Build completed: $JarFile"
+Write-Host "Generated JAR is intentionally kept under tools/mosaic-live-state-layer/out only."

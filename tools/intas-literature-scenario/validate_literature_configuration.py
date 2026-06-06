@@ -148,8 +148,32 @@ def validate(scenario_root: Path) -> dict[str, Any]:
     live_state = docs["liveState"]
     assert_close("SNS/live-state radius", live_state.get("singlehopRadiusMeters"), 250.0, errors)
     assert_close("local CPU", live_state.get("localCpuCyclesPerSecond"), 1_000_000_000.0, errors)
+    assert_close("remote VEHICLE CPU", live_state.get("remoteVehicleCpuCyclesPerSecond"), 1_000_000_000.0, errors)
+    if not live_state.get("remoteVehicleCpuSource"):
+        errors.append("remoteVehicleCpuSource must be non-empty.")
     assert_close("v2v pool capacity", live_state.get("v2vNominalBandwidthBitsPerSecond"), 4_700_000.0, errors)
     assert_close("V2V fixed delay", live_state.get("v2vPropagationDelaySeconds"), 0.002, errors)
+    if "bootstrap_medium_until_14C3" in json.dumps(live_state, sort_keys=True):
+        errors.append("bootstrap_medium_until_14C3 must not remain in 14C.3 generated live-state config.")
+    if live_state.get("taskProfiles") != []:
+        errors.append("taskProfiles must be [] when workloadGeneration is enabled.")
+
+    workload = live_state.get("workloadGeneration", {})
+    assert_equal("workloadGeneration.enabled", workload.get("enabled"), True, errors)
+    assert_equal("workloadGeneration.mode", workload.get("mode"), "SEEDED_POISSON_PER_ACTIVE_VEHICLE", errors)
+    assert_equal("workloadGeneration.randomSeed", workload.get("randomSeed"), 104729, errors)
+    assert_close("workloadGeneration.arrivalRate", workload.get("arrivalRateTasksPerSecondPerActiveVehicle"), 1.0, errors)
+    if number(workload.get("maxGeneratedTasksPerTickPerVehicle")) is None or workload.get("maxGeneratedTasksPerTickPerVehicle", 0) <= 0:
+        errors.append("workloadGeneration.maxGeneratedTasksPerTickPerVehicle must be > 0.")
+    workload_profiles = {profile.get("profileId"): profile for profile in workload.get("profiles", [])}
+    for profile_id in ("light", "medium", "heavy"):
+        if profile_id not in workload_profiles:
+            errors.append(f"Missing workload profile {profile_id}.")
+        else:
+            assert_equal(f"{profile_id} outputSizeBits", workload_profiles[profile_id].get("outputSizeBits"), 8000, errors)
+    weight_sum = sum(float(profile.get("weight", 0.0)) for profile in workload_profiles.values())
+    if abs(weight_sum - 1.0) > 1.0e-9:
+        errors.append(f"workloadGeneration profile weights must sum to 1.0, found {weight_sum}.")
 
     gateways = live_state.get("staticInfrastructure", {}).get("gateways", [])
     assert_equal("live-state gateway count", len(gateways), 2, errors)
@@ -171,6 +195,20 @@ def validate(scenario_root: Path) -> dict[str, Any]:
     assert_close("sns singlehopRadius", sns.get("singlehopRadius"), 250.0, errors)
 
     cell_accounting = live_state.get("cellDiagnosticAccounting", {})
+    configured_cell = live_state.get("configuredCellProfile", {})
+    assert_equal("configuredCellProfile.profileId", configured_cell.get("profileId"), "CELL_5G_AVEIRO_P50", errors)
+    assert_equal("configuredCellProfile.source", configured_cell.get("source"), "LITERATURE_BASED_CONFIGURED_CELL_PROFILE", errors)
+    if not configured_cell.get("classification"):
+        errors.append("configuredCellProfile.classification must be non-empty.")
+    assert_close("configuredCellProfile capacity", configured_cell.get("capacityBitsPerSecond"), 49_200_000.0, errors)
+    assert_equal(
+        "cellDiagnosticAccounting.bandwidthSource",
+        cell_accounting.get("bandwidthSource"),
+        "DIAGNOSTIC_RUNTIME_ACCOUNTING_FROM_CONTROLLED_CELL_MESSAGES",
+        errors,
+    )
+    if configured_cell.get("source") == cell_accounting.get("bandwidthSource"):
+        errors.append("Configured Cell source and diagnostic accounting source must be distinct.")
     pools = {pool.get("poolId"): pool for pool in cell_accounting.get("gatewayPools", [])}
     for pool_id in ("pool_rsu_0", "pool_rsu_1"):
         if pool_id not in pools:
@@ -208,11 +246,13 @@ def validate(scenario_root: Path) -> dict[str, Any]:
         assert_close("CLOUD backhaul delay", cloud_nodes[0].get("serverBaseDelaySeconds"), 0.050, errors)
 
     metadata = docs["metadata"]
-    marker = "TEMPORARY_COMPATIBILITY_TASK_NOT_FINAL_WORKLOAD"
-    if marker not in json.dumps(metadata, sort_keys=True):
-        errors.append("Metadata must mark bootstrap task as temporary compatibility workload.")
-    if marker not in json.dumps(live_state.get("taskProfiles", []), sort_keys=True):
-        errors.append("Live-state bootstrap task must carry temporary marker.")
+    metadata_text = json.dumps(metadata, sort_keys=True)
+    if "TEMPORARY_COMPATIBILITY_TASK_NOT_FINAL_WORKLOAD" in metadata_text:
+        errors.append("Metadata must not keep the temporary bootstrap workload marker in 14C.3.")
+    if metadata.get("workloadGeneration", {}).get("workloadMode") != "SEEDED_POISSON_PER_ACTIVE_VEHICLE":
+        errors.append("Metadata must document workloadMode = SEEDED_POISSON_PER_ACTIVE_VEHICLE.")
+    if metadata.get("workloadGeneration", {}).get("randomSeed") != 104729:
+        errors.append("Metadata must document workload randomSeed = 104729.")
 
     db_files = [relative(path) for path in root.rglob("*.db")]
     jar_files = [relative(path) for path in root.rglob("*.jar")]

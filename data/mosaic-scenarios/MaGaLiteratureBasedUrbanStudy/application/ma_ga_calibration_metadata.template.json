@@ -74,8 +74,8 @@
     },
     "remoteVehicleCpuCyclesPerSecondTarget": {
       "value": 1000000000,
-      "classification": "PENDING_LIVE_STATE_EXTENSION",
-      "status": "not emitted into live-state executable config in 14C.2"
+      "classification": "IMPLEMENTED_CONFIGURABLE_LITERATURE_BASED_PROFILE",
+      "status": "emitted into live-state executable config from 14C.3"
     },
     "edgeCpuCyclesPerSecond": {
       "value": 5000000000,
@@ -90,16 +90,24 @@
       "classification": "CONTROLLED_ASSUMPTION"
     }
   },
-  "temporaryWorkloadBoundary": {
-    "marker": "TEMPORARY_COMPATIBILITY_TASK_NOT_FINAL_WORKLOAD",
-    "profileId": "bootstrap_medium_until_14C3",
-    "classification": "CONTROLLED_ASSUMPTION",
-    "nextPhase": "14C.3"
+  "workloadGeneration": {
+    "workloadMode": "SEEDED_POISSON_PER_ACTIVE_VEHICLE",
+    "randomSeed": 104729,
+    "arrivalRateTasksPerSecondPerActiveVehicle": 1.0,
+    "profileWeights": {
+      "light": 0.50,
+      "medium": 0.35,
+      "heavy": 0.15
+    },
+    "outputSizeBits": {
+      "value": 8000,
+      "classification": "CONTROLLED_ASSUMPTION"
+    },
+    "classification": "IMPLEMENTED_CONFIGURABLE_LITERATURE_BASED_PROFILE"
   },
   "pendingLiveStateExtensions": [
-    "remoteVehicleCpuCyclesPerSecondTarget",
-    "Poisson workload generator",
-    "separate source mode for configured Cell profile versus runtime accounting"
+    "calibrated workload rate matrix",
+    "40 replicate runner"
   ],
   "controlledAssumptions": {
     "sumoStepLengthSeconds": {
