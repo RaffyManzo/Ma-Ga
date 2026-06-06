@@ -1186,6 +1186,8 @@ def write_live_runtime_config(scenario_dir: Path) -> dict[str, Any]:
         "configuredMaxWindowSeconds": 0.2,
         "deltaTMaxComparisonEpsilonSeconds": 1.0e-9,
         "publishedSnapshotCopyLimit": 32,
+        "nativeLiveDetailedReportingEnabled": True,
+        "nativeLiveDetailedReportPrintToConsole": False,
     }
     write_json(scenario_dir / "application" / "ma_ga_live_runtime_config.json", payload)
     return payload

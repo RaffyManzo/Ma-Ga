@@ -5,6 +5,8 @@ import config.ga.GaParameterScalingMode;
 import config.window.TemporalWindowConfig;
 import ga.core.MaGaOptimizer;
 import org.eclipse.mosaic.app.maga.livestate.LiveStateLayerRuntimeFacade;
+import org.eclipse.mosaic.app.maga.liveruntime.reporting.LiveDetailedReportWriter;
+import org.eclipse.mosaic.app.maga.liveruntime.reporting.LiveNativeReportingCollector;
 import org.eclipse.mosaic.fed.application.app.AbstractApplication;
 import org.eclipse.mosaic.fed.application.app.api.os.ServerOperatingSystem;
 import org.eclipse.mosaic.lib.util.scheduling.Event;
@@ -31,7 +33,9 @@ public class MaGaLiveRuntimeCoordinatorApp extends AbstractApplication<ServerOpe
     private MosaicSystemStateSource systemStateSource;
     private LiveStrategyApplier strategyApplier;
     private LiveRuntimeTraceWriter traceWriter;
+    private LiveNativeReportingCollector reportingCollector;
     private LiveGaExecutionCoordinator executionCoordinator;
+    private MaGaConfig maGaConfig;
     private Path runDirectory;
 
     @Override
@@ -50,6 +54,17 @@ public class MaGaLiveRuntimeCoordinatorApp extends AbstractApplication<ServerOpe
                     runtimeConfig.profileName(),
                     runtimeConfig.getPublishedSnapshotCopyLimit()
             );
+            if (runtimeConfig.isNativeLiveDetailedReportingEnabled()) {
+                reportingCollector = new LiveNativeReportingCollector(
+                        traceWriter.getOutputDir(),
+                        runtimeConfig.getScenarioName(),
+                        runtimeConfig.profileName(),
+                        bridge.getDescription(),
+                        String.valueOf(systemStateSource.getMode()),
+                        stateFacade.configuredCellProfileSummary(),
+                        stateFacade.runtimeAccountingSource()
+                );
+            }
         } catch (IOException e) {
             throw new IllegalStateException("Unable to open live MA-GA runtime traces", e);
         }
@@ -59,7 +74,7 @@ public class MaGaLiveRuntimeCoordinatorApp extends AbstractApplication<ServerOpe
                 runtimeConfig.getConfiguredGaRuntimeEstimateSeconds(),
                 runtimeConfig.getConfiguredMaxWindowSeconds()
         );
-        MaGaConfig maGaConfig = MaGaConfig.defaultConfig(GaParameterScalingMode.ADAPTIVE);
+        maGaConfig = MaGaConfig.defaultConfig(GaParameterScalingMode.ADAPTIVE);
         MaGaOptimizer optimizer = new MaGaOptimizer(maGaConfig);
         DynamicityEvaluator dynamicityEvaluator =
                 new DynamicityEvaluator(temporalConfig, maGaConfig.getMobilityConfig());
@@ -84,7 +99,8 @@ public class MaGaLiveRuntimeCoordinatorApp extends AbstractApplication<ServerOpe
                 bridge,
                 strategyApplier,
                 traceWriter,
-                deadlinePolicy
+                deadlinePolicy,
+                reportingCollector
         );
 
         getLog().infoSimTime(
@@ -145,9 +161,34 @@ public class MaGaLiveRuntimeCoordinatorApp extends AbstractApplication<ServerOpe
                 executionCoordinator.finishOnShutdown(shutdownTimeNs);
                 executionCoordinator.close();
             }
+            if (reportingCollector != null) {
+                LiveDetailedReportWriter.LiveDetailedReportArtifacts artifacts =
+                        reportingCollector.writeFinalReports(maGaConfig);
+                getLog().infoSimTime(
+                        this,
+                        "LIVE_NATIVE_DETAILED_REPORT_WRITTEN"
+                                + "|directory=" + reportingCollector.getReportingDir()
+                                + "|reportTxt=" + artifacts.getTxt()
+                                + "|reportMarkdown=" + artifacts.getMarkdown()
+                                + "|reportJson=" + artifacts.getJson()
+                                + "|appliedSteps=" + reportingCollector.getAppliedStepCount()
+                                + "|staleDiscardedSteps=" + reportingCollector.getStaleDiscardedStepCount()
+                                + "|failedJobs=" + reportingCollector.getFailedJobCount()
+                );
+                if (runtimeConfig.isNativeLiveDetailedReportPrintToConsole()) {
+                    System.out.println(Files.readString(artifacts.getTxt()));
+                }
+            }
         } catch (IOException e) {
             throw new IllegalStateException("Unable to finish live MA-GA runtime coordinator", e);
         } finally {
+            if (reportingCollector != null) {
+                try {
+                    reportingCollector.close();
+                } catch (IOException e) {
+                    throw new IllegalStateException("Unable to close native live reporting", e);
+                }
+            }
             if (traceWriter != null) {
                 try {
                     traceWriter.close();

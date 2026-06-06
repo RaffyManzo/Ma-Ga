@@ -1,7 +1,8 @@
 param(
     [string]$MosaicRoot = ".\tmp\mosaic-25.2",
     [string]$ScenarioName = "MaGaLiveMagaRuntimeStudy",
-    [string]$RunName = ""
+    [string]$RunName = "",
+    [switch]$PrintDetailedLiveReport
 )
 
 $ErrorActionPreference = "Stop"
@@ -140,10 +141,21 @@ $ReportFiles = [ordered]@{
     strategyTrace = Join-Path $RuntimeDir "live_strategy_application_trace.csv"
     bridgeTrace = Join-Path $RuntimeDir "live_bridge_snapshot_trace.csv"
     overrunTrace = Join-Path $RuntimeDir "live_overrun_trace.csv"
+    nativeDetailedReportTxt = Join-Path $RuntimeDir "live-reporting\live_detailed_execution_report.txt"
+    nativeDetailedReportMarkdown = Join-Path $RuntimeDir "live-reporting\live_detailed_execution_report.md"
+    nativeDetailedReportJson = Join-Path $RuntimeDir "live-reporting\live_detailed_execution_report.json"
+    nativeGaJobEventsJsonl = Join-Path $RuntimeDir "live-reporting\live_ga_job_events.jsonl"
+    nativeTemporalStepRecordsJsonl = Join-Path $RuntimeDir "live-reporting\live_temporal_step_records.jsonl"
+    nativeAppliedWindowsCsv = Join-Path $RuntimeDir "live-reporting\live_applied_window_records.csv"
+    nativeDiscardedWindowsCsv = Join-Path $RuntimeDir "live-reporting\live_discarded_window_records.csv"
 }
 
 $Warnings = @()
 $Errors = @()
+$DetailedReportTxt = $ReportFiles.nativeDetailedReportTxt
+if (-not (Test-Path -LiteralPath $DetailedReportTxt -PathType Leaf)) {
+    $Warnings += "native live detailed report TXT is not present"
+}
 if ($RuntimeRows.Count -eq 0) { $Errors += "live_ga_runtime_trace.csv is missing or empty" }
 if ($BridgeRows.Count -eq 0) { $Warnings += "live_bridge_snapshot_trace.csv is missing or empty" }
 if (-not $SimulationCompleted) { $Errors += "simulationCompleted is false" }
@@ -208,6 +220,13 @@ $Markdown = @"
 - Strategy trace: `$($ReportFiles.strategyTrace)`
 - Bridge trace: `$($ReportFiles.bridgeTrace)`
 - Overrun trace: `$($ReportFiles.overrunTrace)`
+- Native detailed TXT: `$($ReportFiles.nativeDetailedReportTxt)`
+- Native detailed Markdown: `$($ReportFiles.nativeDetailedReportMarkdown)`
+- Native detailed JSON: `$($ReportFiles.nativeDetailedReportJson)`
+- Native GA events JSONL: `$($ReportFiles.nativeGaJobEventsJsonl)`
+- Native temporal step records JSONL: `$($ReportFiles.nativeTemporalStepRecordsJsonl)`
+- Native applied windows CSV: `$($ReportFiles.nativeAppliedWindowsCsv)`
+- Native discarded windows CSV: `$($ReportFiles.nativeDiscardedWindowsCsv)`
 
 ## Warnings
 
@@ -227,6 +246,21 @@ Write-Host "Strategy trace: $($ReportFiles.strategyTrace)"
 Write-Host "GA trace: $($ReportFiles.gaTrace)"
 Write-Host "Bridge trace: $($ReportFiles.bridgeTrace)"
 Write-Host "Overrun trace: $($ReportFiles.overrunTrace)"
+Write-Host "Native detailed TXT: $($ReportFiles.nativeDetailedReportTxt)"
+Write-Host "Native detailed Markdown: $($ReportFiles.nativeDetailedReportMarkdown)"
+Write-Host "Native detailed JSON: $($ReportFiles.nativeDetailedReportJson)"
+Write-Host "Native GA events JSONL: $($ReportFiles.nativeGaJobEventsJsonl)"
+Write-Host "Native temporal step records JSONL: $($ReportFiles.nativeTemporalStepRecordsJsonl)"
+Write-Host "Native applied windows CSV: $($ReportFiles.nativeAppliedWindowsCsv)"
+Write-Host "Native discarded windows CSV: $($ReportFiles.nativeDiscardedWindowsCsv)"
+if ($PrintDetailedLiveReport) {
+    if (-not (Test-Path -LiteralPath $DetailedReportTxt -PathType Leaf)) {
+        throw "Detailed live report TXT not found: $DetailedReportTxt"
+    }
+    Write-Host ""
+    Write-Host "===== NATIVE LIVE DETAILED REPORT ====="
+    Get-Content -LiteralPath $DetailedReportTxt
+}
 if ($Errors.Count -gt 0) {
     throw "Run summary contains errors"
 }

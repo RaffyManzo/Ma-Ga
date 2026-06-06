@@ -138,6 +138,70 @@ tmp/mosaic-25.2/logs/<run>/live-maga-runtime/live_run_summary.json
 tmp/mosaic-25.2/logs/<run>/live-maga-runtime/live_run_summary.md
 ```
 
+Se il runtime ha prodotto il reporting nativo dettagliato, il summarizer lo
+indicizza nel summary e puo' stamparne il TXT:
+
+```powershell
+powershell -NoProfile -ExecutionPolicy Bypass `
+  -File .\tools\mosaic-live-maga-runtime\summarize-run.ps1 `
+  -MosaicRoot ".\tmp\mosaic-25.2" `
+  -ScenarioName "MaGaLiveMagaRuntimeStudy" `
+  -RunName "<run>" `
+  -PrintDetailedLiveReport
+```
+
+Il summarizer non riesegue MA-GA e non ricostruisce il report. Stampa soltanto
+il file TXT gia' prodotto dal runtime Java durante la vera simulazione live.
+
+## Native live detailed reporting
+
+Il reporting nativo live e' opzionale e retrocompatibile. Nei runtime config
+puo' essere abilitato con:
+
+```json
+{
+  "nativeLiveDetailedReportingEnabled": true,
+  "nativeLiveDetailedReportPrintToConsole": false
+}
+```
+
+Quando abilitato, `MaGaLiveRuntimeCoordinatorApp` crea un collector durante la
+run e registra incrementalmente ogni job GA reale:
+
+```text
+SUBMITTED
+WAIT_CAP_REACHED
+COMPLETED_WITHIN_BOUND
+APPLIED
+STALE_DISCARDED
+FAILED
+NULL_STEP_RESULT
+SHUTDOWN_IN_FLIGHT
+```
+
+Il collector conserva i `TemporalStepResult` realmente restituiti da
+`TemporalWindowManager.executeNextStepOrNull(...)`. Non richiama di nuovo il
+manager, non richiama `MaGaOptimizer` e non usa replay offline degli snapshot.
+
+Artifact locali:
+
+```text
+tmp/mosaic-25.2/logs/<run>/live-maga-runtime/live-reporting/
+|-- live_ga_job_events.jsonl
+|-- live_temporal_step_records.jsonl
+|-- live_applied_window_records.csv
+|-- live_discarded_window_records.csv
+|-- live_detailed_execution_report.txt
+|-- live_detailed_execution_report.md
+`-- live_detailed_execution_report.json
+```
+
+Il TXT aggrega gli step APPLIED con `TemporalWindowResult(appliedSteps)` e
+riusa i printer storici compatibili. Le sezioni operative live-specific
+coprono wall-clock reale, overrun, stale discard, fresh reoptimization,
+snapshot audit e distinzione tra profilo Cell configurato e accounting runtime
+diagnostico.
+
 ## Runner root
 
 Comando ordinario:

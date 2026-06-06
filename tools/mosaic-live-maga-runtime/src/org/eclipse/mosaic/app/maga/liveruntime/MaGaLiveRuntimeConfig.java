@@ -28,6 +28,8 @@ public final class MaGaLiveRuntimeConfig {
     double configuredMaxWindowSeconds;
     double deltaTMaxComparisonEpsilonSeconds;
     int publishedSnapshotCopyLimit;
+    boolean nativeLiveDetailedReportingEnabled;
+    boolean nativeLiveDetailedReportPrintToConsole;
 
     public static MaGaLiveRuntimeConfig load(File configurationPath) {
         if (configurationPath == null) {
@@ -79,6 +81,14 @@ public final class MaGaLiveRuntimeConfig {
 
     public int getPublishedSnapshotCopyLimit() {
         return publishedSnapshotCopyLimit;
+    }
+
+    public boolean isNativeLiveDetailedReportingEnabled() {
+        return nativeLiveDetailedReportingEnabled;
+    }
+
+    public boolean isNativeLiveDetailedReportPrintToConsole() {
+        return nativeLiveDetailedReportPrintToConsole;
     }
 
     public String getScenarioName() {

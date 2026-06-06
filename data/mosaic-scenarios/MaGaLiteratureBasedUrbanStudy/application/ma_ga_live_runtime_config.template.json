@@ -13,5 +13,7 @@
   "configuredGaRuntimeEstimateSeconds": 0.01,
   "configuredMaxWindowSeconds": 0.2,
   "deltaTMaxComparisonEpsilonSeconds": 1.0E-9,
-  "publishedSnapshotCopyLimit": 32
+  "publishedSnapshotCopyLimit": 32,
+  "nativeLiveDetailedReportingEnabled": true,
+  "nativeLiveDetailedReportPrintToConsole": false
 }

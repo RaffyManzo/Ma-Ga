@@ -99,6 +99,16 @@ public final class LiveStateLayerRuntimeFacade {
         );
     }
 
+    public String configuredCellProfileSummary() {
+        return configuredCellProfileLogFields().orElse("NOT_CONFIGURED");
+    }
+
+    public String runtimeAccountingSource() {
+        return config.hasCellDiagnosticAccounting()
+                ? config.getCellDiagnosticAccounting().bandwidthSource
+                : "NOT_CONFIGURED";
+    }
+
     public RuntimeSnapshot buildSnapshotAt(long tickTimeNs) {
         LiveStateSnapshotView view = cache.snapshotAtOrBefore(tickTimeNs);
         List<LiveCellBandwidthBucket> safeBuckets = config.hasCellDiagnosticAccounting()

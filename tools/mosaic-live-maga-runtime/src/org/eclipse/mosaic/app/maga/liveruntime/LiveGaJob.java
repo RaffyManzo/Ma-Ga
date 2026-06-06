@@ -4,6 +4,7 @@ import model.snapshot.SystemSnapshot;
 import window.state.TemporalWindowState;
 
 final class LiveGaJob {
+    private final String jobId;
     private final int windowIndex;
     private final long submissionSimulationTimeNs;
     private final long submissionWallClockNs;
@@ -17,6 +18,7 @@ final class LiveGaJob {
     private long waitCapDetectedSimulationTimeNs;
 
     LiveGaJob(
+            String jobId,
             int windowIndex,
             long submissionSimulationTimeNs,
             long submissionWallClockNs,
@@ -26,6 +28,7 @@ final class LiveGaJob {
             double deltaTMaxAtSubmissionSeconds,
             long wallClockDeadlineNs
     ) {
+        this.jobId = jobId;
         this.windowIndex = windowIndex;
         this.submissionSimulationTimeNs = submissionSimulationTimeNs;
         this.submissionWallClockNs = submissionWallClockNs;
@@ -34,6 +37,10 @@ final class LiveGaJob {
         this.stateAtSubmission = stateAtSubmission;
         this.deltaTMaxAtSubmissionSeconds = deltaTMaxAtSubmissionSeconds;
         this.wallClockDeadlineNs = wallClockDeadlineNs;
+    }
+
+    String getJobId() {
+        return jobId;
     }
 
     int getWindowIndex() {

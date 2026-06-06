@@ -112,6 +112,19 @@ Phase 14C.3 adds executable text configuration for:
 - light, medium and heavy task profiles;
 - `configuredCellProfile` distinct from `cellDiagnosticAccounting`.
 
+Phase 14C.3R adds native live detailed-reporting flags to the generated
+runtime config:
+
+```json
+{
+  "nativeLiveDetailedReportingEnabled": true,
+  "nativeLiveDetailedReportPrintToConsole": false
+}
+```
+
+These flags enable reporting during the live run. They do not trigger replay
+and do not rerun MA-GA.
+
 ## Validate Generated Text Configuration
 
 After a dry-run or full materialization, validate the generated text
@@ -152,7 +165,9 @@ repository scaffold. They are derived from the external InTAS assets.
 
 Phase 14C.2 prepares literature-based radio, Cell, RSU/gateway and compute
 configuration. Phase 14C.3 adds the deterministic workload and remote VEHICLE
-CPU configuration. It does not implement:
+CPU configuration. Phase 14C.3R adds native reporting flags and validates that
+the detailed report is generated from the true live execution data. It does not
+implement:
 
 - 40-replicate runner;
 - MOSAIC end-to-end execution for the literature scenario;

@@ -245,6 +245,10 @@ def validate(scenario_root: Path) -> dict[str, Any]:
         assert_close("CLOUD CPU", cloud_nodes[0].get("availableCpuCyclesPerSecond"), 100_000_000_000.0, errors)
         assert_close("CLOUD backhaul delay", cloud_nodes[0].get("serverBaseDelaySeconds"), 0.050, errors)
 
+    runtime = docs["liveRuntime"]
+    assert_equal("nativeLiveDetailedReportingEnabled", runtime.get("nativeLiveDetailedReportingEnabled"), True, errors)
+    assert_equal("nativeLiveDetailedReportPrintToConsole", runtime.get("nativeLiveDetailedReportPrintToConsole"), False, errors)
+
     metadata = docs["metadata"]
     metadata_text = json.dumps(metadata, sort_keys=True)
     if "TEMPORARY_COMPATIBILITY_TASK_NOT_FINAL_WORKLOAD" in metadata_text:

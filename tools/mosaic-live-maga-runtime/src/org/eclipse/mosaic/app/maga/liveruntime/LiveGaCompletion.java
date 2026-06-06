@@ -6,6 +6,7 @@ final class LiveGaCompletion {
     private final LiveGaJob job;
     private final TemporalStepResult stepResult;
     private final Throwable error;
+    private final long completionWallClockNs;
     private final double wallClockRuntimeSeconds;
     private final double deltaTMaxSeconds;
     private final double deltaTMaxMismatchSeconds;
@@ -14,6 +15,7 @@ final class LiveGaCompletion {
             LiveGaJob job,
             TemporalStepResult stepResult,
             Throwable error,
+            long completionWallClockNs,
             double wallClockRuntimeSeconds,
             double deltaTMaxSeconds,
             double deltaTMaxMismatchSeconds
@@ -21,6 +23,7 @@ final class LiveGaCompletion {
         this.job = job;
         this.stepResult = stepResult;
         this.error = error;
+        this.completionWallClockNs = completionWallClockNs;
         this.wallClockRuntimeSeconds = wallClockRuntimeSeconds;
         this.deltaTMaxSeconds = deltaTMaxSeconds;
         this.deltaTMaxMismatchSeconds = deltaTMaxMismatchSeconds;
@@ -29,24 +32,35 @@ final class LiveGaCompletion {
     static LiveGaCompletion success(
             LiveGaJob job,
             TemporalStepResult stepResult,
+            long completionWallClockNs,
             double wallClockRuntimeSeconds
     ) {
         double deltaTMax = stepResult == null || stepResult.getAdaptiveWindowDecision() == null
                 ? 0.0
                 : stepResult.getAdaptiveWindowDecision().getBounds().getMaximumWindowSeconds();
         double mismatch = Math.abs(job.getDeltaTMaxAtSubmissionSeconds() - deltaTMax);
-        return new LiveGaCompletion(job, stepResult, null, wallClockRuntimeSeconds, deltaTMax, mismatch);
+        return new LiveGaCompletion(
+                job,
+                stepResult,
+                null,
+                completionWallClockNs,
+                wallClockRuntimeSeconds,
+                deltaTMax,
+                mismatch
+        );
     }
 
     static LiveGaCompletion failure(
             LiveGaJob job,
             Throwable error,
+            long completionWallClockNs,
             double wallClockRuntimeSeconds
     ) {
         return new LiveGaCompletion(
                 job,
                 null,
                 error,
+                completionWallClockNs,
                 wallClockRuntimeSeconds,
                 0.0,
                 job == null ? 0.0 : job.getDeltaTMaxAtSubmissionSeconds()
@@ -63,6 +77,10 @@ final class LiveGaCompletion {
 
     Throwable getError() {
         return error;
+    }
+
+    long getCompletionWallClockNs() {
+        return completionWallClockNs;
     }
 
     double getWallClockRuntimeSeconds() {
