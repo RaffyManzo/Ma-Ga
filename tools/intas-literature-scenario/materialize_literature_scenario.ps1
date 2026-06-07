@@ -279,6 +279,7 @@ try {
         --output-root $StagingRoot `
         --density $Density `
         --duration-profile $DurationProfile `
+        --seed $Seed `
         --dry-run
     if ($LASTEXITCODE -ne 0) {
         throw "InTAS literature materializer failed"
@@ -352,6 +353,7 @@ try {
     $Manifest = [ordered]@{
         scenarioName = $ScenarioName
         candidateId = $Report.selectedCandidateId
+        mobilityMode = $Report.mobilityMode
         intasCommit = $Report.source.commit
         density = $Density
         durationProfile = $DurationProfile
@@ -362,6 +364,8 @@ try {
         materializerVersion = @{
             scriptSha256 = Get-Sha256 -Path (Join-Path $ToolRoot "build_intas_literature_scenario.py")
             validatorSha256 = Get-Sha256 -Path (Join-Path $ToolRoot "validate_materialized_literature_scenario.py")
+            syntheticMobilityProfileSha256 = Get-Sha256 -Path (Join-Path $ToolRoot "config\synthetic_mobility_profile.json")
+            selectedEdgeIdsSha256 = Get-Sha256 -Path (Join-Path $ToolRoot "config\candidate_0045_edge_ids.txt")
         }
         scenarioConvertPath = $ScenarioConvertPath
         scenarioConvertRoot = $ScenarioConvertRoot

@@ -1,50 +1,42 @@
 {
-  "scenarioName": "MaGaLiteratureBasedUrbanStudy",
-  "source": {
-    "name": "InTAS",
-    "repository": "https://github.com/silaslobo/InTAS"
-  },
-  "sumoStepLengthSeconds": 0.1,
-  "durationsSeconds": {
-    "smoke": 180,
-    "nominal": 300,
-    "extended": 600
-  },
-  "activeVehicleTargets": {
-    "low_density": 15,
-    "nominal": 30,
-    "high_density": 50
-  },
-  "subscenarioSelection": {
-    "mode": "DETERMINISTIC_SCORE_BASED",
-    "requirements": {
-      "urban": true,
-      "connectedDrivableGraph": true,
-      "minimumTrafficLightCount": 2,
-      "nominalRsuCount": 2,
-      "extendedRsuCount": 3,
-      "nominalRsuRadiusMeters": 250,
-      "nominalV2vRadiusMeters": 250,
-      "requirePartialRsuCoverageOverlap": true,
-      "requirePotentialGatewaySwitching": true
-    }
-  },
-  "materialization": {
-    "mobilitySource": "InTAS",
-    "routeMode": "PASSENGER_VEHICLES_ONLY",
-    "excludePedestrianApplications": true,
-    "excludeBusSpecificApplications": true,
-    "candidateGrid": {
-      "windowSizeMeters": 900,
-      "strideMeters": 300,
-      "maxCandidates": 64
-    },
-    "selectionWeights": {
-      "trafficLightScore": 2.0,
-      "connectivityScore": 3.0,
-      "targetVehicleScore": 2.0,
-      "gatewaySwitchScore": 2.0,
-      "rsuOverlapScore": 1.0
-    }
-  }
+    "activeVehicleTargets":  {
+                                 "high_density":  50,
+                                 "low_density":  15,
+                                 "nominal":  30
+                             },
+    "durationsSeconds":  {
+                             "extended":  600,
+                             "nominal":  300,
+                             "smoke":  180
+                         },
+    "materialization":  {
+                            "excludeBusSpecificApplications":  true,
+                            "excludePedestrianApplications":  true,
+                            "mobilityMode":  "SYNTHETIC_CALIBRATED_ON_INTAS_SUBNETWORK",
+                            "routeMode":  "DETERMINISTIC_SYNTHETIC_PASSENGER_VEHICLES",
+                            "syntheticDemandProfile":  "synthetic_mobility_profile.json",
+                            "topologySource":  "InTAS"
+                        },
+    "scenarioName":  "MaGaLiteratureBasedUrbanStudy",
+    "source":  {
+                   "name":  "InTAS",
+                   "repository":  "https://github.com/silaslobo/InTAS"
+               },
+    "subscenarioSelection":  {
+                                 "mode":  "FIXED_VALIDATED_INTAS_SUBNETWORK",
+                                 "requirements":  {
+                                                      "connectedDrivableGraph":  true,
+                                                      "expectedExternalEdgeCount":  155,
+                                                      "expectedExternalJunctionCount":  88,
+                                                      "expectedTrafficLightCount":  8,
+                                                      "nominalRsuCount":  2,
+                                                      "nominalRsuRadiusMeters":  250,
+                                                      "nominalV2vRadiusMeters":  250,
+                                                      "requirePotentialGatewaySwitching":  true,
+                                                      "urban":  true
+                                                  },
+                                 "selectedEdgeIdsFile":  "candidate_0045_edge_ids.txt",
+                                 "selectedSubnetworkId":  "candidate_0045"
+                             },
+    "sumoStepLengthSeconds":  0.1
 }

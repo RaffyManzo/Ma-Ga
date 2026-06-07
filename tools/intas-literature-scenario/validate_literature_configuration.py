@@ -127,6 +127,32 @@ def validate(scenario_root: Path) -> dict[str, Any]:
     if report_projection.get("fallback") is not None:
         errors.append("Materialization report projection fallback must be null.")
 
+    if report.get("mobilityMode") != "SYNTHETIC_CALIBRATED_ON_INTAS_SUBNETWORK":
+        errors.append("Materialization report must declare synthetic-calibrated InTAS mobility mode.")
+    if report.get("selectedCandidateId") != "candidate_0045":
+        errors.append("Materialization report must use the validated candidate_0045 subnetwork.")
+    reduced_counts = report.get("reducedNetworkCounts", {})
+    for key, expected in (("externalEdges", 155), ("externalJunctions", 88), ("trafficLights", 8)):
+        if reduced_counts.get(key) != expected:
+            errors.append(f"Reduced network {key} expected {expected}, found {reduced_counts.get(key)!r}.")
+    route_subsets = report.get("routeSubsets", {})
+    if not route_subsets:
+        errors.append("Materialization report must contain at least one generated synthetic route subset.")
+    for density, subset in route_subsets.items():
+        mobility_validation = subset.get("mobilityValidation", {})
+        if mobility_validation.get("status") != "VALID_SYNTHETIC_MOBILITY":
+            errors.append(f"Synthetic mobility validation is not valid for {density}.")
+        fcd = mobility_validation.get("fcd", {})
+        logs = mobility_validation.get("logs", {})
+        if number(fcd.get("gatewaySwitchEvents")) is None or fcd.get("gatewaySwitchEvents", 0) <= 0:
+            errors.append(f"Synthetic mobility must expose gateway switches for {density}.")
+        if logs.get("errorCount") != 0:
+            errors.append(f"SUMO error count must be zero for {density}.")
+        if logs.get("teleportMentions") != 0:
+            errors.append(f"SUMO teleport mentions must be zero for {density}.")
+        if logs.get("emergencyBrakingMentions") != 0:
+            errors.append(f"SUMO emergency-braking mentions must be zero for {density}.")
+
     mapping = docs["mapping"]
     prototypes = mapping.get("prototypes", [])
     if not prototypes:
@@ -251,6 +277,8 @@ def validate(scenario_root: Path) -> dict[str, Any]:
 
     metadata = docs["metadata"]
     metadata_text = json.dumps(metadata, sort_keys=True)
+    if metadata.get("mobility", {}).get("mode") != "SYNTHETIC_CALIBRATED_ON_INTAS_SUBNETWORK":
+        errors.append("Metadata must declare SYNTHETIC_CALIBRATED_ON_INTAS_SUBNETWORK mobility.")
     if "TEMPORARY_COMPATIBILITY_TASK_NOT_FINAL_WORKLOAD" in metadata_text:
         errors.append("Metadata must not keep the temporary bootstrap workload marker in 14C.3.")
     if metadata.get("workloadGeneration", {}).get("workloadMode") != "SEEDED_POISSON_PER_ACTIVE_VEHICLE":

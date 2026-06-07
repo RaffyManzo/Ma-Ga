@@ -103,6 +103,11 @@ def validate(intas_root: Path) -> tuple[dict[str, Any], int]:
     sumo_home = os.environ.get("SUMO_HOME")
     sumo = command_path("sumo")
     netconvert = command_path("netconvert")
+    sumolib_path = None
+    if sumo_home:
+        candidate = Path(sumo_home) / "tools" / "sumolib"
+        if candidate.exists():
+            sumolib_path = str(candidate.resolve())
 
     if not sumo_home:
         errors.append("SUMO_HOME is not set. Install SUMO and set SUMO_HOME before materialization.")
@@ -110,6 +115,8 @@ def validate(intas_root: Path) -> tuple[dict[str, Any], int]:
         errors.append("sumo executable not found in PATH.")
     if not netconvert:
         errors.append("netconvert executable not found in PATH.")
+    if not sumolib_path:
+        errors.append("sumolib not found under SUMO_HOME/tools. Check the SUMO installation and SUMO_HOME.")
 
     route_files: list[dict[str, Any]] = []
     sumocfg = root / "scenario" / "InTAS_buildings.sumocfg"
@@ -139,6 +146,7 @@ def validate(intas_root: Path) -> tuple[dict[str, Any], int]:
             "SUMO_HOME": sumo_home,
             "sumo": sumo,
             "netconvert": netconvert,
+            "sumolib": sumolib_path,
         },
         "sumocfg": "scenario/InTAS_buildings.sumocfg",
         "routeFiles": route_files,

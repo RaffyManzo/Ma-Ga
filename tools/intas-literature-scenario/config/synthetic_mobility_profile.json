@@ -1,0 +1,109 @@
+{
+  "scenarioName": "MaGaLiteratureBasedUrbanStudy",
+  "mobilityMode": "SYNTHETIC_CALIBRATED_ON_INTAS_SUBNETWORK",
+  "sourceTopology": {
+    "name": "InTAS",
+    "repository": "https://github.com/silaslobo/InTAS",
+    "networkFile": "scenario/ingolstadt.net.xml",
+    "selectedSubnetworkId": "candidate_0045",
+    "selectedEdgeIdsFile": "candidate_0045_edge_ids.txt",
+    "expectedExternalEdgeCount": 155,
+    "expectedExternalJunctionCount": 88,
+    "expectedTrafficLightCount": 8
+  },
+  "rsus": [
+    {
+      "id": "rsu_0",
+      "projectedX": 213980.44,
+      "projectedY": 450429.42,
+      "coverageRadiusMeters": 250.0
+    },
+    {
+      "id": "rsu_1",
+      "projectedX": 213897.79,
+      "projectedY": 450744.66,
+      "coverageRadiusMeters": 250.0
+    }
+  ],
+  "routeCatalog": {
+    "minimumRouteLengthMeters": 180.0,
+    "maximumRouteLengthMeters": 2200.0,
+    "minimumEdgeCount": 3,
+    "families": [
+      "DUAL_RSU_SWITCH",
+      "BOTH_RSU_NO_SWITCH",
+      "RSU_0_ONLY",
+      "RSU_1_ONLY",
+      "BACKGROUND"
+    ]
+  },
+  "densityProfiles": {
+    "low_density": {
+      "classification": "CONTROLLED_ENGINEERING_VARIANT_NOT_YET_CALIBRATED",
+      "targetMeanActiveVehicles": 18.0,
+      "departureIntervalSeconds": 2.8,
+      "families": {
+        "DUAL_RSU_SWITCH": {"vehicleCount": 12, "templateCount": 5, "targetLengthMeters": 1250.0},
+        "BOTH_RSU_NO_SWITCH": {"vehicleCount": 4, "templateCount": 3, "targetLengthMeters": 1050.0},
+        "RSU_0_ONLY": {"vehicleCount": 4, "templateCount": 3, "targetLengthMeters": 950.0},
+        "RSU_1_ONLY": {"vehicleCount": 3, "templateCount": 3, "targetLengthMeters": 230.0},
+        "BACKGROUND": {"vehicleCount": 6, "templateCount": 4, "targetLengthMeters": 1050.0}
+      },
+      "acceptance": {"minimumMeanActiveVehicles": 12.0, "maximumMeanActiveVehicles": 24.0}
+    },
+    "nominal": {
+      "classification": "CALIBRATED_ON_INTAS_CANDIDATE_0045_WINDOW_14250_14430",
+      "targetMeanActiveVehicles": 30.0,
+      "departureIntervalSeconds": 1.8,
+      "families": {
+        "DUAL_RSU_SWITCH": {"vehicleCount": 21, "templateCount": 6, "targetLengthMeters": 1250.0},
+        "BOTH_RSU_NO_SWITCH": {"vehicleCount": 7, "templateCount": 4, "targetLengthMeters": 1050.0},
+        "RSU_0_ONLY": {"vehicleCount": 7, "templateCount": 4, "targetLengthMeters": 950.0},
+        "RSU_1_ONLY": {"vehicleCount": 5, "templateCount": 4, "targetLengthMeters": 230.0},
+        "BACKGROUND": {"vehicleCount": 10, "templateCount": 6, "targetLengthMeters": 1050.0}
+      },
+      "acceptance": {"minimumMeanActiveVehicles": 28.0, "maximumMeanActiveVehicles": 36.0}
+    },
+    "high_density": {
+      "classification": "CONTROLLED_ENGINEERING_VARIANT_NOT_YET_CALIBRATED",
+      "targetMeanActiveVehicles": 50.0,
+      "departureIntervalSeconds": 1.1,
+      "families": {
+        "DUAL_RSU_SWITCH": {"vehicleCount": 34, "templateCount": 8, "targetLengthMeters": 1250.0},
+        "BOTH_RSU_NO_SWITCH": {"vehicleCount": 11, "templateCount": 5, "targetLengthMeters": 1050.0},
+        "RSU_0_ONLY": {"vehicleCount": 11, "templateCount": 5, "targetLengthMeters": 950.0},
+        "RSU_1_ONLY": {"vehicleCount": 8, "templateCount": 4, "targetLengthMeters": 230.0},
+        "BACKGROUND": {"vehicleCount": 16, "templateCount": 8, "targetLengthMeters": 1050.0}
+      },
+      "acceptance": {"minimumMeanActiveVehicles": 38.0, "maximumMeanActiveVehicles": 65.0}
+    }
+  },
+  "validation": {
+    "minimumGatewaySwitchEvents": 1,
+    "maximumSumoErrors": 0,
+    "maximumTeleportMentions": 0,
+    "maximumEmergencyBrakingMentions": 0,
+    "knownNonBlockingWarningPrefixes": [
+      "Warning: Unsafe green phase 0 in tlLogic"
+    ]
+  },
+  "calibrationEvidence": {
+    "intasReferenceWindowSeconds": {"begin": 14250, "end": 14430},
+    "intasReferenceMeanActiveVehicles": 29.52,
+    "intasReferenceMinimumActiveVehicles": 26,
+    "intasReferenceMaximumActiveVehicles": 34,
+    "validatedSyntheticNominalBaseline": {
+      "durationSeconds": 180,
+      "vehicleCount": 50,
+      "meanActiveVehicles": 31.86,
+      "minimumActiveVehicles": 1,
+      "maximumActiveVehicles": 46,
+      "vehiclesVisitingBothRsus": 20,
+      "vehiclesWithGatewaySwitch": 17,
+      "gatewaySwitchEvents": 17,
+      "sumoErrors": 0,
+      "teleportMentions": 0,
+      "emergencyBrakingMentions": 0
+    }
+  }
+}

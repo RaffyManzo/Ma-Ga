@@ -256,3 +256,9 @@ outside this phase.
 The next step can build on the persistent scenario and smoke-validated runtime
 to introduce calibration run orchestration and replicate management without
 regenerating the database for every run.
+
+## Superseded mobility-generation path
+
+The original 14C.4.1 materializer attempted to derive concrete traffic subsets directly from the InTAS full-day demand. Phase 14C.4.2 replaces that mobility-generation path with `SYNTHETIC_CALIBRATED_ON_INTAS_SUBNETWORK`.
+
+The persistent materialization boundary remains valid: Scenario-Convert still creates the real MOSAIC SQLite database once, while frequent runs reuse the materialized scenario. See `14C4_2_synthetic_calibrated_intas_subscenario.md` for the final design.

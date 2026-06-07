@@ -136,6 +136,29 @@ def sumocfg_references(sumocfg_path: Path) -> list[str]:
     return refs
 
 
+def reduced_network_counts(path: Path, errors: list[str]) -> dict[str, int]:
+    try:
+        root = ET.parse(path).getroot()
+    except (FileNotFoundError, ET.ParseError) as exc:
+        errors.append(f"Cannot inspect reduced SUMO network: {exc}")
+        return {"externalEdges": 0, "externalJunctions": 0, "trafficLights": 0}
+    edges = [node for node in root.iter() if node.tag.split("}")[-1] == "edge" and not node.attrib.get("id", "").startswith(":")]
+    junctions = [node for node in root.iter() if node.tag.split("}")[-1] == "junction" and not node.attrib.get("id", "").startswith(":") and node.attrib.get("type") != "internal"]
+    traffic_lights = [node for node in junctions if node.attrib.get("type") == "traffic_light"]
+    return {"externalEdges": len(edges), "externalJunctions": len(junctions), "trafficLights": len(traffic_lights)}
+
+
+def route_vehicle_counts(paths: list[Path], errors: list[str]) -> dict[str, int]:
+    counts: dict[str, int] = {}
+    for path in paths:
+        try:
+            root = ET.parse(path).getroot()
+            counts[path.name] = sum(1 for node in root.iter() if node.tag.split("}")[-1] == "vehicle")
+        except ET.ParseError as exc:
+            errors.append(f"Invalid route XML {display(path)}: {exc}")
+    return counts
+
+
 def validate(scenario_root: Path, repo_root: Path | None) -> dict[str, Any]:
     root = scenario_root.resolve()
     errors: list[str] = []
@@ -162,6 +185,8 @@ def validate(scenario_root: Path, repo_root: Path | None) -> dict[str, Any]:
         "sumo/intas_literature_urban.sumocfg",
         "sumo/sumo_config.json",
         "output/output_config.xml",
+        "reports/intas_literature_materialization_report.json",
+        "materialization_manifest.json",
     ]
     missing = []
     for relative in required_paths:
@@ -178,6 +203,8 @@ def validate(scenario_root: Path, repo_root: Path | None) -> dict[str, Any]:
     load_json(root / "cell" / "regions.json", errors)
     load_json(root / "application" / "ma_ga_live_state_config.json", errors)
     load_json(root / "application" / "ma_ga_live_runtime_config.json", errors)
+    report = load_json(root / "reports" / "intas_literature_materialization_report.json", errors)
+    manifest = load_json(root / "materialization_manifest.json", errors)
 
     projection = scenario.get("simulation", {}).get("projection", {})
     center = projection.get("centerCoordinates", {})
@@ -209,9 +236,48 @@ def validate(scenario_root: Path, repo_root: Path | None) -> dict[str, Any]:
         except ET.ParseError as exc:
             errors.append(f"Invalid SUMO config XML: {exc}")
 
-    route_files = sorted(display(path) for path in (root / "sumo").glob("*.rou.xml"))
+    route_paths = sorted((root / "sumo").glob("*.rou.xml"))
+    route_files = [display(path) for path in route_paths]
     if not route_files:
         errors.append("No SUMO route file found under sumo/.")
+    route_counts = route_vehicle_counts(route_paths, errors)
+
+    net_counts = reduced_network_counts(root / "sumo" / "intas_literature_urban.net.xml", errors)
+    for key, expected in (("externalEdges", 155), ("externalJunctions", 88), ("trafficLights", 8)):
+        if net_counts.get(key) != expected:
+            errors.append(f"Reduced network {key} expected {expected}, found {net_counts.get(key)!r}.")
+
+    if report.get("mobilityMode") != "SYNTHETIC_CALIBRATED_ON_INTAS_SUBNETWORK":
+        errors.append("Materialization report must declare synthetic-calibrated InTAS mobility mode.")
+    if report.get("selectedCandidateId") != "candidate_0045":
+        errors.append("Materialization report must use candidate_0045.")
+    if manifest.get("mobilityMode") != "SYNTHETIC_CALIBRATED_ON_INTAS_SUBNETWORK":
+        errors.append("Materialization manifest must declare synthetic-calibrated InTAS mobility mode.")
+    route_subsets = report.get("routeSubsets", {})
+    if not route_subsets:
+        errors.append("Materialization report has no synthetic route subsets.")
+    for density, subset in route_subsets.items():
+        validation = subset.get("mobilityValidation", {})
+        fcd = validation.get("fcd", {})
+        logs = validation.get("logs", {})
+        if validation.get("status") != "VALID_SYNTHETIC_MOBILITY":
+            errors.append(f"Synthetic mobility validation failed for {density}.")
+        if int(fcd.get("gatewaySwitchEvents", 0)) <= 0:
+            errors.append(f"Synthetic mobility has no gateway switches for {density}.")
+        if int(logs.get("errorCount", -1)) != 0:
+            errors.append(f"SUMO error count is not zero for {density}.")
+        if int(logs.get("teleportMentions", -1)) != 0:
+            errors.append(f"SUMO teleport count is not zero for {density}.")
+        if int(logs.get("emergencyBrakingMentions", -1)) != 0:
+            errors.append(f"SUMO emergency-braking count is not zero for {density}.")
+    nominal = route_subsets.get("nominal")
+    if nominal is not None:
+        nominal_fcd = nominal.get("mobilityValidation", {}).get("fcd", {})
+        mean_active = float(nominal_fcd.get("meanActiveVehicles", 0.0))
+        if not 28.0 <= mean_active <= 36.0:
+            errors.append(f"Nominal mean active vehicles expected in [28, 36], found {mean_active}.")
+        if int(nominal.get("vehicleCount", 0)) != 50:
+            errors.append(f"Nominal synthetic vehicle count expected 50, found {nominal.get('vehicleCount')!r}.")
 
     if list(root.rglob("*.jar")):
         errors.append("Materialized scenario must not contain JAR files before deploy.")
@@ -251,6 +317,9 @@ def validate(scenario_root: Path, repo_root: Path | None) -> dict[str, Any]:
         "projection": projection,
         "sumocfgReferences": sumocfg_refs,
         "routeFiles": route_files,
+        "routeVehicleCounts": route_counts,
+        "reducedNetworkCounts": net_counts,
+        "mobilityMode": report.get("mobilityMode"),
         "tokenFiles": token_files,
         "warnings": warnings,
         "errors": errors,

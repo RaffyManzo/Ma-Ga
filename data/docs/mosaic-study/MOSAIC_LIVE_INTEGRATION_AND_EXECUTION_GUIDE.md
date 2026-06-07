@@ -185,3 +185,27 @@ powershell -NoProfile -ExecutionPolicy Bypass `
   -File .\run_maga_live.ps1 `
   -Mode "validate-bridge"
 ```
+
+## Quick workflow for the synthetic-calibrated InTAS scenario
+
+The final literature scenario uses a real reduced InTAS topology and deterministic synthetic SUMO traffic. The local MOSAIC installation under `tmp\mosaic-25.2` must remain available.
+
+Run materialization, MOSAIC execution and report lookup with:
+
+```powershell
+powershell -NoProfile -ExecutionPolicy Bypass `
+  -File .\tools\intas-literature-scenario\quick_literature_workflow.ps1 `
+  -ForceRebuild `
+  -PrintDetailedLiveReport `
+  -PrintSummary
+```
+
+Show only the latest reports with:
+
+```powershell
+powershell -NoProfile -ExecutionPolicy Bypass `
+  -File .\tools\intas-literature-scenario\show_latest_literature_report.ps1 `
+  -PrintSummary
+```
+
+The design and calibration evidence are documented in `14C4_2_synthetic_calibrated_intas_subscenario.md`.
