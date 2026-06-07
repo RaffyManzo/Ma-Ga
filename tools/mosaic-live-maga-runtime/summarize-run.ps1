@@ -197,36 +197,36 @@ Set-Content -LiteralPath $SummaryJson -Value ($Summary | ConvertTo-Json -Depth 8
 $Markdown = @"
 # Live MA-GA Run Summary
 
-- Run: `$($Summary.runName)`
-- Scenario: `$ScenarioName`
-- Profile: `$Profile`
-- Simulation completed: `$SimulationCompleted`
-- Snapshots resolved: `$($Summary.snapshotResolved)` / `$($Summary.snapshotRequests)`
-- GA jobs submitted: `$($Summary.gaJobsSubmitted)`
-- GA jobs completed: `$($Summary.gaJobsCompleted)`
-- GA jobs applied: `$($Summary.gaJobsApplied)`
-- GA jobs discarded as stale: `$($Summary.gaJobsDiscardedAsStale)`
-- Strategy applications: `$($Summary.strategyApplications)`
-- Assignments LOCAL/VEHICLE/EDGE/CLOUD: `$($Summary.localAssignments)` / `$($Summary.vehicleAssignments)` / `$($Summary.edgeAssignments)` / `$($Summary.cloudAssignments)`
-- parallelGaViolations: `$($Summary.parallelGaViolations)`
-- futureSnapshotViolations: `$($Summary.futureSnapshotViolations)`
-- futurePoolViolations: `$($Summary.futurePoolViolations)`
-- invalidPoolBandwidthViolations: `$($Summary.invalidPoolBandwidthViolations)`
-- deltaTMaxMismatchViolations: `$($Summary.deltaTMaxMismatchViolations)`
+- Run: $($Summary.runName)
+- Scenario: $ScenarioName
+- Profile: $Profile
+- Simulation completed: $SimulationCompleted
+- Snapshots resolved: $($Summary.snapshotResolved) / $($Summary.snapshotRequests)
+- GA jobs submitted: $($Summary.gaJobsSubmitted)
+- GA jobs completed: $($Summary.gaJobsCompleted)
+- GA jobs applied: $($Summary.gaJobsApplied)
+- GA jobs discarded as stale: $($Summary.gaJobsDiscardedAsStale)
+- Strategy applications: $($Summary.strategyApplications)
+- Assignments LOCAL/VEHICLE/EDGE/CLOUD: $($Summary.localAssignments) / $($Summary.vehicleAssignments) / $($Summary.edgeAssignments) / $($Summary.cloudAssignments)
+- parallelGaViolations: $($Summary.parallelGaViolations)
+- futureSnapshotViolations: $($Summary.futureSnapshotViolations)
+- futurePoolViolations: $($Summary.futurePoolViolations)
+- invalidPoolBandwidthViolations: $($Summary.invalidPoolBandwidthViolations)
+- deltaTMaxMismatchViolations: $($Summary.deltaTMaxMismatchViolations)
 
 ## Reports
 
-- GA trace: `$($ReportFiles.gaTrace)`
-- Strategy trace: `$($ReportFiles.strategyTrace)`
-- Bridge trace: `$($ReportFiles.bridgeTrace)`
-- Overrun trace: `$($ReportFiles.overrunTrace)`
-- Native detailed TXT: `$($ReportFiles.nativeDetailedReportTxt)`
-- Native detailed Markdown: `$($ReportFiles.nativeDetailedReportMarkdown)`
-- Native detailed JSON: `$($ReportFiles.nativeDetailedReportJson)`
-- Native GA events JSONL: `$($ReportFiles.nativeGaJobEventsJsonl)`
-- Native temporal step records JSONL: `$($ReportFiles.nativeTemporalStepRecordsJsonl)`
-- Native applied windows CSV: `$($ReportFiles.nativeAppliedWindowsCsv)`
-- Native discarded windows CSV: `$($ReportFiles.nativeDiscardedWindowsCsv)`
+- GA trace: $($ReportFiles.gaTrace)
+- Strategy trace: $($ReportFiles.strategyTrace)
+- Bridge trace: $($ReportFiles.bridgeTrace)
+- Overrun trace: $($ReportFiles.overrunTrace)
+- Native detailed TXT: $($ReportFiles.nativeDetailedReportTxt)
+- Native detailed Markdown: $($ReportFiles.nativeDetailedReportMarkdown)
+- Native detailed JSON: $($ReportFiles.nativeDetailedReportJson)
+- Native GA events JSONL: $($ReportFiles.nativeGaJobEventsJsonl)
+- Native temporal step records JSONL: $($ReportFiles.nativeTemporalStepRecordsJsonl)
+- Native applied windows CSV: $($ReportFiles.nativeAppliedWindowsCsv)
+- Native discarded windows CSV: $($ReportFiles.nativeDiscardedWindowsCsv)
 
 ## Warnings
 

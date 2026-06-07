@@ -338,9 +338,15 @@ try {
     Invoke-ScenarioConvert -ScenarioConvertRoot $ScenarioConvertRoot -WorkingDirectory $ApplicationDir -Arguments @(
         "route", "import", $DatabasePath, $RouteFile
     )
-    $ScenarioConvertLog = Join-Path $ApplicationDir "scenario-convert.log"
-    if (Test-Path -LiteralPath $ScenarioConvertLog -PathType Leaf) {
-        Remove-Item -LiteralPath $ScenarioConvertLog -Force
+    $ScenarioConvertLogs = @(
+        (Join-Path $ApplicationDir "scenario-convert.log"),
+        (Join-Path $RepoRoot "scenario-convert.log")
+    )
+
+    foreach ($ScenarioConvertLog in $ScenarioConvertLogs) {
+        if (Test-Path -LiteralPath $ScenarioConvertLog -PathType Leaf) {
+            Remove-Item -LiteralPath $ScenarioConvertLog -Force
+        }
     }
 
     $ReportJson = Join-Path $PersistentScenarioRoot "reports\intas_literature_materialization_report.json"

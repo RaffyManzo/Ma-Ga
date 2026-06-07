@@ -92,23 +92,23 @@ C:\Users\raffa\IdeaProjects\external\InTAS
 
 ```text
 tools/intas-literature-scenario/
-â”œâ”€â”€ README.md
-â”œâ”€â”€ build_intas_literature_scenario.py
-â”œâ”€â”€ materialize_literature_scenario.ps1
-â”œâ”€â”€ deploy_materialized_literature_scenario.ps1
-â”œâ”€â”€ run_literature_scenario.ps1
-â”œâ”€â”€ quick_literature_workflow.ps1
-â”œâ”€â”€ show_latest_literature_report.ps1
-â”œâ”€â”€ validate_intas_source.py
-â”œâ”€â”€ validate_literature_configuration.py
-â”œâ”€â”€ validate_materialized_literature_scenario.py
-â”œâ”€â”€ validate_literature_smoke_run.ps1
-â””â”€â”€ config/
-    â”œâ”€â”€ candidate_0045_edge_ids.txt
-    â”œâ”€â”€ literature_calibration_catalog.json
-    â”œâ”€â”€ literature_scenario_targets.json
-    â”œâ”€â”€ reproducibility_seeds.json
-    â””â”€â”€ synthetic_mobility_profile.json
+ÃƒÂ¢Ã¢â‚¬ÂÃ…â€œÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ README.md
+ÃƒÂ¢Ã¢â‚¬ÂÃ…â€œÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ build_intas_literature_scenario.py
+ÃƒÂ¢Ã¢â‚¬ÂÃ…â€œÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ materialize_literature_scenario.ps1
+ÃƒÂ¢Ã¢â‚¬ÂÃ…â€œÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ deploy_materialized_literature_scenario.ps1
+ÃƒÂ¢Ã¢â‚¬ÂÃ…â€œÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ run_literature_scenario.ps1
+ÃƒÂ¢Ã¢â‚¬ÂÃ…â€œÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ quick_literature_workflow.ps1
+ÃƒÂ¢Ã¢â‚¬ÂÃ…â€œÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ show_latest_literature_report.ps1
+|-- validate_intas_source.py
+|-- validate_literature_configuration.py
+|-- validate_materialized_literature_scenario.py
+|-- validate_literature_smoke_run.ps1
+`-- config/
+    |-- candidate_0045_edge_ids.txt
+    |-- literature_calibration_catalog.json
+    |-- literature_scenario_targets.json
+    |-- reproducibility_seeds.json
+    `-- synthetic_mobility_profile.json
 ```
 
 ## Fast commands
