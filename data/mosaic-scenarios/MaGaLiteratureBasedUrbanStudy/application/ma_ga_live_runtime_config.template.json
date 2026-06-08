@@ -15,5 +15,6 @@
   "deltaTMaxComparisonEpsilonSeconds": 1.0E-9,
   "publishedSnapshotCopyLimit": 32,
   "nativeLiveDetailedReportingEnabled": true,
-  "nativeLiveDetailedReportPrintToConsole": false
+  "nativeLiveDetailedReportPrintToConsole": false,
+  "gaParameterScalingMode": "STATIC"
 }

@@ -74,7 +74,8 @@ public class MaGaLiveRuntimeCoordinatorApp extends AbstractApplication<ServerOpe
                 runtimeConfig.getConfiguredGaRuntimeEstimateSeconds(),
                 runtimeConfig.getConfiguredMaxWindowSeconds()
         );
-        maGaConfig = MaGaConfig.defaultConfig(GaParameterScalingMode.ADAPTIVE);
+        GaParameterScalingMode scalingMode = runtimeConfig.getGaParameterScalingMode();
+        maGaConfig = MaGaConfig.defaultConfig(scalingMode);
         MaGaOptimizer optimizer = new MaGaOptimizer(maGaConfig);
         DynamicityEvaluator dynamicityEvaluator =
                 new DynamicityEvaluator(temporalConfig, maGaConfig.getMobilityConfig());
@@ -108,6 +109,7 @@ public class MaGaLiveRuntimeCoordinatorApp extends AbstractApplication<ServerOpe
                 "LIVE_MAGA_RUNTIME_COORDINATOR_START"
                         + "|serverId=" + getOs().getId()
                         + "|profile=" + runtimeConfig.profileName()
+                        + "|gaParameterScalingMode=" + scalingMode
                         + "|bridgeDescription=" + bridge.getDescription()
                         + "|sourceMode=" + systemStateSource.getMode()
                         + "|traceDir=" + traceWriter.getOutputDir().getFileName()
@@ -121,6 +123,7 @@ public class MaGaLiveRuntimeCoordinatorApp extends AbstractApplication<ServerOpe
     @Override
     public void processEvent(Event event) {
         long tickTimeNs = getOs().getSimulationTime();
+        int expiredTasks = stateFacade.removeExpiredTasks(tickTimeNs);
         int generatedTasks = stateFacade.generateWorkloadTasks(tickTimeNs);
         int activatedTasks = stateFacade.activateDueTasks(tickTimeNs);
         LiveStateLayerRuntimeFacade.RuntimeSnapshot runtimeSnapshot =
@@ -142,6 +145,7 @@ public class MaGaLiveRuntimeCoordinatorApp extends AbstractApplication<ServerOpe
                         + "|profile=" + runtimeConfig.profileName()
                         + "|generatedTasks=" + generatedTasks
                         + "|activatedTasks=" + activatedTasks
+                        + "|expiredTasks=" + expiredTasks
                         + "|snapshotResolved=" + runtimeSnapshot.getSnapshot().isPresent()
                         + "|snapshotsRequested=" + bridge.getSnapshotsRequested()
                         + "|snapshotsResolved=" + bridge.getSnapshotsResolved()
@@ -202,6 +206,7 @@ public class MaGaLiveRuntimeCoordinatorApp extends AbstractApplication<ServerOpe
                 "LIVE_MAGA_RUNTIME_COORDINATOR_STOP"
                         + "|serverId=" + getOs().getId()
                         + "|profile=" + runtimeConfig.profileName()
+                        + "|gaParameterScalingMode=" + runtimeConfig.getGaParameterScalingMode()
                         + "|snapshotsRequested=" + bridge.getSnapshotsRequested()
                         + "|snapshotsResolved=" + bridge.getSnapshotsResolved()
                         + "|snapshotEmptyResponses=" + bridge.getEmptyResponses()

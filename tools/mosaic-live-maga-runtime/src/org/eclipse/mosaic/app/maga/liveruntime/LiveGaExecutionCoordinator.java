@@ -115,13 +115,7 @@ final class LiveGaExecutionCoordinator implements AutoCloseable {
             parallelGaViolations++;
             return;
         }
-        if (temporalState == null) {
-            temporalState = TemporalWindowState.initial(
-                    snapshot.getTimeSeconds(),
-                    config.getTemporalInitialWindowSeconds(),
-                    deadlinePolicy.initialOperationalMetrics()
-            );
-        }
+        temporalState = alignTemporalStateToLiveSnapshot(snapshot);
         long submissionWallClockNs = System.nanoTime();
         LiveGaOverrunDeadlinePolicy.LiveGaDeadline deadline =
                 deadlinePolicy.computeDeadline(snapshot, temporalState, submissionWallClockNs);
@@ -174,6 +168,42 @@ final class LiveGaExecutionCoordinator implements AutoCloseable {
                 lastAppliedSnapshotId(),
                 "",
                 details(job, 0.0, 0.0)
+        );
+    }
+
+
+    /**
+     * Riallinea lo stato temporale operativo al più recente snapshot MOSAIC disponibile.
+     *
+     * <p>Nel runtime live non dobbiamo recuperare ordinatamente finestre logiche ormai
+     * superate mentre MOSAIC continua ad avanzare. Manteniamo quindi l'ultimo risultato
+     * valido, le metriche osservate e la popolazione genetica riutilizzabile, ma facciamo
+     * in modo che il prossimo step del manager osservi lo snapshot live corrente.</p>
+     */
+    private TemporalWindowState alignTemporalStateToLiveSnapshot(SystemSnapshot snapshot) {
+        double liveTriggerTimeSeconds = Math.max(
+                0.0,
+                snapshot.getTimeSeconds()
+                        - manager.getWindowConfig().getDataCollectionDelaySeconds()
+        );
+
+        if (temporalState == null) {
+            return TemporalWindowState.initial(
+                    liveTriggerTimeSeconds,
+                    config.getTemporalInitialWindowSeconds(),
+                    deadlinePolicy.initialOperationalMetrics()
+            );
+        }
+
+        return new TemporalWindowState(
+                temporalState.getWindowIndex(),
+                liveTriggerTimeSeconds,
+                liveTriggerTimeSeconds,
+                temporalState.getCurrentWindowDurationSeconds(),
+                temporalState.getLastSnapshot(),
+                temporalState.getLastResult(),
+                temporalState.getLastOperationalMetrics(),
+                temporalState.getLastFinalPopulation()
         );
     }
 

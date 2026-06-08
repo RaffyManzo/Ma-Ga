@@ -178,6 +178,46 @@ function Set-JsonFile {
     )
 }
 
+function Remove-ScenarioConvertLogs {
+    param(
+        [AllowNull()]
+        [string]$ApplicationDirectory = $null
+    )
+
+    $ScenarioConvertLogs = @(
+        (Join-Path $RepoRoot "scenario-convert.log")
+    )
+
+    if (
+        -not [string]::IsNullOrWhiteSpace(
+            $ApplicationDirectory
+        )
+    ) {
+        $ScenarioConvertLogs += (
+            Join-Path `
+                $ApplicationDirectory `
+                "scenario-convert.log"
+        )
+    }
+
+    foreach (
+        $ScenarioConvertLog in (
+            $ScenarioConvertLogs |
+                Select-Object -Unique
+        )
+    ) {
+        if (
+            Test-Path `
+                -LiteralPath $ScenarioConvertLog `
+                -PathType Leaf
+        ) {
+            Remove-Item `
+                -LiteralPath $ScenarioConvertLog `
+                -Force
+        }
+    }
+}
+
 function Apply-SmokeExecutionOverrides {
     param([string]$ScenarioRoot)
     $StateConfigPath = Join-Path $ScenarioRoot "application\ma_ga_live_state_config.json"
@@ -228,9 +268,16 @@ if (-not (Get-Command java -ErrorAction SilentlyContinue)) {
     throw "java not found in PATH; Scenario-Convert requires Java"
 }
 
+Remove-ScenarioConvertLogs
+
 $ScenarioConvertPath = Find-ScenarioConvert -ExplicitPath $ScenarioConvert
 $ScenarioConvertRoot = Get-ScenarioConvertRoot -ScenarioConvertPath $ScenarioConvertPath
-$ScenarioConvertHelp = Get-ScenarioConvertHelp -ScenarioConvertRoot $ScenarioConvertRoot
+
+try {
+    $ScenarioConvertHelp = Get-ScenarioConvertHelp -ScenarioConvertRoot $ScenarioConvertRoot
+} finally {
+    Remove-ScenarioConvertLogs
+}
 if ($ScenarioConvertHelp -notmatch "database create" -or $ScenarioConvertHelp -notmatch "route import") {
     throw "Scenario-Convert CLI does not expose required 'database create' and 'route import' commands."
 }
@@ -264,6 +311,7 @@ if (Test-Path -LiteralPath $PersistentScenarioRoot) {
     Remove-Item -LiteralPath $ResolvedTarget -Recurse -Force
 }
 
+$ApplicationDir = $null
 $StagingRoot = Join-Path (Join-Path $RepoRoot "tmp\intas-literature-materialization-staging") ([Guid]::NewGuid().ToString("N"))
 New-Item -ItemType Directory -Path $StagingRoot -Force | Out-Null
 try {
@@ -305,6 +353,12 @@ try {
         Write-Host "Applied smoke execution override: workload rate 0.02 task/s/active vehicle, runtime tick 500ms"
     }
 
+    $LiveRuntimeConfigPath = Join-Path $PersistentScenarioRoot "application\ma_ga_live_runtime_config.json"
+    $LiveRuntimeConfig = Get-Content -LiteralPath $LiveRuntimeConfigPath -Raw | ConvertFrom-Json
+    if ($LiveRuntimeConfig.gaParameterScalingMode -ne "STATIC") {
+        throw "Literature scenario runtime must use gaParameterScalingMode=STATIC."
+    }
+
     $ApplicationDir = Join-Path $PersistentScenarioRoot "application"
     $SumoDir = Join-Path $PersistentScenarioRoot "sumo"
     $NetFile = Join-Path $SumoDir "$SubscenarioName.net.xml"
@@ -338,20 +392,12 @@ try {
     Invoke-ScenarioConvert -ScenarioConvertRoot $ScenarioConvertRoot -WorkingDirectory $ApplicationDir -Arguments @(
         "route", "import", $DatabasePath, $RouteFile
     )
-    $ScenarioConvertLogs = @(
-        (Join-Path $ApplicationDir "scenario-convert.log"),
-        (Join-Path $RepoRoot "scenario-convert.log")
-    )
-
-    foreach ($ScenarioConvertLog in $ScenarioConvertLogs) {
-        if (Test-Path -LiteralPath $ScenarioConvertLog -PathType Leaf) {
-            Remove-Item -LiteralPath $ScenarioConvertLog -Force
-        }
-    }
+    Remove-ScenarioConvertLogs -ApplicationDirectory $ApplicationDir
 
     $ReportJson = Join-Path $PersistentScenarioRoot "reports\intas_literature_materialization_report.json"
     $Report = Get-Content -LiteralPath $ReportJson -Raw | ConvertFrom-Json
     $Report | Add-Member -NotePropertyName "smokeExecutionOverrides" -NotePropertyValue $SmokeExecutionOverrides -Force
+    $Report | Add-Member -NotePropertyName "gaParameterScalingMode" -NotePropertyValue $LiveRuntimeConfig.gaParameterScalingMode -Force
     Set-JsonFile -Path $ReportJson -Value $Report
     $NetworkChecksum = Get-Sha256 -Path $NetFile
     $RouteChecksum = Get-Sha256 -Path $RouteFile
@@ -380,6 +426,7 @@ try {
         projection = $Report.projection
         rsuCoordinates = $Report.selectedCandidate.candidateRsuPositions
         smokeExecutionOverrides = $SmokeExecutionOverrides
+        gaParameterScalingMode = $LiveRuntimeConfig.gaParameterScalingMode
         generatedAt = (Get-Date).ToString("o")
         databasePath = ($DatabasePath.Replace($RepoRoot, "")).TrimStart("\")
         databaseSizeBytes = (Get-Item -LiteralPath $DatabasePath).Length
@@ -398,6 +445,8 @@ try {
     Write-Host "Database SHA-256: $DatabaseChecksum"
     Write-Host "Manifest: $ManifestPath"
 } finally {
+    Remove-ScenarioConvertLogs -ApplicationDirectory $ApplicationDir
+
     if (Test-Path -LiteralPath $StagingRoot) {
         Remove-Item -LiteralPath $StagingRoot -Recurse -Force
     }

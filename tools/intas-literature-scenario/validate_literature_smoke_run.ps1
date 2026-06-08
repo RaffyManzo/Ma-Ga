@@ -52,6 +52,36 @@ function Get-IntOrZero {
     return [int]$Value
 }
 
+function Get-DoubleOrZero {
+    param([object]$Object, [string]$Name)
+    if ($null -eq $Object) {
+        return 0.0
+    }
+    if (-not ($Object.PSObject.Properties.Name -contains $Name)) {
+        return 0.0
+    }
+    $Value = $Object.$Name
+    if ($null -eq $Value -or $Value -eq "") {
+        return 0.0
+    }
+    return [double]$Value
+}
+
+function Get-StringOrDefault {
+    param([object]$Object, [string]$Name, [string]$DefaultValue)
+    if ($null -eq $Object) {
+        return $DefaultValue
+    }
+    if (-not ($Object.PSObject.Properties.Name -contains $Name)) {
+        return $DefaultValue
+    }
+    $Value = [string]$Object.$Name
+    if ([string]::IsNullOrWhiteSpace($Value)) {
+        return $DefaultValue
+    }
+    return $Value
+}
+
 function Count-Pattern {
     param([string[]]$Files, [string]$Pattern)
     $Count = 0
@@ -96,52 +126,36 @@ if (-not (Test-Path -LiteralPath $SummaryPath -PathType Leaf)) {
 
 $Summary = Read-JsonFile -Path $SummaryPath
 $LogFiles = @(Get-ChildItem -LiteralPath $Run.FullName -Recurse -File -Filter "*.log" | ForEach-Object { $_.FullName })
-$RuntimeRows = @()
-$RuntimeTrace = Join-Path $RuntimeDir "live_ga_runtime_trace.csv"
-if (Test-Path -LiteralPath $RuntimeTrace -PathType Leaf) {
-    $RuntimeRows = @(Import-Csv -LiteralPath $RuntimeTrace)
+
+$TasksGeneratedCumulative = Get-IntOrZero -Object $Summary -Name "tasksGeneratedCumulative"
+$TasksActivatedCumulative = Get-IntOrZero -Object $Summary -Name "tasksActivatedCumulative"
+$TasksRemovedAtDeadlineCumulative = Get-IntOrZero -Object $Summary -Name "tasksRemovedAtDeadlineCumulative"
+$TasksPendingAtEnd = Get-IntOrZero -Object $Summary -Name "tasksPendingAtEnd"
+$TasksPendingPeak = Get-IntOrZero -Object $Summary -Name "tasksPendingPeak"
+$TaskCompletionModel = Get-StringOrDefault -Object $Summary -Name "taskCompletionModel" -DefaultValue "UNSPECIFIED"
+$TaskCountersSource = Get-StringOrDefault -Object $Summary -Name "taskCountersSource" -DefaultValue "UNSPECIFIED"
+$GaParameterScalingMode = Get-StringOrDefault -Object $Summary -Name "gaParameterScalingMode" -DefaultValue "UNSPECIFIED"
+$GaRuntimeMeanSeconds = Get-DoubleOrZero -Object $Summary -Name "gaRuntimeMeanSeconds"
+$GaRuntimeMedianSeconds = Get-DoubleOrZero -Object $Summary -Name "gaRuntimeMedianSeconds"
+$GaRuntimeP95Seconds = Get-DoubleOrZero -Object $Summary -Name "gaRuntimeP95Seconds"
+$GaRuntimeMaxSeconds = Get-DoubleOrZero -Object $Summary -Name "gaRuntimeMaxSeconds"
+$StaleRatioPercent = Get-DoubleOrZero -Object $Summary -Name "staleRatioPercent"
+$StaleSequenceCount = Get-IntOrZero -Object $Summary -Name "staleSequenceCount"
+$LongestConsecutiveStaleSequence = Get-IntOrZero -Object $Summary -Name "longestConsecutiveStaleSequence"
+$MaximumAbsoluteSnapshotLagSeconds = Get-DoubleOrZero -Object $Summary -Name "maximumAbsoluteSnapshotLagSeconds"
+$NonZeroLagWindowCount = Get-IntOrZero -Object $Summary -Name "nonZeroLagWindowCount"
+$LastAppliedStrategySimulationTimeSeconds = Get-DoubleOrZero -Object $Summary -Name "lastAppliedStrategySimulationTimeSeconds"
+$SecondsWithoutAppliedStrategyAtEnd = Get-DoubleOrZero -Object $Summary -Name "secondsWithoutAppliedStrategyAtEnd"
+
+if ($TasksGeneratedCumulative -le 0) {
+    $TasksGeneratedCumulative = Get-IntOrZero -Object $Summary -Name "tasksGenerated"
 }
-$StrategyRows = @()
-$StrategyTrace = Join-Path $RuntimeDir "live_strategy_application_trace.csv"
-if (Test-Path -LiteralPath $StrategyTrace -PathType Leaf) {
-    $StrategyRows = @(Import-Csv -LiteralPath $StrategyTrace)
+if ($TasksActivatedCumulative -le 0) {
+    $TasksActivatedCumulative = Get-IntOrZero -Object $Summary -Name "tasksActivated"
 }
 
-$TasksGenerated = 0
-$TasksActivated = 0
-foreach ($Log in $LogFiles) {
-    foreach ($Line in Get-Content -LiteralPath $Log) {
-        if ($Line -match "LIVE_STATE_COORDINATOR_STOP" -or $Line -match "LIVE_MAGA_RUNTIME_COORDINATOR_STOP") {
-            if ($Line -match "tasksGenerated=([^| )]+)") {
-                $TasksGenerated = [Math]::Max($TasksGenerated, [int]$Matches[1])
-            }
-            if ($Line -match "tasksActivated=([^| )]+)") {
-                $TasksActivated = [Math]::Max($TasksActivated, [int]$Matches[1])
-            }
-        }
-        if ($Line -match "newlyGeneratedTasks=([^| )]+)") {
-            $TasksGenerated += [int]$Matches[1]
-        }
-        if ($Line -match "newlyActivatedTasks=([^| )]+)") {
-            $TasksActivated += [int]$Matches[1]
-        }
-    }
-}
-if (($TasksGenerated -le 0 -or $TasksActivated -le 0) -and
-        (Test-Path -LiteralPath (Join-Path $RuntimeDir "live_bridge_snapshot_trace.csv") -PathType Leaf)) {
-    $BridgeRows = @(Import-Csv -LiteralPath (Join-Path $RuntimeDir "live_bridge_snapshot_trace.csv"))
-    $MaxBridgeTaskCount = 0
-    foreach ($Row in $BridgeRows) {
-        $TaskValue = Get-IntOrZero -Object $Row -Name "tasks"
-        $MaxBridgeTaskCount = [Math]::Max($MaxBridgeTaskCount, $TaskValue)
-    }
-    if ($TasksGenerated -le 0) {
-        $TasksGenerated = $MaxBridgeTaskCount
-    }
-    if ($TasksActivated -le 0) {
-        $TasksActivated = $MaxBridgeTaskCount
-    }
-}
+$TasksGenerated = $TasksGeneratedCumulative
+$TasksActivated = $TasksActivatedCumulative
 
 $DetailedJsonPath = Join-Path $ReportingDir "live_detailed_execution_report.json"
 $DetailedJsonValid = $false
@@ -195,8 +209,16 @@ $DeltaTMaxMismatchViolations = Get-IntOrZero -Object $Summary -Name "deltaTMaxMi
 if (-not $SimulationCompleted) { $Errors += "simulationCompleted is false" }
 if (-not $ConfiguredCellProfileLoaded) { $Errors += "LIVE_STATE_CONFIGURED_CELL_PROFILE_LOADED not observed" }
 if (-not $NativeReportWritten) { $Errors += "LIVE_NATIVE_DETAILED_REPORT_WRITTEN not observed" }
-if ($TasksGenerated -le 0) { $Errors += "tasksGenerated <= 0" }
-if ($TasksActivated -le 0) { $Errors += "tasksActivated <= 0" }
+if ($TasksGeneratedCumulative -le 0) { $Errors += "tasksGeneratedCumulative <= 0" }
+if ($TasksActivatedCumulative -le 0) { $Errors += "tasksActivatedCumulative <= 0" }
+if ($TasksRemovedAtDeadlineCumulative -lt 0) { $Errors += "tasksRemovedAtDeadlineCumulative < 0" }
+if ($TasksPendingAtEnd -lt 0) { $Errors += "tasksPendingAtEnd < 0" }
+if ($TasksPendingPeak -lt 0) { $Errors += "tasksPendingPeak < 0" }
+if ($TaskCompletionModel -ne "NOT_IMPLEMENTED") { $Errors += "taskCompletionModel must be NOT_IMPLEMENTED" }
+if ($TaskCountersSource -ne "LIVE_MAGA_RUNTIME_COORDINATOR_TICK") { $Errors += "taskCountersSource must be LIVE_MAGA_RUNTIME_COORDINATOR_TICK" }
+if ($GaParameterScalingMode -ne "STATIC") { $Errors += "gaParameterScalingMode must be STATIC" }
+if ($MaximumAbsoluteSnapshotLagSeconds -gt 1.0E-9) { $Errors += "maximumAbsoluteSnapshotLagSeconds = $MaximumAbsoluteSnapshotLagSeconds" }
+if ($NonZeroLagWindowCount -ne 0) { $Errors += "nonZeroLagWindowCount = $NonZeroLagWindowCount" }
 if ($SnapshotRequests -le 0) { $Errors += "snapshotRequests <= 0" }
 if ($SnapshotResolved -le 0) { $Errors += "snapshotResolved <= 0" }
 if ($GaJobsSubmitted -le 0) { $Errors += "gaJobsSubmitted <= 0" }
@@ -224,6 +246,25 @@ $Payload = [ordered]@{
     simulationCompleted = $SimulationCompleted
     configuredCellProfileLoaded = $ConfiguredCellProfileLoaded
     nativeDetailedReportWritten = $NativeReportWritten
+    taskCountersSource = $TaskCountersSource
+    taskCompletionModel = $TaskCompletionModel
+    gaParameterScalingMode = $GaParameterScalingMode
+    gaRuntimeMeanSeconds = $GaRuntimeMeanSeconds
+    gaRuntimeMedianSeconds = $GaRuntimeMedianSeconds
+    gaRuntimeP95Seconds = $GaRuntimeP95Seconds
+    gaRuntimeMaxSeconds = $GaRuntimeMaxSeconds
+    staleRatioPercent = $StaleRatioPercent
+    staleSequenceCount = $StaleSequenceCount
+    longestConsecutiveStaleSequence = $LongestConsecutiveStaleSequence
+    maximumAbsoluteSnapshotLagSeconds = $MaximumAbsoluteSnapshotLagSeconds
+    nonZeroLagWindowCount = $NonZeroLagWindowCount
+    lastAppliedStrategySimulationTimeSeconds = $LastAppliedStrategySimulationTimeSeconds
+    secondsWithoutAppliedStrategyAtEnd = $SecondsWithoutAppliedStrategyAtEnd
+    tasksGeneratedCumulative = $TasksGeneratedCumulative
+    tasksActivatedCumulative = $TasksActivatedCumulative
+    tasksRemovedAtDeadlineCumulative = $TasksRemovedAtDeadlineCumulative
+    tasksPendingAtEnd = $TasksPendingAtEnd
+    tasksPendingPeak = $TasksPendingPeak
     tasksGenerated = $TasksGenerated
     tasksActivated = $TasksActivated
     snapshotRequests = $SnapshotRequests
@@ -261,13 +302,34 @@ $Markdown = @"
 - run: $($Run.Name)
 - scenario: $ScenarioName
 - simulationCompleted: $SimulationCompleted
-- tasksGenerated: $TasksGenerated
-- tasksActivated: $TasksActivated
+- taskCountersSource: $TaskCountersSource
+- taskCompletionModel: $TaskCompletionModel
+- gaParameterScalingMode: $GaParameterScalingMode
+- gaRuntimeMeanSeconds: $GaRuntimeMeanSeconds
+- gaRuntimeMedianSeconds: $GaRuntimeMedianSeconds
+- gaRuntimeP95Seconds: $GaRuntimeP95Seconds
+- gaRuntimeMaxSeconds: $GaRuntimeMaxSeconds
+- staleRatioPercent: $StaleRatioPercent
+- staleSequenceCount: $StaleSequenceCount
+- longestConsecutiveStaleSequence: $LongestConsecutiveStaleSequence
+- maximumAbsoluteSnapshotLagSeconds: $MaximumAbsoluteSnapshotLagSeconds
+- nonZeroLagWindowCount: $NonZeroLagWindowCount
+- lastAppliedStrategySimulationTimeSeconds: $LastAppliedStrategySimulationTimeSeconds
+- secondsWithoutAppliedStrategyAtEnd: $SecondsWithoutAppliedStrategyAtEnd
+- tasksGeneratedCumulative: $TasksGeneratedCumulative
+- tasksActivatedCumulative: $TasksActivatedCumulative
+- tasksRemovedAtDeadlineCumulative: $TasksRemovedAtDeadlineCumulative
+- tasksPendingAtEnd: $TasksPendingAtEnd
+- tasksPendingPeak: $TasksPendingPeak
 - snapshots: $SnapshotResolved / $SnapshotRequests
 - GA jobs completed/submitted: $GaJobsCompleted / $GaJobsSubmitted
 - strategyApplications: $StrategyApplications
 - assignments LOCAL/VEHICLE/EDGE/CLOUD: $LocalAssignments / $VehicleAssignments / $EdgeAssignments / $CloudAssignments
 - violations parallel/futureSnapshot/futurePool/invalidPool/deltaTMaxMismatch: $ParallelGaViolations / $FutureSnapshotViolations / $FuturePoolViolations / $InvalidPoolBandwidthViolations / $DeltaTMaxMismatchViolations
+
+## Task lifecycle note
+
+Tasks removed at deadline are not reported as completed. The live prototype does not simulate task execution completion.
 
 ## Artifacts
 
@@ -281,6 +343,16 @@ Set-Content -LiteralPath $MarkdownOut -Value $Markdown -Encoding UTF8
 
 Write-Host $Status
 Write-Host "Run: $($Run.Name)"
+Write-Host "Tasks generated cumulative: $TasksGeneratedCumulative"
+Write-Host "Tasks activated cumulative: $TasksActivatedCumulative"
+Write-Host "Tasks removed at deadline cumulative: $TasksRemovedAtDeadlineCumulative"
+Write-Host "Tasks pending at end: $TasksPendingAtEnd"
+Write-Host "Tasks pending peak: $TasksPendingPeak"
+Write-Host "Task completion model: $TaskCompletionModel"
+Write-Host "GA parameter scaling mode: $GaParameterScalingMode"
+Write-Host "GA stale ratio percent: $StaleRatioPercent"
+Write-Host "GA runtime mean/median/P95/max seconds: $GaRuntimeMeanSeconds / $GaRuntimeMedianSeconds / $GaRuntimeP95Seconds / $GaRuntimeMaxSeconds"
+Write-Host "Maximum absolute snapshot lag seconds: $MaximumAbsoluteSnapshotLagSeconds"
 Write-Host "Validation JSON: $JsonOut"
 Write-Host "Validation Markdown: $MarkdownOut"
 if ($Errors.Count -gt 0) {

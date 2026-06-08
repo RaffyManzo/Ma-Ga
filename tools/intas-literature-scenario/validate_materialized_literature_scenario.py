@@ -202,7 +202,7 @@ def validate(scenario_root: Path, repo_root: Path | None) -> dict[str, Any]:
     load_json(root / "cell" / "network.json", errors)
     load_json(root / "cell" / "regions.json", errors)
     load_json(root / "application" / "ma_ga_live_state_config.json", errors)
-    load_json(root / "application" / "ma_ga_live_runtime_config.json", errors)
+    runtime_config = load_json(root / "application" / "ma_ga_live_runtime_config.json", errors)
     report = load_json(root / "reports" / "intas_literature_materialization_report.json", errors)
     manifest = load_json(root / "materialization_manifest.json", errors)
 
@@ -253,31 +253,104 @@ def validate(scenario_root: Path, repo_root: Path | None) -> dict[str, Any]:
         errors.append("Materialization report must use candidate_0045.")
     if manifest.get("mobilityMode") != "SYNTHETIC_CALIBRATED_ON_INTAS_SUBNETWORK":
         errors.append("Materialization manifest must declare synthetic-calibrated InTAS mobility mode.")
+    if runtime_config.get("gaParameterScalingMode") != "STATIC":
+        errors.append("Live runtime config must declare gaParameterScalingMode = STATIC.")
+    if report.get("gaParameterScalingMode") != "STATIC":
+        errors.append("Materialization report must declare gaParameterScalingMode = STATIC.")
+    if manifest.get("gaParameterScalingMode") != "STATIC":
+        errors.append("Materialization manifest must declare gaParameterScalingMode = STATIC.")
     route_subsets = report.get("routeSubsets", {})
     if not route_subsets:
         errors.append("Materialization report has no synthetic route subsets.")
+    expected_base_vehicle_counts = {
+        "low_density": 29,
+        "nominal": 50,
+        "high_density": 80,
+    }
+
     for density, subset in route_subsets.items():
         validation = subset.get("mobilityValidation", {})
         fcd = validation.get("fcd", {})
         logs = validation.get("logs", {})
+
         if validation.get("status") != "VALID_SYNTHETIC_MOBILITY":
             errors.append(f"Synthetic mobility validation failed for {density}.")
+
         if int(fcd.get("gatewaySwitchEvents", 0)) <= 0:
             errors.append(f"Synthetic mobility has no gateway switches for {density}.")
+
         if int(logs.get("errorCount", -1)) != 0:
             errors.append(f"SUMO error count is not zero for {density}.")
+
         if int(logs.get("teleportMentions", -1)) != 0:
             errors.append(f"SUMO teleport count is not zero for {density}.")
+
         if int(logs.get("emergencyBrakingMentions", -1)) != 0:
             errors.append(f"SUMO emergency-braking count is not zero for {density}.")
+
+        expected_base_count = expected_base_vehicle_counts.get(density)
+        generated_vehicle_count = int(subset.get("vehicleCount", 0))
+        base_vehicle_count = int(
+            subset.get(
+                "baseVehicleCount",
+                generated_vehicle_count,
+            )
+        )
+
+        if (
+            expected_base_count is not None
+            and base_vehicle_count != expected_base_count
+        ):
+            errors.append(
+                f"{density} base synthetic vehicle count expected "
+                f"{expected_base_count}, found {base_vehicle_count}."
+            )
+
+        if generated_vehicle_count < base_vehicle_count:
+            errors.append(
+                f"{density} generated vehicle count must be >= base count: "
+                f"generated={generated_vehicle_count}, "
+                f"base={base_vehicle_count}."
+            )
+
+        route_file_name = f"intas_literature_urban_{density}.rou.xml"
+        route_vehicle_count = route_counts.get(route_file_name)
+
+        if (
+            route_vehicle_count is not None
+            and route_vehicle_count != generated_vehicle_count
+        ):
+            errors.append(
+                f"{density} route XML vehicle count mismatch: "
+                f"report={generated_vehicle_count}, "
+                f"xml={route_vehicle_count}."
+            )
+
+        extension = subset.get("longDurationDemandExtension", {})
+
+        if generated_vehicle_count > base_vehicle_count:
+            if extension.get("applied") is not True:
+                errors.append(
+                    f"{density} long-duration demand extension must be applied "
+                    "when generated vehicle count exceeds the base count."
+                )
+
+            if float(extension.get("repeatIntervalSeconds", 0.0)) <= 0.0:
+                errors.append(
+                    f"{density} long-duration repeat interval must be positive."
+                )
+
     nominal = route_subsets.get("nominal")
+
     if nominal is not None:
         nominal_fcd = nominal.get("mobilityValidation", {}).get("fcd", {})
         mean_active = float(nominal_fcd.get("meanActiveVehicles", 0.0))
+
         if not 28.0 <= mean_active <= 36.0:
-            errors.append(f"Nominal mean active vehicles expected in [28, 36], found {mean_active}.")
-        if int(nominal.get("vehicleCount", 0)) != 50:
-            errors.append(f"Nominal synthetic vehicle count expected 50, found {nominal.get('vehicleCount')!r}.")
+            errors.append(
+                f"Nominal mean active vehicles expected in [28, 36], "
+                f"found {mean_active}."
+            )
 
     if list(root.rglob("*.jar")):
         errors.append("Materialized scenario must not contain JAR files before deploy.")
@@ -320,6 +393,7 @@ def validate(scenario_root: Path, repo_root: Path | None) -> dict[str, Any]:
         "routeVehicleCounts": route_counts,
         "reducedNetworkCounts": net_counts,
         "mobilityMode": report.get("mobilityMode"),
+        "gaParameterScalingMode": runtime_config.get("gaParameterScalingMode"),
         "tokenFiles": token_files,
         "warnings": warnings,
         "errors": errors,

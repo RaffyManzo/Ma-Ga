@@ -422,53 +422,161 @@ def choose_vtype(intas_root: Path, preferred_id: str = "default_001") -> ET.Elem
     return fallback
 
 
-def write_route_file(path: Path, candidates: list[RouteCandidate], density_profile: dict[str, Any], seed: int, vtype: ET.Element) -> dict[str, Any]:
+def write_route_file(
+    path: Path,
+    candidates: list[RouteCandidate],
+    density_profile: dict[str, Any],
+    seed: int,
+    vtype: ET.Element,
+    duration: int,
+    repeat_interval: float,
+) -> dict[str, Any]:
+    if repeat_interval <= 0:
+        raise RuntimeError("Demand repeat interval must be positive.")
+
     root = ET.Element("routes")
     root.append(deepcopy(vtype))
     vtype_id = vtype.attrib["id"]
+
     selected_by_family: dict[str, list[RouteCandidate]] = {}
     route_id_by_key: dict[tuple[str, tuple[str, ...]], str] = {}
+
     for family, settings in density_profile["families"].items():
-        templates = choose_templates(candidates, family, int(settings["templateCount"]), float(settings["targetLengthMeters"]))
+        templates = choose_templates(
+            candidates,
+            family,
+            int(settings["templateCount"]),
+            float(settings["targetLengthMeters"]),
+        )
+
         selected_by_family[family] = templates
+
         for index, template in enumerate(templates, start=1):
             route_id = f"route_{family.lower()}_{index:02d}"
-            route_id_by_key[(family, template.edge_ids)] = route_id
-            ET.SubElement(root, "route", {"id": route_id, "edges": " ".join(template.edge_ids)})
-    sequence: list[str] = []
+
+            route_id_by_key[
+                (family, template.edge_ids)
+            ] = route_id
+
+            ET.SubElement(
+                root,
+                "route",
+                {
+                    "id": route_id,
+                    "edges": " ".join(template.edge_ids),
+                },
+            )
+
+    base_sequence: list[str] = []
+
     for family, settings in density_profile["families"].items():
-        sequence.extend([family] * int(settings["vehicleCount"]))
-    random.Random(seed).shuffle(sequence)
-    emitted = Counter()
-    interval = float(density_profile["departureIntervalSeconds"])
-    for vehicle_index, family in enumerate(sequence):
-        templates = selected_by_family[family]
-        template = templates[emitted[family] % len(templates)]
-        route_id = route_id_by_key[(family, template.edge_ids)]
-        ET.SubElement(
-            root,
-            "vehicle",
-            {
-                "id": f"synthetic_{vehicle_index:03d}",
-                "type": vtype_id,
-                "route": route_id,
-                "depart": f"{vehicle_index * interval:.2f}",
-                "departLane": "best",
-                "departSpeed": "max",
-            },
+        base_sequence.extend(
+            [family] * int(settings["vehicleCount"])
         )
-        emitted[family] += 1
+
+    random.Random(seed).shuffle(base_sequence)
+
+    emitted = Counter()
+
+    interval = float(
+        density_profile["departureIntervalSeconds"]
+    )
+
+    repeat_cycle_count = 0
+    total_vehicle_count = 0
+    last_requested_departure = 0.0
+
+    while repeat_cycle_count * repeat_interval < duration:
+        cycle_offset = repeat_cycle_count * repeat_interval
+        emitted_in_cycle = 0
+
+        for vehicle_index, family in enumerate(base_sequence):
+            departure = (
+                cycle_offset
+                + vehicle_index * interval
+            )
+
+            if departure >= duration:
+                continue
+
+            templates = selected_by_family[family]
+
+            template = templates[
+                emitted[family] % len(templates)
+            ]
+
+            route_id = route_id_by_key[
+                (family, template.edge_ids)
+            ]
+
+            vehicle_id = (
+                f"synthetic_{vehicle_index:03d}"
+                if repeat_cycle_count == 0
+                else (
+                    f"synthetic_c{repeat_cycle_count:03d}_"
+                    f"{vehicle_index:03d}"
+                )
+            )
+
+            ET.SubElement(
+                root,
+                "vehicle",
+                {
+                    "id": vehicle_id,
+                    "type": vtype_id,
+                    "route": route_id,
+                    "depart": f"{departure:.2f}",
+                    "departLane": "best",
+                    "departSpeed": "max",
+                },
+            )
+
+            emitted[family] += 1
+            emitted_in_cycle += 1
+            total_vehicle_count += 1
+
+            last_requested_departure = max(
+                last_requested_departure,
+                departure,
+            )
+
+        if emitted_in_cycle == 0:
+            break
+
+        repeat_cycle_count += 1
+
     indent(root)
-    path.parent.mkdir(parents=True, exist_ok=True)
-    ET.ElementTree(root).write(path, encoding="utf-8", xml_declaration=True)
+
+    path.parent.mkdir(
+        parents=True,
+        exist_ok=True,
+    )
+
+    ET.ElementTree(root).write(
+        path,
+        encoding="utf-8",
+        xml_declaration=True,
+    )
+
     return {
         "routeFile": str(path),
-        "vehicleCount": len(sequence),
+        "vehicleCount": total_vehicle_count,
+        "baseVehicleCount": len(base_sequence),
         "vehicleCounts": dict(sorted(emitted.items())),
-        "lastRequestedDeparture": (len(sequence) - 1) * interval if sequence else 0.0,
+        "lastRequestedDeparture": last_requested_departure,
         "seed": seed,
+        "longDurationDemandExtension": {
+            "mode": "PERIODIC_REPETITION_OF_CALIBRATED_BASE_DEMAND",
+            "repeatIntervalSeconds": repeat_interval,
+            "repeatCycleCount": repeat_cycle_count,
+            "applied": repeat_cycle_count > 1,
+        },
         "vTypeIdsWritten": [vtype_id],
-        "routeTemplateCounts": {family: len(values) for family, values in sorted(selected_by_family.items())},
+        "routeTemplateCounts": {
+            family: len(values)
+            for family, values
+            in sorted(selected_by_family.items())
+        },
         "templates": {
             family: [
                 {
@@ -479,10 +587,10 @@ def write_route_file(path: Path, candidates: list[RouteCandidate], density_profi
                 }
                 for item in values
             ]
-            for family, values in sorted(selected_by_family.items())
+            for family, values
+            in sorted(selected_by_family.items())
         },
     }
-
 
 def write_sumocfg(path: Path, net_file: str, route_file: str, step_length: float, duration: int) -> None:
     root = ET.Element("configuration")
@@ -714,7 +822,7 @@ def write_live_state_config(scenario_dir: Path, rsus: tuple[Point, Point], catal
 
 
 def write_live_runtime_config(scenario_dir: Path) -> dict[str, Any]:
-    payload = {"scenarioName": SCENARIO_NAME, "coordinatorTickIntervalMs": 100, "initialOptimizationDelayMs": 1000, "gaPollingIntervalMs": 50, "singleInFlightGaOnly": True, "discardLateResult": True, "keepLastAppliedStrategyWhileRunning": True, "freshReoptimizationAfterTimeout": True, "runtimeTraceEnabled": True, "diagnosticArtificialGaDelayMs": 0, "temporalInitialWindowSeconds": 1.0, "configuredGaRuntimeEstimateSeconds": 0.01, "configuredMaxWindowSeconds": 0.2, "deltaTMaxComparisonEpsilonSeconds": 1.0e-9, "publishedSnapshotCopyLimit": 32, "nativeLiveDetailedReportingEnabled": True, "nativeLiveDetailedReportPrintToConsole": False}
+    payload = {"scenarioName": SCENARIO_NAME, "coordinatorTickIntervalMs": 100, "initialOptimizationDelayMs": 1000, "gaPollingIntervalMs": 50, "singleInFlightGaOnly": True, "discardLateResult": True, "keepLastAppliedStrategyWhileRunning": True, "freshReoptimizationAfterTimeout": True, "runtimeTraceEnabled": True, "diagnosticArtificialGaDelayMs": 0, "temporalInitialWindowSeconds": 1.0, "configuredGaRuntimeEstimateSeconds": 0.01, "configuredMaxWindowSeconds": 0.2, "deltaTMaxComparisonEpsilonSeconds": 1.0e-9, "publishedSnapshotCopyLimit": 32, "nativeLiveDetailedReportingEnabled": True, "nativeLiveDetailedReportPrintToConsole": False, "gaParameterScalingMode": "STATIC"}
     write_json(scenario_dir / "application" / "ma_ga_live_runtime_config.json", payload)
     return payload
 
@@ -782,12 +890,22 @@ def main() -> int:
     requested_densities = list(mobility_profile["densityProfiles"]) if args.density == "all" else [args.density]
     duration = int(targets["durationsSeconds"][args.duration_profile])
     step_length = float(targets["sumoStepLengthSeconds"])
+    long_duration_extension = mobility_profile["longDurationDemandExtension"]
+    repeat_interval = float(long_duration_extension["repeatIntervalSeconds"])
     route_outputs: dict[str, Any] = {}
     for index, density in enumerate(requested_densities):
         density_profile = mobility_profile["densityProfiles"][density]
         seed = int(args.seed if args.seed is not None else seeds[index % len(seeds)])
         route_file = output_scenario / "sumo" / f"{SUBSCENARIO_NAME}_{density}.rou.xml"
-        output = write_route_file(route_file, candidates, density_profile, seed, preferred_vtype)
+        output = write_route_file(
+            route_file,
+            candidates,
+            density_profile,
+            seed,
+            preferred_vtype,
+            duration,
+            repeat_interval,
+        )
         output["targetMeanActiveVehicles"] = density_profile["targetMeanActiveVehicles"]
         output["mobilityValidation"] = validate_mobility(route_file, reduced_net, duration, step_length, rsus, float(mobility_profile["rsus"][0]["coverageRadiusMeters"]), density_profile, mobility_profile)
         if output["mobilityValidation"]["errors"]:

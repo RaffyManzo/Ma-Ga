@@ -2,11 +2,13 @@ package org.eclipse.mosaic.app.maga.liveruntime;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
+import config.ga.GaParameterScalingMode;
 
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.util.Locale;
 
 public final class MaGaLiveRuntimeConfig {
 
@@ -30,6 +32,7 @@ public final class MaGaLiveRuntimeConfig {
     int publishedSnapshotCopyLimit;
     boolean nativeLiveDetailedReportingEnabled;
     boolean nativeLiveDetailedReportPrintToConsole;
+    String gaParameterScalingMode;
 
     public static MaGaLiveRuntimeConfig load(File configurationPath) {
         if (configurationPath == null) {
@@ -91,6 +94,10 @@ public final class MaGaLiveRuntimeConfig {
         return nativeLiveDetailedReportPrintToConsole;
     }
 
+    public GaParameterScalingMode getGaParameterScalingMode() {
+        return GaParameterScalingMode.valueOf(gaParameterScalingMode);
+    }
+
     public String getScenarioName() {
         return scenarioName == null || scenarioName.isBlank()
                 ? "MaGaLiveMagaRuntimeStudy"
@@ -111,6 +118,19 @@ public final class MaGaLiveRuntimeConfig {
                 || scenarioName.contains("/")
                 || !scenarioName.matches("^[A-Za-z0-9_.-]+$")) {
             throw new IllegalArgumentException(source + ": scenarioName is invalid");
+        }
+        if (gaParameterScalingMode == null || gaParameterScalingMode.isBlank()) {
+            gaParameterScalingMode = GaParameterScalingMode.ADAPTIVE.name();
+        } else {
+            String normalized = gaParameterScalingMode.trim().toUpperCase(Locale.ROOT);
+            try {
+                gaParameterScalingMode = GaParameterScalingMode.valueOf(normalized).name();
+            } catch (IllegalArgumentException e) {
+                throw new IllegalArgumentException(
+                        source + ": gaParameterScalingMode must be STATIC or ADAPTIVE",
+                        e
+                );
+            }
         }
         requirePositive(coordinatorTickIntervalMs, "coordinatorTickIntervalMs", source);
         requirePositive(initialOptimizationDelayMs, "initialOptimizationDelayMs", source);

@@ -1,6 +1,12 @@
 {
   "scenarioName": "MaGaLiteratureBasedUrbanStudy",
   "mobilityMode": "SYNTHETIC_CALIBRATED_ON_INTAS_SUBNETWORK",
+  "longDurationDemandExtension": {
+    "mode": "PERIODIC_REPETITION_OF_CALIBRATED_BASE_DEMAND",
+    "calibrationBaseDurationSeconds": 180.0,
+    "repeatIntervalSeconds": 195.0,
+    "classification": "CONTROLLED_ENGINEERING_EXTENSION_VALIDATED_BY_SUMO_DIAGNOSTIC"
+  },
   "sourceTopology": {
     "name": "InTAS",
     "repository": "https://github.com/silaslobo/InTAS",

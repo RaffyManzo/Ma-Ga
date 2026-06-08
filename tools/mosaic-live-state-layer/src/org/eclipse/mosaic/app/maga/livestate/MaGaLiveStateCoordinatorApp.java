@@ -134,6 +134,7 @@ public class MaGaLiveStateCoordinatorApp extends AbstractApplication<ServerOpera
     public void processEvent(Event event) {
         long tickTimeNs = getOs().getSimulationTime();
         tickCount++;
+        int expiredTasks = cache.removeExpiredTasks(tickTimeNs);
         LiveStateSnapshotView vehicleObservationView = cache.snapshotAtOrBefore(tickTimeNs);
         int newlyGeneratedTasks = 0;
         if (workloadGenerator != null) {
@@ -188,6 +189,7 @@ public class MaGaLiveStateCoordinatorApp extends AbstractApplication<ServerOpera
                 "LIVE_STATE_COORDINATOR_TICK"
                         + "|simulationTime=" + tickTimeNs
                         + "|tickCount=" + tickCount
+                        + "|expiredTasks=" + expiredTasks
                         + "|activeVehicles=" + view.getActiveVehicles().size()
                         + "|pendingTasks=" + view.getPendingTasks().size()
                         + "|newlyGeneratedTasks=" + newlyGeneratedTasks

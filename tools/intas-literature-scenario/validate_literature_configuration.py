@@ -272,6 +272,7 @@ def validate(scenario_root: Path) -> dict[str, Any]:
         assert_close("CLOUD backhaul delay", cloud_nodes[0].get("serverBaseDelaySeconds"), 0.050, errors)
 
     runtime = docs["liveRuntime"]
+    assert_equal("gaParameterScalingMode", runtime.get("gaParameterScalingMode"), "STATIC", errors)
     assert_equal("nativeLiveDetailedReportingEnabled", runtime.get("nativeLiveDetailedReportingEnabled"), True, errors)
     assert_equal("nativeLiveDetailedReportPrintToConsole", runtime.get("nativeLiveDetailedReportPrintToConsole"), False, errors)
 

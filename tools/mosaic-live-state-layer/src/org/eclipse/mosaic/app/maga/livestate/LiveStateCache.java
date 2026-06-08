@@ -9,6 +9,7 @@ import java.util.concurrent.ConcurrentMap;
 
 final class LiveStateCache {
 
+    private static final double NANOSECONDS_PER_SECOND = 1_000_000_000.0;
     private static final LiveStateCache INSTANCE = new LiveStateCache();
 
     private final ConcurrentMap<String, LiveVehicleState> vehicles = new ConcurrentHashMap<>();
@@ -113,6 +114,33 @@ final class LiveStateCache {
             }
         }
         return activated;
+    }
+
+    int removeExpiredTasks(long tickTimeNs) {
+        int removed = 0;
+
+        for (Map.Entry<String, LiveTaskState> entry : taskDefinitions.entrySet()) {
+            String taskId = entry.getKey();
+            LiveTaskState task = entry.getValue();
+
+            long deadlineDurationNs = Math.round(
+                    task.getDeadlineSeconds() * NANOSECONDS_PER_SECOND
+            );
+
+            long deadlineTimeNs = task.getActivationTimeNs() + deadlineDurationNs;
+
+            if (deadlineTimeNs > tickTimeNs) {
+                continue;
+            }
+
+            if (taskDefinitions.remove(taskId, task)) {
+                removed++;
+            }
+
+            activeTasks.remove(taskId);
+        }
+
+        return removed;
     }
 
     void markTasksExported(List<LiveTaskState> tasks) {

@@ -79,6 +79,10 @@ public final class LiveStateLayerRuntimeFacade {
         return cache.activateDueTasks(tickTimeNs);
     }
 
+    public int removeExpiredTasks(long tickTimeNs) {
+        return cache.removeExpiredTasks(tickTimeNs);
+    }
+
     public Optional<String> configuredCellProfileLogFields() {
         if (!config.hasConfiguredCellProfile()) {
             return Optional.empty();

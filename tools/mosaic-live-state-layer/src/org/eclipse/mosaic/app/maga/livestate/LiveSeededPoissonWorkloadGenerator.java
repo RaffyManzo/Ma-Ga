@@ -9,24 +9,32 @@ final class LiveSeededPoissonWorkloadGenerator {
 
     private final MaGaLiveStateConfig.WorkloadGeneration config;
     private final Random random;
+    private final long tickIntervalNs;
     private final double tickIntervalSeconds;
+    private long nextGenerationTimeNs;
     private long sequence;
 
     LiveSeededPoissonWorkloadGenerator(MaGaLiveStateConfig.WorkloadGeneration config, long tickIntervalNs) {
         if (config == null || !config.enabled) {
             throw new IllegalArgumentException("Enabled workloadGeneration configuration is required");
         }
+        if (tickIntervalNs <= 0L) {
+            throw new IllegalArgumentException("tickIntervalNs must be positive");
+        }
         this.config = config;
         this.random = new Random(config.randomSeed);
+        this.tickIntervalNs = tickIntervalNs;
         this.tickIntervalSeconds = tickIntervalNs / 1_000_000_000.0;
+        this.nextGenerationTimeNs = config.getStartTimeNs();
         this.sequence = 0L;
     }
 
     List<LiveTaskState> generate(long tickTimeNs, List<LiveVehicleState> activeVehicles) {
         List<LiveTaskState> generated = new ArrayList<>();
-        if (tickTimeNs < config.getStartTimeNs()) {
+        if (tickTimeNs < nextGenerationTimeNs) {
             return generated;
         }
+        nextGenerationTimeNs = tickTimeNs + tickIntervalNs;
         List<LiveVehicleState> orderedVehicles = new ArrayList<>();
         for (LiveVehicleState vehicle : activeVehicles) {
             if (vehicle.isActive()) {

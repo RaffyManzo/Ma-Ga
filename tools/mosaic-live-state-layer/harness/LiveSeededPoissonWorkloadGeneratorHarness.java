@@ -16,6 +16,8 @@ public final class LiveSeededPoissonWorkloadGeneratorHarness {
         verifyNoActiveVehiclesGeneratesNothing();
         verifyOnlyActiveVehiclesReceiveTasks();
         verifyTaskCausalityAndProfiles();
+        verifySubTickCallsDoNotOverGenerate();
+        verifyExpiredTasksAreRemoved();
         verifyRemoteVehicleCpuForV2vCandidate();
         verifyConfiguredCellProfileIsDistinctFromRuntimeAccounting();
         System.out.println("PHASE14C3_HARNESS_PASSED");
@@ -65,6 +67,86 @@ public final class LiveSeededPoissonWorkloadGeneratorHarness {
                     "generated task profile must be light, medium or heavy"
             );
         }
+    }
+
+    private static void verifySubTickCallsDoNotOverGenerate() {
+        MaGaLiveStateConfig cfg =
+                config(104729L, 30.0, 1_000_000_000L, 750_000_000L);
+
+        LiveSeededPoissonWorkloadGenerator generator =
+                new LiveSeededPoissonWorkloadGenerator(
+                        cfg.getWorkloadGeneration(),
+                        TICK_INTERVAL_NS
+                );
+
+        List<LiveTaskState> first =
+                generator.generate(TICK_TIME_NS, activeVehicles());
+
+        List<LiveTaskState> insideSameTick =
+                generator.generate(
+                        TICK_TIME_NS + 100_000_000L,
+                        activeVehicles()
+                );
+
+        List<LiveTaskState> nextTick =
+                generator.generate(
+                        TICK_TIME_NS + TICK_INTERVAL_NS,
+                        activeVehicles()
+                );
+
+        require(!first.isEmpty(), "first scheduled workload tick must generate tasks");
+        require(insideSameTick.isEmpty(), "sub-tick call must not generate tasks again");
+        require(!nextTick.isEmpty(), "next scheduled workload tick must generate tasks");
+    }
+
+    private static void verifyExpiredTasksAreRemoved() {
+        MaGaLiveStateConfig cfg =
+                config(104729L, 30.0, 1_000_000_000L, 750_000_000L);
+
+        List<LiveTaskState> generated =
+                generateTasks(cfg, activeVehicles());
+
+        LiveStateCache cache = new LiveStateCache();
+
+        require(
+                cache.installGeneratedTaskDefinitions(generated)
+                        == generated.size(),
+                "all generated tasks must be inserted"
+        );
+
+        require(
+                cache.activateDueTasks(TICK_TIME_NS)
+                        == generated.size(),
+                "all generated tasks must activate"
+        );
+
+        require(
+                !cache.snapshotAtOrBefore(TICK_TIME_NS)
+                        .getPendingTasks()
+                        .isEmpty(),
+                "activated tasks must appear in the pending view"
+        );
+
+        require(
+                cache.removeExpiredTasks(
+                        TICK_TIME_NS + 5_000_000_000L
+                ) == generated.size(),
+                "all generated tasks must expire after their deadlines"
+        );
+
+        require(
+                cache.snapshotAtOrBefore(
+                        TICK_TIME_NS + 5_000_000_000L
+                ).getPendingTasks().isEmpty(),
+                "expired tasks must disappear from the pending view"
+        );
+
+        require(
+                cache.activateDueTasks(
+                        TICK_TIME_NS + 5_000_000_000L
+                ) == 0,
+                "expired tasks must not reactivate"
+        );
     }
 
     private static void verifyRemoteVehicleCpuForV2vCandidate() {
