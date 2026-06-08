@@ -1,4 +1,4 @@
-﻿# Live MA-GA Run Summary
+# Live MA-GA Run Summary
 
 - Run: log-20260609-011846-MaGaLiteratureBasedUrbanStudy
 - Scenario: MaGaLiteratureBasedUrbanStudy
@@ -60,5 +60,3 @@ Tasks removed at deadline are not reported as completed. The live prototype does
 
 
 ## Errors
-
-
