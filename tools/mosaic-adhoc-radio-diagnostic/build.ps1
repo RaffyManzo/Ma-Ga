@@ -49,7 +49,9 @@ $OriginalJarDependencies = foreach ($DependencyPath in $JarDependencyPaths) {
     Get-Item -LiteralPath $FullPath
 }
 
-$SourceFiles = Get-ChildItem -LiteralPath $SourceRoot -Recurse -Filter "*.java" -File
+$SourceFiles = @(
+    Get-ChildItem -LiteralPath $SourceRoot -Recurse -Filter "*.java" -File
+)
 if ($SourceFiles.Count -eq 0) {
     throw "No Java source files found under $SourceRoot"
 }
