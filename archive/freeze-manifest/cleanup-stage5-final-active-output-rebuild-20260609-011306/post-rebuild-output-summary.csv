@@ -1,0 +1,4 @@
+﻿"Phase","Component","ActivePath","BackupPath","FileCount","SizeBytes","SizeMiB","AggregateSHA256"
+"POST_REBUILD","LIVE_STATE_LAYER","tools\mosaic-live-state-layer\out","tmp\archive\freeze-local-evidence-20260609\pre-rebuild-active-output-backup-final-20260609-011306\LIVE_STATE_LAYER","50","1472536","1,404","1b10958fbf72d8a5e73ea051b6cb422c87f62584a1415c3e892bdaa9742edb69"
+"POST_REBUILD","ADHOC_RADIO_DIAGNOSTIC","tools\mosaic-adhoc-radio-diagnostic\out","tmp\archive\freeze-local-evidence-20260609\pre-rebuild-active-output-backup-final-20260609-011306\ADHOC_RADIO_DIAGNOSTIC","9","792890","0,756","a3126e336d71b43758945f0bece2f5a3ec37cc6abd37345b1f4db3a7a484d761"
+"POST_REBUILD","LIVE_MAGA_RUNTIME","tools\mosaic-live-maga-runtime\out","tmp\archive\freeze-local-evidence-20260609\pre-rebuild-active-output-backup-final-20260609-011306\LIVE_MAGA_RUNTIME","265","5019482","4,787","6bf4c82eea64fd406ec7e64c711a5b9069970adefc1c0a5f0f96af7c68b689d6"

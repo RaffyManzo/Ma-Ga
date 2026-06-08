@@ -1,0 +1,3 @@
+﻿"Name","StartedAt","FinishedAt","DurationSeconds","ExitCode","Success","StdoutPath","StderrPath"
+"materialized-validator","2026-06-09T01:16:08","2026-06-09T01:16:09","0,539","0","True","tmp\manual-audits\cleanup-stage6-materialized-validation-deploy-audit-20260609-011545\materialized-validator.stdout.log","tmp\manual-audits\cleanup-stage6-materialized-validation-deploy-audit-20260609-011545\materialized-validator.stderr.log"
+"materialized-deploy","2026-06-09T01:16:09","2026-06-09T01:16:09","0,467","0","True","tmp\manual-audits\cleanup-stage6-materialized-validation-deploy-audit-20260609-011545\materialized-deploy.stdout.log","tmp\manual-audits\cleanup-stage6-materialized-validation-deploy-audit-20260609-011545\materialized-deploy.stderr.log"

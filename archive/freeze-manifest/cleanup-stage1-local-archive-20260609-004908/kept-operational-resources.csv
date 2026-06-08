@@ -1,0 +1,6 @@
+﻿"RelativePath","Action","Reason"
+"tmp\external-tools\scenario-convert-25.2","KEEP_OPERATIONAL","Dipendenza operativa della materializzazione completa."
+"tmp\mosaic-25.2\tools\web","KEEP_OPERATIONAL","Componente dell'installazione Eclipse MOSAIC."
+"tmp\materialized-literature-scenarios","KEEP_UNTIL_POST_CLEANUP_VALIDATION","Scenario materializzato utile per il controllo post-cleanup."
+"tmp\mosaic-25.2\scenarios\MaGaLiteratureBasedUrbanStudy","KEEP_OPERATIONAL","Scenario attualmente deployato dentro Eclipse MOSAIC."
+".idea\workspace.xml","KEEP_LOCAL_NOT_VERSIONED","Configurazione locale IntelliJ."

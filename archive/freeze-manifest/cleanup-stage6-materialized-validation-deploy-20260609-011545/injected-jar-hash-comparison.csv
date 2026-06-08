@@ -1,0 +1,3 @@
+﻿"JarRole","GeneratedJar","InjectedJar","GeneratedSHA256","InjectedSHA256","HashMatches"
+"LIVE_MAGA_RUNTIME","tools\mosaic-live-maga-runtime\out\maga-live-maga-runtime.jar","tmp\mosaic-25.2\scenarios\MaGaLiteratureBasedUrbanStudy\application\maga-live-maga-runtime.jar","B179E2D90EAF9AFCF0F71ED7FE4550A223840D7BEEE2C6278234F6A984679AD1","B179E2D90EAF9AFCF0F71ED7FE4550A223840D7BEEE2C6278234F6A984679AD1","True"
+"ADHOC_RADIO_DIAGNOSTIC","tools\mosaic-adhoc-radio-diagnostic\out\maga-adhoc-radio-diagnostic.jar","tmp\mosaic-25.2\scenarios\MaGaLiteratureBasedUrbanStudy\application\maga-adhoc-radio-diagnostic.jar","9744C3F48190E9F1D3F502FF524AC323DE5572ABBD7C0D149A6DAD0C2612E4B5","9744C3F48190E9F1D3F502FF524AC323DE5572ABBD7C0D149A6DAD0C2612E4B5","True"
