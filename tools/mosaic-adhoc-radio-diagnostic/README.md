@@ -1,5 +1,13 @@
 # MOSAIC Ad-Hoc Radio Diagnostic
 
+> Nota post-audit 2026-06-14: questa applicazione diagnostica e' ancora
+> richiesta dallo scenario finale `MaGaLiteratureBasedUrbanStudy`, perche' i
+> veicoli la usano per abilitare la radio ad-hoc osservata dal live-state
+> layer. I riferimenti a `MaGaIntegratedStudy*` nelle sezioni storiche sotto
+> appartengono a scenari archiviati. Il file `build.ps1` punta ancora a quei
+> default storici e va riconciliato in una fase successiva; non viene modificato
+> in questa fase documentale.
+
 Questo tool contiene una piccola applicazione Eclipse MOSAIC usata dalla Fase 10G della pipeline offline MOSAIC -> MA-GA.
 
 ## Scopo
@@ -95,6 +103,16 @@ copia il JAR negli scenari diagnostici versionabili.
 ```
 
 ## Scenari che lo usano
+
+Contesto attuale: il mapping materializzato di
+`MaGaLiteratureBasedUrbanStudy` include ancora:
+
+```text
+org.eclipse.mosaic.app.maga.adhocradio.MaGaAdHocRadioDiagnosticApp
+```
+
+I percorsi seguenti sono storici: gli scenari `MaGaIntegratedStudy*` sono stati
+archiviati e non rappresentano la pipeline finale.
 
 Il JAR viene copiato in:
 

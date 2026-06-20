@@ -1,5 +1,13 @@
 # MOSAIC live state layer
 
+> Nota post-audit 2026-06-14: questo layer non e' piu' soltanto un esperimento
+> separato. I suoi sorgenti sono usati dalla pipeline finale
+> `MaGaLiteratureBasedUrbanStudy` per ricostruire stato live, workload,
+> candidati, gateway, pool e snapshot. Le sezioni su `MaGaLiveStateLayerStudy`
+> e `MaGaLiveInfrastructureSnapshotStudy` descrivono fasi diagnostiche
+> precedenti; nella pipeline finale il layer viene integrato dal runtime bridge
+> e configurato dallo scenario materializzato.
+
 Tool diagnostico versionabile per le Fasi 13B e 13C. Compila e deploya uno
 skeleton runtime MOSAIC che mantiene una cache causale live per veicoli e task
 diagnostici, produce preview CSV per candidati `LOCAL`, candidati `VEHICLE`
@@ -18,6 +26,10 @@ Il tool non invoca MA-GA e non implementa bridge concreto, strategy applier,
 worker o policy overrun.
 
 ## Scenario
+
+Contesto attuale: lo scenario finale e' `MaGaLiteratureBasedUrbanStudy`.
+Gli scenari sotto sono scenari diagnostici storici usati per isolare e
+validare il live-state layer prima del workflow literature-based.
 
 Scenario versionabile:
 

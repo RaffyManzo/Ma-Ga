@@ -1,5 +1,10 @@
 # Fase 11 - Consolidamento end-to-end della pipeline offline
 
+> Nota post-audit 2026-06-14: questa fase documenta il consolidamento offline
+> MOSAIC -> snapshot JSON -> replay. La pipeline finale usa invece SUMO/MOSAIC
+> live, live-state layer, runtime bridge e `SystemSnapshot` costruiti durante la
+> simulazione. Conservare questo documento come storico/regressivo.
+
 ## Scopo
 
 La Fase 11 consolida in un solo comando la pipeline offline gia' validata nelle

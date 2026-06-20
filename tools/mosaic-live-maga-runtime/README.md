@@ -1,5 +1,13 @@
 # MOSAIC live MA-GA runtime
 
+> Nota post-audit 2026-06-14: questo tool e' ancora un componente attivo della
+> pipeline finale `MaGaLiteratureBasedUrbanStudy`, perche' produce il JAR del
+> runtime bridge, del coordinatore asincrono MA-GA e del reporting live. Le
+> sezioni storiche sotto restano utili per capire le Fasi 13D-13E e lo scenario
+> diagnostico `MaGaLiveMagaRuntimeStudy`, ma quello scenario non e' lo scenario
+> finale literature-based. Nella pipeline finale il deploy e la run ordinaria
+> passano da `tools/intas-literature-scenario/`.
+
 Tool diagnostico versionabile per le Fasi 13D-13E. Collega il layer live 13C al
 core MA-GA esistente usando un `MosaicSnapshotBridge` concreto, la
 `MosaicSystemStateSource` invariata, `TemporalWindowManager.executeNextStepOrNull`
@@ -10,6 +18,10 @@ strategy control operativo o scenario finale realistico. Lo strategy applier e'
 diagnostico.
 
 ## Scenario
+
+Contesto attuale: lo scenario finale e' `MaGaLiteratureBasedUrbanStudy`.
+Lo scenario indicato qui sotto e' il predecessore diagnostico usato per
+validare il bridge live prima della materializzazione literature-based.
 
 Scenario versionabile:
 

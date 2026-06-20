@@ -1,5 +1,10 @@
 # Fase 13E - validazione end-to-end finale bridge live
 
+> Nota post-audit 2026-06-14: questa validazione resta importante per il bridge
+> live, la causalita e la policy sugli overrun. Tuttavia precede lo scenario
+> finale `MaGaLiteratureBasedUrbanStudy`; lo scenario `MaGaLiveMagaRuntimeStudy`
+> citato qui va letto come scenario diagnostico precedente.
+
 ## 1. Obiettivo
 
 La Fase 13E stabilizza il bridge live MOSAIC -> `SystemSnapshot` -> MA-GA

@@ -1,5 +1,32 @@
 # MOSAIC Live Integration and Execution Guide
 
+> Nota post-audit 2026-06-14: questo documento resta utile come guida storica
+> dell'integrazione live fino alle Fasi 13D-13E. Non e' pero' il punto di
+> ingresso finale dello scenario literature-based. Per lo stato operativo
+> corrente usare `README.md`, `tools/intas-literature-scenario/README.md` e
+> `data/mosaic-scenarios/MaGaLiteratureBasedUrbanStudy/README.md`.
+
+## Indice documentale post-audit
+
+| Area | Documenti | Stato |
+| --- | --- | --- |
+| Pipeline finale literature-based | `14C4_1_persistent_materialization_and_literature_smoke_test.md`, `14C4_2_synthetic_calibrated_intas_subscenario.md` | Piu' vicini allo stato operativo finale. |
+| Configurazione radio/Cell/compute e workload | `14C2_literature_radio_cell_compute_configuration.md`, `14C3_live_state_workload_and_cell_profile_extension.md`, `14C3R_native_live_detailed_reporting.md` | Ancora utili come base tecnica della pipeline finale. |
+| Bridge live precedente | `13B_*`, `13C_*`, `13D_*`, `13E_*` | Storico tecnico: valida i componenti poi riusati nella pipeline finale. |
+| Pipeline offline/replay | `10_punto_10_sviluppo_completo.md`, `11_offline_pipeline_end_to_end_consolidation.md` | Regressione standalone, non percorso ordinario live finale. |
+| Guide iniziali e Barnim | `01_*` ... `09_*` | Storiche, utili per capire l'evoluzione. |
+
+Distinzione corrente delle cartelle:
+
+```text
+data/mosaic-scenarios/MaGaLiteratureBasedUrbanStudy/     = template versionato
+tmp/materialized-literature-scenarios/                    = scenari concreti generati
+tmp/mosaic-25.2/scenarios/MaGaLiteratureBasedUrbanStudy/  = scenario deployato locale
+tmp/mosaic-25.2/logs/                                     = evidenza locale delle run
+data/snapshots/                                           = replay/regressione standalone
+src/                                                      = core MA-GA da non toccare
+```
+
 ## 1. Stato finale
 
 Il repository e' pronto per la fase pre-calibrazione. Il bridge live

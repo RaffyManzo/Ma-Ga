@@ -1,10 +1,12 @@
-# Phase 14C.4.2 â€” Synthetic-calibrated mobility on a real InTAS subnetwork
+# Phase 14C.4.2 - Synthetic-calibrated mobility on a real InTAS subnetwork
 
 ## Goal
 
-The goal of this phase is to obtain a small, reproducible and understandable MOSAIC/SUMO scenario for the live MA-GA runtime.
+This phase defines the small, reproducible and inspectable MOSAIC/SUMO
+scenario used by the final live MA-GA runtime.
 
-The scenario must remain realistic enough to exercise local, V2V, edge and cloud choices. At the same time, it must be easy to regenerate and inspect.
+The scenario must remain realistic enough to exercise local, V2V, edge and
+cloud choices. At the same time, it must be easy to regenerate and inspect.
 
 ## Final architectural choice
 
@@ -24,17 +26,21 @@ This means:
 
 ## Why exact replay was abandoned
 
-The previous attempt tried to reproduce the exact InTAS interval `14250-14430 s` as a compact `0-180 s` scenario.
+The previous attempt tried to reproduce the exact InTAS interval
+`14250-14430 s` as a compact `0-180 s` scenario.
 
 The experiment identified several difficulties:
 
 - vehicles were already active at the beginning of the interval;
 - other vehicles were waiting for insertion;
 - route times required careful shifting;
-- SUMO save-state loading required `--xml-validation never` because of a `tlLogic active` schema inconsistency;
-- even corrected offset experiments did not preserve equivalent traffic over the full interval.
+- SUMO save-state loading required `--xml-validation never` because of a
+  `tlLogic active` schema inconsistency;
+- corrected offset experiments still did not preserve equivalent traffic over
+  the full interval.
 
-Continuing along that path would have increased implementation complexity without improving the validation of MA-GA itself.
+Continuing along that path would have increased implementation complexity
+without improving the validation of MA-GA itself.
 
 ## Reused evidence from InTAS
 
@@ -83,7 +89,8 @@ BACKGROUND: 10 vehicles
 TOTAL: 50 vehicles
 ```
 
-The seed is fixed to `104729` and requested departures are separated by `1.80 s`.
+The seed is fixed to `104729` and requested departures are separated by
+`1.80 s`.
 
 ## Validated SUMO baseline
 
@@ -102,7 +109,8 @@ teleports: 0
 emergency braking: 0
 ```
 
-The density is intentionally close to, but not identical to, the observed InTAS reference interval.
+The density is intentionally close to, but not identical to, the observed InTAS
+reference interval.
 
 ## Materialization flow
 
@@ -110,15 +118,15 @@ The materializer performs these steps:
 
 ```text
 external InTAS network
-â†’ fixed candidate_0045 edge list
-â†’ netconvert reduced network
-â†’ route-template generation
-â†’ deterministic synthetic demand
-â†’ SUMO validation
-â†’ MOSAIC text configuration
-â†’ Scenario-Convert SQLite database
-â†’ route import
-â†’ persistent manifest
+-> fixed candidate_0045 edge list
+-> netconvert reduced network
+-> route-template generation
+-> deterministic synthetic demand
+-> SUMO validation
+-> MOSAIC text configuration
+-> Scenario-Convert SQLite database
+-> route import
+-> persistent manifest
 ```
 
 ## Local folders that must remain available
@@ -130,8 +138,10 @@ tmp/mosaic-25.2
 tmp/external-tools/scenario-convert-25.2
 ```
 
-The first contains the MOSAIC runtime. The second contains Scenario-Convert used during materialization.
+The first contains the MOSAIC runtime. The second contains Scenario-Convert
+used during materialization.
 
 ## Scope boundary
 
-The phase does not alter the MA-GA core. It changes only scenario generation, validation and documentation.
+The phase does not alter the MA-GA core. It changes only scenario generation,
+validation and documentation.

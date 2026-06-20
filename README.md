@@ -1,432 +1,215 @@
-# MA-GA Core
+# MA-GA - integrazione live Eclipse MOSAIC / SUMO
 
-Questo repository contiene il core Java del **Mobility-Aware Genetic Algorithm
-(MA-GA)** per il computation offloading in scenari veicolo, edge e cloud.
+Questo repository contiene il prototipo Java del Mobility-Aware Genetic
+Algorithm (MA-GA) per il computation offloading in un Vehicular Edge-to-Cloud
+Continuum.
 
-## Avvio rapido MOSAIC live
+L'idea centrale e' semplice:
 
-Il comando ordinario per avviare il runtime live MOSAIC -> MA-GA e':
+```text
+SUMO genera la mobilita.
+Eclipse MOSAIC orchestra la simulazione.
+Il live-state layer ricostruisce lo stato causale.
+Il runtime bridge lo trasforma in SystemSnapshot.
+Il core MA-GA ottimizza la strategia di offloading.
+Il reporting rende la run verificabile.
+```
+
+Il core MA-GA lavora sempre sul contratto `SystemSnapshot`: non dipende
+direttamente da MOSAIC o da SUMO.
+
+## Stato finale
+
+Branch di integrazione:
+
+```text
+MOSAIC/SUMO-integration
+```
+
+Commit congelato:
+
+```text
+5a9477735a3d707a5f000a64653cd2a6fc7f2007
+```
+
+Lo scenario finale testato localmente e':
+
+```text
+MaGaLiteratureBasedUrbanStudy
+```
+
+La sottorete urbana congelata e':
+
+```text
+candidate_0045
+```
+
+Valori strutturali dello scenario:
+
+```text
+external edges                  = 155
+external junctions              = 88
+physical traffic-light junctions = 8
+tlLogic definitions             = 7
+RSU                              = 2
+RSU coverage radius              = 250 m
+```
+
+## Cartelle e responsabilita
+
+| Percorso | Ruolo |
+| --- | --- |
+| `src/` | Core MA-GA standalone. Non toccare durante riallineamenti documentali o cleanup. |
+| `data/mosaic-scenarios/MaGaLiteratureBasedUrbanStudy/` | Template/scaffold versionato dello scenario finale. Non contiene lo scenario concreto gia' eseguito. |
+| `tools/intas-literature-scenario/` | Tool principale per materializzare, deployare, eseguire, riassumere e validare lo scenario literature-based. |
+| `tools/mosaic-live-state-layer/` | Sorgenti del layer che ricostruisce stato live, workload, candidati e snapshot. |
+| `tools/mosaic-live-maga-runtime/` | Sorgenti del runtime bridge, coordinatore asincrono MA-GA e reporting live. |
+| `tools/mosaic-adhoc-radio-diagnostic/` | App MOSAIC diagnostica richiesta dai veicoli per abilitare la radio ad-hoc. |
+| `tmp/materialized-literature-scenarios/` | Scenari concreti generati dal materializer. Output locale ignored, non sorgente. |
+| `tmp/mosaic-25.2/scenarios/MaGaLiteratureBasedUrbanStudy/` | Copia deployata nel runtime MOSAIC locale. Output locale ignored. |
+| `tmp/mosaic-25.2/logs/` | Evidenza locale delle run MOSAIC/SUMO. Non e' sorgente. |
+| `tmp/external-tools/` | Dipendenze locali, incluso Scenario-Convert. Non toccare senza una fase dedicata. |
+| `data/snapshots/` | Snapshot standalone/regressivi per replay del core. Non sono la sorgente della pipeline live finale. |
+| `archive/` | Materiale storico, freeze manifest e prove di cleanup. |
+
+## Template, materializzazione, deploy e run
+
+La distinzione importante e':
+
+```text
+data/mosaic-scenarios/MaGaLiteratureBasedUrbanStudy/
+  -> template versionati
+
+tmp/materialized-literature-scenarios/MaGaLiteratureBasedUrbanStudy/<profile>/
+  -> scenario concreto generato dal materializer
+
+tmp/mosaic-25.2/scenarios/MaGaLiteratureBasedUrbanStudy/
+  -> scenario concreto copiato dentro MOSAIC locale per la run
+
+tmp/mosaic-25.2/logs/log-<timestamp>-MaGaLiteratureBasedUrbanStudy/
+  -> evidenza locale della singola esecuzione
+```
+
+Quindi `data/mosaic-scenarios/MaGaLiteratureBasedUrbanStudy/` non deve essere
+letto come scenario gia' eseguibile: e' lo scaffold da cui il materializer
+produce i file concreti.
+
+## Profili disponibili
+
+Profili di densita:
+
+| Profilo | Uso |
+| --- | --- |
+| `low_density` | Variante controllata a densita ridotta. |
+| `nominal` | Profilo calibrato sulla sottorete `candidate_0045`. |
+| `high_density` | Stress profile documentato, non configurazione operativa stabile. |
+
+Profili di durata:
+
+| Profilo | Durata | Uso |
+| --- | ---: | --- |
+| `smoke` | 180 s | Controllo tecnico end-to-end. |
+| `nominal` | 300 s | Test operativo ordinario. |
+| `extended` | 600 s | Verifica piu' lunga della stabilita. |
+
+Nota post-audit: `nominal-smoke-seed-104729` e' lo scenario attualmente
+deployato nel runtime MOSAIC locale. `nominal-extended-seed-104729` risulta
+l'ultimo scenario materializzato per timestamp, ma non va confuso
+automaticamente con lo scenario deployato corrente.
+
+## Workflow principale
+
+Esecuzione completa con materializzazione, deploy, run e report:
 
 ```powershell
 powershell -NoProfile -ExecutionPolicy Bypass `
-  -File .\run_maga_live.ps1
+  -File .\tools\intas-literature-scenario\quick_literature_workflow.ps1 `
+  -Density nominal `
+  -DurationProfile smoke `
+  -Seed 104729 `
+  -ForceRebuild `
+  -PrintDetailedLiveReport `
+  -PrintSummary
 ```
 
-Il comando compila il runtime live, deploya lo scenario
-`MaGaLiveMagaRuntimeStudy`, esegue MOSAIC, produce le trace live e genera un
-riepilogo JSON/Markdown della run sotto:
+Esecuzione di uno scenario gia' materializzato:
 
-```text
-tmp/mosaic-25.2/logs/<run>/live-maga-runtime/
+```powershell
+powershell -NoProfile -ExecutionPolicy Bypass `
+  -File .\tools\intas-literature-scenario\run_literature_scenario.ps1 `
+  -MaterializedScenarioRoot .\tmp\materialized-literature-scenarios\MaGaLiteratureBasedUrbanStudy\nominal-smoke-seed-104729 `
+  -PrintDetailedLiveReport
 ```
 
-La guida operativa completa e':
+Visualizzazione dell'ultimo report locale:
+
+```powershell
+powershell -NoProfile -ExecutionPolicy Bypass `
+  -File .\tools\intas-literature-scenario\show_latest_literature_report.ps1 `
+  -PrintSummary
+```
+
+## Output di run
+
+Ogni run crea una directory locale:
 
 ```text
+tmp/mosaic-25.2/logs/log-<timestamp>-MaGaLiteratureBasedUrbanStudy/
+```
+
+File principali:
+
+```text
+live-maga-runtime/live_run_summary.json
+live-maga-runtime/live_run_summary.md
+live-maga-runtime/literature_smoke_validation.json
+live-maga-runtime/literature_smoke_validation.md
+live-maga-runtime/live-reporting/live_detailed_execution_report.md
+live-maga-runtime/live-reporting/live_detailed_execution_report.json
+```
+
+I log locali sono evidenza dei test, non sorgenti da editare a mano.
+
+## Limiti noti
+
+- `taskCompletionModel = NOT_IMPLEMENTED`: un task rimosso alla deadline non
+  equivale a un task completato con successo.
+- `LiveStrategyApplier` registra la strategia applicata, ma non controlla una
+  reale esecuzione distribuita del task.
+- La banda Cell live deriva da accounting diagnostico controllato, non da una
+  misura scientifica diretta del federate Cell.
+- `high_density` serve come stress profile: puo' mostrare overrun o risultati
+  stale e non deve essere presentato come baseline operativa stabile.
+- I file sotto `tmp/` e `tools/*/out/` sono locali e ignored; non vanno puliti
+  senza una fase dedicata.
+
+## Documentazione
+
+Punto di ingresso operativo:
+
+```text
+README.md
+tools/intas-literature-scenario/README.md
+data/mosaic-scenarios/MaGaLiteratureBasedUrbanStudy/README.md
+```
+
+Documenti vicini allo stato finale:
+
+```text
+data/docs/mosaic-study/14C4_1_persistent_materialization_and_literature_smoke_test.md
+data/docs/mosaic-study/14C4_2_synthetic_calibrated_intas_subscenario.md
+```
+
+Documenti precedenti utili come storico tecnico:
+
+```text
+data/docs/mosaic-study/10_punto_10_sviluppo_completo.md
+data/docs/mosaic-study/11_offline_pipeline_end_to_end_consolidation.md
+data/docs/mosaic-study/13D_live_maga_runtime_bridge_and_overrun_policy.md
+data/docs/mosaic-study/13E_live_bridge_end_to_end_validation.md
 data/docs/mosaic-study/MOSAIC_LIVE_INTEGRATION_AND_EXECUTION_GUIDE.md
 ```
 
-L'obiettivo del progetto e' scegliere, per ogni task generato da un veicolo,
-dove eseguirlo e con quali risorse:
-
-- esecuzione locale sul veicolo sorgente;
-- offloading verso un altro veicolo;
-- offloading verso edge;
-- offloading verso cloud tramite gateway radio attivo.
-
-Il codice lavora su snapshot JSON dello scenario e supporta sia ottimizzazioni
-statiche indipendenti, sia sequenze temporali con finestra adattiva, riuso della
-popolazione e diagnostiche dettagliate.
-
-## Stato attuale
-
-La versione corrente e' riallineata al modello gateway-aware e alla banda
-gerarchica.
-
-Punti principali:
-
-- il cloud operativo e' `STRICT_GATEWAY`: copertura, instabilita' link e rischio
-  handover delle decisioni `CLOUD` derivano dall'access gateway attivo;
-- il vecchio placeholder cloud stabile non e' usato nei report correnti
-  (`legacyPlaceholderEnabled: false`);
-- gli snapshot possono includere gateway, access link e pool di banda tramite
-  `AccessGatewaySnapshot`, `AccessLinkSnapshot` e `BandwidthPoolSnapshot`;
-- la banda e' controllata su due livelli:
-  - limite source-aware del singolo candidato (`candidateId`);
-  - pool condiviso (`poolId`) di tipo `GLOBAL`, `GATEWAY` o `DIRECT_V2V`;
-- il repair aggregato della banda e' implementato e lavora insieme al repair
-  del singolo gene e al repair aggregato CPU;
-- `Dv(k)` misura il churn dei veicoli, mentre `Dl(k)` misura la variazione della
-  qualita' dell'access link attivo;
-- il prefilter dei candidati rimuove candidati non utilizzabili e mantiene nello
-  snapshot filtrato gateway, access link e pool di banda.
-
-## Cosa ottimizza MA-GA
-
-Una soluzione e' rappresentata come un cromosoma. Ogni gene descrive la scelta
-per un singolo task:
-
-- candidato selezionato;
-- quota di offloading `p`;
-- CPU assegnata;
-- banda assegnata.
-
-La fitness minimizza una combinazione di:
-
-- tempo di completamento;
-- latenza comunicativa complessiva;
-- penalita' mobility-aware;
-- uso e pressione di CPU e banda;
-- violazioni residue di deadline.
-
-Se il repair non trova una scelta che rispetti la deadline tra le alternative
-valutate, la decisione puo' essere marcata come `DEGRADED_BEST_EFFORT`. Questa
-etichetta indica un esito di repair limitato e degradato, non una prova di
-infeasibilita' globale del task.
-
-## Funzionalita'
-
-- GA snapshot-based con inizializzazione, selezione, crossover, mutazione,
-  elitismo, repair e fitness dettagliata.
-- Scaling adattivo dei parametri GA in base allo snapshot.
-- Vincoli e repair per deadline, coverage, CPU aggregata, banda per-link e
-  banda per-pool.
-- Gestione temporale con `TemporalWindowManager`, finestra adattiva e riuso
-  della popolazione.
-- Replay JSON in due modalita':
-  - `JSON_TIME`, indicizzato sul tempo logico richiesto dal manager;
-  - `JSON_SEQUENCE`, replay ordinale utile per diagnosi riproducibili.
-- Profilo runtime della finestra:
-  - `OBSERVED_RUNTIME`, usa il runtime GA osservato nella finestra precedente;
-  - `CONFIGURED_RUNTIME`, usa una stima configurata e riproducibile.
-- Diagnostiche per deadline, best-effort degradato, gateway cloud, access link,
-  banda gerarchica, mobilita', latenza, finestra adattiva, sorgente temporale,
-  prefilter e riuso della popolazione.
-
-## Struttura
-
-```text
-src/
-  app/                 entry point eseguibili
-  config/              pesi, soglie, parametri GA, mobilita' e finestra
-  ga/                  algoritmo genetico, fitness, vincoli e operatori
-  io/                  loader JSON e report diagnostici
-  model/               snapshot, nodi, geni, offloading, banda e mobilita'
-  validation/          validazione degli snapshot e invarianti
-  window/              sorgenti temporali, dinamicita', riuso e timing
-
-data/
-  snapshots/           dataset JSON inclusi
-  docs/                documentazione tecnica e guide di lettura
-```
-
-## Entry point
-
-Il progetto e' un modulo Java per IntelliJ IDEA. Richiede Java 21 e Jackson
-Databind configurato nel progetto. Non e' presente un wrapper Maven o Gradle:
-il modo piu' diretto per eseguire i main e' una Run Configuration di IntelliJ.
-
-### Finestra adattiva
-
-Main class:
-
-```text
-app.AdaptiveWindowMain
-```
-
-Uso:
-
-```text
-AdaptiveWindowMain [sourceMode] [runtimeProfile] [folder] [maxSteps]
-```
-
-Argomenti:
-
-- `sourceMode`: `JSON_TIME`, `JSON_SEQUENCE`; il flusso `MOSAIC_LIVE` e'
-  esercitato dal tool runtime live tramite `MosaicSystemStateSource` e un
-  `MosaicSnapshotBridge` concreto esterno al main CLI;
-- `runtimeProfile`: `OBSERVED_RUNTIME` o `CONFIGURED_RUNTIME`;
-- `folder`: cartella di snapshot temporali;
-- `maxSteps`: numero massimo di finestre da eseguire.
-
-Esempio diagnostico completo sullo scenario piu' ricco:
-
-```text
-JSON_SEQUENCE CONFIGURED_RUNTIME data/snapshots/temporal/scenarios/comprehensive_dynamic_validation 27
-```
-
-Esempio operativo indicizzato sul tempo:
-
-```text
-JSON_TIME OBSERVED_RUNTIME data/snapshots/temporal/scenarios/urban_realistic_dynamic_calibrated 8
-```
-
-Note per replay JSON offline:
-
-- uno snapshot con `tasks=[]` e `candidateNodes=[]` e' una finestra vuota
-  valida; l'optimizer restituisce `EMPTY_TASK_SET`, fitness `0.0` e non avvia
-  il ciclo genetico;
-- `JSON_TIME` parte dal primo timestamp realmente disponibile nella cartella
-  caricata, non da un'origine temporale sintetica a `0.0 s`;
-- `TimeIndexedSnapshotReplaySource` conserva la semantica no-look-ahead: una
-  richiesta precedente al primo snapshot restituisce `Optional.empty()`;
-- `JSON_SEQUENCE` continua a consumare ordinalmente anche una finestra vuota.
-- i report diagnostici supportano veicoli senza access link attivo: in assenza
-  di gateway la qualita' accesso e' `q_v(k)=0`, distanza e `phiLink` sono
-  renderizzati come `-`, e perdita copertura, recupero copertura e handover
-  sono distinti;
-- il riepilogo cloud separa il conteggio dei link del primo snapshot dagli
-  aggregati dell'intera run, evitando di trattare una finestra vuota iniziale
-  come rappresentativa della copertura globale.
-
-Validazione del replay MOSAIC generato:
-
-- `JSON_SEQUENCE` valida l'esecuzione ordinale end-to-end: ogni file JSON viene
-  consumato nella sequenza ordinata;
-- `JSON_TIME` valida la causalita' temporale con lookup
-  `latest <= requestedTime` fino all'orizzonte finale realmente disponibile;
-- lo stop ordinario della validazione temporale e'
-  `FULL_TIME_HORIZON_REACHED`;
-- `SAFETY_MAX_STEPS_REACHED` e' solo un guardrail e non rappresenta una
-  condizione di successo.
-
-### Pipeline offline MOSAIC -> MA-GA
-
-La pipeline offline MOSAIC -> stream diagnostici -> `SystemSnapshot` JSON ->
-replay resta disponibile come materiale regressivo archiviato. Il tool storico
-si trova in:
-
-```text
-archive/regression-tools/mosaic-offline-exporter/
-```
-
-Il comando storico era:
-
-```powershell
-powershell -NoProfile -ExecutionPolicy Bypass `
-  -File .\archive\regression-tools\mosaic-offline-exporter\run_offline_pipeline.ps1 `
-  -RepoRoot "." `
-  -MosaicRoot ".\tmp\mosaic-25.2" `
-  -ScenarioName "MaGaIntegratedStudy" `
-  -SourceRun "log-20260604-220216-MaGaIntegratedStudy" `
-  -SimulationStartSeconds 0 `
-  -SimulationEndSeconds 180 `
-  -WindowIntervalSeconds 5 `
-  -SafetyMaxSteps 100000 `
-  -CleanGeneratedOutputs `
-  -VerifyDeterminism
-```
-
-L'orchestratore consuma una run MOSAIC gia' disponibile, rigenera gli artefatti
-offline, valida gli snapshot con Java, esegue `JSON_SEQUENCE` e valida
-`JSON_TIME` fino a `FULL_TIME_HORIZON_REACHED`. Produce manifest con SHA-256,
-log per stage e diagnostiche storiche ora conservate in
-`archive/generated-offline-artifacts/diagnostics-history/`.
-
-Il bridge live MOSAIC e' stato implementato e validato nelle Fasi 13D-13E in
-uno scenario runtime isolato. Restano aperti i warning sperimentali: strategy
-application diagnostica, banda Cell diagnostica da accounting controllato,
-scenario non ancora calibrato per offloading non locale e calibrazione
-scientifica ancora necessaria.
-
-### Fase 12 - design bridge live
-
-La Fase 11 offline e' completata sulla baseline
-`log-20260604-220216-MaGaIntegratedStudy`. La Fase 12 ha completato il design
-architetturale del bridge live MOSAIC -> SystemSnapshot -> MA-GA, documentando
-API MOSAIC verificate, cache causali, policy snapshot, gestione task pendenti e
-overrun GA su `DeltaT_max`. Il design e' stato poi realizzato in modo
-diagnostico e isolato nelle sottofasi 13A-13E.
-
-### Fase 13A - probe runtime MOSAIC
-
-La Fase 13A introduce lo scenario isolato `MaGaLiveBridgeProbe` e il tool
-`tools/mosaic-live-api-probe/` per validare lifecycle MOSAIC, tick periodici su
-server coordinator, `simulationTime`, vehicle update, projected position,
-speed e stato radio ad-hoc locale. La validazione produce
-`data/mosaic-study/diagnostics/phase_13a_live_api_probe_validation.json`.
-Il bridge live, le cache, l'assembler snapshot e MA-GA live non sono ancora
-implementati; la prossima sottofase e' la 13B.
-
-### Fase 13B - live state layer LOCAL/V2V
-
-La Fase 13B introduce lo scenario isolato `MaGaLiveStateLayerStudy` e il tool
-`tools/mosaic-live-state-layer/`. Il runtime mantiene una cache causale di
-veicoli e task diagnostici, carica infrastruttura statica di base e produce
-preview CSV per candidati `LOCAL`, candidati `VEHICLE` direct single-hop e pool
-`DIRECT_V2V`. La validazione produce
-`data/mosaic-study/diagnostics/phase_13b_live_state_layer_validation.json`.
-Cell live, EDGE/CLOUD, `SystemSnapshot`, bridge concreto e MA-GA live restano
-fuori scope; la prossima sottofase e' la 13C.
-
-### Fase 13C - live infrastructure e snapshot JSON
-
-La Fase 13C introduce lo scenario isolato
-`MaGaLiveInfrastructureSnapshotStudy` estendendo
-`tools/mosaic-live-state-layer/`. Il runtime aggiunge accounting Cell
-diagnostico causale, bucket safe-after-timestamp, access link RSU geometrici,
-pool `GATEWAY`, candidati `EDGE`/`CLOUD` e snapshot JSON live compatibili con
-`JsonSnapshotFolderLoader` e `SnapshotValidator`. La validazione produce
-`data/mosaic-study/diagnostics/phase_13c_live_infrastructure_snapshot_validation.json`.
-La banda Cell resta diagnostica, non una misura diretta del federate; bridge
-concreto, `TemporalWindowManager` live e MA-GA live restano fuori scope.
-
-### Fase 13D - bridge MA-GA operativo live
-
-La Fase 13D introduce lo scenario isolato `MaGaLiveMagaRuntimeStudy` e il tool
-`tools/mosaic-live-maga-runtime/`. Il runtime usa un
-`MosaicSnapshotBridge` concreto, la `MosaicSystemStateSource` esistente, il
-`TemporalWindowManager` invariato e un worker single-thread per eseguire MA-GA
-su snapshot live causali costruiti in memoria. Produce trace runtime locali e
-la diagnostica
-`data/mosaic-study/diagnostics/phase_13d_live_maga_runtime_validation.json`.
-La strategy application resta diagnostica: task execution reale, migrazione,
-checkpoint e scenario finale realistico restano fuori scope per le fasi
-successive.
-
-### Fase 13E - validazione finale bridge live
-
-La Fase 13E stabilizza il bridge live e conclude la Fase 13. Il runtime ora
-rileva `WAIT_CAP_REACHED` durante `GA_RUNNING`, calcolando `DeltaT_max` prima
-della submission tramite `TemporalWindowBoundsCalculator.compute(...)`; i
-risultati tardivi sono scartati, la strategia precedente resta attiva e viene
-richiesta una fresh reoptimization. La diagnostica separa
-`futurePoolViolations` da `invalidPoolBandwidthViolations` e valida copie JSON
-degli snapshot pubblicati con `JsonSnapshotFolderLoader` e `SnapshotValidator`.
-La validazione produce
-`data/mosaic-study/diagnostics/phase_13e_live_bridge_end_to_end_validation.json`
-con `phase13Status = COMPLETED` e `readyForCalibration = true`.
-
-### Batch statico GA
-
-Main class:
-
-```text
-app.GaBatchMain
-```
-
-Uso:
-
-```text
-GaBatchMain [snapshotFolder] [--details]
-```
-
-Esempio sugli scenari statici presenti:
-
-```text
-data/snapshots/ga/scenarios --details
-```
-
-Ogni snapshot viene trattato come scenario indipendente: la popolazione finale
-di uno snapshot non viene riusata nel successivo.
-
-## Dataset inclusi
-
-Gli snapshot sono divisi in due famiglie:
-
-- `data/snapshots/ga`: scenari statici per confrontare il GA;
-- `data/snapshots/temporal`: sequenze temporali per la finestra adattiva.
-
-Scenari temporali principali:
-
-- `data/snapshots/temporal/scenarios/comprehensive_dynamic_validation`;
-- `data/snapshots/temporal/scenarios/gateway_cloud_validation`;
-- `data/snapshots/temporal/scenarios/static_baseline`;
-- `data/snapshots/temporal/scenarios/urban_moderate`;
-- `data/snapshots/temporal/scenarios/urban_realistic_dynamic_calibrated`.
-
-Lo scenario piu' utile per controllare il comportamento corrente di gateway,
-access link, deadline, banda gerarchica, mobilita' e finestra adattiva e':
-
-```text
-data/snapshots/temporal/scenarios/comprehensive_dynamic_validation
-```
-
-## Come leggere i report
-
-Il report di `AdaptiveWindowMain` e' composto da molte sezioni. La lettura
-consigliata e':
-
-1. `EXECUTIVE SUMMARY`;
-2. `WORST WINDOWS`;
-3. sezioni deadline e `DEGRADED_BEST_EFFORT`;
-4. sezioni latenza comunicativa;
-5. sezioni banda link/pool;
-6. sezioni gateway cloud, access link e mobilita';
-7. sezioni finestra adattiva, sorgente temporale, riuso popolazione e prefilter.
-
-La guida completa alla lettura e' in:
-
-```text
-data/docs/guida_lettura_report_maga.md
-```
-
-Il riallineamento dei risultati correnti rispetto ai report storici e' in:
-
-```text
-data/docs/actual_results.md
-```
-
-## Interpretazione dello scenario completo
-
-Nel run diagnostico completo su
-`comprehensive_dynamic_validation`, il sistema mostra il comportamento atteso
-per molte parti del modello:
-
-- cloud gateway-aware attivo;
-- placeholder cloud disabilitato;
-- prefilter operativo;
-- repair CPU efficace;
-- repair banda gerarchico efficace;
-- nessuna violazione finale di coverage nello scenario analizzato.
-
-Il problema residuo principale emerso dal report completo e' sulle deadline in
-finestre severe: alcune decisioni cloud parziali restano in
-`DEGRADED_BEST_EFFORT` per latenza di upload troppo alta. In quei casi le
-violazioni non sono causate da coverage insufficiente o da violazione formale
-del pool di banda; il collo di bottiglia e' spesso il link cloud per-candidato.
-
-## Limiti ancora aperti
-
-- La strategy application del bridge live resta diagnostica e non controlla
-  ancora l'esecuzione reale dei task.
-- La banda Cell live resta accounting diagnostico runtime da messaggi
-  controllati, non misura diretta scientifica del federate Cell.
-- Task execution reale, live migration, checkpoint, ripresa upload/download e
-  persistenza remota restano fuori scope.
-- Lo scenario live non e' ancora calibrato per stressare offloading non locale.
-- La calibrazione scientifica di CPU, banda V2V, workload e scenario resta
-  necessaria.
-- Il modello V2V usa distanza euclidea e velocita' relativa scalare
-  `abs(v_source - v_target)`, senza vettori di traiettoria o heading.
-- Il repair best-effort valuta un insieme limitato di alternative: non dimostra
-  infeasibilita' globale.
-- In scenari con finestre molto corte, il runtime osservato del GA puo' superare
-  la finestra logica; l'integrazione live ora applica la policy
-  `DEFER_NEXT_WINDOW_UNTIL_GA_COMPLETES_CAPPED_BY_DELTA_T_MAX`.
-- `FULL_OFFLOADING` puo' non comparire in alcuni scenari: se e' atteso, vanno
-  controllate inizializzazione, mutazione e repair di `offloadingRatio`.
-
-## Documentazione tecnica
-
-Documentazione estesa del codice:
-
-```text
-data/docs/documentazione_completa_codice_maga.md
-```
-
-Documentazione architetturale in LaTeX:
-
-```text
-data/docs/documentazione_architettura_maga.tex
-```
-
-Guida consigliata per orientarsi nel codice:
-
-1. `model.snapshot`, `model.node`, `model.bandwidth` e `model.genetic`;
-2. `model.offloading` e `model.mobility`;
-3. `ga.constraints` e `ga.operators`;
-4. `ga.fitness.FitnessEvaluator`;
-5. `ga.core.MaGaOptimizer`;
-6. `window.core.TemporalWindowManager`;
-7. `io.reporting`.
+La pipeline offline MOSAIC -> CSV -> `SystemSnapshot` JSON -> replay resta
+disponibile come materiale regressivo, ma non e' il percorso ordinario dello
+scenario finale.

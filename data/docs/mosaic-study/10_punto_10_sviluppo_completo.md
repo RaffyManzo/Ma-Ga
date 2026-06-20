@@ -1,5 +1,10 @@
 # Punto 10 - Sviluppo completo della pipeline offline MOSAIC -> MA-GA
 
+> Nota post-audit 2026-06-14: questo documento descrive la pipeline offline e
+> il replay JSON costruiti prima dello scenario live finale
+> `MaGaLiteratureBasedUrbanStudy`. Resta materiale regressivo e storico. Non
+> va usato come descrizione primaria del workflow finale live-state/runtime.
+
 ## Scopo del documento
 
 Questo documento accorpa la documentazione delle sottofasi del Punto 10, dalla
