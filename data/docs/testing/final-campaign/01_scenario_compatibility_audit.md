@@ -6,7 +6,7 @@
 - Commit congelato verificato: 5a9477735a3d707a5f000a64653cd2a6fc7f2007
 - Branch di lavoro preparato: testing/final-campaign
 - Workbook analizzato: C:/Users/raffa/Downloads/Matrice_test_MA_GA_MOSAIC_SUMO_Fase0_completa.xlsx
-- Stato: pianificazione/audit soltanto; nessuno scenario generato, nessuna simulazione eseguita, nessun codice modificato.
+- Stato iniziale prima dell'esecuzione di G00: pianificazione/audit soltanto; nessuno scenario generato, nessuna simulazione eseguita, nessun codice modificato.
 
 | Oggetto | Atteso | Reale | Esito |
 | --- | --- | --- | --- |
@@ -56,7 +56,7 @@
 | gaParameterScalingMode | ma_ga_live_runtime_config.gaParameterScalingMode | STATIC baseline; loader accepts STATIC/ADAPTIVE | runtime supports it, current materializer/validator enforce STATIC for canonical materializations |
 | diagnosticArtificialGaDelayMs | ma_ga_live_runtime_config.diagnosticArtificialGaDelayMs | 0 | supported by runtime config loader |
 
-## Classification summary
+## Classification summary - Stato iniziale prima dell'esecuzione di G00
 
 | Classificazione | Conteggio |
 | --- | --- |
@@ -66,7 +66,7 @@
 | READY_EXISTING_TOOLING | 7 |
 | REQUIRES_DECISION | 6 |
 
-## Classification by Config_ID
+## Classification by Config_ID - Stato iniziale prima dell'esecuzione di G00
 
 | Config_ID | Classification | Materializable | Instances | Supported parameters | Unsupported/risks | Decision required | Notes |
 | --- | --- | --- | --- | --- | --- | --- | --- |
@@ -101,7 +101,7 @@
 | CFG-G-ADAPTIVE | NEEDS_TEST_TOOLING_EXTENSION | yes | 1 | density; durationProfile; mobility seed; runtime gaParameterScalingMode supported by loader | current materializer/validators enforce gaParameterScalingMode=STATIC for canonical scenarios | no | lambda=1; weights=0.25/0.3/0.45; multipliers cpu=1/1/1/1, cell=1, v2v=1, range=1, rtt=1; ga=ADAPTIVE, delayMs=0 |
 | CFG-G-STALE | READY_CONFIG_ONLY | yes | 1 | density; durationProfile; mobility seed; workloadGeneration.arrivalRateTasksPerSecondPerActiveVehicle; workloadGeneration.profiles[].weight; diagnosticArtificialGaDelayMs | none known for frozen core | no | lambda=1; weights=0.5/0.35/0.15; multipliers cpu=1/1/1/1, cell=1, v2v=1, range=1, rtt=1; ga=STATIC, delayMs=300 |
 
-## Key risks and decisions
+## Key risks and decisions - Stato iniziale prima dell'esecuzione di G00
 
 - workloadGeneration.randomSeed is a real runtime field, but current materializer --seed does not propagate into it. Multi-seed campaign tooling should patch it or explicitly document that only mobility demand varies by seed.
 - Route focus labels such as BACKGROUND_DOMINANT, RSU_0_ONLY, DUAL_RSU_SWITCH_DOMINANT and BACKGROUND_AND_DUAL do not yet map to concrete route family counts. These configurations are marked REQUIRES_DECISION.
@@ -112,3 +112,9 @@
 ## No-code-change boundary
 
 No core MA-GA file, Java MOSAIC runtime class, formalization, existing script behavior or .gitignore is modified by this subphase. This audit only records what future tooling may need to do on testing/final-campaign.
+
+## G00 Campaign Tooling Resolution
+
+Stato iniziale prima dell'esecuzione di G00: le configurazioni route dirette e `CFG-G-ADAPTIVE` richiedevano tooling di campagna dedicato.
+
+Stato corrente post-G00/G00F: le decisioni route-family sono chiuse tramite profili diretti nel campaign spec; `CFG-G-ADAPTIVE` resta non canonica ed e accettata solo dal validator di campagna. Le classificazioni correnti sono: NON_MATERIALIZABLE=2, READY_CONFIG_ONLY=20, READY_EXISTING_TOOLING=8, REQUIRES_DECISION=0, NEEDS_TEST_TOOLING_EXTENSION=0. Sono stati materializzati 69 scenari; MOSAIC non e stato eseguito; G00 e tecnicamente completata e l'audit e stato normalizzato in G00F.

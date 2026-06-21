@@ -1,0 +1,1505 @@
+{
+  "blockedMaterializations": 0,
+  "campaignSeedCount": 5,
+  "cleanup": {},
+  "completedMaterializations": 69,
+  "configCounts": {
+    "CFG-G-ADAPTIVE": 1,
+    "CFG-G-SPARSE": 1,
+    "CFG-G-STALE": 1,
+    "CFG-H-E": 5,
+    "CFG-H-I": 5,
+    "CFG-H-S": 5,
+    "CFG-H-S-EXT": 1,
+    "CFG-L-E": 5,
+    "CFG-L-I": 5,
+    "CFG-L-S": 5,
+    "CFG-M-BACKGROUND": 1,
+    "CFG-M-RSU0": 1,
+    "CFG-M-RSU1": 1,
+    "CFG-M-SWITCH": 1,
+    "CFG-M-V2V": 1,
+    "CFG-N-E": 5,
+    "CFG-N-I": 5,
+    "CFG-N-I-EXT": 5,
+    "CFG-N-S": 5,
+    "CFG-R-CELLBW": 1,
+    "CFG-R-CLOUDCPU": 1,
+    "CFG-R-EDGECPU": 1,
+    "CFG-R-LOCALCPU": 1,
+    "CFG-R-RTT": 1,
+    "CFG-R-V2VBW": 1,
+    "CFG-REPRO": 2,
+    "CFG-RUNTIME-REPEAT": 1,
+    "CFG-SMOKE": 1
+  },
+  "failedMaterializations": 0,
+  "groupCounts": {
+    "G01": 1,
+    "G02": 45,
+    "G03": 9,
+    "G04": 5,
+    "G05": 6,
+    "G06": 3
+  },
+  "intermediateAnomalies": [
+    {
+      "config_id": "CFG-SMOKE",
+      "evidence_id": "EV-G00-RECOVERED-INTERMEDIATE-STATUSES",
+      "expected": "Final G00 materialization is validated or warning-only after tooling correction.",
+      "group_id": "G01",
+      "materialization_id": "MAT-CFG-SMOKE-104729",
+      "notes": "Recovered from G00F pre-normalization audit observation and archived G00 context.",
+      "observed": "Recovered G00 pilot/history attempt recorded status=FAILED_MATERIALIZATION"
+    },
+    {
+      "config_id": "CFG-SMOKE",
+      "evidence_id": "EV-G00-RECOVERED-INTERMEDIATE-STATUSES",
+      "expected": "Final G00 materialization is validated or warning-only after tooling correction.",
+      "group_id": "G01",
+      "materialization_id": "MAT-CFG-SMOKE-104729",
+      "notes": "Recovered from G00F pre-normalization audit observation and archived G00 context.",
+      "observed": "Recovered G00 pilot/history attempt recorded status=BLOCKED"
+    },
+    {
+      "config_id": "CFG-SMOKE",
+      "evidence_id": "EV-G00-RECOVERED-INTERMEDIATE-STATUSES",
+      "expected": "Final G00 materialization is validated or warning-only after tooling correction.",
+      "group_id": "G01",
+      "materialization_id": "MAT-CFG-SMOKE-104729",
+      "notes": "Recovered from G00F pre-normalization audit observation and archived G00 context.",
+      "observed": "Recovered G00 pilot/history attempt recorded status=FAILED_VALIDATION"
+    },
+    {
+      "config_id": "CFG-N-E",
+      "evidence_id": "EV-G00-RECOVERED-INTERMEDIATE-STATUSES",
+      "expected": "Final G00 materialization is validated or warning-only after tooling correction.",
+      "group_id": "G02",
+      "materialization_id": "MAT-CFG-N-E-104729",
+      "notes": "Recovered from G00F pre-normalization audit observation and archived G00 context.",
+      "observed": "Recovered G00 pilot/history attempt recorded status=BLOCKED"
+    },
+    {
+      "config_id": "CFG-N-I",
+      "evidence_id": "EV-G00-RECOVERED-INTERMEDIATE-STATUSES",
+      "expected": "Final G00 materialization is validated or warning-only after tooling correction.",
+      "group_id": "G02",
+      "materialization_id": "MAT-CFG-N-I-104729",
+      "notes": "Recovered from G00F pre-normalization audit observation and archived G00 context.",
+      "observed": "Recovered G00 pilot/history attempt recorded status=BLOCKED"
+    },
+    {
+      "config_id": "CFG-M-SWITCH",
+      "evidence_id": "EV-G00-RECOVERED-INTERMEDIATE-STATUSES",
+      "expected": "Final G00 materialization is validated or warning-only after tooling correction.",
+      "group_id": "G04",
+      "materialization_id": "MAT-CFG-M-SWITCH-104729",
+      "notes": "Recovered from G00F pre-normalization audit observation and archived G00 context.",
+      "observed": "Recovered G00 pilot/history attempt recorded status=BLOCKED"
+    },
+    {
+      "config_id": "CFG-R-CELLBW",
+      "evidence_id": "EV-G00-RECOVERED-INTERMEDIATE-STATUSES",
+      "expected": "Final G00 materialization is validated or warning-only after tooling correction.",
+      "group_id": "G05",
+      "materialization_id": "MAT-CFG-R-CELLBW-104729",
+      "notes": "Recovered from G00F pre-normalization audit observation and archived G00 context.",
+      "observed": "Recovered G00 pilot/history attempt recorded status=BLOCKED"
+    },
+    {
+      "config_id": "CFG-G-ADAPTIVE",
+      "evidence_id": "EV-G00-RECOVERED-INTERMEDIATE-STATUSES",
+      "expected": "Final G00 materialization is validated or warning-only after tooling correction.",
+      "group_id": "G06",
+      "materialization_id": "MAT-CFG-G-ADAPTIVE-104729",
+      "notes": "Recovered from G00F pre-normalization audit observation and archived G00 context.",
+      "observed": "Recovered G00 pilot/history attempt recorded status=BLOCKED"
+    },
+    {
+      "config_id": "CFG-M-RSU1",
+      "evidence_id": "EV-G00-RECOVERED-INTERMEDIATE-STATUSES",
+      "expected": "Final G00 materialization is validated or warning-only after tooling correction.",
+      "group_id": "G04",
+      "materialization_id": "MAT-CFG-M-RSU1-104729",
+      "notes": "Recovered from G00F pre-normalization audit observation and archived G00 context.",
+      "observed": "Recovered G00 pilot/history attempt recorded status=FAILED_MATERIALIZATION"
+    }
+  ],
+  "overallStatus": "COMPLETED",
+  "plannedMaterializations": 69,
+  "repro": {
+    "comparison": "CFG-REPRO",
+    "leftMaterializationId": "MAT-CFG-REPRO-104729-A",
+    "leftRoot": "tmp/materialized-literature-scenarios/final-test-campaign/G03_reproducibility_duration/CFG-REPRO/104729/A",
+    "logicalComparison": {
+      "comparedArtifactCount": 22,
+      "differentArtifactCount": 0,
+      "differentArtifacts": [],
+      "excludedArtifacts": [
+        {
+          "path": "_campaign_logs/campaign_builder_stdout.log",
+          "reason": "documentary nondeterministic log artifact"
+        },
+        {
+          "path": "application/scenario-convert-command.log",
+          "reason": "documentary nondeterministic log artifact"
+        },
+        {
+          "path": "application/scenario-convert.log",
+          "reason": "documentary nondeterministic log artifact"
+        }
+      ],
+      "status": "LOGICALLY_IDENTICAL"
+    },
+    "normalizationRules": [
+      "Normalize ISO-like timestamps and generated-at metadata.",
+      "Normalize absolute repository paths and destination directories.",
+      "Normalize Materialization_ID A/B identifiers.",
+      "Exclude purely documentary nondeterministic fields from JSON manifests and validation reports.",
+      "Normalize the temporal header generated by SUMO in XML artifacts.",
+      "Exclude documentary command logs from logical comparison only; raw comparison still lists them.",
+      "Do not normalize route XML vehicle sequences, scenario configuration values, topology bodies, database bytes, or substantive numeric parameters."
+    ],
+    "rawComparison": {
+      "comparedArtifactCount": 25,
+      "differentArtifactCount": 9,
+      "differentArtifacts": [
+        {
+          "equal": false,
+          "leftSha256": "c4d18c16afc27dac464dacc2089f04f13f109c789b30aa396fb320b0abe0bb3c",
+          "path": "_campaign_logs/campaign_builder_stdout.log",
+          "rightSha256": "a21392c751eb4d83f06bdcc378536c128a9f7d77facc81f3efe70b30113fe511"
+        },
+        {
+          "equal": false,
+          "leftSha256": "70740c2469a4cf03e8d8fb059e8252e86ef02cf19a2e35ef4f910bad0398199b",
+          "path": "application/scenario-convert-command.log",
+          "rightSha256": "ad3b72b650d0f4151dd13005db3722c3d6f5a0b2663f5d74d1dec8c9d3a1b867"
+        },
+        {
+          "equal": false,
+          "leftSha256": "84f18c391cc7e548f6ca9d08d1b020cb9e300c504c95ec50b815b74a722ebde5",
+          "path": "application/scenario-convert.log",
+          "rightSha256": "cbb6d3b0bfbe9347075c12d2802424c3de249be770efa68d9fb95a4a0474cd01"
+        },
+        {
+          "equal": false,
+          "leftSha256": "d46cf717d9615a5e224589dddf6df48e9e63204543a66e6a4e29530b74b0a043",
+          "path": "final_campaign_manifest.json",
+          "rightSha256": "7b2787475fb44354c2e49669df1ccef2c85e6b0ee25d3d8c530f43e39970f2b1"
+        },
+        {
+          "equal": false,
+          "leftSha256": "070d0e713b595f586b8f09295842ed7c87b3ff887f9f5914dfc88afe72cb82ae",
+          "path": "materialization_manifest.json",
+          "rightSha256": "de90102a97d270cebbeb86d489d679ca8f12b49c57d7786aa2da3ba14170b33e"
+        },
+        {
+          "equal": false,
+          "leftSha256": "e09f32684c9cb176a86156adf5cc2a319d69880cbe9d05bf66f03cb8c084c14e",
+          "path": "reports/final_campaign_validation_report.json",
+          "rightSha256": "3f8a429b10ff98da28fcf700130ff02d2fc4a05967e518d8b6e9ec9b97d1f17b"
+        },
+        {
+          "equal": false,
+          "leftSha256": "87672e538ef70bc1ccaa22f767bcf869157a1fcdabfd294288eb51d5862b31ea",
+          "path": "reports/intas_literature_materialization_report.json",
+          "rightSha256": "5af910b9ca78587e073a32e9b845401e48a0b2119b0e719c2c83ca93678e2310"
+        },
+        {
+          "equal": false,
+          "leftSha256": "4d50e16cf384bf855dd62fb588a32bc5ca8cf5192c0ba28dc55f0189f50054bd",
+          "path": "reports/literature_configuration_validation.json",
+          "rightSha256": "cfc68826fb7e0e823281e197729c0983f6410826b664a64355287b5cc9ac4b48"
+        },
+        {
+          "equal": false,
+          "leftSha256": "a4f1373b800b8e4d6b68f6ca7e37a8bfbf6c734ae5685d7a70c0cbf7b3f76dcf",
+          "path": "sumo/intas_literature_urban.net.xml",
+          "rightSha256": "189effb3a18d3caab6b9f583c75d1199d54074b2085c3d85a014d357b65065c4"
+        }
+      ],
+      "status": "DIFFERENT"
+    },
+    "rightMaterializationId": "MAT-CFG-REPRO-104729-B",
+    "rightRoot": "tmp/materialized-literature-scenarios/final-test-campaign/G03_reproducibility_duration/CFG-REPRO/104729/B"
+  },
+  "results": [
+    {
+      "configId": "CFG-SMOKE",
+      "errors": [],
+      "groupId": "G01",
+      "manifestPath": "tmp/materialized-literature-scenarios/final-test-campaign/G01_pipeline_validation/CFG-SMOKE/104729/final_campaign_manifest.json",
+      "materializationId": "MAT-CFG-SMOKE-104729",
+      "metrics": {
+        "databasePresent": true,
+        "emergencyBrakingMentions": 0,
+        "sumoErrors": 0,
+        "teleportMentions": 0,
+        "vehicleCount": 50
+      },
+      "status": "MATERIALIZED_VALIDATED",
+      "targetDirectory": "tmp/materialized-literature-scenarios/final-test-campaign/G01_pipeline_validation/CFG-SMOKE/104729",
+      "validationReport": "tmp/materialized-literature-scenarios/final-test-campaign/G01_pipeline_validation/CFG-SMOKE/104729/reports/final_campaign_validation_report.json",
+      "warnings": []
+    },
+    {
+      "configId": "CFG-REPRO",
+      "errors": [],
+      "groupId": "G03",
+      "manifestPath": "tmp/materialized-literature-scenarios/final-test-campaign/G03_reproducibility_duration/CFG-REPRO/104729/A/final_campaign_manifest.json",
+      "materializationId": "MAT-CFG-REPRO-104729-A",
+      "metrics": {
+        "databasePresent": true,
+        "emergencyBrakingMentions": 0,
+        "sumoErrors": 0,
+        "teleportMentions": 0,
+        "vehicleCount": 100
+      },
+      "status": "MATERIALIZED_VALIDATED",
+      "targetDirectory": "tmp/materialized-literature-scenarios/final-test-campaign/G03_reproducibility_duration/CFG-REPRO/104729/A",
+      "validationReport": "tmp/materialized-literature-scenarios/final-test-campaign/G03_reproducibility_duration/CFG-REPRO/104729/A/reports/final_campaign_validation_report.json",
+      "warnings": []
+    },
+    {
+      "configId": "CFG-REPRO",
+      "errors": [],
+      "groupId": "G03",
+      "manifestPath": "tmp/materialized-literature-scenarios/final-test-campaign/G03_reproducibility_duration/CFG-REPRO/104729/B/final_campaign_manifest.json",
+      "materializationId": "MAT-CFG-REPRO-104729-B",
+      "metrics": {
+        "databasePresent": true,
+        "emergencyBrakingMentions": 0,
+        "sumoErrors": 0,
+        "teleportMentions": 0,
+        "vehicleCount": 100
+      },
+      "status": "MATERIALIZED_VALIDATED",
+      "targetDirectory": "tmp/materialized-literature-scenarios/final-test-campaign/G03_reproducibility_duration/CFG-REPRO/104729/B",
+      "validationReport": "tmp/materialized-literature-scenarios/final-test-campaign/G03_reproducibility_duration/CFG-REPRO/104729/B/reports/final_campaign_validation_report.json",
+      "warnings": []
+    },
+    {
+      "configId": "CFG-RUNTIME-REPEAT",
+      "errors": [],
+      "groupId": "G03",
+      "manifestPath": "tmp/materialized-literature-scenarios/final-test-campaign/G03_reproducibility_duration/CFG-RUNTIME-REPEAT/104729/final_campaign_manifest.json",
+      "materializationId": "MAT-CFG-RUNTIME-REPEAT-104729",
+      "metrics": {
+        "databasePresent": true,
+        "emergencyBrakingMentions": 0,
+        "sumoErrors": 0,
+        "teleportMentions": 0,
+        "vehicleCount": 100
+      },
+      "status": "MATERIALIZED_VALIDATED",
+      "targetDirectory": "tmp/materialized-literature-scenarios/final-test-campaign/G03_reproducibility_duration/CFG-RUNTIME-REPEAT/104729",
+      "validationReport": "tmp/materialized-literature-scenarios/final-test-campaign/G03_reproducibility_duration/CFG-RUNTIME-REPEAT/104729/reports/final_campaign_validation_report.json",
+      "warnings": []
+    },
+    {
+      "configId": "CFG-L-E",
+      "errors": [],
+      "groupId": "G02",
+      "manifestPath": "tmp/materialized-literature-scenarios/final-test-campaign/G02_main_factorial_experiments/CFG-L-E/104729/final_campaign_manifest.json",
+      "materializationId": "MAT-CFG-L-E-104729",
+      "metrics": {
+        "databasePresent": true,
+        "emergencyBrakingMentions": 0,
+        "sumoErrors": 0,
+        "teleportMentions": 0,
+        "vehicleCount": 58
+      },
+      "status": "MATERIALIZED_VALIDATED",
+      "targetDirectory": "tmp/materialized-literature-scenarios/final-test-campaign/G02_main_factorial_experiments/CFG-L-E/104729",
+      "validationReport": "tmp/materialized-literature-scenarios/final-test-campaign/G02_main_factorial_experiments/CFG-L-E/104729/reports/final_campaign_validation_report.json",
+      "warnings": []
+    },
+    {
+      "configId": "CFG-L-E",
+      "errors": [],
+      "groupId": "G02",
+      "manifestPath": "tmp/materialized-literature-scenarios/final-test-campaign/G02_main_factorial_experiments/CFG-L-E/130363/final_campaign_manifest.json",
+      "materializationId": "MAT-CFG-L-E-130363",
+      "metrics": {
+        "databasePresent": true,
+        "emergencyBrakingMentions": 0,
+        "sumoErrors": 0,
+        "teleportMentions": 0,
+        "vehicleCount": 58
+      },
+      "status": "MATERIALIZED_VALIDATED",
+      "targetDirectory": "tmp/materialized-literature-scenarios/final-test-campaign/G02_main_factorial_experiments/CFG-L-E/130363",
+      "validationReport": "tmp/materialized-literature-scenarios/final-test-campaign/G02_main_factorial_experiments/CFG-L-E/130363/reports/final_campaign_validation_report.json",
+      "warnings": []
+    },
+    {
+      "configId": "CFG-L-E",
+      "errors": [],
+      "groupId": "G02",
+      "manifestPath": "tmp/materialized-literature-scenarios/final-test-campaign/G02_main_factorial_experiments/CFG-L-E/155921/final_campaign_manifest.json",
+      "materializationId": "MAT-CFG-L-E-155921",
+      "metrics": {
+        "databasePresent": true,
+        "emergencyBrakingMentions": 0,
+        "sumoErrors": 0,
+        "teleportMentions": 0,
+        "vehicleCount": 58
+      },
+      "status": "MATERIALIZED_VALIDATED",
+      "targetDirectory": "tmp/materialized-literature-scenarios/final-test-campaign/G02_main_factorial_experiments/CFG-L-E/155921",
+      "validationReport": "tmp/materialized-literature-scenarios/final-test-campaign/G02_main_factorial_experiments/CFG-L-E/155921/reports/final_campaign_validation_report.json",
+      "warnings": []
+    },
+    {
+      "configId": "CFG-L-E",
+      "errors": [],
+      "groupId": "G02",
+      "manifestPath": "tmp/materialized-literature-scenarios/final-test-campaign/G02_main_factorial_experiments/CFG-L-E/181081/final_campaign_manifest.json",
+      "materializationId": "MAT-CFG-L-E-181081",
+      "metrics": {
+        "databasePresent": true,
+        "emergencyBrakingMentions": 0,
+        "sumoErrors": 0,
+        "teleportMentions": 0,
+        "vehicleCount": 58
+      },
+      "status": "MATERIALIZED_VALIDATED",
+      "targetDirectory": "tmp/materialized-literature-scenarios/final-test-campaign/G02_main_factorial_experiments/CFG-L-E/181081",
+      "validationReport": "tmp/materialized-literature-scenarios/final-test-campaign/G02_main_factorial_experiments/CFG-L-E/181081/reports/final_campaign_validation_report.json",
+      "warnings": []
+    },
+    {
+      "configId": "CFG-L-E",
+      "errors": [],
+      "groupId": "G02",
+      "manifestPath": "tmp/materialized-literature-scenarios/final-test-campaign/G02_main_factorial_experiments/CFG-L-E/207547/final_campaign_manifest.json",
+      "materializationId": "MAT-CFG-L-E-207547",
+      "metrics": {
+        "databasePresent": true,
+        "emergencyBrakingMentions": 0,
+        "sumoErrors": 0,
+        "teleportMentions": 0,
+        "vehicleCount": 58
+      },
+      "status": "MATERIALIZED_VALIDATED",
+      "targetDirectory": "tmp/materialized-literature-scenarios/final-test-campaign/G02_main_factorial_experiments/CFG-L-E/207547",
+      "validationReport": "tmp/materialized-literature-scenarios/final-test-campaign/G02_main_factorial_experiments/CFG-L-E/207547/reports/final_campaign_validation_report.json",
+      "warnings": []
+    },
+    {
+      "configId": "CFG-L-I",
+      "errors": [],
+      "groupId": "G02",
+      "manifestPath": "tmp/materialized-literature-scenarios/final-test-campaign/G02_main_factorial_experiments/CFG-L-I/104729/final_campaign_manifest.json",
+      "materializationId": "MAT-CFG-L-I-104729",
+      "metrics": {
+        "databasePresent": true,
+        "emergencyBrakingMentions": 0,
+        "sumoErrors": 0,
+        "teleportMentions": 0,
+        "vehicleCount": 58
+      },
+      "status": "MATERIALIZED_VALIDATED",
+      "targetDirectory": "tmp/materialized-literature-scenarios/final-test-campaign/G02_main_factorial_experiments/CFG-L-I/104729",
+      "validationReport": "tmp/materialized-literature-scenarios/final-test-campaign/G02_main_factorial_experiments/CFG-L-I/104729/reports/final_campaign_validation_report.json",
+      "warnings": []
+    },
+    {
+      "configId": "CFG-L-I",
+      "errors": [],
+      "groupId": "G02",
+      "manifestPath": "tmp/materialized-literature-scenarios/final-test-campaign/G02_main_factorial_experiments/CFG-L-I/130363/final_campaign_manifest.json",
+      "materializationId": "MAT-CFG-L-I-130363",
+      "metrics": {
+        "databasePresent": true,
+        "emergencyBrakingMentions": 0,
+        "sumoErrors": 0,
+        "teleportMentions": 0,
+        "vehicleCount": 58
+      },
+      "status": "MATERIALIZED_VALIDATED",
+      "targetDirectory": "tmp/materialized-literature-scenarios/final-test-campaign/G02_main_factorial_experiments/CFG-L-I/130363",
+      "validationReport": "tmp/materialized-literature-scenarios/final-test-campaign/G02_main_factorial_experiments/CFG-L-I/130363/reports/final_campaign_validation_report.json",
+      "warnings": []
+    },
+    {
+      "configId": "CFG-L-I",
+      "errors": [],
+      "groupId": "G02",
+      "manifestPath": "tmp/materialized-literature-scenarios/final-test-campaign/G02_main_factorial_experiments/CFG-L-I/155921/final_campaign_manifest.json",
+      "materializationId": "MAT-CFG-L-I-155921",
+      "metrics": {
+        "databasePresent": true,
+        "emergencyBrakingMentions": 0,
+        "sumoErrors": 0,
+        "teleportMentions": 0,
+        "vehicleCount": 58
+      },
+      "status": "MATERIALIZED_VALIDATED",
+      "targetDirectory": "tmp/materialized-literature-scenarios/final-test-campaign/G02_main_factorial_experiments/CFG-L-I/155921",
+      "validationReport": "tmp/materialized-literature-scenarios/final-test-campaign/G02_main_factorial_experiments/CFG-L-I/155921/reports/final_campaign_validation_report.json",
+      "warnings": []
+    },
+    {
+      "configId": "CFG-L-I",
+      "errors": [],
+      "groupId": "G02",
+      "manifestPath": "tmp/materialized-literature-scenarios/final-test-campaign/G02_main_factorial_experiments/CFG-L-I/181081/final_campaign_manifest.json",
+      "materializationId": "MAT-CFG-L-I-181081",
+      "metrics": {
+        "databasePresent": true,
+        "emergencyBrakingMentions": 0,
+        "sumoErrors": 0,
+        "teleportMentions": 0,
+        "vehicleCount": 58
+      },
+      "status": "MATERIALIZED_VALIDATED",
+      "targetDirectory": "tmp/materialized-literature-scenarios/final-test-campaign/G02_main_factorial_experiments/CFG-L-I/181081",
+      "validationReport": "tmp/materialized-literature-scenarios/final-test-campaign/G02_main_factorial_experiments/CFG-L-I/181081/reports/final_campaign_validation_report.json",
+      "warnings": []
+    },
+    {
+      "configId": "CFG-L-I",
+      "errors": [],
+      "groupId": "G02",
+      "manifestPath": "tmp/materialized-literature-scenarios/final-test-campaign/G02_main_factorial_experiments/CFG-L-I/207547/final_campaign_manifest.json",
+      "materializationId": "MAT-CFG-L-I-207547",
+      "metrics": {
+        "databasePresent": true,
+        "emergencyBrakingMentions": 0,
+        "sumoErrors": 0,
+        "teleportMentions": 0,
+        "vehicleCount": 58
+      },
+      "status": "MATERIALIZED_VALIDATED",
+      "targetDirectory": "tmp/materialized-literature-scenarios/final-test-campaign/G02_main_factorial_experiments/CFG-L-I/207547",
+      "validationReport": "tmp/materialized-literature-scenarios/final-test-campaign/G02_main_factorial_experiments/CFG-L-I/207547/reports/final_campaign_validation_report.json",
+      "warnings": []
+    },
+    {
+      "configId": "CFG-L-S",
+      "errors": [],
+      "groupId": "G02",
+      "manifestPath": "tmp/materialized-literature-scenarios/final-test-campaign/G02_main_factorial_experiments/CFG-L-S/104729/final_campaign_manifest.json",
+      "materializationId": "MAT-CFG-L-S-104729",
+      "metrics": {
+        "databasePresent": true,
+        "emergencyBrakingMentions": 0,
+        "sumoErrors": 0,
+        "teleportMentions": 0,
+        "vehicleCount": 58
+      },
+      "status": "MATERIALIZED_VALIDATED",
+      "targetDirectory": "tmp/materialized-literature-scenarios/final-test-campaign/G02_main_factorial_experiments/CFG-L-S/104729",
+      "validationReport": "tmp/materialized-literature-scenarios/final-test-campaign/G02_main_factorial_experiments/CFG-L-S/104729/reports/final_campaign_validation_report.json",
+      "warnings": []
+    },
+    {
+      "configId": "CFG-L-S",
+      "errors": [],
+      "groupId": "G02",
+      "manifestPath": "tmp/materialized-literature-scenarios/final-test-campaign/G02_main_factorial_experiments/CFG-L-S/130363/final_campaign_manifest.json",
+      "materializationId": "MAT-CFG-L-S-130363",
+      "metrics": {
+        "databasePresent": true,
+        "emergencyBrakingMentions": 0,
+        "sumoErrors": 0,
+        "teleportMentions": 0,
+        "vehicleCount": 58
+      },
+      "status": "MATERIALIZED_VALIDATED",
+      "targetDirectory": "tmp/materialized-literature-scenarios/final-test-campaign/G02_main_factorial_experiments/CFG-L-S/130363",
+      "validationReport": "tmp/materialized-literature-scenarios/final-test-campaign/G02_main_factorial_experiments/CFG-L-S/130363/reports/final_campaign_validation_report.json",
+      "warnings": []
+    },
+    {
+      "configId": "CFG-L-S",
+      "errors": [],
+      "groupId": "G02",
+      "manifestPath": "tmp/materialized-literature-scenarios/final-test-campaign/G02_main_factorial_experiments/CFG-L-S/155921/final_campaign_manifest.json",
+      "materializationId": "MAT-CFG-L-S-155921",
+      "metrics": {
+        "databasePresent": true,
+        "emergencyBrakingMentions": 0,
+        "sumoErrors": 0,
+        "teleportMentions": 0,
+        "vehicleCount": 58
+      },
+      "status": "MATERIALIZED_VALIDATED",
+      "targetDirectory": "tmp/materialized-literature-scenarios/final-test-campaign/G02_main_factorial_experiments/CFG-L-S/155921",
+      "validationReport": "tmp/materialized-literature-scenarios/final-test-campaign/G02_main_factorial_experiments/CFG-L-S/155921/reports/final_campaign_validation_report.json",
+      "warnings": []
+    },
+    {
+      "configId": "CFG-L-S",
+      "errors": [],
+      "groupId": "G02",
+      "manifestPath": "tmp/materialized-literature-scenarios/final-test-campaign/G02_main_factorial_experiments/CFG-L-S/181081/final_campaign_manifest.json",
+      "materializationId": "MAT-CFG-L-S-181081",
+      "metrics": {
+        "databasePresent": true,
+        "emergencyBrakingMentions": 0,
+        "sumoErrors": 0,
+        "teleportMentions": 0,
+        "vehicleCount": 58
+      },
+      "status": "MATERIALIZED_VALIDATED",
+      "targetDirectory": "tmp/materialized-literature-scenarios/final-test-campaign/G02_main_factorial_experiments/CFG-L-S/181081",
+      "validationReport": "tmp/materialized-literature-scenarios/final-test-campaign/G02_main_factorial_experiments/CFG-L-S/181081/reports/final_campaign_validation_report.json",
+      "warnings": []
+    },
+    {
+      "configId": "CFG-L-S",
+      "errors": [],
+      "groupId": "G02",
+      "manifestPath": "tmp/materialized-literature-scenarios/final-test-campaign/G02_main_factorial_experiments/CFG-L-S/207547/final_campaign_manifest.json",
+      "materializationId": "MAT-CFG-L-S-207547",
+      "metrics": {
+        "databasePresent": true,
+        "emergencyBrakingMentions": 0,
+        "sumoErrors": 0,
+        "teleportMentions": 0,
+        "vehicleCount": 58
+      },
+      "status": "MATERIALIZED_VALIDATED",
+      "targetDirectory": "tmp/materialized-literature-scenarios/final-test-campaign/G02_main_factorial_experiments/CFG-L-S/207547",
+      "validationReport": "tmp/materialized-literature-scenarios/final-test-campaign/G02_main_factorial_experiments/CFG-L-S/207547/reports/final_campaign_validation_report.json",
+      "warnings": []
+    },
+    {
+      "configId": "CFG-N-E",
+      "errors": [],
+      "groupId": "G02",
+      "manifestPath": "tmp/materialized-literature-scenarios/final-test-campaign/G02_main_factorial_experiments/CFG-N-E/104729/final_campaign_manifest.json",
+      "materializationId": "MAT-CFG-N-E-104729",
+      "metrics": {
+        "databasePresent": true,
+        "emergencyBrakingMentions": 0,
+        "sumoErrors": 0,
+        "teleportMentions": 0,
+        "vehicleCount": 100
+      },
+      "status": "MATERIALIZED_VALIDATED",
+      "targetDirectory": "tmp/materialized-literature-scenarios/final-test-campaign/G02_main_factorial_experiments/CFG-N-E/104729",
+      "validationReport": "tmp/materialized-literature-scenarios/final-test-campaign/G02_main_factorial_experiments/CFG-N-E/104729/reports/final_campaign_validation_report.json",
+      "warnings": []
+    },
+    {
+      "configId": "CFG-N-E",
+      "errors": [],
+      "groupId": "G02",
+      "manifestPath": "tmp/materialized-literature-scenarios/final-test-campaign/G02_main_factorial_experiments/CFG-N-E/130363/final_campaign_manifest.json",
+      "materializationId": "MAT-CFG-N-E-130363",
+      "metrics": {
+        "databasePresent": true,
+        "emergencyBrakingMentions": 0,
+        "sumoErrors": 0,
+        "teleportMentions": 0,
+        "vehicleCount": 100
+      },
+      "status": "MATERIALIZED_VALIDATED",
+      "targetDirectory": "tmp/materialized-literature-scenarios/final-test-campaign/G02_main_factorial_experiments/CFG-N-E/130363",
+      "validationReport": "tmp/materialized-literature-scenarios/final-test-campaign/G02_main_factorial_experiments/CFG-N-E/130363/reports/final_campaign_validation_report.json",
+      "warnings": []
+    },
+    {
+      "configId": "CFG-N-E",
+      "errors": [],
+      "groupId": "G02",
+      "manifestPath": "tmp/materialized-literature-scenarios/final-test-campaign/G02_main_factorial_experiments/CFG-N-E/155921/final_campaign_manifest.json",
+      "materializationId": "MAT-CFG-N-E-155921",
+      "metrics": {
+        "databasePresent": true,
+        "emergencyBrakingMentions": 0,
+        "sumoErrors": 0,
+        "teleportMentions": 0,
+        "vehicleCount": 100
+      },
+      "status": "MATERIALIZED_VALIDATED",
+      "targetDirectory": "tmp/materialized-literature-scenarios/final-test-campaign/G02_main_factorial_experiments/CFG-N-E/155921",
+      "validationReport": "tmp/materialized-literature-scenarios/final-test-campaign/G02_main_factorial_experiments/CFG-N-E/155921/reports/final_campaign_validation_report.json",
+      "warnings": []
+    },
+    {
+      "configId": "CFG-N-E",
+      "errors": [],
+      "groupId": "G02",
+      "manifestPath": "tmp/materialized-literature-scenarios/final-test-campaign/G02_main_factorial_experiments/CFG-N-E/181081/final_campaign_manifest.json",
+      "materializationId": "MAT-CFG-N-E-181081",
+      "metrics": {
+        "databasePresent": true,
+        "emergencyBrakingMentions": 0,
+        "sumoErrors": 0,
+        "teleportMentions": 0,
+        "vehicleCount": 100
+      },
+      "status": "MATERIALIZED_VALIDATED",
+      "targetDirectory": "tmp/materialized-literature-scenarios/final-test-campaign/G02_main_factorial_experiments/CFG-N-E/181081",
+      "validationReport": "tmp/materialized-literature-scenarios/final-test-campaign/G02_main_factorial_experiments/CFG-N-E/181081/reports/final_campaign_validation_report.json",
+      "warnings": []
+    },
+    {
+      "configId": "CFG-N-E",
+      "errors": [],
+      "groupId": "G02",
+      "manifestPath": "tmp/materialized-literature-scenarios/final-test-campaign/G02_main_factorial_experiments/CFG-N-E/207547/final_campaign_manifest.json",
+      "materializationId": "MAT-CFG-N-E-207547",
+      "metrics": {
+        "databasePresent": true,
+        "emergencyBrakingMentions": 0,
+        "sumoErrors": 0,
+        "teleportMentions": 0,
+        "vehicleCount": 100
+      },
+      "status": "MATERIALIZED_VALIDATED",
+      "targetDirectory": "tmp/materialized-literature-scenarios/final-test-campaign/G02_main_factorial_experiments/CFG-N-E/207547",
+      "validationReport": "tmp/materialized-literature-scenarios/final-test-campaign/G02_main_factorial_experiments/CFG-N-E/207547/reports/final_campaign_validation_report.json",
+      "warnings": []
+    },
+    {
+      "configId": "CFG-N-I",
+      "errors": [],
+      "groupId": "G02",
+      "manifestPath": "tmp/materialized-literature-scenarios/final-test-campaign/G02_main_factorial_experiments/CFG-N-I/104729/final_campaign_manifest.json",
+      "materializationId": "MAT-CFG-N-I-104729",
+      "metrics": {
+        "databasePresent": true,
+        "emergencyBrakingMentions": 0,
+        "sumoErrors": 0,
+        "teleportMentions": 0,
+        "vehicleCount": 100
+      },
+      "status": "MATERIALIZED_VALIDATED",
+      "targetDirectory": "tmp/materialized-literature-scenarios/final-test-campaign/G02_main_factorial_experiments/CFG-N-I/104729",
+      "validationReport": "tmp/materialized-literature-scenarios/final-test-campaign/G02_main_factorial_experiments/CFG-N-I/104729/reports/final_campaign_validation_report.json",
+      "warnings": []
+    },
+    {
+      "configId": "CFG-N-I",
+      "errors": [],
+      "groupId": "G02",
+      "manifestPath": "tmp/materialized-literature-scenarios/final-test-campaign/G02_main_factorial_experiments/CFG-N-I/130363/final_campaign_manifest.json",
+      "materializationId": "MAT-CFG-N-I-130363",
+      "metrics": {
+        "databasePresent": true,
+        "emergencyBrakingMentions": 0,
+        "sumoErrors": 0,
+        "teleportMentions": 0,
+        "vehicleCount": 100
+      },
+      "status": "MATERIALIZED_VALIDATED",
+      "targetDirectory": "tmp/materialized-literature-scenarios/final-test-campaign/G02_main_factorial_experiments/CFG-N-I/130363",
+      "validationReport": "tmp/materialized-literature-scenarios/final-test-campaign/G02_main_factorial_experiments/CFG-N-I/130363/reports/final_campaign_validation_report.json",
+      "warnings": []
+    },
+    {
+      "configId": "CFG-N-I",
+      "errors": [],
+      "groupId": "G02",
+      "manifestPath": "tmp/materialized-literature-scenarios/final-test-campaign/G02_main_factorial_experiments/CFG-N-I/155921/final_campaign_manifest.json",
+      "materializationId": "MAT-CFG-N-I-155921",
+      "metrics": {
+        "databasePresent": true,
+        "emergencyBrakingMentions": 0,
+        "sumoErrors": 0,
+        "teleportMentions": 0,
+        "vehicleCount": 100
+      },
+      "status": "MATERIALIZED_VALIDATED",
+      "targetDirectory": "tmp/materialized-literature-scenarios/final-test-campaign/G02_main_factorial_experiments/CFG-N-I/155921",
+      "validationReport": "tmp/materialized-literature-scenarios/final-test-campaign/G02_main_factorial_experiments/CFG-N-I/155921/reports/final_campaign_validation_report.json",
+      "warnings": []
+    },
+    {
+      "configId": "CFG-N-I",
+      "errors": [],
+      "groupId": "G02",
+      "manifestPath": "tmp/materialized-literature-scenarios/final-test-campaign/G02_main_factorial_experiments/CFG-N-I/181081/final_campaign_manifest.json",
+      "materializationId": "MAT-CFG-N-I-181081",
+      "metrics": {
+        "databasePresent": true,
+        "emergencyBrakingMentions": 0,
+        "sumoErrors": 0,
+        "teleportMentions": 0,
+        "vehicleCount": 100
+      },
+      "status": "MATERIALIZED_VALIDATED",
+      "targetDirectory": "tmp/materialized-literature-scenarios/final-test-campaign/G02_main_factorial_experiments/CFG-N-I/181081",
+      "validationReport": "tmp/materialized-literature-scenarios/final-test-campaign/G02_main_factorial_experiments/CFG-N-I/181081/reports/final_campaign_validation_report.json",
+      "warnings": []
+    },
+    {
+      "configId": "CFG-N-I",
+      "errors": [],
+      "groupId": "G02",
+      "manifestPath": "tmp/materialized-literature-scenarios/final-test-campaign/G02_main_factorial_experiments/CFG-N-I/207547/final_campaign_manifest.json",
+      "materializationId": "MAT-CFG-N-I-207547",
+      "metrics": {
+        "databasePresent": true,
+        "emergencyBrakingMentions": 0,
+        "sumoErrors": 0,
+        "teleportMentions": 0,
+        "vehicleCount": 100
+      },
+      "status": "MATERIALIZED_VALIDATED",
+      "targetDirectory": "tmp/materialized-literature-scenarios/final-test-campaign/G02_main_factorial_experiments/CFG-N-I/207547",
+      "validationReport": "tmp/materialized-literature-scenarios/final-test-campaign/G02_main_factorial_experiments/CFG-N-I/207547/reports/final_campaign_validation_report.json",
+      "warnings": []
+    },
+    {
+      "configId": "CFG-N-S",
+      "errors": [],
+      "groupId": "G02",
+      "manifestPath": "tmp/materialized-literature-scenarios/final-test-campaign/G02_main_factorial_experiments/CFG-N-S/104729/final_campaign_manifest.json",
+      "materializationId": "MAT-CFG-N-S-104729",
+      "metrics": {
+        "databasePresent": true,
+        "emergencyBrakingMentions": 0,
+        "sumoErrors": 0,
+        "teleportMentions": 0,
+        "vehicleCount": 100
+      },
+      "status": "MATERIALIZED_VALIDATED",
+      "targetDirectory": "tmp/materialized-literature-scenarios/final-test-campaign/G02_main_factorial_experiments/CFG-N-S/104729",
+      "validationReport": "tmp/materialized-literature-scenarios/final-test-campaign/G02_main_factorial_experiments/CFG-N-S/104729/reports/final_campaign_validation_report.json",
+      "warnings": []
+    },
+    {
+      "configId": "CFG-N-S",
+      "errors": [],
+      "groupId": "G02",
+      "manifestPath": "tmp/materialized-literature-scenarios/final-test-campaign/G02_main_factorial_experiments/CFG-N-S/130363/final_campaign_manifest.json",
+      "materializationId": "MAT-CFG-N-S-130363",
+      "metrics": {
+        "databasePresent": true,
+        "emergencyBrakingMentions": 0,
+        "sumoErrors": 0,
+        "teleportMentions": 0,
+        "vehicleCount": 100
+      },
+      "status": "MATERIALIZED_VALIDATED",
+      "targetDirectory": "tmp/materialized-literature-scenarios/final-test-campaign/G02_main_factorial_experiments/CFG-N-S/130363",
+      "validationReport": "tmp/materialized-literature-scenarios/final-test-campaign/G02_main_factorial_experiments/CFG-N-S/130363/reports/final_campaign_validation_report.json",
+      "warnings": []
+    },
+    {
+      "configId": "CFG-N-S",
+      "errors": [],
+      "groupId": "G02",
+      "manifestPath": "tmp/materialized-literature-scenarios/final-test-campaign/G02_main_factorial_experiments/CFG-N-S/155921/final_campaign_manifest.json",
+      "materializationId": "MAT-CFG-N-S-155921",
+      "metrics": {
+        "databasePresent": true,
+        "emergencyBrakingMentions": 0,
+        "sumoErrors": 0,
+        "teleportMentions": 0,
+        "vehicleCount": 100
+      },
+      "status": "MATERIALIZED_VALIDATED",
+      "targetDirectory": "tmp/materialized-literature-scenarios/final-test-campaign/G02_main_factorial_experiments/CFG-N-S/155921",
+      "validationReport": "tmp/materialized-literature-scenarios/final-test-campaign/G02_main_factorial_experiments/CFG-N-S/155921/reports/final_campaign_validation_report.json",
+      "warnings": []
+    },
+    {
+      "configId": "CFG-N-S",
+      "errors": [],
+      "groupId": "G02",
+      "manifestPath": "tmp/materialized-literature-scenarios/final-test-campaign/G02_main_factorial_experiments/CFG-N-S/181081/final_campaign_manifest.json",
+      "materializationId": "MAT-CFG-N-S-181081",
+      "metrics": {
+        "databasePresent": true,
+        "emergencyBrakingMentions": 0,
+        "sumoErrors": 0,
+        "teleportMentions": 0,
+        "vehicleCount": 100
+      },
+      "status": "MATERIALIZED_VALIDATED",
+      "targetDirectory": "tmp/materialized-literature-scenarios/final-test-campaign/G02_main_factorial_experiments/CFG-N-S/181081",
+      "validationReport": "tmp/materialized-literature-scenarios/final-test-campaign/G02_main_factorial_experiments/CFG-N-S/181081/reports/final_campaign_validation_report.json",
+      "warnings": []
+    },
+    {
+      "configId": "CFG-N-S",
+      "errors": [],
+      "groupId": "G02",
+      "manifestPath": "tmp/materialized-literature-scenarios/final-test-campaign/G02_main_factorial_experiments/CFG-N-S/207547/final_campaign_manifest.json",
+      "materializationId": "MAT-CFG-N-S-207547",
+      "metrics": {
+        "databasePresent": true,
+        "emergencyBrakingMentions": 0,
+        "sumoErrors": 0,
+        "teleportMentions": 0,
+        "vehicleCount": 100
+      },
+      "status": "MATERIALIZED_VALIDATED",
+      "targetDirectory": "tmp/materialized-literature-scenarios/final-test-campaign/G02_main_factorial_experiments/CFG-N-S/207547",
+      "validationReport": "tmp/materialized-literature-scenarios/final-test-campaign/G02_main_factorial_experiments/CFG-N-S/207547/reports/final_campaign_validation_report.json",
+      "warnings": []
+    },
+    {
+      "configId": "CFG-H-E",
+      "errors": [],
+      "groupId": "G02",
+      "manifestPath": "tmp/materialized-literature-scenarios/final-test-campaign/G02_main_factorial_experiments/CFG-H-E/104729/final_campaign_manifest.json",
+      "materializationId": "MAT-CFG-H-E-104729",
+      "metrics": {
+        "databasePresent": true,
+        "emergencyBrakingMentions": 0,
+        "sumoErrors": 0,
+        "teleportMentions": 0,
+        "vehicleCount": 160
+      },
+      "status": "MATERIALIZED_VALIDATED",
+      "targetDirectory": "tmp/materialized-literature-scenarios/final-test-campaign/G02_main_factorial_experiments/CFG-H-E/104729",
+      "validationReport": "tmp/materialized-literature-scenarios/final-test-campaign/G02_main_factorial_experiments/CFG-H-E/104729/reports/final_campaign_validation_report.json",
+      "warnings": []
+    },
+    {
+      "configId": "CFG-H-E",
+      "errors": [],
+      "groupId": "G02",
+      "manifestPath": "tmp/materialized-literature-scenarios/final-test-campaign/G02_main_factorial_experiments/CFG-H-E/130363/final_campaign_manifest.json",
+      "materializationId": "MAT-CFG-H-E-130363",
+      "metrics": {
+        "databasePresent": true,
+        "emergencyBrakingMentions": 0,
+        "sumoErrors": 0,
+        "teleportMentions": 0,
+        "vehicleCount": 160
+      },
+      "status": "MATERIALIZED_VALIDATED",
+      "targetDirectory": "tmp/materialized-literature-scenarios/final-test-campaign/G02_main_factorial_experiments/CFG-H-E/130363",
+      "validationReport": "tmp/materialized-literature-scenarios/final-test-campaign/G02_main_factorial_experiments/CFG-H-E/130363/reports/final_campaign_validation_report.json",
+      "warnings": []
+    },
+    {
+      "configId": "CFG-H-E",
+      "errors": [],
+      "groupId": "G02",
+      "manifestPath": "tmp/materialized-literature-scenarios/final-test-campaign/G02_main_factorial_experiments/CFG-H-E/155921/final_campaign_manifest.json",
+      "materializationId": "MAT-CFG-H-E-155921",
+      "metrics": {
+        "databasePresent": true,
+        "emergencyBrakingMentions": 0,
+        "sumoErrors": 0,
+        "teleportMentions": 0,
+        "vehicleCount": 160
+      },
+      "status": "MATERIALIZED_VALIDATED",
+      "targetDirectory": "tmp/materialized-literature-scenarios/final-test-campaign/G02_main_factorial_experiments/CFG-H-E/155921",
+      "validationReport": "tmp/materialized-literature-scenarios/final-test-campaign/G02_main_factorial_experiments/CFG-H-E/155921/reports/final_campaign_validation_report.json",
+      "warnings": []
+    },
+    {
+      "configId": "CFG-H-E",
+      "errors": [],
+      "groupId": "G02",
+      "manifestPath": "tmp/materialized-literature-scenarios/final-test-campaign/G02_main_factorial_experiments/CFG-H-E/181081/final_campaign_manifest.json",
+      "materializationId": "MAT-CFG-H-E-181081",
+      "metrics": {
+        "databasePresent": true,
+        "emergencyBrakingMentions": 0,
+        "sumoErrors": 0,
+        "teleportMentions": 0,
+        "vehicleCount": 160
+      },
+      "status": "MATERIALIZED_VALIDATED",
+      "targetDirectory": "tmp/materialized-literature-scenarios/final-test-campaign/G02_main_factorial_experiments/CFG-H-E/181081",
+      "validationReport": "tmp/materialized-literature-scenarios/final-test-campaign/G02_main_factorial_experiments/CFG-H-E/181081/reports/final_campaign_validation_report.json",
+      "warnings": []
+    },
+    {
+      "configId": "CFG-H-E",
+      "errors": [],
+      "groupId": "G02",
+      "manifestPath": "tmp/materialized-literature-scenarios/final-test-campaign/G02_main_factorial_experiments/CFG-H-E/207547/final_campaign_manifest.json",
+      "materializationId": "MAT-CFG-H-E-207547",
+      "metrics": {
+        "databasePresent": true,
+        "emergencyBrakingMentions": 0,
+        "sumoErrors": 0,
+        "teleportMentions": 0,
+        "vehicleCount": 160
+      },
+      "status": "MATERIALIZED_VALIDATED",
+      "targetDirectory": "tmp/materialized-literature-scenarios/final-test-campaign/G02_main_factorial_experiments/CFG-H-E/207547",
+      "validationReport": "tmp/materialized-literature-scenarios/final-test-campaign/G02_main_factorial_experiments/CFG-H-E/207547/reports/final_campaign_validation_report.json",
+      "warnings": []
+    },
+    {
+      "configId": "CFG-H-I",
+      "errors": [],
+      "groupId": "G02",
+      "manifestPath": "tmp/materialized-literature-scenarios/final-test-campaign/G02_main_factorial_experiments/CFG-H-I/104729/final_campaign_manifest.json",
+      "materializationId": "MAT-CFG-H-I-104729",
+      "metrics": {
+        "databasePresent": true,
+        "emergencyBrakingMentions": 0,
+        "sumoErrors": 0,
+        "teleportMentions": 0,
+        "vehicleCount": 160
+      },
+      "status": "MATERIALIZED_VALIDATED",
+      "targetDirectory": "tmp/materialized-literature-scenarios/final-test-campaign/G02_main_factorial_experiments/CFG-H-I/104729",
+      "validationReport": "tmp/materialized-literature-scenarios/final-test-campaign/G02_main_factorial_experiments/CFG-H-I/104729/reports/final_campaign_validation_report.json",
+      "warnings": []
+    },
+    {
+      "configId": "CFG-H-I",
+      "errors": [],
+      "groupId": "G02",
+      "manifestPath": "tmp/materialized-literature-scenarios/final-test-campaign/G02_main_factorial_experiments/CFG-H-I/130363/final_campaign_manifest.json",
+      "materializationId": "MAT-CFG-H-I-130363",
+      "metrics": {
+        "databasePresent": true,
+        "emergencyBrakingMentions": 0,
+        "sumoErrors": 0,
+        "teleportMentions": 0,
+        "vehicleCount": 160
+      },
+      "status": "MATERIALIZED_VALIDATED",
+      "targetDirectory": "tmp/materialized-literature-scenarios/final-test-campaign/G02_main_factorial_experiments/CFG-H-I/130363",
+      "validationReport": "tmp/materialized-literature-scenarios/final-test-campaign/G02_main_factorial_experiments/CFG-H-I/130363/reports/final_campaign_validation_report.json",
+      "warnings": []
+    },
+    {
+      "configId": "CFG-H-I",
+      "errors": [],
+      "groupId": "G02",
+      "manifestPath": "tmp/materialized-literature-scenarios/final-test-campaign/G02_main_factorial_experiments/CFG-H-I/155921/final_campaign_manifest.json",
+      "materializationId": "MAT-CFG-H-I-155921",
+      "metrics": {
+        "databasePresent": true,
+        "emergencyBrakingMentions": 0,
+        "sumoErrors": 0,
+        "teleportMentions": 0,
+        "vehicleCount": 160
+      },
+      "status": "MATERIALIZED_VALIDATED",
+      "targetDirectory": "tmp/materialized-literature-scenarios/final-test-campaign/G02_main_factorial_experiments/CFG-H-I/155921",
+      "validationReport": "tmp/materialized-literature-scenarios/final-test-campaign/G02_main_factorial_experiments/CFG-H-I/155921/reports/final_campaign_validation_report.json",
+      "warnings": []
+    },
+    {
+      "configId": "CFG-H-I",
+      "errors": [],
+      "groupId": "G02",
+      "manifestPath": "tmp/materialized-literature-scenarios/final-test-campaign/G02_main_factorial_experiments/CFG-H-I/181081/final_campaign_manifest.json",
+      "materializationId": "MAT-CFG-H-I-181081",
+      "metrics": {
+        "databasePresent": true,
+        "emergencyBrakingMentions": 0,
+        "sumoErrors": 0,
+        "teleportMentions": 0,
+        "vehicleCount": 160
+      },
+      "status": "MATERIALIZED_VALIDATED",
+      "targetDirectory": "tmp/materialized-literature-scenarios/final-test-campaign/G02_main_factorial_experiments/CFG-H-I/181081",
+      "validationReport": "tmp/materialized-literature-scenarios/final-test-campaign/G02_main_factorial_experiments/CFG-H-I/181081/reports/final_campaign_validation_report.json",
+      "warnings": []
+    },
+    {
+      "configId": "CFG-H-I",
+      "errors": [],
+      "groupId": "G02",
+      "manifestPath": "tmp/materialized-literature-scenarios/final-test-campaign/G02_main_factorial_experiments/CFG-H-I/207547/final_campaign_manifest.json",
+      "materializationId": "MAT-CFG-H-I-207547",
+      "metrics": {
+        "databasePresent": true,
+        "emergencyBrakingMentions": 0,
+        "sumoErrors": 0,
+        "teleportMentions": 0,
+        "vehicleCount": 160
+      },
+      "status": "MATERIALIZED_VALIDATED",
+      "targetDirectory": "tmp/materialized-literature-scenarios/final-test-campaign/G02_main_factorial_experiments/CFG-H-I/207547",
+      "validationReport": "tmp/materialized-literature-scenarios/final-test-campaign/G02_main_factorial_experiments/CFG-H-I/207547/reports/final_campaign_validation_report.json",
+      "warnings": []
+    },
+    {
+      "configId": "CFG-H-S",
+      "errors": [],
+      "groupId": "G02",
+      "manifestPath": "tmp/materialized-literature-scenarios/final-test-campaign/G02_main_factorial_experiments/CFG-H-S/104729/final_campaign_manifest.json",
+      "materializationId": "MAT-CFG-H-S-104729",
+      "metrics": {
+        "databasePresent": true,
+        "emergencyBrakingMentions": 0,
+        "sumoErrors": 0,
+        "teleportMentions": 0,
+        "vehicleCount": 160
+      },
+      "status": "MATERIALIZED_VALIDATED",
+      "targetDirectory": "tmp/materialized-literature-scenarios/final-test-campaign/G02_main_factorial_experiments/CFG-H-S/104729",
+      "validationReport": "tmp/materialized-literature-scenarios/final-test-campaign/G02_main_factorial_experiments/CFG-H-S/104729/reports/final_campaign_validation_report.json",
+      "warnings": []
+    },
+    {
+      "configId": "CFG-H-S",
+      "errors": [],
+      "groupId": "G02",
+      "manifestPath": "tmp/materialized-literature-scenarios/final-test-campaign/G02_main_factorial_experiments/CFG-H-S/130363/final_campaign_manifest.json",
+      "materializationId": "MAT-CFG-H-S-130363",
+      "metrics": {
+        "databasePresent": true,
+        "emergencyBrakingMentions": 0,
+        "sumoErrors": 0,
+        "teleportMentions": 0,
+        "vehicleCount": 160
+      },
+      "status": "MATERIALIZED_VALIDATED",
+      "targetDirectory": "tmp/materialized-literature-scenarios/final-test-campaign/G02_main_factorial_experiments/CFG-H-S/130363",
+      "validationReport": "tmp/materialized-literature-scenarios/final-test-campaign/G02_main_factorial_experiments/CFG-H-S/130363/reports/final_campaign_validation_report.json",
+      "warnings": []
+    },
+    {
+      "configId": "CFG-H-S",
+      "errors": [],
+      "groupId": "G02",
+      "manifestPath": "tmp/materialized-literature-scenarios/final-test-campaign/G02_main_factorial_experiments/CFG-H-S/155921/final_campaign_manifest.json",
+      "materializationId": "MAT-CFG-H-S-155921",
+      "metrics": {
+        "databasePresent": true,
+        "emergencyBrakingMentions": 0,
+        "sumoErrors": 0,
+        "teleportMentions": 0,
+        "vehicleCount": 160
+      },
+      "status": "MATERIALIZED_VALIDATED",
+      "targetDirectory": "tmp/materialized-literature-scenarios/final-test-campaign/G02_main_factorial_experiments/CFG-H-S/155921",
+      "validationReport": "tmp/materialized-literature-scenarios/final-test-campaign/G02_main_factorial_experiments/CFG-H-S/155921/reports/final_campaign_validation_report.json",
+      "warnings": []
+    },
+    {
+      "configId": "CFG-H-S",
+      "errors": [],
+      "groupId": "G02",
+      "manifestPath": "tmp/materialized-literature-scenarios/final-test-campaign/G02_main_factorial_experiments/CFG-H-S/181081/final_campaign_manifest.json",
+      "materializationId": "MAT-CFG-H-S-181081",
+      "metrics": {
+        "databasePresent": true,
+        "emergencyBrakingMentions": 0,
+        "sumoErrors": 0,
+        "teleportMentions": 0,
+        "vehicleCount": 160
+      },
+      "status": "MATERIALIZED_VALIDATED",
+      "targetDirectory": "tmp/materialized-literature-scenarios/final-test-campaign/G02_main_factorial_experiments/CFG-H-S/181081",
+      "validationReport": "tmp/materialized-literature-scenarios/final-test-campaign/G02_main_factorial_experiments/CFG-H-S/181081/reports/final_campaign_validation_report.json",
+      "warnings": []
+    },
+    {
+      "configId": "CFG-H-S",
+      "errors": [],
+      "groupId": "G02",
+      "manifestPath": "tmp/materialized-literature-scenarios/final-test-campaign/G02_main_factorial_experiments/CFG-H-S/207547/final_campaign_manifest.json",
+      "materializationId": "MAT-CFG-H-S-207547",
+      "metrics": {
+        "databasePresent": true,
+        "emergencyBrakingMentions": 0,
+        "sumoErrors": 0,
+        "teleportMentions": 0,
+        "vehicleCount": 160
+      },
+      "status": "MATERIALIZED_VALIDATED",
+      "targetDirectory": "tmp/materialized-literature-scenarios/final-test-campaign/G02_main_factorial_experiments/CFG-H-S/207547",
+      "validationReport": "tmp/materialized-literature-scenarios/final-test-campaign/G02_main_factorial_experiments/CFG-H-S/207547/reports/final_campaign_validation_report.json",
+      "warnings": []
+    },
+    {
+      "configId": "CFG-N-I-EXT",
+      "errors": [],
+      "groupId": "G03",
+      "manifestPath": "tmp/materialized-literature-scenarios/final-test-campaign/G03_reproducibility_duration/CFG-N-I-EXT/104729/final_campaign_manifest.json",
+      "materializationId": "MAT-CFG-N-I-EXT-104729",
+      "metrics": {
+        "databasePresent": true,
+        "emergencyBrakingMentions": 0,
+        "sumoErrors": 0,
+        "teleportMentions": 0,
+        "vehicleCount": 159
+      },
+      "status": "MATERIALIZED_VALIDATED",
+      "targetDirectory": "tmp/materialized-literature-scenarios/final-test-campaign/G03_reproducibility_duration/CFG-N-I-EXT/104729",
+      "validationReport": "tmp/materialized-literature-scenarios/final-test-campaign/G03_reproducibility_duration/CFG-N-I-EXT/104729/reports/final_campaign_validation_report.json",
+      "warnings": []
+    },
+    {
+      "configId": "CFG-N-I-EXT",
+      "errors": [],
+      "groupId": "G03",
+      "manifestPath": "tmp/materialized-literature-scenarios/final-test-campaign/G03_reproducibility_duration/CFG-N-I-EXT/130363/final_campaign_manifest.json",
+      "materializationId": "MAT-CFG-N-I-EXT-130363",
+      "metrics": {
+        "databasePresent": true,
+        "emergencyBrakingMentions": 0,
+        "sumoErrors": 0,
+        "teleportMentions": 0,
+        "vehicleCount": 159
+      },
+      "status": "MATERIALIZED_VALIDATED",
+      "targetDirectory": "tmp/materialized-literature-scenarios/final-test-campaign/G03_reproducibility_duration/CFG-N-I-EXT/130363",
+      "validationReport": "tmp/materialized-literature-scenarios/final-test-campaign/G03_reproducibility_duration/CFG-N-I-EXT/130363/reports/final_campaign_validation_report.json",
+      "warnings": []
+    },
+    {
+      "configId": "CFG-N-I-EXT",
+      "errors": [],
+      "groupId": "G03",
+      "manifestPath": "tmp/materialized-literature-scenarios/final-test-campaign/G03_reproducibility_duration/CFG-N-I-EXT/155921/final_campaign_manifest.json",
+      "materializationId": "MAT-CFG-N-I-EXT-155921",
+      "metrics": {
+        "databasePresent": true,
+        "emergencyBrakingMentions": 0,
+        "sumoErrors": 0,
+        "teleportMentions": 0,
+        "vehicleCount": 159
+      },
+      "status": "MATERIALIZED_VALIDATED",
+      "targetDirectory": "tmp/materialized-literature-scenarios/final-test-campaign/G03_reproducibility_duration/CFG-N-I-EXT/155921",
+      "validationReport": "tmp/materialized-literature-scenarios/final-test-campaign/G03_reproducibility_duration/CFG-N-I-EXT/155921/reports/final_campaign_validation_report.json",
+      "warnings": []
+    },
+    {
+      "configId": "CFG-N-I-EXT",
+      "errors": [],
+      "groupId": "G03",
+      "manifestPath": "tmp/materialized-literature-scenarios/final-test-campaign/G03_reproducibility_duration/CFG-N-I-EXT/181081/final_campaign_manifest.json",
+      "materializationId": "MAT-CFG-N-I-EXT-181081",
+      "metrics": {
+        "databasePresent": true,
+        "emergencyBrakingMentions": 0,
+        "sumoErrors": 0,
+        "teleportMentions": 0,
+        "vehicleCount": 159
+      },
+      "status": "MATERIALIZED_VALIDATED",
+      "targetDirectory": "tmp/materialized-literature-scenarios/final-test-campaign/G03_reproducibility_duration/CFG-N-I-EXT/181081",
+      "validationReport": "tmp/materialized-literature-scenarios/final-test-campaign/G03_reproducibility_duration/CFG-N-I-EXT/181081/reports/final_campaign_validation_report.json",
+      "warnings": []
+    },
+    {
+      "configId": "CFG-N-I-EXT",
+      "errors": [],
+      "groupId": "G03",
+      "manifestPath": "tmp/materialized-literature-scenarios/final-test-campaign/G03_reproducibility_duration/CFG-N-I-EXT/207547/final_campaign_manifest.json",
+      "materializationId": "MAT-CFG-N-I-EXT-207547",
+      "metrics": {
+        "databasePresent": true,
+        "emergencyBrakingMentions": 0,
+        "sumoErrors": 0,
+        "teleportMentions": 0,
+        "vehicleCount": 159
+      },
+      "status": "MATERIALIZED_VALIDATED",
+      "targetDirectory": "tmp/materialized-literature-scenarios/final-test-campaign/G03_reproducibility_duration/CFG-N-I-EXT/207547",
+      "validationReport": "tmp/materialized-literature-scenarios/final-test-campaign/G03_reproducibility_duration/CFG-N-I-EXT/207547/reports/final_campaign_validation_report.json",
+      "warnings": []
+    },
+    {
+      "configId": "CFG-H-S-EXT",
+      "errors": [],
+      "groupId": "G03",
+      "manifestPath": "tmp/materialized-literature-scenarios/final-test-campaign/G03_reproducibility_duration/CFG-H-S-EXT/104729/final_campaign_manifest.json",
+      "materializationId": "MAT-CFG-H-S-EXT-104729",
+      "metrics": {
+        "databasePresent": true,
+        "emergencyBrakingMentions": 0,
+        "sumoErrors": 0,
+        "teleportMentions": 0,
+        "vehicleCount": 254
+      },
+      "status": "MATERIALIZED_VALIDATED",
+      "targetDirectory": "tmp/materialized-literature-scenarios/final-test-campaign/G03_reproducibility_duration/CFG-H-S-EXT/104729",
+      "validationReport": "tmp/materialized-literature-scenarios/final-test-campaign/G03_reproducibility_duration/CFG-H-S-EXT/104729/reports/final_campaign_validation_report.json",
+      "warnings": []
+    },
+    {
+      "configId": "CFG-M-BACKGROUND",
+      "errors": [],
+      "groupId": "G04",
+      "manifestPath": "tmp/materialized-literature-scenarios/final-test-campaign/G04_mobility_connectivity/CFG-M-BACKGROUND/104729/final_campaign_manifest.json",
+      "materializationId": "MAT-CFG-M-BACKGROUND-104729",
+      "metrics": {
+        "databasePresent": true,
+        "emergencyBrakingMentions": 0,
+        "sumoErrors": 0,
+        "teleportMentions": 0,
+        "vehicleCount": 50
+      },
+      "status": "MATERIALIZED_WITH_WARNINGS",
+      "targetDirectory": "tmp/materialized-literature-scenarios/final-test-campaign/G04_mobility_connectivity/CFG-M-BACKGROUND/104729",
+      "validationReport": "tmp/materialized-literature-scenarios/final-test-campaign/G04_mobility_connectivity/CFG-M-BACKGROUND/104729/reports/final_campaign_validation_report.json",
+      "warnings": [
+        "DIRECTED_ENGINEERING_TEST_PROFILE",
+        "NOT_LITERATURE_CALIBRATED",
+        "NOT_PART_OF_MAIN_FACTORIAL_RESULTS"
+      ]
+    },
+    {
+      "configId": "CFG-M-RSU0",
+      "errors": [],
+      "groupId": "G04",
+      "manifestPath": "tmp/materialized-literature-scenarios/final-test-campaign/G04_mobility_connectivity/CFG-M-RSU0/104729/final_campaign_manifest.json",
+      "materializationId": "MAT-CFG-M-RSU0-104729",
+      "metrics": {
+        "databasePresent": true,
+        "emergencyBrakingMentions": 0,
+        "sumoErrors": 0,
+        "teleportMentions": 0,
+        "vehicleCount": 50
+      },
+      "status": "MATERIALIZED_WITH_WARNINGS",
+      "targetDirectory": "tmp/materialized-literature-scenarios/final-test-campaign/G04_mobility_connectivity/CFG-M-RSU0/104729",
+      "validationReport": "tmp/materialized-literature-scenarios/final-test-campaign/G04_mobility_connectivity/CFG-M-RSU0/104729/reports/final_campaign_validation_report.json",
+      "warnings": [
+        "DIRECTED_ENGINEERING_TEST_PROFILE",
+        "NOT_LITERATURE_CALIBRATED",
+        "NOT_PART_OF_MAIN_FACTORIAL_RESULTS"
+      ]
+    },
+    {
+      "configId": "CFG-M-RSU1",
+      "errors": [],
+      "groupId": "G04",
+      "manifestPath": "tmp/materialized-literature-scenarios/final-test-campaign/G04_mobility_connectivity/CFG-M-RSU1/104729/final_campaign_manifest.json",
+      "materializationId": "MAT-CFG-M-RSU1-104729",
+      "metrics": {
+        "databasePresent": true,
+        "emergencyBrakingMentions": 0,
+        "sumoErrors": 0,
+        "teleportMentions": 0,
+        "vehicleCount": 50
+      },
+      "status": "MATERIALIZED_WITH_WARNINGS",
+      "targetDirectory": "tmp/materialized-literature-scenarios/final-test-campaign/G04_mobility_connectivity/CFG-M-RSU1/104729",
+      "validationReport": "tmp/materialized-literature-scenarios/final-test-campaign/G04_mobility_connectivity/CFG-M-RSU1/104729/reports/final_campaign_validation_report.json",
+      "warnings": [
+        "DIRECTED_ENGINEERING_TEST_PROFILE",
+        "NOT_LITERATURE_CALIBRATED",
+        "NOT_PART_OF_MAIN_FACTORIAL_RESULTS"
+      ]
+    },
+    {
+      "configId": "CFG-M-SWITCH",
+      "errors": [],
+      "groupId": "G04",
+      "manifestPath": "tmp/materialized-literature-scenarios/final-test-campaign/G04_mobility_connectivity/CFG-M-SWITCH/104729/final_campaign_manifest.json",
+      "materializationId": "MAT-CFG-M-SWITCH-104729",
+      "metrics": {
+        "databasePresent": true,
+        "emergencyBrakingMentions": 0,
+        "sumoErrors": 0,
+        "teleportMentions": 0,
+        "vehicleCount": 50
+      },
+      "status": "MATERIALIZED_WITH_WARNINGS",
+      "targetDirectory": "tmp/materialized-literature-scenarios/final-test-campaign/G04_mobility_connectivity/CFG-M-SWITCH/104729",
+      "validationReport": "tmp/materialized-literature-scenarios/final-test-campaign/G04_mobility_connectivity/CFG-M-SWITCH/104729/reports/final_campaign_validation_report.json",
+      "warnings": [
+        "DIRECTED_ENGINEERING_TEST_PROFILE",
+        "NOT_LITERATURE_CALIBRATED",
+        "NOT_PART_OF_MAIN_FACTORIAL_RESULTS"
+      ]
+    },
+    {
+      "configId": "CFG-M-V2V",
+      "errors": [],
+      "groupId": "G04",
+      "manifestPath": "tmp/materialized-literature-scenarios/final-test-campaign/G04_mobility_connectivity/CFG-M-V2V/104729/final_campaign_manifest.json",
+      "materializationId": "MAT-CFG-M-V2V-104729",
+      "metrics": {
+        "databasePresent": true,
+        "emergencyBrakingMentions": 0,
+        "sumoErrors": 0,
+        "teleportMentions": 0,
+        "vehicleCount": 80
+      },
+      "status": "MATERIALIZED_WITH_WARNINGS",
+      "targetDirectory": "tmp/materialized-literature-scenarios/final-test-campaign/G04_mobility_connectivity/CFG-M-V2V/104729",
+      "validationReport": "tmp/materialized-literature-scenarios/final-test-campaign/G04_mobility_connectivity/CFG-M-V2V/104729/reports/final_campaign_validation_report.json",
+      "warnings": [
+        "DIRECTED_ENGINEERING_TEST_PROFILE",
+        "NOT_LITERATURE_CALIBRATED",
+        "NOT_PART_OF_MAIN_FACTORIAL_RESULTS"
+      ]
+    },
+    {
+      "configId": "CFG-R-LOCALCPU",
+      "errors": [],
+      "groupId": "G05",
+      "manifestPath": "tmp/materialized-literature-scenarios/final-test-campaign/G05_resource_policies_repair/CFG-R-LOCALCPU/104729/final_campaign_manifest.json",
+      "materializationId": "MAT-CFG-R-LOCALCPU-104729",
+      "metrics": {
+        "databasePresent": true,
+        "emergencyBrakingMentions": 0,
+        "sumoErrors": 0,
+        "teleportMentions": 0,
+        "vehicleCount": 50
+      },
+      "status": "MATERIALIZED_VALIDATED",
+      "targetDirectory": "tmp/materialized-literature-scenarios/final-test-campaign/G05_resource_policies_repair/CFG-R-LOCALCPU/104729",
+      "validationReport": "tmp/materialized-literature-scenarios/final-test-campaign/G05_resource_policies_repair/CFG-R-LOCALCPU/104729/reports/final_campaign_validation_report.json",
+      "warnings": []
+    },
+    {
+      "configId": "CFG-R-EDGECPU",
+      "errors": [],
+      "groupId": "G05",
+      "manifestPath": "tmp/materialized-literature-scenarios/final-test-campaign/G05_resource_policies_repair/CFG-R-EDGECPU/104729/final_campaign_manifest.json",
+      "materializationId": "MAT-CFG-R-EDGECPU-104729",
+      "metrics": {
+        "databasePresent": true,
+        "emergencyBrakingMentions": 0,
+        "sumoErrors": 0,
+        "teleportMentions": 0,
+        "vehicleCount": 50
+      },
+      "status": "MATERIALIZED_VALIDATED",
+      "targetDirectory": "tmp/materialized-literature-scenarios/final-test-campaign/G05_resource_policies_repair/CFG-R-EDGECPU/104729",
+      "validationReport": "tmp/materialized-literature-scenarios/final-test-campaign/G05_resource_policies_repair/CFG-R-EDGECPU/104729/reports/final_campaign_validation_report.json",
+      "warnings": []
+    },
+    {
+      "configId": "CFG-R-CLOUDCPU",
+      "errors": [],
+      "groupId": "G05",
+      "manifestPath": "tmp/materialized-literature-scenarios/final-test-campaign/G05_resource_policies_repair/CFG-R-CLOUDCPU/104729/final_campaign_manifest.json",
+      "materializationId": "MAT-CFG-R-CLOUDCPU-104729",
+      "metrics": {
+        "databasePresent": true,
+        "emergencyBrakingMentions": 0,
+        "sumoErrors": 0,
+        "teleportMentions": 0,
+        "vehicleCount": 50
+      },
+      "status": "MATERIALIZED_VALIDATED",
+      "targetDirectory": "tmp/materialized-literature-scenarios/final-test-campaign/G05_resource_policies_repair/CFG-R-CLOUDCPU/104729",
+      "validationReport": "tmp/materialized-literature-scenarios/final-test-campaign/G05_resource_policies_repair/CFG-R-CLOUDCPU/104729/reports/final_campaign_validation_report.json",
+      "warnings": []
+    },
+    {
+      "configId": "CFG-R-CELLBW",
+      "errors": [],
+      "groupId": "G05",
+      "manifestPath": "tmp/materialized-literature-scenarios/final-test-campaign/G05_resource_policies_repair/CFG-R-CELLBW/104729/final_campaign_manifest.json",
+      "materializationId": "MAT-CFG-R-CELLBW-104729",
+      "metrics": {
+        "databasePresent": true,
+        "emergencyBrakingMentions": 0,
+        "sumoErrors": 0,
+        "teleportMentions": 0,
+        "vehicleCount": 50
+      },
+      "status": "MATERIALIZED_VALIDATED",
+      "targetDirectory": "tmp/materialized-literature-scenarios/final-test-campaign/G05_resource_policies_repair/CFG-R-CELLBW/104729",
+      "validationReport": "tmp/materialized-literature-scenarios/final-test-campaign/G05_resource_policies_repair/CFG-R-CELLBW/104729/reports/final_campaign_validation_report.json",
+      "warnings": []
+    },
+    {
+      "configId": "CFG-R-V2VBW",
+      "errors": [],
+      "groupId": "G05",
+      "manifestPath": "tmp/materialized-literature-scenarios/final-test-campaign/G05_resource_policies_repair/CFG-R-V2VBW/104729/final_campaign_manifest.json",
+      "materializationId": "MAT-CFG-R-V2VBW-104729",
+      "metrics": {
+        "databasePresent": true,
+        "emergencyBrakingMentions": 0,
+        "sumoErrors": 0,
+        "teleportMentions": 0,
+        "vehicleCount": 80
+      },
+      "status": "MATERIALIZED_WITH_WARNINGS",
+      "targetDirectory": "tmp/materialized-literature-scenarios/final-test-campaign/G05_resource_policies_repair/CFG-R-V2VBW/104729",
+      "validationReport": "tmp/materialized-literature-scenarios/final-test-campaign/G05_resource_policies_repair/CFG-R-V2VBW/104729/reports/final_campaign_validation_report.json",
+      "warnings": [
+        "DIRECTED_ENGINEERING_TEST_PROFILE",
+        "NOT_LITERATURE_CALIBRATED",
+        "NOT_PART_OF_MAIN_FACTORIAL_RESULTS"
+      ]
+    },
+    {
+      "configId": "CFG-R-RTT",
+      "errors": [],
+      "groupId": "G05",
+      "manifestPath": "tmp/materialized-literature-scenarios/final-test-campaign/G05_resource_policies_repair/CFG-R-RTT/104729/final_campaign_manifest.json",
+      "materializationId": "MAT-CFG-R-RTT-104729",
+      "metrics": {
+        "databasePresent": true,
+        "emergencyBrakingMentions": 0,
+        "sumoErrors": 0,
+        "teleportMentions": 0,
+        "vehicleCount": 50
+      },
+      "status": "MATERIALIZED_VALIDATED",
+      "targetDirectory": "tmp/materialized-literature-scenarios/final-test-campaign/G05_resource_policies_repair/CFG-R-RTT/104729",
+      "validationReport": "tmp/materialized-literature-scenarios/final-test-campaign/G05_resource_policies_repair/CFG-R-RTT/104729/reports/final_campaign_validation_report.json",
+      "warnings": []
+    },
+    {
+      "configId": "CFG-G-SPARSE",
+      "errors": [],
+      "groupId": "G06",
+      "manifestPath": "tmp/materialized-literature-scenarios/final-test-campaign/G06_runtime_temporal_policies/CFG-G-SPARSE/104729/final_campaign_manifest.json",
+      "materializationId": "MAT-CFG-G-SPARSE-104729",
+      "metrics": {
+        "databasePresent": true,
+        "emergencyBrakingMentions": 0,
+        "sumoErrors": 0,
+        "teleportMentions": 0,
+        "vehicleCount": 29
+      },
+      "status": "MATERIALIZED_VALIDATED",
+      "targetDirectory": "tmp/materialized-literature-scenarios/final-test-campaign/G06_runtime_temporal_policies/CFG-G-SPARSE/104729",
+      "validationReport": "tmp/materialized-literature-scenarios/final-test-campaign/G06_runtime_temporal_policies/CFG-G-SPARSE/104729/reports/final_campaign_validation_report.json",
+      "warnings": []
+    },
+    {
+      "configId": "CFG-G-ADAPTIVE",
+      "errors": [],
+      "groupId": "G06",
+      "manifestPath": "tmp/materialized-literature-scenarios/final-test-campaign/G06_runtime_temporal_policies/CFG-G-ADAPTIVE/104729/final_campaign_manifest.json",
+      "materializationId": "MAT-CFG-G-ADAPTIVE-104729",
+      "metrics": {
+        "databasePresent": true,
+        "emergencyBrakingMentions": 0,
+        "sumoErrors": 0,
+        "teleportMentions": 0,
+        "vehicleCount": 160
+      },
+      "status": "MATERIALIZED_VALIDATED",
+      "targetDirectory": "tmp/materialized-literature-scenarios/final-test-campaign/G06_runtime_temporal_policies/CFG-G-ADAPTIVE/104729",
+      "validationReport": "tmp/materialized-literature-scenarios/final-test-campaign/G06_runtime_temporal_policies/CFG-G-ADAPTIVE/104729/reports/final_campaign_validation_report.json",
+      "warnings": []
+    },
+    {
+      "configId": "CFG-G-STALE",
+      "errors": [],
+      "groupId": "G06",
+      "manifestPath": "tmp/materialized-literature-scenarios/final-test-campaign/G06_runtime_temporal_policies/CFG-G-STALE/104729/final_campaign_manifest.json",
+      "materializationId": "MAT-CFG-G-STALE-104729",
+      "metrics": {
+        "databasePresent": true,
+        "emergencyBrakingMentions": 0,
+        "sumoErrors": 0,
+        "teleportMentions": 0,
+        "vehicleCount": 50
+      },
+      "status": "MATERIALIZED_VALIDATED",
+      "targetDirectory": "tmp/materialized-literature-scenarios/final-test-campaign/G06_runtime_temporal_policies/CFG-G-STALE/104729",
+      "validationReport": "tmp/materialized-literature-scenarios/final-test-campaign/G06_runtime_temporal_policies/CFG-G-STALE/104729/reports/final_campaign_validation_report.json",
+      "warnings": []
+    }
+  ],
+  "scenarioRootSizeBytes": 47381437,
+  "statusCounts": {
+    "MATERIALIZED_VALIDATED": 63,
+    "MATERIALIZED_WITH_WARNINGS": 6
+  },
+  "uniqueMaterializationIds": 69,
+  "uniqueTargetDirectories": 69,
+  "validatedMaterializations": 63,
+  "warningMaterializations": 6,
+  "workloadSeedCount": 5
+}

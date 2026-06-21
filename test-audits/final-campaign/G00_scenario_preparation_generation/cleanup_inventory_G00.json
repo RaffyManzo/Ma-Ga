@@ -1,0 +1,1011 @@
+{
+  "destination": "C:\\Users\\raffa\\IdeaProjects\\maga-core\\tmp\\archive\\final-test-campaign-pre-g00-20260620-105205",
+  "directoryCount": 582,
+  "fileCount": 1512,
+  "hashes": [
+    {
+      "path": "G01_pipeline_validation/CFG-SMOKE/104729/_campaign_logs/campaign_builder_stdout.log",
+      "sha256": "c638b47cbb2d7329f2175632bc235cc44c07896dae3132bca32d9fcb48da5675",
+      "sizeBytes": 31306
+    },
+    {
+      "path": "G01_pipeline_validation/CFG-SMOKE/104729/application/application_config.json",
+      "sha256": "5a13763a030b8a4d74a66307e55a0d0879ec87433bb4210aa24e29d38ec65aba",
+      "sizeBytes": 407
+    },
+    {
+      "path": "G01_pipeline_validation/CFG-SMOKE/104729/application/intas_literature_urban.db",
+      "sha256": "b05b5c708751b1fa1732728a6db8b7cfd497d326986ce709aa6be3bf53a009ac",
+      "sizeBytes": 176128
+    },
+    {
+      "path": "G01_pipeline_validation/CFG-SMOKE/104729/application/ma_ga_calibration_metadata.json",
+      "sha256": "6e0ce515ab9faabc8408165927d8ccefbbc6ac8e1eb5eb201641f97a740500e5",
+      "sizeBytes": 2896
+    },
+    {
+      "path": "G01_pipeline_validation/CFG-SMOKE/104729/application/ma_ga_live_runtime_config.json",
+      "sha256": "2541843dcb4000d5a69876810ab177dd845a5d6727c0c8459787c16fbbbc5df9",
+      "sizeBytes": 809
+    },
+    {
+      "path": "G01_pipeline_validation/CFG-SMOKE/104729/application/ma_ga_live_state_config.json",
+      "sha256": "db71636725f899ba9504b843fe2085b78a0a26217eba42faae76549bc0c97c78",
+      "sizeBytes": 4320
+    },
+    {
+      "path": "G01_pipeline_validation/CFG-SMOKE/104729/application/scenario-convert-command.log",
+      "sha256": "d3627e712262e3ca52fd779bc38e646503d54d8b70b8c5bed30597af577241c2",
+      "sizeBytes": 4291
+    },
+    {
+      "path": "G01_pipeline_validation/CFG-SMOKE/104729/application/scenario-convert.log",
+      "sha256": "6e553f54a53d449862629f7d0057a6a9d14b4f785b4e7f7d65a44591e9528376",
+      "sizeBytes": 5256
+    },
+    {
+      "path": "G01_pipeline_validation/CFG-SMOKE/104729/cell/cell_config.json",
+      "sha256": "f4ed057288c25ee254ada4c82f52adb8d366fb751dc19a91819c471e2bd94de0",
+      "sizeBytes": 731
+    },
+    {
+      "path": "G01_pipeline_validation/CFG-SMOKE/104729/cell/network.json",
+      "sha256": "9566f236f5d276c29f375f7b35e5f3d7e9ccdb5b0d40a4a546870bf493cda785",
+      "sizeBytes": 1468
+    },
+    {
+      "path": "G01_pipeline_validation/CFG-SMOKE/104729/cell/regions.json",
+      "sha256": "d3394c5602b0b0bbf0c2fe5816542cd6101aa925bd207933b30acc61c7851171",
+      "sizeBytes": 1168
+    },
+    {
+      "path": "G01_pipeline_validation/CFG-SMOKE/104729/final_campaign_manifest.json",
+      "sha256": "4dabcbcde1ed98e985d647e5a51047a05a0ef366580b583e7b0f05345ca0f961",
+      "sizeBytes": 6661
+    },
+    {
+      "path": "G01_pipeline_validation/CFG-SMOKE/104729/mapping/mapping_config.json",
+      "sha256": "2ee86d01bbf9251cda6f02ae2a3d485ff95b4c8c67afe555996cc2bf6ba51144",
+      "sizeBytes": 1269
+    },
+    {
+      "path": "G01_pipeline_validation/CFG-SMOKE/104729/materialization_manifest.json",
+      "sha256": "befd8e1629e4067382997f6793cf75e2c10fe19e03285f3f11877294df3a3296",
+      "sizeBytes": 1006
+    },
+    {
+      "path": "G01_pipeline_validation/CFG-SMOKE/104729/output/output_config.xml",
+      "sha256": "909653ff7707f4ae9aa82e30da3534ad9a30e54882dcbefa784963dc97edbcb2",
+      "sizeBytes": 11402
+    },
+    {
+      "path": "G01_pipeline_validation/CFG-SMOKE/104729/reports/final_campaign_validation_report.json",
+      "sha256": "80c88e8ea7c2acf1781e5ca6aa4cf9900cfff5727704c04612185f3b36732bc8",
+      "sizeBytes": 445
+    },
+    {
+      "path": "G01_pipeline_validation/CFG-SMOKE/104729/reports/intas_literature_materialization_report.json",
+      "sha256": "1c233ad39b70f0ebfdd0470939b2f9a22fe420b3e1743ab1b984caa453d03f8b",
+      "sizeBytes": 29714
+    },
+    {
+      "path": "G01_pipeline_validation/CFG-SMOKE/104729/reports/intas_literature_materialization_report.md",
+      "sha256": "d9b589779b55656c90818cf346d281ed5b9460c69d5143fde2c8adb7b2c195d5",
+      "sizeBytes": 812
+    },
+    {
+      "path": "G01_pipeline_validation/CFG-SMOKE/104729/reports/literature_configuration_validation.json",
+      "sha256": "d124ad047ca91434aeee4bbab24cb5853bd1cb35c0f269e6b57c9a5535f18d9e",
+      "sizeBytes": 842
+    },
+    {
+      "path": "G01_pipeline_validation/CFG-SMOKE/104729/scenario_config.json",
+      "sha256": "00492099da62b9d2ee4f40b32be424f808b41d2ff045d89de4d0a8301361238d",
+      "sizeBytes": 796
+    },
+    {
+      "path": "G01_pipeline_validation/CFG-SMOKE/104729/sns/sns_config.json",
+      "sha256": "253846a429c46648950016ed06656817906c99ea8c520a64da712ae7da31e3d0",
+      "sizeBytes": 360
+    },
+    {
+      "path": "G01_pipeline_validation/CFG-SMOKE/104729/sumo/intas_literature_urban.net.xml",
+      "sha256": "0efc52505e687efa6ac165d8d6e43d49e1ea0d9b5547aa7821b4c7dcbb0d5ea7",
+      "sizeBytes": 380262
+    },
+    {
+      "path": "G01_pipeline_validation/CFG-SMOKE/104729/sumo/intas_literature_urban.sumocfg",
+      "sha256": "af7aafa599307861ccb5dfa41ba5325e69739fd75f96fbd9cb858169ca9c2a9a",
+      "sizeBytes": 353
+    },
+    {
+      "path": "G01_pipeline_validation/CFG-SMOKE/104729/sumo/intas_literature_urban_nominal.rou.xml",
+      "sha256": "8d2d125b9db29345d382884e09fa171ee7183e4091f3d361d902a5b496e89f9d",
+      "sizeBytes": 11482
+    },
+    {
+      "path": "G01_pipeline_validation/CFG-SMOKE/104729/sumo/sumo_config.json",
+      "sha256": "5d07eda420d6a8eca6b0888d65b3c12b23196d5c323d14f2635aff6ac790b048",
+      "sizeBytes": 120
+    },
+    {
+      "path": "G02_main_factorial_experiments/CFG-H-E/104729/_campaign_logs/campaign_builder_stdout.log",
+      "sha256": "d2b2c30253f75eaac2033e755989ea0d7237629899b55c2f2ec0d4ae79a8ae63",
+      "sizeBytes": 32430
+    },
+    {
+      "path": "G02_main_factorial_experiments/CFG-H-E/104729/application/application_config.json",
+      "sha256": "5a13763a030b8a4d74a66307e55a0d0879ec87433bb4210aa24e29d38ec65aba",
+      "sizeBytes": 407
+    },
+    {
+      "path": "G02_main_factorial_experiments/CFG-H-E/104729/application/intas_literature_urban.db",
+      "sha256": "6330041a2588c2b846c402837917ef45b300da5a99ce98d8242b87598b80ea16",
+      "sizeBytes": 176128
+    },
+    {
+      "path": "G02_main_factorial_experiments/CFG-H-E/104729/application/ma_ga_calibration_metadata.json",
+      "sha256": "6e0ce515ab9faabc8408165927d8ccefbbc6ac8e1eb5eb201641f97a740500e5",
+      "sizeBytes": 2896
+    },
+    {
+      "path": "G02_main_factorial_experiments/CFG-H-E/104729/application/ma_ga_live_runtime_config.json",
+      "sha256": "64ceec5dd062c9786b82818582e284fa117ec3c095b5a0c941b7e7becd93052b",
+      "sizeBytes": 736
+    },
+    {
+      "path": "G02_main_factorial_experiments/CFG-H-E/104729/application/ma_ga_live_state_config.json",
+      "sha256": "fe2f15c0986f71b58a01a0b70bfbd826e7c379046a12dc448450737c0d4651ef",
+      "sizeBytes": 4245
+    },
+    {
+      "path": "G02_main_factorial_experiments/CFG-H-E/104729/application/scenario-convert-command.log",
+      "sha256": "1ecee0bc8403343d50b1ff94006f96b79f34aface1f31213c5274d3d87c18a4e",
+      "sizeBytes": 9970
+    },
+    {
+      "path": "G02_main_factorial_experiments/CFG-H-E/104729/application/scenario-convert.log",
+      "sha256": "b0a07d65342861859cf0dd3d92d315b91bb39c036e4e83a58e75ad0c56bcb02c",
+      "sizeBytes": 10824
+    },
+    {
+      "path": "G02_main_factorial_experiments/CFG-H-E/104729/cell/cell_config.json",
+      "sha256": "f4ed057288c25ee254ada4c82f52adb8d366fb751dc19a91819c471e2bd94de0",
+      "sizeBytes": 731
+    },
+    {
+      "path": "G02_main_factorial_experiments/CFG-H-E/104729/cell/network.json",
+      "sha256": "9566f236f5d276c29f375f7b35e5f3d7e9ccdb5b0d40a4a546870bf493cda785",
+      "sizeBytes": 1468
+    },
+    {
+      "path": "G02_main_factorial_experiments/CFG-H-E/104729/cell/regions.json",
+      "sha256": "d3394c5602b0b0bbf0c2fe5816542cd6101aa925bd207933b30acc61c7851171",
+      "sizeBytes": 1168
+    },
+    {
+      "path": "G02_main_factorial_experiments/CFG-H-E/104729/final_campaign_manifest.json",
+      "sha256": "006b3014067edd643661c859761f09c40a091ef99400f6627683ca0d2b26b7f3",
+      "sizeBytes": 6676
+    },
+    {
+      "path": "G02_main_factorial_experiments/CFG-H-E/104729/mapping/mapping_config.json",
+      "sha256": "2ee86d01bbf9251cda6f02ae2a3d485ff95b4c8c67afe555996cc2bf6ba51144",
+      "sizeBytes": 1269
+    },
+    {
+      "path": "G02_main_factorial_experiments/CFG-H-E/104729/materialization_manifest.json",
+      "sha256": "b8be1b6a270b054c8b29b4a45bc0222b29d86f1215bdfd16b1952b7c6257ff72",
+      "sizeBytes": 1016
+    },
+    {
+      "path": "G02_main_factorial_experiments/CFG-H-E/104729/output/output_config.xml",
+      "sha256": "909653ff7707f4ae9aa82e30da3534ad9a30e54882dcbefa784963dc97edbcb2",
+      "sizeBytes": 11402
+    },
+    {
+      "path": "G02_main_factorial_experiments/CFG-H-E/104729/reports/final_campaign_validation_report.json",
+      "sha256": "34129a709e5f349d1367c3c38c89ed34ff06775400c9760bdcaf865207599eb1",
+      "sizeBytes": 447
+    },
+    {
+      "path": "G02_main_factorial_experiments/CFG-H-E/104729/reports/intas_literature_materialization_report.json",
+      "sha256": "fdd43809e1bee550ce79c0c469c5bc62b8087f7f308e485c949cf82c55c4df88",
+      "sizeBytes": 30833
+    },
+    {
+      "path": "G02_main_factorial_experiments/CFG-H-E/104729/reports/intas_literature_materialization_report.md",
+      "sha256": "96b5da2f39619b331ed6c5f51277b6d6eee039d87945eee826134197721f9447",
+      "sizeBytes": 813
+    },
+    {
+      "path": "G02_main_factorial_experiments/CFG-H-E/104729/reports/literature_configuration_validation.json",
+      "sha256": "da9fa80313953d96f4d861c904e58c010319bafa1589621fa01c73fab0504c90",
+      "sizeBytes": 847
+    },
+    {
+      "path": "G02_main_factorial_experiments/CFG-H-E/104729/scenario_config.json",
+      "sha256": "36e632d08b56ee0f434744de6aa4cc7847637238537a7da32cd260fb94f524ec",
+      "sizeBytes": 796
+    },
+    {
+      "path": "G02_main_factorial_experiments/CFG-H-E/104729/sns/sns_config.json",
+      "sha256": "253846a429c46648950016ed06656817906c99ea8c520a64da712ae7da31e3d0",
+      "sizeBytes": 360
+    },
+    {
+      "path": "G02_main_factorial_experiments/CFG-H-E/104729/sumo/intas_literature_urban.net.xml",
+      "sha256": "c74b9bf1732967e8779f21916d693e51b6b048c0d159a2e568c3b681111f181b",
+      "sizeBytes": 380267
+    },
+    {
+      "path": "G02_main_factorial_experiments/CFG-H-E/104729/sumo/intas_literature_urban.sumocfg",
+      "sha256": "d5ce936d0d3466ccda3ccf5e1c6a36fb14cef6fb8debb25ef8d77751475eadaa",
+      "sizeBytes": 358
+    },
+    {
+      "path": "G02_main_factorial_experiments/CFG-H-E/104729/sumo/intas_literature_urban_high_density.rou.xml",
+      "sha256": "001da6c5a173d2a05a97c4d706750d5d65c28e54c1c491e57a1667c6b656695e",
+      "sizeBytes": 28280
+    },
+    {
+      "path": "G02_main_factorial_experiments/CFG-H-E/104729/sumo/sumo_config.json",
+      "sha256": "5d07eda420d6a8eca6b0888d65b3c12b23196d5c323d14f2635aff6ac790b048",
+      "sizeBytes": 120
+    },
+    {
+      "path": "G02_main_factorial_experiments/CFG-H-E/130363/_campaign_logs/campaign_builder_stdout.log",
+      "sha256": "ec577b1026526e432a2a13ed3602d62a67ef8d55a291b7dae18196fdade26247",
+      "sizeBytes": 32454
+    },
+    {
+      "path": "G02_main_factorial_experiments/CFG-H-E/130363/application/application_config.json",
+      "sha256": "5a13763a030b8a4d74a66307e55a0d0879ec87433bb4210aa24e29d38ec65aba",
+      "sizeBytes": 407
+    },
+    {
+      "path": "G02_main_factorial_experiments/CFG-H-E/130363/application/intas_literature_urban.db",
+      "sha256": "6330041a2588c2b846c402837917ef45b300da5a99ce98d8242b87598b80ea16",
+      "sizeBytes": 176128
+    },
+    {
+      "path": "G02_main_factorial_experiments/CFG-H-E/130363/application/ma_ga_calibration_metadata.json",
+      "sha256": "6e0ce515ab9faabc8408165927d8ccefbbc6ac8e1eb5eb201641f97a740500e5",
+      "sizeBytes": 2896
+    },
+    {
+      "path": "G02_main_factorial_experiments/CFG-H-E/130363/application/ma_ga_live_runtime_config.json",
+      "sha256": "64ceec5dd062c9786b82818582e284fa117ec3c095b5a0c941b7e7becd93052b",
+      "sizeBytes": 736
+    },
+    {
+      "path": "G02_main_factorial_experiments/CFG-H-E/130363/application/ma_ga_live_state_config.json",
+      "sha256": "19c45b67c367d7ad7492228e3ebe8028db34a7b101b5734a8b08cc5a12f04831",
+      "sizeBytes": 4245
+    },
+    {
+      "path": "G02_main_factorial_experiments/CFG-H-E/130363/application/scenario-convert-command.log",
+      "sha256": "2c254bb9c3f89edca5f1a37e34fce5cd15dfaed249180e6ec9032c867b691813",
+      "sizeBytes": 9970
+    },
+    {
+      "path": "G02_main_factorial_experiments/CFG-H-E/130363/application/scenario-convert.log",
+      "sha256": "b2e3550579beb9a6fc3bafe5461777b1f89c7ca2d6695cd27122fc457f3aec6e",
+      "sizeBytes": 10824
+    },
+    {
+      "path": "G02_main_factorial_experiments/CFG-H-E/130363/cell/cell_config.json",
+      "sha256": "f4ed057288c25ee254ada4c82f52adb8d366fb751dc19a91819c471e2bd94de0",
+      "sizeBytes": 731
+    },
+    {
+      "path": "G02_main_factorial_experiments/CFG-H-E/130363/cell/network.json",
+      "sha256": "9566f236f5d276c29f375f7b35e5f3d7e9ccdb5b0d40a4a546870bf493cda785",
+      "sizeBytes": 1468
+    },
+    {
+      "path": "G02_main_factorial_experiments/CFG-H-E/130363/cell/regions.json",
+      "sha256": "d3394c5602b0b0bbf0c2fe5816542cd6101aa925bd207933b30acc61c7851171",
+      "sizeBytes": 1168
+    },
+    {
+      "path": "G02_main_factorial_experiments/CFG-H-E/130363/final_campaign_manifest.json",
+      "sha256": "4013e121f7b665965b4901f48a5c41f53520f909016b5a3afea4dd871b20d340",
+      "sizeBytes": 6676
+    },
+    {
+      "path": "G02_main_factorial_experiments/CFG-H-E/130363/mapping/mapping_config.json",
+      "sha256": "2ee86d01bbf9251cda6f02ae2a3d485ff95b4c8c67afe555996cc2bf6ba51144",
+      "sizeBytes": 1269
+    },
+    {
+      "path": "G02_main_factorial_experiments/CFG-H-E/130363/materialization_manifest.json",
+      "sha256": "5e52b99107e7b6071de64983ee95f81b1f2b2b4fe44427c470eb9a8da9b0dead",
+      "sizeBytes": 1016
+    },
+    {
+      "path": "G02_main_factorial_experiments/CFG-H-E/130363/output/output_config.xml",
+      "sha256": "909653ff7707f4ae9aa82e30da3534ad9a30e54882dcbefa784963dc97edbcb2",
+      "sizeBytes": 11402
+    },
+    {
+      "path": "G02_main_factorial_experiments/CFG-H-E/130363/reports/final_campaign_validation_report.json",
+      "sha256": "4418e633232f5f098e4a0d1c5d2d2bf2c3ec2b3eb3ccb69449f8fc6ab9f2a124",
+      "sizeBytes": 447
+    },
+    {
+      "path": "G02_main_factorial_experiments/CFG-H-E/130363/reports/intas_literature_materialization_report.json",
+      "sha256": "eab2946f46c33e9b0095bcb3eec8ac4111ecca09d17852eacfec5159c5f95c20",
+      "sizeBytes": 30857
+    },
+    {
+      "path": "G02_main_factorial_experiments/CFG-H-E/130363/reports/intas_literature_materialization_report.md",
+      "sha256": "5d796f1706310009e0bacb1f6344fffc47f1011255e6bf0a26d45350ad29f86b",
+      "sizeBytes": 813
+    },
+    {
+      "path": "G02_main_factorial_experiments/CFG-H-E/130363/reports/literature_configuration_validation.json",
+      "sha256": "c618ae059bf9bb26c43e6ad0d143176fdc4ca63b80db1c75a1b8dfa8a196b7bf",
+      "sizeBytes": 847
+    },
+    {
+      "path": "G02_main_factorial_experiments/CFG-H-E/130363/scenario_config.json",
+      "sha256": "36e632d08b56ee0f434744de6aa4cc7847637238537a7da32cd260fb94f524ec",
+      "sizeBytes": 796
+    },
+    {
+      "path": "G02_main_factorial_experiments/CFG-H-E/130363/sns/sns_config.json",
+      "sha256": "253846a429c46648950016ed06656817906c99ea8c520a64da712ae7da31e3d0",
+      "sizeBytes": 360
+    },
+    {
+      "path": "G02_main_factorial_experiments/CFG-H-E/130363/sumo/intas_literature_urban.net.xml",
+      "sha256": "fce45c33e376d55ae0d3b721c0dd5b8ed2d87afa82ac82215b425ce2e581a638",
+      "sizeBytes": 380267
+    },
+    {
+      "path": "G02_main_factorial_experiments/CFG-H-E/130363/sumo/intas_literature_urban.sumocfg",
+      "sha256": "d5ce936d0d3466ccda3ccf5e1c6a36fb14cef6fb8debb25ef8d77751475eadaa",
+      "sizeBytes": 358
+    },
+    {
+      "path": "G02_main_factorial_experiments/CFG-H-E/130363/sumo/intas_literature_urban_high_density.rou.xml",
+      "sha256": "4f78909117a30f9b9997521609ce4992730d33f0f095a08b86dd1b5acdc61e89",
+      "sizeBytes": 28280
+    },
+    {
+      "path": "G02_main_factorial_experiments/CFG-H-E/130363/sumo/sumo_config.json",
+      "sha256": "5d07eda420d6a8eca6b0888d65b3c12b23196d5c323d14f2635aff6ac790b048",
+      "sizeBytes": 120
+    },
+    {
+      "path": "G02_main_factorial_experiments/CFG-H-E/155921/_campaign_logs/campaign_builder_stdout.log",
+      "sha256": "3cf523ae30e75d52964bc9c967b97b7fa29d75b9c53bd9b535f6c45a4a67dd0e",
+      "sizeBytes": 32430
+    },
+    {
+      "path": "G02_main_factorial_experiments/CFG-H-E/155921/application/application_config.json",
+      "sha256": "5a13763a030b8a4d74a66307e55a0d0879ec87433bb4210aa24e29d38ec65aba",
+      "sizeBytes": 407
+    },
+    {
+      "path": "G02_main_factorial_experiments/CFG-H-E/155921/application/intas_literature_urban.db",
+      "sha256": "6330041a2588c2b846c402837917ef45b300da5a99ce98d8242b87598b80ea16",
+      "sizeBytes": 176128
+    },
+    {
+      "path": "G02_main_factorial_experiments/CFG-H-E/155921/application/ma_ga_calibration_metadata.json",
+      "sha256": "6e0ce515ab9faabc8408165927d8ccefbbc6ac8e1eb5eb201641f97a740500e5",
+      "sizeBytes": 2896
+    },
+    {
+      "path": "G02_main_factorial_experiments/CFG-H-E/155921/application/ma_ga_live_runtime_config.json",
+      "sha256": "64ceec5dd062c9786b82818582e284fa117ec3c095b5a0c941b7e7becd93052b",
+      "sizeBytes": 736
+    },
+    {
+      "path": "G02_main_factorial_experiments/CFG-H-E/155921/application/ma_ga_live_state_config.json",
+      "sha256": "078ca270927db47eb98602015b2a36c86ce2e719c123c1c25f834511e872a126",
+      "sizeBytes": 4245
+    },
+    {
+      "path": "G02_main_factorial_experiments/CFG-H-E/155921/application/scenario-convert-command.log",
+      "sha256": "c9bc127c44f42ffd9b641f031201551175795d48296e4fc79a90ed44b66e0c53",
+      "sizeBytes": 9970
+    },
+    {
+      "path": "G02_main_factorial_experiments/CFG-H-E/155921/application/scenario-convert.log",
+      "sha256": "d979bb6819935cc0f21443136bba60fd3df7f9ffce0c2c7241a2220f833c64db",
+      "sizeBytes": 10824
+    },
+    {
+      "path": "G02_main_factorial_experiments/CFG-H-E/155921/cell/cell_config.json",
+      "sha256": "f4ed057288c25ee254ada4c82f52adb8d366fb751dc19a91819c471e2bd94de0",
+      "sizeBytes": 731
+    },
+    {
+      "path": "G02_main_factorial_experiments/CFG-H-E/155921/cell/network.json",
+      "sha256": "9566f236f5d276c29f375f7b35e5f3d7e9ccdb5b0d40a4a546870bf493cda785",
+      "sizeBytes": 1468
+    },
+    {
+      "path": "G02_main_factorial_experiments/CFG-H-E/155921/cell/regions.json",
+      "sha256": "d3394c5602b0b0bbf0c2fe5816542cd6101aa925bd207933b30acc61c7851171",
+      "sizeBytes": 1168
+    },
+    {
+      "path": "G02_main_factorial_experiments/CFG-H-E/155921/final_campaign_manifest.json",
+      "sha256": "158f6b1f1b41ccd9e46be1364222d1a43ebc7e27621bebda23525dced94a083a",
+      "sizeBytes": 6676
+    },
+    {
+      "path": "G02_main_factorial_experiments/CFG-H-E/155921/mapping/mapping_config.json",
+      "sha256": "2ee86d01bbf9251cda6f02ae2a3d485ff95b4c8c67afe555996cc2bf6ba51144",
+      "sizeBytes": 1269
+    },
+    {
+      "path": "G02_main_factorial_experiments/CFG-H-E/155921/materialization_manifest.json",
+      "sha256": "9f6c0f0d39cc18fd19cbe8d6efb769b02066ae9c6b78d4770959fba2bebef05e",
+      "sizeBytes": 1016
+    },
+    {
+      "path": "G02_main_factorial_experiments/CFG-H-E/155921/output/output_config.xml",
+      "sha256": "909653ff7707f4ae9aa82e30da3534ad9a30e54882dcbefa784963dc97edbcb2",
+      "sizeBytes": 11402
+    },
+    {
+      "path": "G02_main_factorial_experiments/CFG-H-E/155921/reports/final_campaign_validation_report.json",
+      "sha256": "ef514afe821a17f9cd627b4e40b8161e1784d333824146611e88b44fb569677c",
+      "sizeBytes": 447
+    },
+    {
+      "path": "G02_main_factorial_experiments/CFG-H-E/155921/reports/intas_literature_materialization_report.json",
+      "sha256": "f2eb9836cfd96e2b9c82d6be6259de8219fc166fe0fa44263ad5e967bd8a21cc",
+      "sizeBytes": 30833
+    },
+    {
+      "path": "G02_main_factorial_experiments/CFG-H-E/155921/reports/intas_literature_materialization_report.md",
+      "sha256": "3fc1f90eb373550a2f17e4630269c57c06d2e5b8cb0e0117f7c355d4a656c1db",
+      "sizeBytes": 813
+    },
+    {
+      "path": "G02_main_factorial_experiments/CFG-H-E/155921/reports/literature_configuration_validation.json",
+      "sha256": "8b788f30aae7b1c4f5a3b2702cb95d4f74b98559447cce5ede302c6c86eb39bd",
+      "sizeBytes": 847
+    },
+    {
+      "path": "G02_main_factorial_experiments/CFG-H-E/155921/scenario_config.json",
+      "sha256": "36e632d08b56ee0f434744de6aa4cc7847637238537a7da32cd260fb94f524ec",
+      "sizeBytes": 796
+    },
+    {
+      "path": "G02_main_factorial_experiments/CFG-H-E/155921/sns/sns_config.json",
+      "sha256": "253846a429c46648950016ed06656817906c99ea8c520a64da712ae7da31e3d0",
+      "sizeBytes": 360
+    },
+    {
+      "path": "G02_main_factorial_experiments/CFG-H-E/155921/sumo/intas_literature_urban.net.xml",
+      "sha256": "f9b033660fa9cf7704b12f9796a89da63ad04333a35842a013628f3886a43dfb",
+      "sizeBytes": 380267
+    },
+    {
+      "path": "G02_main_factorial_experiments/CFG-H-E/155921/sumo/intas_literature_urban.sumocfg",
+      "sha256": "d5ce936d0d3466ccda3ccf5e1c6a36fb14cef6fb8debb25ef8d77751475eadaa",
+      "sizeBytes": 358
+    },
+    {
+      "path": "G02_main_factorial_experiments/CFG-H-E/155921/sumo/intas_literature_urban_high_density.rou.xml",
+      "sha256": "268b43e1989be3a10b7d33dac561fc4734831d2f71490864bea7432859cd70ea",
+      "sizeBytes": 28280
+    },
+    {
+      "path": "G02_main_factorial_experiments/CFG-H-E/155921/sumo/sumo_config.json",
+      "sha256": "5d07eda420d6a8eca6b0888d65b3c12b23196d5c323d14f2635aff6ac790b048",
+      "sizeBytes": 120
+    },
+    {
+      "path": "G02_main_factorial_experiments/CFG-H-E/181081/_campaign_logs/campaign_builder_stdout.log",
+      "sha256": "2a0e20dcead564092e10e08fab025cba10945fc924a43fa5cbd6d5b166b07549",
+      "sizeBytes": 32452
+    },
+    {
+      "path": "G02_main_factorial_experiments/CFG-H-E/181081/application/application_config.json",
+      "sha256": "5a13763a030b8a4d74a66307e55a0d0879ec87433bb4210aa24e29d38ec65aba",
+      "sizeBytes": 407
+    },
+    {
+      "path": "G02_main_factorial_experiments/CFG-H-E/181081/application/intas_literature_urban.db",
+      "sha256": "6330041a2588c2b846c402837917ef45b300da5a99ce98d8242b87598b80ea16",
+      "sizeBytes": 176128
+    },
+    {
+      "path": "G02_main_factorial_experiments/CFG-H-E/181081/application/ma_ga_calibration_metadata.json",
+      "sha256": "6e0ce515ab9faabc8408165927d8ccefbbc6ac8e1eb5eb201641f97a740500e5",
+      "sizeBytes": 2896
+    },
+    {
+      "path": "G02_main_factorial_experiments/CFG-H-E/181081/application/ma_ga_live_runtime_config.json",
+      "sha256": "64ceec5dd062c9786b82818582e284fa117ec3c095b5a0c941b7e7becd93052b",
+      "sizeBytes": 736
+    },
+    {
+      "path": "G02_main_factorial_experiments/CFG-H-E/181081/application/ma_ga_live_state_config.json",
+      "sha256": "312aca4cbfe8037bc194c44ebf001595faee14ffcc5749f799620bc585056125",
+      "sizeBytes": 4245
+    },
+    {
+      "path": "G02_main_factorial_experiments/CFG-H-E/181081/application/scenario-convert-command.log",
+      "sha256": "7c52c5d97fb6ef8753972b502bf4e74a898864fa97e402024e6fb9b0082c5334",
+      "sizeBytes": 9970
+    },
+    {
+      "path": "G02_main_factorial_experiments/CFG-H-E/181081/application/scenario-convert.log",
+      "sha256": "ed79b6529746bae5ec1c867ff511897f2e83ff6a4f402c2ef833501fa49c51fd",
+      "sizeBytes": 10824
+    },
+    {
+      "path": "G02_main_factorial_experiments/CFG-H-E/181081/cell/cell_config.json",
+      "sha256": "f4ed057288c25ee254ada4c82f52adb8d366fb751dc19a91819c471e2bd94de0",
+      "sizeBytes": 731
+    },
+    {
+      "path": "G02_main_factorial_experiments/CFG-H-E/181081/cell/network.json",
+      "sha256": "9566f236f5d276c29f375f7b35e5f3d7e9ccdb5b0d40a4a546870bf493cda785",
+      "sizeBytes": 1468
+    },
+    {
+      "path": "G02_main_factorial_experiments/CFG-H-E/181081/cell/regions.json",
+      "sha256": "d3394c5602b0b0bbf0c2fe5816542cd6101aa925bd207933b30acc61c7851171",
+      "sizeBytes": 1168
+    },
+    {
+      "path": "G02_main_factorial_experiments/CFG-H-E/181081/final_campaign_manifest.json",
+      "sha256": "4af94f208154e07165323ed612a4fffeb7a3b3946f9b734ad2ca189415c06687",
+      "sizeBytes": 6676
+    },
+    {
+      "path": "G02_main_factorial_experiments/CFG-H-E/181081/mapping/mapping_config.json",
+      "sha256": "2ee86d01bbf9251cda6f02ae2a3d485ff95b4c8c67afe555996cc2bf6ba51144",
+      "sizeBytes": 1269
+    },
+    {
+      "path": "G02_main_factorial_experiments/CFG-H-E/181081/materialization_manifest.json",
+      "sha256": "7693edf4dd2b3a7678bcab5d3bc1a69df739f4bbc4367cecc15b226cd854610f",
+      "sizeBytes": 1016
+    },
+    {
+      "path": "G02_main_factorial_experiments/CFG-H-E/181081/output/output_config.xml",
+      "sha256": "909653ff7707f4ae9aa82e30da3534ad9a30e54882dcbefa784963dc97edbcb2",
+      "sizeBytes": 11402
+    },
+    {
+      "path": "G02_main_factorial_experiments/CFG-H-E/181081/reports/final_campaign_validation_report.json",
+      "sha256": "686841b382741f5002edfacb2b2609c0ac0a5e7299cecdd7927eaaaaf89c4215",
+      "sizeBytes": 447
+    },
+    {
+      "path": "G02_main_factorial_experiments/CFG-H-E/181081/reports/intas_literature_materialization_report.json",
+      "sha256": "983fbfdae8b05fc3f16455777d70bef9827b09bb147d9650200e7eefe2d42d98",
+      "sizeBytes": 30855
+    },
+    {
+      "path": "G02_main_factorial_experiments/CFG-H-E/181081/reports/intas_literature_materialization_report.md",
+      "sha256": "f05bdc83cc256ed674f0a6c865d5cde92a7dd004d0fd739261196b11c985a5a9",
+      "sizeBytes": 813
+    },
+    {
+      "path": "G02_main_factorial_experiments/CFG-H-E/181081/reports/literature_configuration_validation.json",
+      "sha256": "c30e3b7020edfe27f5950d4883e80490e4725849abb6a2f80f64255efb6c184b",
+      "sizeBytes": 847
+    },
+    {
+      "path": "G02_main_factorial_experiments/CFG-H-E/181081/scenario_config.json",
+      "sha256": "36e632d08b56ee0f434744de6aa4cc7847637238537a7da32cd260fb94f524ec",
+      "sizeBytes": 796
+    },
+    {
+      "path": "G02_main_factorial_experiments/CFG-H-E/181081/sns/sns_config.json",
+      "sha256": "253846a429c46648950016ed06656817906c99ea8c520a64da712ae7da31e3d0",
+      "sizeBytes": 360
+    },
+    {
+      "path": "G02_main_factorial_experiments/CFG-H-E/181081/sumo/intas_literature_urban.net.xml",
+      "sha256": "c0630d84331bf29465696d5ede0c41862788a6dbefdedfd19eb12f8516dabe46",
+      "sizeBytes": 380267
+    },
+    {
+      "path": "G02_main_factorial_experiments/CFG-H-E/181081/sumo/intas_literature_urban.sumocfg",
+      "sha256": "d5ce936d0d3466ccda3ccf5e1c6a36fb14cef6fb8debb25ef8d77751475eadaa",
+      "sizeBytes": 358
+    },
+    {
+      "path": "G02_main_factorial_experiments/CFG-H-E/181081/sumo/intas_literature_urban_high_density.rou.xml",
+      "sha256": "b4eaf81171dee8dc3862297b89f04110a3c029b9f14938820121f198445255c6",
+      "sizeBytes": 28280
+    },
+    {
+      "path": "G02_main_factorial_experiments/CFG-H-E/181081/sumo/sumo_config.json",
+      "sha256": "5d07eda420d6a8eca6b0888d65b3c12b23196d5c323d14f2635aff6ac790b048",
+      "sizeBytes": 120
+    },
+    {
+      "path": "G02_main_factorial_experiments/CFG-H-E/207547/_campaign_logs/campaign_builder_stdout.log",
+      "sha256": "9742fbf57fb1910e8968c85c6ebbdce8bcb1177dbb1c0209ad41151671efed11",
+      "sizeBytes": 32430
+    },
+    {
+      "path": "G02_main_factorial_experiments/CFG-H-E/207547/application/application_config.json",
+      "sha256": "5a13763a030b8a4d74a66307e55a0d0879ec87433bb4210aa24e29d38ec65aba",
+      "sizeBytes": 407
+    },
+    {
+      "path": "G02_main_factorial_experiments/CFG-H-E/207547/application/intas_literature_urban.db",
+      "sha256": "6330041a2588c2b846c402837917ef45b300da5a99ce98d8242b87598b80ea16",
+      "sizeBytes": 176128
+    },
+    {
+      "path": "G02_main_factorial_experiments/CFG-H-E/207547/application/ma_ga_calibration_metadata.json",
+      "sha256": "6e0ce515ab9faabc8408165927d8ccefbbc6ac8e1eb5eb201641f97a740500e5",
+      "sizeBytes": 2896
+    },
+    {
+      "path": "G02_main_factorial_experiments/CFG-H-E/207547/application/ma_ga_live_runtime_config.json",
+      "sha256": "64ceec5dd062c9786b82818582e284fa117ec3c095b5a0c941b7e7becd93052b",
+      "sizeBytes": 736
+    },
+    {
+      "path": "G02_main_factorial_experiments/CFG-H-E/207547/application/ma_ga_live_state_config.json",
+      "sha256": "ca9d7f9d8e3dce59abf9560236ece90b61d841576be3d63ab82592413fb2e636",
+      "sizeBytes": 4245
+    },
+    {
+      "path": "G02_main_factorial_experiments/CFG-H-E/207547/application/scenario-convert-command.log",
+      "sha256": "72c3263df3e0056eb578ad4f5714ef76f30ee292df6a1c5e7a7750d2b71673fa",
+      "sizeBytes": 9970
+    },
+    {
+      "path": "G02_main_factorial_experiments/CFG-H-E/207547/application/scenario-convert.log",
+      "sha256": "9bbf43b4c14c67bbb150182b64435738b076406ef3ec3085ddacf9cbe2b3681e",
+      "sizeBytes": 10824
+    },
+    {
+      "path": "G02_main_factorial_experiments/CFG-H-E/207547/cell/cell_config.json",
+      "sha256": "f4ed057288c25ee254ada4c82f52adb8d366fb751dc19a91819c471e2bd94de0",
+      "sizeBytes": 731
+    },
+    {
+      "path": "G02_main_factorial_experiments/CFG-H-E/207547/cell/network.json",
+      "sha256": "9566f236f5d276c29f375f7b35e5f3d7e9ccdb5b0d40a4a546870bf493cda785",
+      "sizeBytes": 1468
+    },
+    {
+      "path": "G02_main_factorial_experiments/CFG-H-E/207547/cell/regions.json",
+      "sha256": "d3394c5602b0b0bbf0c2fe5816542cd6101aa925bd207933b30acc61c7851171",
+      "sizeBytes": 1168
+    },
+    {
+      "path": "G02_main_factorial_experiments/CFG-H-E/207547/final_campaign_manifest.json",
+      "sha256": "063643feaa598f7763ee8380c43cf297509f3a1e46fbf7746d195b507deb86cb",
+      "sizeBytes": 6676
+    },
+    {
+      "path": "G02_main_factorial_experiments/CFG-H-E/207547/mapping/mapping_config.json",
+      "sha256": "2ee86d01bbf9251cda6f02ae2a3d485ff95b4c8c67afe555996cc2bf6ba51144",
+      "sizeBytes": 1269
+    },
+    {
+      "path": "G02_main_factorial_experiments/CFG-H-E/207547/materialization_manifest.json",
+      "sha256": "e66e4f813d323db4ce82dc53f0618f5289c9032f838dd1de9e1fb3e340420135",
+      "sizeBytes": 1016
+    },
+    {
+      "path": "G02_main_factorial_experiments/CFG-H-E/207547/output/output_config.xml",
+      "sha256": "909653ff7707f4ae9aa82e30da3534ad9a30e54882dcbefa784963dc97edbcb2",
+      "sizeBytes": 11402
+    },
+    {
+      "path": "G02_main_factorial_experiments/CFG-H-E/207547/reports/final_campaign_validation_report.json",
+      "sha256": "83a78e665845d3d3aad19ef2d30114ece52dbf9a2b5fec516b27fb58cdc88fbf",
+      "sizeBytes": 447
+    },
+    {
+      "path": "G02_main_factorial_experiments/CFG-H-E/207547/reports/intas_literature_materialization_report.json",
+      "sha256": "f1a244fd02e8682710bf926eec006bbbad846ffa67d6ab7e032f4945de1b9035",
+      "sizeBytes": 30833
+    },
+    {
+      "path": "G02_main_factorial_experiments/CFG-H-E/207547/reports/intas_literature_materialization_report.md",
+      "sha256": "7a47a487474fb89c7f7efe177bef35ef12422328cfc9bb7597522f7bfffa3e23",
+      "sizeBytes": 813
+    },
+    {
+      "path": "G02_main_factorial_experiments/CFG-H-E/207547/reports/literature_configuration_validation.json",
+      "sha256": "77c8d5e35ab56f65eeb82dcc67c88dd1399e97668da472f6e06a3ac0582dd0d5",
+      "sizeBytes": 847
+    },
+    {
+      "path": "G02_main_factorial_experiments/CFG-H-E/207547/scenario_config.json",
+      "sha256": "36e632d08b56ee0f434744de6aa4cc7847637238537a7da32cd260fb94f524ec",
+      "sizeBytes": 796
+    },
+    {
+      "path": "G02_main_factorial_experiments/CFG-H-E/207547/sns/sns_config.json",
+      "sha256": "253846a429c46648950016ed06656817906c99ea8c520a64da712ae7da31e3d0",
+      "sizeBytes": 360
+    },
+    {
+      "path": "G02_main_factorial_experiments/CFG-H-E/207547/sumo/intas_literature_urban.net.xml",
+      "sha256": "f5c89f7219f343b821c372d72c816a0ab79efa854de4b6577af97b2145721e6a",
+      "sizeBytes": 380267
+    },
+    {
+      "path": "G02_main_factorial_experiments/CFG-H-E/207547/sumo/intas_literature_urban.sumocfg",
+      "sha256": "d5ce936d0d3466ccda3ccf5e1c6a36fb14cef6fb8debb25ef8d77751475eadaa",
+      "sizeBytes": 358
+    },
+    {
+      "path": "G02_main_factorial_experiments/CFG-H-E/207547/sumo/intas_literature_urban_high_density.rou.xml",
+      "sha256": "8e846dbb385ad43d4f180766930581266e2e4d58f823d0668f17acc18bdfd5dc",
+      "sizeBytes": 28280
+    },
+    {
+      "path": "G02_main_factorial_experiments/CFG-H-E/207547/sumo/sumo_config.json",
+      "sha256": "5d07eda420d6a8eca6b0888d65b3c12b23196d5c323d14f2635aff6ac790b048",
+      "sizeBytes": 120
+    },
+    {
+      "path": "G02_main_factorial_experiments/CFG-H-I/104729/_campaign_logs/campaign_builder_stdout.log",
+      "sha256": "b89da117a484968fca58dd27c3e7a73e5f0dd06c19479a787357da3862378d8a",
+      "sizeBytes": 32430
+    },
+    {
+      "path": "G02_main_factorial_experiments/CFG-H-I/104729/application/application_config.json",
+      "sha256": "5a13763a030b8a4d74a66307e55a0d0879ec87433bb4210aa24e29d38ec65aba",
+      "sizeBytes": 407
+    },
+    {
+      "path": "G02_main_factorial_experiments/CFG-H-I/104729/application/intas_literature_urban.db",
+      "sha256": "6330041a2588c2b846c402837917ef45b300da5a99ce98d8242b87598b80ea16",
+      "sizeBytes": 176128
+    },
+    {
+      "path": "G02_main_factorial_experiments/CFG-H-I/104729/application/ma_ga_calibration_metadata.json",
+      "sha256": "6e0ce515ab9faabc8408165927d8ccefbbc6ac8e1eb5eb201641f97a740500e5",
+      "sizeBytes": 2896
+    },
+    {
+      "path": "G02_main_factorial_experiments/CFG-H-I/104729/application/ma_ga_live_runtime_config.json",
+      "sha256": "64ceec5dd062c9786b82818582e284fa117ec3c095b5a0c941b7e7becd93052b",
+      "sizeBytes": 736
+    },
+    {
+      "path": "G02_main_factorial_experiments/CFG-H-I/104729/application/ma_ga_live_state_config.json",
+      "sha256": "577bf4300fafc32f3f7470b4de87250feca05cd544154d66466b9c4490ba1ed5",
+      "sizeBytes": 4245
+    },
+    {
+      "path": "G02_main_factorial_experiments/CFG-H-I/104729/application/scenario-convert-command.log",
+      "sha256": "aa237bca6125be80df3c4d7758d8ec969739179f83a81352f4febbb05f50990c",
+      "sizeBytes": 9970
+    },
+    {
+      "path": "G02_main_factorial_experiments/CFG-H-I/104729/application/scenario-convert.log",
+      "sha256": "a31cb41396ed0c9d280779fa30f12390c9dfc4e6ec1807be6417b9832ceeef09",
+      "sizeBytes": 10824
+    },
+    {
+      "path": "G02_main_factorial_experiments/CFG-H-I/104729/cell/cell_config.json",
+      "sha256": "f4ed057288c25ee254ada4c82f52adb8d366fb751dc19a91819c471e2bd94de0",
+      "sizeBytes": 731
+    },
+    {
+      "path": "G02_main_factorial_experiments/CFG-H-I/104729/cell/network.json",
+      "sha256": "9566f236f5d276c29f375f7b35e5f3d7e9ccdb5b0d40a4a546870bf493cda785",
+      "sizeBytes": 1468
+    },
+    {
+      "path": "G02_main_factorial_experiments/CFG-H-I/104729/cell/regions.json",
+      "sha256": "d3394c5602b0b0bbf0c2fe5816542cd6101aa925bd207933b30acc61c7851171",
+      "sizeBytes": 1168
+    },
+    {
+      "path": "G02_main_factorial_experiments/CFG-H-I/104729/final_campaign_manifest.json",
+      "sha256": "70c0d8041adff270a56443b52f1b08278e82eb4a55de9def04c90fb45f179a23",
+      "sizeBytes": 6676
+    },
+    {
+      "path": "G02_main_factorial_experiments/CFG-H-I/104729/mapping/mapping_config.json",
+      "sha256": "2ee86d01bbf9251cda6f02ae2a3d485ff95b4c8c67afe555996cc2bf6ba51144",
+      "sizeBytes": 1269
+    },
+    {
+      "path": "G02_main_factorial_experiments/CFG-H-I/104729/materialization_manifest.json",
+      "sha256": "4a10a3dc7aeb25b3ab42e73e76bfa46d2cb37485a618fe441366115721b31d19",
+      "sizeBytes": 1016
+    },
+    {
+      "path": "G02_main_factorial_experiments/CFG-H-I/104729/output/output_config.xml",
+      "sha256": "909653ff7707f4ae9aa82e30da3534ad9a30e54882dcbefa784963dc97edbcb2",
+      "sizeBytes": 11402
+    },
+    {
+      "path": "G02_main_factorial_experiments/CFG-H-I/104729/reports/final_campaign_validation_report.json",
+      "sha256": "39aaaef877dea4412e73905d07cb6e30ee8f9118ae3c71b75d0ecd49a5403e31",
+      "sizeBytes": 447
+    },
+    {
+      "path": "G02_main_factorial_experiments/CFG-H-I/104729/reports/intas_literature_materialization_report.json",
+      "sha256": "d7918a42dc8f5a81c30b5a3b780fb0598a1d1c8a31ca30c3d7b8f39382cc9756",
+      "sizeBytes": 30833
+    },
+    {
+      "path": "G02_main_factorial_experiments/CFG-H-I/104729/reports/intas_literature_materialization_report.md",
+      "sha256": "96b5da2f39619b331ed6c5f51277b6d6eee039d87945eee826134197721f9447",
+      "sizeBytes": 813
+    },
+    {
+      "path": "G02_main_factorial_experiments/CFG-H-I/104729/reports/literature_configuration_validation.json",
+      "sha256": "6649fa3b05927c60ce4bcb23c3daeb9bb39e5332cfe234c59228a52ee9a6f8e9",
+      "sizeBytes": 847
+    },
+    {
+      "path": "G02_main_factorial_experiments/CFG-H-I/104729/scenario_config.json",
+      "sha256": "36e632d08b56ee0f434744de6aa4cc7847637238537a7da32cd260fb94f524ec",
+      "sizeBytes": 796
+    },
+    {
+      "path": "G02_main_factorial_experiments/CFG-H-I/104729/sns/sns_config.json",
+      "sha256": "253846a429c46648950016ed06656817906c99ea8c520a64da712ae7da31e3d0",
+      "sizeBytes": 360
+    },
+    {
+      "path": "G02_main_factorial_experiments/CFG-H-I/104729/sumo/intas_literature_urban.net.xml",
+      "sha256": "c24bf83248db036cae25e9fd9253154186eb087ee29ba8750c379d417ceed49b",
+      "sizeBytes": 380267
+    },
+    {
+      "path": "G02_main_factorial_experiments/CFG-H-I/104729/sumo/intas_literature_urban.sumocfg",
+      "sha256": "d5ce936d0d3466ccda3ccf5e1c6a36fb14cef6fb8debb25ef8d77751475eadaa",
+      "sizeBytes": 358
+    },
+    {
+      "path": "G02_main_factorial_experiments/CFG-H-I/104729/sumo/intas_literature_urban_high_density.rou.xml",
+      "sha256": "001da6c5a173d2a05a97c4d706750d5d65c28e54c1c491e57a1667c6b656695e",
+      "sizeBytes": 28280
+    },
+    {
+      "path": "G02_main_factorial_experiments/CFG-H-I/104729/sumo/sumo_config.json",
+      "sha256": "5d07eda420d6a8eca6b0888d65b3c12b23196d5c323d14f2635aff6ac790b048",
+      "sizeBytes": 120
+    },
+    {
+      "path": "G02_main_factorial_experiments/CFG-H-I/130363/_campaign_logs/campaign_builder_stdout.log",
+      "sha256": "68fb888fb69c29692f7a87c6ecb4212cb4c88713035112308e85e66ea45ac19c",
+      "sizeBytes": 32454
+    },
+    {
+      "path": "G02_main_factorial_experiments/CFG-H-I/130363/application/application_config.json",
+      "sha256": "5a13763a030b8a4d74a66307e55a0d0879ec87433bb4210aa24e29d38ec65aba",
+      "sizeBytes": 407
+    },
+    {
+      "path": "G02_main_factorial_experiments/CFG-H-I/130363/application/intas_literature_urban.db",
+      "sha256": "6330041a2588c2b846c402837917ef45b300da5a99ce98d8242b87598b80ea16",
+      "sizeBytes": 176128
+    },
+    {
+      "path": "G02_main_factorial_experiments/CFG-H-I/130363/application/ma_ga_calibration_metadata.json",
+      "sha256": "6e0ce515ab9faabc8408165927d8ccefbbc6ac8e1eb5eb201641f97a740500e5",
+      "sizeBytes": 2896
+    },
+    {
+      "path": "G02_main_factorial_experiments/CFG-H-I/130363/application/ma_ga_live_runtime_config.json",
+      "sha256": "64ceec5dd062c9786b82818582e284fa117ec3c095b5a0c941b7e7becd93052b",
+      "sizeBytes": 736
+    },
+    {
+      "path": "G02_main_factorial_experiments/CFG-H-I/130363/application/ma_ga_live_state_config.json",
+      "sha256": "2245f814579f597d79ffc50189f73f5818c58d53ccf8ed3ad13dff274263281d",
+      "sizeBytes": 4245
+    },
+    {
+      "path": "G02_main_factorial_experiments/CFG-H-I/130363/application/scenario-convert-command.log",
+      "sha256": "9ce7d6e3665ac6c8f2db174bd3c7f93a2dcd5a023f3a2f6865b9081a22e4a9fe",
+      "sizeBytes": 9970
+    },
+    {
+      "path": "G02_main_factorial_experiments/CFG-H-I/130363/application/scenario-convert.log",
+      "sha256": "046233fb49bb4557c3a99f75ecb94a409e9f6ec62f9286fc82b68a2e9c268995",
+      "sizeBytes": 10824
+    },
+    {
+      "path": "G02_main_factorial_experiments/CFG-H-I/130363/cell/cell_config.json",
+      "sha256": "f4ed057288c25ee254ada4c82f52adb8d366fb751dc19a91819c471e2bd94de0",
+      "sizeBytes": 731
+    },
+    {
+      "path": "G02_main_factorial_experiments/CFG-H-I/130363/cell/network.json",
+      "sha256": "9566f236f5d276c29f375f7b35e5f3d7e9ccdb5b0d40a4a546870bf493cda785",
+      "sizeBytes": 1468
+    },
+    {
+      "path": "G02_main_factorial_experiments/CFG-H-I/130363/cell/regions.json",
+      "sha256": "d3394c5602b0b0bbf0c2fe5816542cd6101aa925bd207933b30acc61c7851171",
+      "sizeBytes": 1168
+    },
+    {
+      "path": "G02_main_factorial_experiments/CFG-H-I/130363/final_campaign_manifest.json",
+      "sha256": "8a5ac96da5082bacc5f9542db3b4c17306425cdebbc50d18c8c6fa1a26ee71a7",
+      "sizeBytes": 6676
+    },
+    {
+      "path": "G02_main_factorial_experiments/CFG-H-I/130363/mapping/mapping_config.json",
+      "sha256": "2ee86d01bbf9251cda6f02ae2a3d485ff95b4c8c67afe555996cc2bf6ba51144",
+      "sizeBytes": 1269
+    },
+    {
+      "path": "G02_main_factorial_experiments/CFG-H-I/130363/materialization_manifest.json",
+      "sha256": "b2fdde7ec4c6eea83167971623e2c5238e2068775b0b1e540a74febe163692fb",
+      "sizeBytes": 1016
+    },
+    {
+      "path": "G02_main_factorial_experiments/CFG-H-I/130363/output/output_config.xml",
+      "sha256": "909653ff7707f4ae9aa82e30da3534ad9a30e54882dcbefa784963dc97edbcb2",
+      "sizeBytes": 11402
+    },
+    {
+      "path": "G02_main_factorial_experiments/CFG-H-I/130363/reports/final_campaign_validation_report.json",
+      "sha256": "afe99eb1c00999f008f0c87aed72addb93fa14791d789522d1f7ba4308db6aa0",
+      "sizeBytes": 447
+    },
+    {
+      "path": "G02_main_factorial_experiments/CFG-H-I/130363/reports/intas_literature_materialization_report.json",
+      "sha256": "1c17d103346d945562cda6fb585e7210fb78fa1de2c6c0f6699e17bef40753e2",
+      "sizeBytes": 30857
+    },
+    {
+      "path": "G02_main_factorial_experiments/CFG-H-I/130363/reports/intas_literature_materialization_report.md",
+      "sha256": "5d796f1706310009e0bacb1f6344fffc47f1011255e6bf0a26d45350ad29f86b",
+      "sizeBytes": 813
+    },
+    {
+      "path": "G02_main_factorial_experiments/CFG-H-I/130363/reports/literature_configuration_validation.json",
+      "sha256": "239ffdabacae84552673b8225bc8021f0fd59ad8d7c6f2ced797b04315172587",
+      "sizeBytes": 847
+    },
+    {
+      "path": "G02_main_factorial_experiments/CFG-H-I/130363/scenario_config.json",
+      "sha256": "36e632d08b56ee0f434744de6aa4cc7847637238537a7da32cd260fb94f524ec",
+      "sizeBytes": 796
+    },
+    {
+      "path": "G02_main_factorial_experiments/CFG-H-I/130363/sns/sns_config.json",
+      "sha256": "253846a429c46648950016ed06656817906c99ea8c520a64da712ae7da31e3d0",
+      "sizeBytes": 360
+    },
+    {
+      "path": "G02_main_factorial_experiments/CFG-H-I/130363/sumo/intas_literature_urban.net.xml",
+      "sha256": "cd34349b0aaa4791e537591a557e57aee94fea2bf05c6f820998fbd103fd9d51",
+      "sizeBytes": 380267
+    },
+    {
+      "path": "G02_main_factorial_experiments/CFG-H-I/130363/sumo/intas_literature_urban.sumocfg",
+      "sha256": "d5ce936d0d3466ccda3ccf5e1c6a36fb14cef6fb8debb25ef8d77751475eadaa",
+      "sizeBytes": 358
+    },
+    {
+      "path": "G02_main_factorial_experiments/CFG-H-I/130363/sumo/intas_literature_urban_high_density.rou.xml",
+      "sha256": "4f78909117a30f9b9997521609ce4992730d33f0f095a08b86dd1b5acdc61e89",
+      "sizeBytes": 28280
+    },
+    {
+      "path": "G02_main_factorial_experiments/CFG-H-I/130363/sumo/sumo_config.json",
+      "sha256": "5d07eda420d6a8eca6b0888d65b3c12b23196d5c323d14f2635aff6ac790b048",
+      "sizeBytes": 120
+    }
+  ],
+  "hashesTruncated": true,
+  "sizeBytes": 41676271,
+  "source": "C:\\Users\\raffa\\IdeaProjects\\maga-core\\tmp\\materialized-literature-scenarios\\final-test-campaign",
+  "status": "ARCHIVED"
+}

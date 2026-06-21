@@ -1,0 +1,83 @@
+[
+  {
+    "config_id": "CFG-SMOKE",
+    "evidence_id": "EV-G00-RECOVERED-INTERMEDIATE-STATUSES",
+    "expected": "Final G00 materialization is validated or warning-only after tooling correction.",
+    "group_id": "G01",
+    "materialization_id": "MAT-CFG-SMOKE-104729",
+    "notes": "Recovered from G00F pre-normalization audit observation and archived G00 context.",
+    "observed": "Recovered G00 pilot/history attempt recorded status=FAILED_MATERIALIZATION"
+  },
+  {
+    "config_id": "CFG-SMOKE",
+    "evidence_id": "EV-G00-RECOVERED-INTERMEDIATE-STATUSES",
+    "expected": "Final G00 materialization is validated or warning-only after tooling correction.",
+    "group_id": "G01",
+    "materialization_id": "MAT-CFG-SMOKE-104729",
+    "notes": "Recovered from G00F pre-normalization audit observation and archived G00 context.",
+    "observed": "Recovered G00 pilot/history attempt recorded status=BLOCKED"
+  },
+  {
+    "config_id": "CFG-SMOKE",
+    "evidence_id": "EV-G00-RECOVERED-INTERMEDIATE-STATUSES",
+    "expected": "Final G00 materialization is validated or warning-only after tooling correction.",
+    "group_id": "G01",
+    "materialization_id": "MAT-CFG-SMOKE-104729",
+    "notes": "Recovered from G00F pre-normalization audit observation and archived G00 context.",
+    "observed": "Recovered G00 pilot/history attempt recorded status=FAILED_VALIDATION"
+  },
+  {
+    "config_id": "CFG-N-E",
+    "evidence_id": "EV-G00-RECOVERED-INTERMEDIATE-STATUSES",
+    "expected": "Final G00 materialization is validated or warning-only after tooling correction.",
+    "group_id": "G02",
+    "materialization_id": "MAT-CFG-N-E-104729",
+    "notes": "Recovered from G00F pre-normalization audit observation and archived G00 context.",
+    "observed": "Recovered G00 pilot/history attempt recorded status=BLOCKED"
+  },
+  {
+    "config_id": "CFG-N-I",
+    "evidence_id": "EV-G00-RECOVERED-INTERMEDIATE-STATUSES",
+    "expected": "Final G00 materialization is validated or warning-only after tooling correction.",
+    "group_id": "G02",
+    "materialization_id": "MAT-CFG-N-I-104729",
+    "notes": "Recovered from G00F pre-normalization audit observation and archived G00 context.",
+    "observed": "Recovered G00 pilot/history attempt recorded status=BLOCKED"
+  },
+  {
+    "config_id": "CFG-M-SWITCH",
+    "evidence_id": "EV-G00-RECOVERED-INTERMEDIATE-STATUSES",
+    "expected": "Final G00 materialization is validated or warning-only after tooling correction.",
+    "group_id": "G04",
+    "materialization_id": "MAT-CFG-M-SWITCH-104729",
+    "notes": "Recovered from G00F pre-normalization audit observation and archived G00 context.",
+    "observed": "Recovered G00 pilot/history attempt recorded status=BLOCKED"
+  },
+  {
+    "config_id": "CFG-R-CELLBW",
+    "evidence_id": "EV-G00-RECOVERED-INTERMEDIATE-STATUSES",
+    "expected": "Final G00 materialization is validated or warning-only after tooling correction.",
+    "group_id": "G05",
+    "materialization_id": "MAT-CFG-R-CELLBW-104729",
+    "notes": "Recovered from G00F pre-normalization audit observation and archived G00 context.",
+    "observed": "Recovered G00 pilot/history attempt recorded status=BLOCKED"
+  },
+  {
+    "config_id": "CFG-G-ADAPTIVE",
+    "evidence_id": "EV-G00-RECOVERED-INTERMEDIATE-STATUSES",
+    "expected": "Final G00 materialization is validated or warning-only after tooling correction.",
+    "group_id": "G06",
+    "materialization_id": "MAT-CFG-G-ADAPTIVE-104729",
+    "notes": "Recovered from G00F pre-normalization audit observation and archived G00 context.",
+    "observed": "Recovered G00 pilot/history attempt recorded status=BLOCKED"
+  },
+  {
+    "config_id": "CFG-M-RSU1",
+    "evidence_id": "EV-G00-RECOVERED-INTERMEDIATE-STATUSES",
+    "expected": "Final G00 materialization is validated or warning-only after tooling correction.",
+    "group_id": "G04",
+    "materialization_id": "MAT-CFG-M-RSU1-104729",
+    "notes": "Recovered from G00F pre-normalization audit observation and archived G00 context.",
+    "observed": "Recovered G00 pilot/history attempt recorded status=FAILED_MATERIALIZATION"
+  }
+]

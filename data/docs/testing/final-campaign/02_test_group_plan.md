@@ -42,7 +42,7 @@ test-manifests/final-campaign/<Gxx_name>/~~~
 
 This keeps generated scenario instances and raw run output out of the versioned scenario templates and gives each Config_ID + seed + duration + replica a collision-free directory.
 
-## Config_ID to group
+## Config_ID to group - Stato iniziale prima dell'esecuzione di G00
 
 | Config_ID | Group | Group name | Classification | Materializzare | Planned materializations |
 | --- | --- | --- | --- | --- | --- |
@@ -239,3 +239,23 @@ The full mapping is in test_id_group_mapping.csv. The following Test_ID entries 
 - The nine main configurations CFG-L-E through CFG-H-S require five materializations each, one for seeds 104729, 130363, 155921, 181081, 207547.
 - CFG-RUNTIME-REPEAT uses one materialization and three MOSAIC executions.
 - CFG-REPRO uses two independent materializations with the same parameters and seed for hash comparison.
+
+## G00 Execution Result
+
+Stato iniziale prima dell'esecuzione di G00: documentazione e piano di campagna predisposti, con tooling finale ancora da creare e scenari non ancora materializzati.
+
+Stato corrente post-G00/G00F: `COMPLETED`.
+
+- planned materializations: `69`
+- completed materializations: `69`
+- validated materializations: `63`
+- warning materializations: `6`
+- failed materializations: `0`
+- blocked materializations: `0`
+- NON_MATERIALIZABLE: `2`
+- READY_CONFIG_ONLY: `20`
+- READY_EXISTING_TOOLING: `8`
+- REQUIRES_DECISION: `0`
+- NEEDS_TEST_TOOLING_EXTENSION: `0`
+
+Tooling created under `tools/intas-literature-scenario/final_campaign/`. Concrete scenarios remain under `tmp/materialized-literature-scenarios/final-test-campaign/`; MOSAIC was not executed. G00 is technically complete and the audit bundle was normalized in G00F.

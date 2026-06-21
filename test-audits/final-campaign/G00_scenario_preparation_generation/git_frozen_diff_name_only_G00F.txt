@@ -1,0 +1,8 @@
+$ git -c safe.directory=C:/Users/raffa/IdeaProjects/maga-core diff --name-only -- src tools/mosaic-live-maga-runtime/src tools/mosaic-live-state-layer/src tools/mosaic-adhoc-radio-diagnostic/src
+# returncode: 0
+
+[stdout]
+<empty>
+
+[stderr]
+<empty>

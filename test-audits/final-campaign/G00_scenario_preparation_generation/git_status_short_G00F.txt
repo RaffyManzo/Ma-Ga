@@ -1,0 +1,17 @@
+$ git -c safe.directory=C:/Users/raffa/IdeaProjects/maga-core status --short
+# returncode: 0
+
+[stdout]
+ M data/docs/testing/final-campaign/01_scenario_compatibility_audit.md
+ M data/docs/testing/final-campaign/02_test_group_plan.md
+ M data/docs/testing/final-campaign/README.md
+ M data/docs/testing/final-campaign/scenario_configuration_mapping.csv
+ M data/docs/testing/final-campaign/scenario_instance_plan.csv
+?? G00F_verification_bundle_20260621-101311.zip
+?? G00_verification_bundle_20260620-111031.zip
+?? test-audits/
+?? test-results/
+?? tools/intas-literature-scenario/final_campaign/
+
+[stderr]
+<empty>

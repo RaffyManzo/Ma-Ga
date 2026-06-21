@@ -1,0 +1,14 @@
+$ git -c safe.directory=C:/Users/raffa/IdeaProjects/maga-core diff --name-only
+# returncode: 0
+
+[stdout]
+data/docs/testing/final-campaign/01_scenario_compatibility_audit.md
+data/docs/testing/final-campaign/02_test_group_plan.md
+data/docs/testing/final-campaign/README.md
+data/docs/testing/final-campaign/scenario_configuration_mapping.csv
+data/docs/testing/final-campaign/scenario_instance_plan.csv
+
+[stderr]
+warning: in the working copy of 'data/docs/testing/final-campaign/01_scenario_compatibility_audit.md', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'data/docs/testing/final-campaign/scenario_configuration_mapping.csv', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'data/docs/testing/final-campaign/scenario_instance_plan.csv', LF will be replaced by CRLF the next time Git touches it

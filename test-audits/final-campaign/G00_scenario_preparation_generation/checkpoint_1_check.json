@@ -1,0 +1,11 @@
+{
+  "mode": "check",
+  "planning": {
+    "configRows": 30,
+    "errors": [],
+    "materializationRows": 69,
+    "testRows": 87,
+    "uniqueMaterializationIds": 69,
+    "uniqueTargetDirectories": 69
+  }
+}

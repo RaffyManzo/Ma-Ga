@@ -1,0 +1,19 @@
+campaign_id,group_id,config_id,materialization_id,run_id,test_id,metric_name,metric_value,metric_unit,source_file,validator_status,notes
+final-test-campaign,G00,ALL,ALL,,T-001,planned_materializations,69,count,test-audits/final-campaign/G00_scenario_preparation_generation/materialization_summary_all.json,PASS,
+final-test-campaign,G00,ALL,ALL,,T-001,completed_materializations,69,count,test-audits/final-campaign/G00_scenario_preparation_generation/materialization_summary_all.json,PASS,
+final-test-campaign,G00,ALL,ALL,,T-002,validated_materializations,63,count,test-audits/final-campaign/G00_scenario_preparation_generation/materialization_summary_all.json,PASS,
+final-test-campaign,G00,ALL,ALL,,T-002,warning_materializations,6,count,test-audits/final-campaign/G00_scenario_preparation_generation/materialization_summary_all.json,WARN,Warning-only direct profiles are accepted engineering profiles.
+final-test-campaign,G00,ALL,ALL,,T-001,failed_materializations,0,count,test-audits/final-campaign/G00_scenario_preparation_generation/materialization_summary_all.json,PASS,
+final-test-campaign,G00,ALL,ALL,,T-001,blocked_materializations,0,count,test-audits/final-campaign/G00_scenario_preparation_generation/materialization_summary_all.json,PASS,
+final-test-campaign,G00,ALL,ALL,,T-001,unique_materialization_ids,69,count,test-audits/final-campaign/G00_scenario_preparation_generation/materialization_summary_all.json,PASS,
+final-test-campaign,G00,ALL,ALL,,T-001,unique_target_directories,69,count,test-audits/final-campaign/G00_scenario_preparation_generation/materialization_summary_all.json,PASS,
+final-test-campaign,G00,ALL,ALL,,T-002,campaign_seed_count,5,count,test-results/final-campaign/G00_scenario_preparation_generation/materialization_input_index.csv,PASS,
+final-test-campaign,G00,ALL,ALL,,T-002,workload_seed_count,5,count,test-results/final-campaign/G00_scenario_preparation_generation/materialization_input_index.csv,PASS,
+final-test-campaign,G00,ALL,ALL,,T-014,raw_repro_compared_artifact_count,25,count,test-results/final-campaign/G03_reproducibility_duration/repro_materialization_comparison.json,WARN,Preliminary reproducibility evidence; G03 keeps responsibility for final interpretation.
+final-test-campaign,G00,ALL,ALL,,T-014,raw_repro_different_artifact_count,9,count,test-results/final-campaign/G03_reproducibility_duration/repro_materialization_comparison.json,WARN,Raw comparison is intentionally unnormalized.
+final-test-campaign,G00,ALL,ALL,,T-014,logical_repro_compared_artifact_count,22,count,test-results/final-campaign/G03_reproducibility_duration/repro_materialization_comparison.json,PASS,Preliminary reproducibility evidence; G03 keeps responsibility for final interpretation.
+final-test-campaign,G00,ALL,ALL,,T-014,logical_repro_different_artifact_count,0,count,test-results/final-campaign/G03_reproducibility_duration/repro_materialization_comparison.json,PASS,Logical comparison excludes only documented nondeterministic fields.
+final-test-campaign,G00,ALL,ALL,,T-002,sumo_errors_total,0,count,test-audits/final-campaign/G00_scenario_preparation_generation/materialization_summary_all.json,PASS,
+final-test-campaign,G00,ALL,ALL,,T-002,teleport_mentions_total,0,count,test-audits/final-campaign/G00_scenario_preparation_generation/materialization_summary_all.json,PASS,
+final-test-campaign,G00,ALL,ALL,,T-002,emergency_braking_mentions_total,0,count,test-audits/final-campaign/G00_scenario_preparation_generation/materialization_summary_all.json,PASS,
+final-test-campaign,G00,ALL,ALL,,T-001,scenario_root_size_bytes,47381437,bytes,test-audits/final-campaign/G00_scenario_preparation_generation/materialization_summary_all.json,NOT_APPLICABLE,

@@ -1,0 +1,11 @@
+{
+  "configId": "CFG-M-RSU1",
+  "errors": [
+    "Canonical builder failed for MAT-CFG-M-RSU1-104729 with exit code 1. See C:\\Users\\raffa\\IdeaProjects\\maga-core\\tmp\\materialized-literature-scenarios\\final-test-campaign\\G04_mobility_connectivity\\CFG-M-RSU1\\104729\\_campaign_logs\\campaign_builder_stdout.log"
+  ],
+  "groupId": "G04",
+  "materializationId": "MAT-CFG-M-RSU1-104729",
+  "status": "FAILED_MATERIALIZATION",
+  "targetDirectory": "tmp/materialized-literature-scenarios/final-test-campaign/G04_mobility_connectivity/CFG-M-RSU1/104729/",
+  "warnings": []
+}

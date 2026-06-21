@@ -4,7 +4,7 @@
 - Commit congelato verificato: 5a9477735a3d707a5f000a64653cd2a6fc7f2007
 - Branch di lavoro preparato: testing/final-campaign
 - Workbook analizzato: C:/Users/raffa/Downloads/Matrice_test_MA_GA_MOSAIC_SUMO_Fase0_completa.xlsx
-- Stato: pianificazione/audit soltanto; nessuno scenario generato, nessuna simulazione eseguita, nessun codice modificato.
+- Stato iniziale prima dell'esecuzione di G00: pianificazione/audit soltanto; nessuno scenario generato, nessuna simulazione eseguita, nessun codice modificato.
 
 ## Documenti prodotti
 
@@ -25,7 +25,7 @@
 | Operazioni obbligatorie | 67 | 67 | OK |
 | Test funzionali censiti | 87 | 87 | OK |
 
-## Sintesi classificazioni
+## Sintesi classificazioni - Stato iniziale prima dell'esecuzione di G00
 
 | Classificazione | Conteggio |
 | --- | --- |
@@ -35,6 +35,26 @@
 | READY_EXISTING_TOOLING | 7 |
 | REQUIRES_DECISION | 6 |
 
-## Stato operativo
+## Stato operativo iniziale prima dell'esecuzione di G00
 
 Questa sottofase non materializza scenari e non lancia MOSAIC/SUMO. Le prossime modifiche operative devono restare sul branch testing/final-campaign e dovranno essere limitate a scenari sperimentali, orchestrazione, audit, manifest e documentazione dei test.
+
+## G00 Scenario Preparation And Generation
+
+Stato iniziale prima dell'esecuzione di G00: documentazione e piano di campagna predisposti, con tooling finale ancora da creare e scenari non ancora materializzati.
+
+Stato corrente post-G00/G00F: `COMPLETED`.
+
+- planned materializations: `69`
+- completed materializations: `69`
+- validated materializations: `63`
+- warning materializations: `6`
+- failed materializations: `0`
+- blocked materializations: `0`
+- NON_MATERIALIZABLE: `2`
+- READY_CONFIG_ONLY: `20`
+- READY_EXISTING_TOOLING: `8`
+- REQUIRES_DECISION: `0`
+- NEEDS_TEST_TOOLING_EXTENSION: `0`
+
+Tooling created under `tools/intas-literature-scenario/final_campaign/`. Concrete scenarios remain under `tmp/materialized-literature-scenarios/final-test-campaign/`; MOSAIC was not executed. G00 is technically complete and the audit bundle was normalized in G00F.

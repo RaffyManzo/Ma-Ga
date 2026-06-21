@@ -1,0 +1,11 @@
+{
+  "configId": "CFG-SMOKE",
+  "errors": [
+    "Refusing to overwrite existing generated item: C:\\Users\\raffa\\IdeaProjects\\maga-core\\tmp\\materialized-literature-scenarios\\final-test-campaign\\G01_pipeline_validation\\CFG-SMOKE\\104729\\reports"
+  ],
+  "groupId": "G01",
+  "materializationId": "MAT-CFG-SMOKE-104729",
+  "status": "FAILED_MATERIALIZATION",
+  "targetDirectory": "tmp/materialized-literature-scenarios/final-test-campaign/G01_pipeline_validation/CFG-SMOKE/104729/",
+  "warnings": []
+}
