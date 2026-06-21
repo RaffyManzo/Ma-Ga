@@ -1,0 +1,45 @@
+﻿{
+    "campaignId":  "final-test-campaign",
+    "groupId":  "G01",
+    "runId":  "PRE-03-SMOKE",
+    "timestampUtc":  "2026-06-21T15:22:30Z",
+    "gitBranch":  "testing/final-campaign",
+    "gitHead":  "8cf83f53f3c08016edaacfc19a83fcbb767b479a",
+    "rootCause":  "Nested PowerShell parent with ErrorActionPreference=Stop aborted when build.ps1 surfaced non-fatal javac stderr through WriteErrorLine.",
+    "modifiedFile":  "tools/mosaic-live-maga-runtime/build.ps1",
+    "previousRetryAttempt":  "G01R retry command stopped before deploy/MOSAIC despite producing a complete runtime out/ artifact.",
+    "nestedParentTest":  {
+                             "executedCount":  1,
+                             "harness":  "tmp/final-campaign-build-diagnostics/G01F/nested_build_harness.ps1",
+                             "startedAtUtc":  "2026-06-21T15:20:19Z",
+                             "completedAtUtc":  "2026-06-21T15:20:29Z",
+                             "durationSeconds":  10.099
+                         },
+    "parentExitCode":  0,
+    "parentStdoutPath":  "test-results/final-campaign/G01_pipeline_validation/PRE-03-SMOKE/runtime_nested_powershell_build_validation/nested_parent_stdout.txt",
+    "parentStderrPath":  "test-results/final-campaign/G01_pipeline_validation/PRE-03-SMOKE/runtime_nested_powershell_build_validation/nested_parent_stderr.txt",
+    "parentStderrEmpty":  true,
+    "deprecationNotesPresentInStdout":  true,
+    "accessDeniedExceptionPresent":  false,
+    "compilerExceptionPresent":  false,
+    "runtimeBuildFailedPresent":  false,
+    "nestedRuntimeBuildCompletedPresent":  true,
+    "buildCompletedPresent":  true,
+    "sourceCount":  198,
+    "classCount":  252,
+    "dependencyJarCount":  11,
+    "runtimeJarPath":  "tools/mosaic-live-maga-runtime/out/maga-live-maga-runtime.jar",
+    "runtimeJarSizeBytes":  491454,
+    "runtimeJarSha256":  "f5ae0d80da0e92cbe40a0aa2e10b847713a11c55112da3299618d10bf9e5f49c",
+    "jarValidationStatus":  "PASS",
+    "missingExpectedJarEntries":  [
+
+                                  ],
+    "externalStagingPath":  "C:\\Users\\raffa\\AppData\\Local\\Temp\\maga-live-maga-runtime-build-26920-20260621172020590",
+    "externalStagingRemoved":  true,
+    "classification":  "NESTED_POWERSHELL_STDERR_PROPAGATION_FIXED",
+    "limitations":  [
+                        "This test validates the nested runtime build only; it does not run deploy, SUMO, MOSAIC, or the smoke validator.",
+                        "The G01 end-to-end blocker remains open until a separate authorized retry completes the full pipeline."
+                    ]
+}

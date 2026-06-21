@@ -1,0 +1,40 @@
+﻿{
+    "campaignId":  "final-test-campaign",
+    "groupId":  "G01",
+    "configId":  "CFG-SMOKE",
+    "materializationId":  "MAT-CFG-SMOKE-104729",
+    "runId":  "PRE-03-SMOKE",
+    "attemptId":  "RETRY-01",
+    "gitBranch":  "testing/final-campaign",
+    "gitHead":  "8cf83f53f3c08016edaacfc19a83fcbb767b479a",
+    "materializedScenarioRoot":  "tmp/materialized-literature-scenarios/final-test-campaign/G01_pipeline_validation/CFG-SMOKE/104729",
+    "mosaicRoot":  "tmp/mosaic-25.2",
+    "mosaicRunName":  null,
+    "mosaicRunDirectory":  null,
+    "startedAtUtc":  "2026-06-21T14:56:42Z",
+    "completedAtUtc":  "2026-06-21T14:56:44Z",
+    "durationSeconds":  1.173,
+    "command":  "powershell -NoProfile -ExecutionPolicy Bypass -File tools/intas-literature-scenario/run_literature_scenario.ps1 -MaterializedScenarioRoot tmp/materialized-literature-scenarios/final-test-campaign/G01_pipeline_validation/CFG-SMOKE/104729 -MosaicRoot tmp/mosaic-25.2 -ScenarioName MaGaLiteratureBasedUrbanStudy -PrintDetailedLiveReport",
+    "commandRunCount":  1,
+    "exitCode":  1,
+    "consoleLog":  "test-results/final-campaign/G01_pipeline_validation/PRE-03-SMOKE/retry-01/run_literature_scenario_console.log",
+    "runtimeBuildStatus":  "FAILED_BEFORE_DEPLOY_OUTER_POWERSHELL_NATIVE_STDERR_ABORT",
+    "runtimeJarPath":  "tools/mosaic-live-maga-runtime/out/maga-live-maga-runtime.jar",
+    "runtimeJarSizeBytes":  491454,
+    "runtimeJarSha256":  "32120d162843a1cd477a8945d793966393439747cc01ef9fa5e41ba63d39dea7",
+    "accessDeniedExceptionPresent":  false,
+    "compilerExceptionPresent":  false,
+    "newMosaicRunCount":  0,
+    "validatorStatus":  "NOT_RUN",
+    "simulationCompleted":  false,
+    "errors":  [
+                   "Retry command aborted before deploy/MOSAIC; no new MOSAIC run directory was created.",
+                   "The console log contains javac deprecation-note context from the build phase, but no AccessDeniedException or javac internal compiler exception."
+               ],
+    "classification":  "G01_RETRY_FAILED_BEFORE_MOSAIC",
+    "limitations":  [
+                        "No second retry was executed.",
+                        "No runtime metrics are available for G01R.",
+                        "The runtime JAR hash recorded here reflects the current out/ artifact; the retry did not reach a verified MOSAIC execution."
+                    ]
+}

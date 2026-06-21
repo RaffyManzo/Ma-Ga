@@ -114,7 +114,11 @@ function Invoke-NativeCaptured {
         Write-Host $StdoutText.TrimEnd()
     }
     if (-not [string]::IsNullOrWhiteSpace($StderrText)) {
-        $Host.UI.WriteErrorLine($StderrText.TrimEnd())
+        # Native tools such as javac write warnings and informational notes
+        # to stderr even when they complete successfully. Surface the captured
+        # text through the host output so a parent PowerShell process using
+        # ErrorActionPreference=Stop does not abort before checking the exit code.
+        Write-Host $StderrText.TrimEnd()
     }
     return [pscustomobject]@{
         ExitCode = $Process.ExitCode
