@@ -1,0 +1,77 @@
+{
+  "configuredDatabaseFile": "intas_literature_urban.db",
+  "database": {
+    "exists": true,
+    "matchingDiagnosticDbs": [],
+    "path": "C:/Users/raffa/IdeaProjects/maga-core/tmp/materialized-literature-scenarios/final-test-campaign/G02_main_factorial_experiments/CFG-L-E/181081/application/intas_literature_urban.db",
+    "readable": true,
+    "sha256": "cbd14630737b22f5cb3fedc07d8be24c9994a505a3fb34a485cf8e981e07cd97",
+    "sizeBytes": 172032,
+    "tableCounts": {
+      "Building": 0,
+      "BuildingConsistsOf": 0,
+      "Connection": 155,
+      "ConnectionConsistsOf": 695,
+      "ConnectionDetails": 0,
+      "Node": 314,
+      "Properties": 2,
+      "Restriction": 125,
+      "Roundabout": 0,
+      "RoundaboutConsistsOf": 0,
+      "Route": 223,
+      "TrafficSignals": 0,
+      "Way": 155,
+      "WayConsistsOf": 695
+    },
+    "tables": [
+      "Building",
+      "BuildingConsistsOf",
+      "Connection",
+      "ConnectionConsistsOf",
+      "ConnectionDetails",
+      "Node",
+      "Properties",
+      "Restriction",
+      "Roundabout",
+      "RoundaboutConsistsOf",
+      "Route",
+      "TrafficSignals",
+      "Way",
+      "WayConsistsOf"
+    ]
+  },
+  "errors": [],
+  "gaParameterScalingMode": "STATIC",
+  "generatedAtUtc": "2026-06-21T09:07:50.892062+00:00",
+  "missingFiles": [],
+  "mobilityMode": "SYNTHETIC_CALIBRATED_ON_INTAS_SUBNETWORK",
+  "projection": {
+    "cartesianOffset": {
+      "x": -464198.88,
+      "y": -4952821.58
+    },
+    "centerCoordinates": {
+      "latitude": 48.75619812000397,
+      "longitude": 11.425493114727528
+    }
+  },
+  "reducedNetworkCounts": {
+    "externalEdges": 155,
+    "externalJunctions": 88,
+    "trafficLights": 8
+  },
+  "routeFiles": [
+    "C:/Users/raffa/IdeaProjects/maga-core/tmp/materialized-literature-scenarios/final-test-campaign/G02_main_factorial_experiments/CFG-L-E/181081/sumo/intas_literature_urban_low_density.rou.xml"
+  ],
+  "routeVehicleCounts": {
+    "intas_literature_urban_low_density.rou.xml": 58
+  },
+  "scenarioRoot": "C:/Users/raffa/IdeaProjects/maga-core/tmp/materialized-literature-scenarios/final-test-campaign/G02_main_factorial_experiments/CFG-L-E/181081",
+  "status": "VALID_MATERIALIZED_SCENARIO",
+  "sumocfgReferences": [
+    "intas_literature_urban.net.xml",
+    "intas_literature_urban_low_density.rou.xml"
+  ],
+  "tokenFiles": [],
+  "warnings": []
+}

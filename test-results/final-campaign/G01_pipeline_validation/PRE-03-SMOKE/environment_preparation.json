@@ -1,0 +1,14 @@
+{
+  "campaignId": "final-test-campaign",
+  "groupId": "G01",
+  "runId": "PRE-03-SMOKE",
+  "action": "MOVED_TO_ARCHIVE",
+  "timestamp": "20260621-104059",
+  "origin": "tmp/mosaic-25.2/scenarios/MaGaLiteratureBasedUrbanStudy",
+  "originExistsAfterArchive": false,
+  "archiveDestination": "tmp/archive/final-test-campaign-pre-G01-20260621-104059/MaGaLiteratureBasedUrbanStudy",
+  "archivedFileCount": 24,
+  "archivedSizeBytes": 1198358,
+  "mosaicRoot": "tmp/mosaic-25.2",
+  "mosaicBatExists": true
+}

@@ -1,0 +1,27 @@
+{
+  "campaignId": "final-test-campaign",
+  "groupId": "G01",
+  "configId": "CFG-SMOKE",
+  "requestedMaterializationId": "MAT-SMOKE-104729",
+  "actualMaterializationId": "MAT-CFG-SMOKE-104729",
+  "runId": "PRE-03-SMOKE",
+  "branch": "testing/final-campaign",
+  "head": "6449978026d205c3f0949cd5532782fd447fed1d",
+  "expectedHead": "6449978026d205c3f0949cd5532782fd447fed1d",
+  "workingTreeStatusShortBeforeRun": [],
+  "frozenJavaDiffBeforeRun": [],
+  "planRowMaterializationId": "MAT-CFG-SMOKE-104729",
+  "targetDirectory": "tmp/materialized-literature-scenarios/final-test-campaign/G01_pipeline_validation/CFG-SMOKE/104729/",
+  "targetDirectoryExists": true,
+  "manifestExists": true,
+  "materializationValidationReportExists": true,
+  "manifestConfigId": "CFG-SMOKE",
+  "manifestMaterializationId": "MAT-CFG-SMOKE-104729",
+  "g00ValidationStatus": "MATERIALIZED_VALIDATED",
+  "databaseExists": true,
+  "mosaicBatExists": true,
+  "canonicalMaterializationIdUsed": true,
+  "notes": [
+    "Requested MAT-SMOKE-104729 was not present in the G00 plan; the canonical G00 smoke materialization MAT-CFG-SMOKE-104729 was used without renaming or rematerialization."
+  ]
+}

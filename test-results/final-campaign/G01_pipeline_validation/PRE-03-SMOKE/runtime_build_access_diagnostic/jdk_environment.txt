@@ -1,0 +1,135 @@
+﻿where.exe java
+C:\Program Files\Java\jdk-17\bin\java.exe
+
+where.exe javac
+C:\Program Files\Java\jdk-17\bin\javac.exe
+
+where.exe jar
+C:\Program Files\Java\jdk-17\bin\jar.exe
+
+Get-Command java
+
+
+HelpUri            : 
+FileVersionInfo    : File:             C:\Program Files\Java\jdk-17\bin\java.exe
+                     InternalName:     java
+                     OriginalFilename: java.exe
+                     FileVersion:      17.0.12.0
+                     FileDescription:  Java(TM) Platform SE binary
+                     Product:          Java(TM) Platform SE 17.0.12
+                     ProductVersion:   17.0.12.0
+                     Debug:            False
+                     Patched:          False
+                     PreRelease:       False
+                     PrivateBuild:     False
+                     SpecialBuild:     False
+                     Language:         Inglese (Stati Uniti d'America)
+                     
+Path               : C:\Program Files\Java\jdk-17\bin\java.exe
+Extension          : .exe
+Definition         : C:\Program Files\Java\jdk-17\bin\java.exe
+Source             : C:\Program Files\Java\jdk-17\bin\java.exe
+Version            : 17.0.12.0
+Visibility         : Public
+OutputType         : {System.String}
+Name               : java.exe
+CommandType        : Application
+ModuleName         : 
+Module             : 
+RemotingCapability : PowerShell
+Parameters         : 
+ParameterSets      : 
+
+
+
+
+Get-Command javac
+
+
+HelpUri            : 
+FileVersionInfo    : File:             C:\Program Files\Java\jdk-17\bin\javac.exe
+                     InternalName:     javac
+                     OriginalFilename: javac.exe
+                     FileVersion:      17.0.12.0
+                     FileDescription:  Java(TM) Platform SE binary
+                     Product:          Java(TM) Platform SE 17.0.12
+                     ProductVersion:   17.0.12.0
+                     Debug:            False
+                     Patched:          False
+                     PreRelease:       False
+                     PrivateBuild:     False
+                     SpecialBuild:     False
+                     Language:         Inglese (Stati Uniti d'America)
+                     
+Path               : C:\Program Files\Java\jdk-17\bin\javac.exe
+Extension          : .exe
+Definition         : C:\Program Files\Java\jdk-17\bin\javac.exe
+Source             : C:\Program Files\Java\jdk-17\bin\javac.exe
+Version            : 17.0.12.0
+Visibility         : Public
+OutputType         : {System.String}
+Name               : javac.exe
+CommandType        : Application
+ModuleName         : 
+Module             : 
+RemotingCapability : PowerShell
+Parameters         : 
+ParameterSets      : 
+
+
+
+
+Get-Command jar
+
+
+HelpUri            : 
+FileVersionInfo    : File:             C:\Program Files\Java\jdk-17\bin\jar.exe
+                     InternalName:     jar
+                     OriginalFilename: jar.exe
+                     FileVersion:      17.0.12.0
+                     FileDescription:  Java(TM) Platform SE binary
+                     Product:          Java(TM) Platform SE 17.0.12
+                     ProductVersion:   17.0.12.0
+                     Debug:            False
+                     Patched:          False
+                     PreRelease:       False
+                     PrivateBuild:     False
+                     SpecialBuild:     False
+                     Language:         Inglese (Stati Uniti d'America)
+                     
+Path               : C:\Program Files\Java\jdk-17\bin\jar.exe
+Extension          : .exe
+Definition         : C:\Program Files\Java\jdk-17\bin\jar.exe
+Source             : C:\Program Files\Java\jdk-17\bin\jar.exe
+Version            : 17.0.12.0
+Visibility         : Public
+OutputType         : {System.String}
+Name               : jar.exe
+CommandType        : Application
+ModuleName         : 
+Module             : 
+RemotingCapability : PowerShell
+Parameters         : 
+ParameterSets      : 
+
+
+
+
+java -version
+java.exe : java version "17.0.12" 2024-07-16 LTS
+In C:\Users\raffa\IdeaProjects\maga-core\tmp\final-campaign-build-diagnostics\G01B\run_g01b_diagnostic.ps1:60 car:19
++         $output = & $FilePath @Arguments 2>&1
++                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (java version "17.0.12" 2024-07-16 LTS:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+Java(TM) SE Runtime Environment (build 17.0.12+8-LTS-286)
+Java HotSpot(TM) 64-Bit Server VM (build 17.0.12+8-LTS-286, mixed mode, sharing)
+javac -version
+javac 17.0.12
+jar --version
+jar 17.0.12
+JAVA_HOME
+C:\Program Files\Java\jdk-17
+PATH
+C:\Users\raffa\.codex\tmp\arg0\codex-arg0bv93RH;C:\Program Files (x86)\Eclipse\Sumo\bin;C:\Users\raffa\AppData\Local\Programs\Microsoft VS Code\bin;C:\Windows\System32;C:\Windows;C:\Windows\System32\Wbem;C:\Windows\System32\WindowsPowerShell\v1.0\;C:\Program Files\Java\jdk-17\bin;C:\Program Files\Git\cmd;C:\Users\raffa\MiKTeX\miktex\bin\x64\;C:\Users\raffa\AppData\Roaming\Programs\Zero Install;C:\Users\raffa\AppData\Local\OpenAI\Codex\bin;C:\Program Files\WindowsApps\OpenAI.Codex_26.506.3741.0_x64__2p2nqsd0c76g0\app\resources

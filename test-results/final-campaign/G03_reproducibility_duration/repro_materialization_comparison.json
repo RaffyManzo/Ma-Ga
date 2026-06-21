@@ -55,15 +55,15 @@
       },
       {
         "equal": false,
-        "leftSha256": "d46cf717d9615a5e224589dddf6df48e9e63204543a66e6a4e29530b74b0a043",
+        "leftSha256": "e8d187e3a00e62f66bd226dad699d9c4631c76771ac357fed1351fd0c9774475",
         "path": "final_campaign_manifest.json",
-        "rightSha256": "7b2787475fb44354c2e49669df1ccef2c85e6b0ee25d3d8c530f43e39970f2b1"
+        "rightSha256": "ebdd943fca17d57927327f53631dbded70175b5b0cd4c2ae335904faa60d000b"
       },
       {
         "equal": false,
-        "leftSha256": "070d0e713b595f586b8f09295842ed7c87b3ff887f9f5914dfc88afe72cb82ae",
+        "leftSha256": "082dc579c2d8fdebb4811364d9a82594ad6789348b38a4bab9d009d9703ca6dc",
         "path": "materialization_manifest.json",
-        "rightSha256": "de90102a97d270cebbeb86d489d679ca8f12b49c57d7786aa2da3ba14170b33e"
+        "rightSha256": "262b8aed37778eae05678d1fc4ea2b637ba0881ccb36f368567452e43a9878e2"
       },
       {
         "equal": false,
@@ -73,9 +73,9 @@
       },
       {
         "equal": false,
-        "leftSha256": "87672e538ef70bc1ccaa22f767bcf869157a1fcdabfd294288eb51d5862b31ea",
+        "leftSha256": "faa645e7a53d73ac1e18d872e99f1d708ae8f0c82d5420853a5219ad6a59124e",
         "path": "reports/intas_literature_materialization_report.json",
-        "rightSha256": "5af910b9ca78587e073a32e9b845401e48a0b2119b0e719c2c83ca93678e2310"
+        "rightSha256": "d8a2589186f927880a600a85d185077653038ab6f03bac76a5e161bdf0da700f"
       },
       {
         "equal": false,

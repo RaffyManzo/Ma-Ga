@@ -1,0 +1,146 @@
+﻿[
+    {
+        "label":  "source-mosaic-objects",
+        "path":  "C:\\Users\\raffa\\IdeaProjects\\maga-core\\tmp\\mosaic-25.2\\lib\\mosaic\\mosaic-objects-25.2.jar",
+        "operations":  [
+                           {
+                               "operation":  "open_read_normal_share",
+                               "status":  "PASS",
+                               "exceptionType":  "",
+                               "exceptionMessage":  "",
+                               "timestampUtc":  "2026-06-21T10:11:46Z",
+                               "result":  {
+                                              "length":  222754
+                                          }
+                           },
+                           {
+                               "operation":  "open_read_fileshare_none",
+                               "status":  "PASS",
+                               "exceptionType":  "",
+                               "exceptionMessage":  "",
+                               "timestampUtc":  "2026-06-21T10:11:46Z",
+                               "result":  {
+                                              "length":  222754
+                                          }
+                           },
+                           {
+                               "operation":  "read_first_bytes",
+                               "status":  "PASS",
+                               "exceptionType":  "",
+                               "exceptionMessage":  "",
+                               "timestampUtc":  "2026-06-21T10:11:46Z",
+                               "result":  {
+                                              "firstBytesHex":  "504b0304140000080800ba708f5baaae"
+                                          }
+                           },
+                           {
+                               "operation":  "jar_tf",
+                               "status":  "PASS",
+                               "exceptionType":  "",
+                               "exceptionMessage":  "",
+                               "timestampUtc":  "2026-06-21T10:11:46Z",
+                               "result":  {
+                                              "exitCode":  0,
+                                              "durationSeconds":  1.104,
+                                              "stdout":  "tmp/final-campaign-build-diagnostics/G01B/access-tests/source-mosaic-objects/jar_tf_stdout.txt",
+                                              "stderr":  "tmp/final-campaign-build-diagnostics/G01B/access-tests/source-mosaic-objects/jar_tf_stderr.txt",
+                                              "accessDeniedExceptionPresent":  false,
+                                              "compilerExceptionPresent":  false
+                                          }
+                           },
+                           {
+                               "operation":  "copy_to_temp",
+                               "status":  "PASS",
+                               "exceptionType":  "",
+                               "exceptionMessage":  "",
+                               "timestampUtc":  "2026-06-21T10:11:47Z",
+                               "result":  {
+                                              "destination":  "tmp/final-campaign-build-diagnostics/G01B/access-tests/source-mosaic-objects/mosaic-objects-25.2.jar",
+                                              "sha256":  "072d362c56fe85d84dff71e04444266b1de1b18e47c36deeab025f8bfadf4411"
+                                          }
+                           },
+                           {
+                               "operation":  "rename_temp_copy_and_restore",
+                               "status":  "PASS",
+                               "exceptionType":  "",
+                               "exceptionMessage":  "",
+                               "timestampUtc":  "2026-06-21T10:11:47Z",
+                               "result":  {
+                                              "restored":  "tmp/final-campaign-build-diagnostics/G01B/access-tests/source-mosaic-objects/mosaic-objects-25.2.jar"
+                                          }
+                           }
+                       ]
+    },
+    {
+        "label":  "copied-mosaic-objects",
+        "path":  "C:\\Users\\raffa\\IdeaProjects\\maga-core\\tools\\mosaic-live-maga-runtime\\out\\classpath\\mosaic-objects-25.2.jar",
+        "operations":  [
+                           {
+                               "operation":  "open_read_normal_share",
+                               "status":  "PASS",
+                               "exceptionType":  "",
+                               "exceptionMessage":  "",
+                               "timestampUtc":  "2026-06-21T10:11:47Z",
+                               "result":  {
+                                              "length":  222754
+                                          }
+                           },
+                           {
+                               "operation":  "open_read_fileshare_none",
+                               "status":  "PASS",
+                               "exceptionType":  "",
+                               "exceptionMessage":  "",
+                               "timestampUtc":  "2026-06-21T10:11:47Z",
+                               "result":  {
+                                              "length":  222754
+                                          }
+                           },
+                           {
+                               "operation":  "read_first_bytes",
+                               "status":  "PASS",
+                               "exceptionType":  "",
+                               "exceptionMessage":  "",
+                               "timestampUtc":  "2026-06-21T10:11:47Z",
+                               "result":  {
+                                              "firstBytesHex":  "504b0304140000080800ba708f5baaae"
+                                          }
+                           },
+                           {
+                               "operation":  "jar_tf",
+                               "status":  "PASS",
+                               "exceptionType":  "",
+                               "exceptionMessage":  "",
+                               "timestampUtc":  "2026-06-21T10:11:47Z",
+                               "result":  {
+                                              "exitCode":  0,
+                                              "durationSeconds":  1.042,
+                                              "stdout":  "tmp/final-campaign-build-diagnostics/G01B/access-tests/copied-mosaic-objects/jar_tf_stdout.txt",
+                                              "stderr":  "tmp/final-campaign-build-diagnostics/G01B/access-tests/copied-mosaic-objects/jar_tf_stderr.txt",
+                                              "accessDeniedExceptionPresent":  false,
+                                              "compilerExceptionPresent":  false
+                                          }
+                           },
+                           {
+                               "operation":  "copy_to_temp",
+                               "status":  "PASS",
+                               "exceptionType":  "",
+                               "exceptionMessage":  "",
+                               "timestampUtc":  "2026-06-21T10:11:48Z",
+                               "result":  {
+                                              "destination":  "tmp/final-campaign-build-diagnostics/G01B/access-tests/copied-mosaic-objects/mosaic-objects-25.2.jar",
+                                              "sha256":  "072d362c56fe85d84dff71e04444266b1de1b18e47c36deeab025f8bfadf4411"
+                                          }
+                           },
+                           {
+                               "operation":  "rename_temp_copy_and_restore",
+                               "status":  "PASS",
+                               "exceptionType":  "",
+                               "exceptionMessage":  "",
+                               "timestampUtc":  "2026-06-21T10:11:49Z",
+                               "result":  {
+                                              "restored":  "tmp/final-campaign-build-diagnostics/G01B/access-tests/copied-mosaic-objects/mosaic-objects-25.2.jar"
+                                          }
+                           }
+                       ]
+    }
+]

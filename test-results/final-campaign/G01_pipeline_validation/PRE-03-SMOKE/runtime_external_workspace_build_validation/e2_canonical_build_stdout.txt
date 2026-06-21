@@ -1,0 +1,12 @@
+JDK javac: C:\Program Files\Java\jdk-17\bin\javac.exe
+JDK jar: C:\Program Files\Java\jdk-17\bin\jar.exe
+MOSAIC root: C:\Users\raffa\IdeaProjects\maga-core\tmp\mosaic-25.2
+External build root: C:\Users\raffa\AppData\Local\Temp\maga-live-maga-runtime-build-19332-20260621152005200
+Compiling core, live state layer, and live MA-GA runtime in external staging...
+Source counts:
+  core=151
+  live-state-layer=27
+  live-maga-runtime=20
+External staging removed: C:\Users\raffa\AppData\Local\Temp\maga-live-maga-runtime-build-19332-20260621152005200
+Build completed: C:\Users\raffa\IdeaProjects\maga-core\tools\mosaic-live-maga-runtime\out\maga-live-maga-runtime.jar
+Generated JAR is intentionally kept out of versioned scenarios.

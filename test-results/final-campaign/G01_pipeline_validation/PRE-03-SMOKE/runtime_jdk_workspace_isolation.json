@@ -1,0 +1,449 @@
+﻿{
+    "campaignId":  "final-test-campaign",
+    "groupId":  "G01",
+    "runId":  "PRE-03-SMOKE",
+    "timestampUtc":  "2026-06-21T12:10:21Z",
+    "gitBranch":  "testing/final-campaign",
+    "gitHead":  "6449978026d205c3f0949cd5532782fd447fed1d",
+    "currentJdk":  {
+                       "label":  "current",
+                       "vendor":  "Oracle Corporation",
+                       "javaHome":  "C:\\Program Files\\Java\\jdk-17",
+                       "javaVersion":  "17.0.12",
+                       "javacVersion":  "javac 17.0.12",
+                       "jarVersion":  "jar 17.0.12",
+                       "javaPath":  "C:\\Program Files\\Java\\jdk-17\\bin\\java.exe",
+                       "javacPath":  "C:\\Program Files\\Java\\jdk-17\\bin\\javac.exe",
+                       "jarPath":  "C:\\Program Files\\Java\\jdk-17\\bin\\jar.exe",
+                       "majorVersion":  17
+                   },
+    "alternateJdks":  [
+                          {
+                              "label":  "jdk-17.0.8.101-hotspot",
+                              "vendor":  "Eclipse Adoptium",
+                              "javaHome":  "C:\\Program Files\\Eclipse Adoptium\\jdk-17.0.8.101-hotspot",
+                              "javaVersion":  "17.0.8.1",
+                              "javacVersion":  "javac 17.0.8.1",
+                              "jarVersion":  "jar 17.0.8.1",
+                              "javaPath":  "C:\\Program Files\\Eclipse Adoptium\\jdk-17.0.8.101-hotspot\\bin\\java.exe",
+                              "javacPath":  "C:\\Program Files\\Eclipse Adoptium\\jdk-17.0.8.101-hotspot\\bin\\javac.exe",
+                              "jarPath":  "C:\\Program Files\\Eclipse Adoptium\\jdk-17.0.8.101-hotspot\\bin\\jar.exe",
+                              "majorVersion":  17
+                          },
+                          {
+                              "label":  "jdk-20",
+                              "vendor":  "Oracle Corporation",
+                              "javaHome":  "C:\\Program Files\\Java\\jdk-20",
+                              "javaVersion":  "20.0.2",
+                              "javacVersion":  "javac 20.0.2",
+                              "jarVersion":  "jar 20.0.2",
+                              "javaPath":  "C:\\Program Files\\Java\\jdk-20\\bin\\java.exe",
+                              "javacPath":  "C:\\Program Files\\Java\\jdk-20\\bin\\javac.exe",
+                              "jarPath":  "C:\\Program Files\\Java\\jdk-20\\bin\\jar.exe",
+                              "majorVersion":  20
+                          },
+                          {
+                              "label":  "jdk-21",
+                              "vendor":  "Oracle Corporation",
+                              "javaHome":  "C:\\Program Files\\Java\\jdk-21",
+                              "javaVersion":  "21.0.2",
+                              "javacVersion":  "javac 21.0.2",
+                              "jarVersion":  "jar 21.0.2",
+                              "javaPath":  "C:\\Program Files\\Java\\jdk-21\\bin\\java.exe",
+                              "javacPath":  "C:\\Program Files\\Java\\jdk-21\\bin\\javac.exe",
+                              "jarPath":  "C:\\Program Files\\Java\\jdk-21\\bin\\jar.exe",
+                              "majorVersion":  21
+                          }
+                      ],
+    "processorInventory":  {
+                               "jarCount":  11,
+                               "annotationProcessorDetected":  false,
+                               "javacPluginDetected":  false,
+                               "moduleInfoDetected":  true,
+                               "jars":  [
+                                            {
+                                                "name":  "mosaic-application-25.2.jar",
+                                                "path":  "C:\\Users\\raffa\\IdeaProjects\\maga-core\\tmp\\mosaic-25.2\\lib\\mosaic\\mosaic-application-25.2.jar",
+                                                "sha256":  "2491403b9d235f8d79247ef71353dffca49097b1224ba3ae29462fec79387b80",
+                                                "annotationProcessorServicePresent":  false,
+                                                "annotationProcessors":  [
+
+                                                                         ],
+                                                "javacPluginServicePresent":  false,
+                                                "javacPlugins":  [
+
+                                                                 ],
+                                                "moduleInfoPresent":  false
+                                            },
+                                            {
+                                                "name":  "mosaic-objects-25.2.jar",
+                                                "path":  "C:\\Users\\raffa\\IdeaProjects\\maga-core\\tmp\\mosaic-25.2\\lib\\mosaic\\mosaic-objects-25.2.jar",
+                                                "sha256":  "072d362c56fe85d84dff71e04444266b1de1b18e47c36deeab025f8bfadf4411",
+                                                "annotationProcessorServicePresent":  false,
+                                                "annotationProcessors":  [
+
+                                                                         ],
+                                                "javacPluginServicePresent":  false,
+                                                "javacPlugins":  [
+
+                                                                 ],
+                                                "moduleInfoPresent":  false
+                                            },
+                                            {
+                                                "name":  "mosaic-geomath-25.2.jar",
+                                                "path":  "C:\\Users\\raffa\\IdeaProjects\\maga-core\\tmp\\mosaic-25.2\\lib\\mosaic\\mosaic-geomath-25.2.jar",
+                                                "sha256":  "e5ce150b566fac801841c71d9a1d55449925db43870fba14deb80db63b8638a2",
+                                                "annotationProcessorServicePresent":  false,
+                                                "annotationProcessors":  [
+
+                                                                         ],
+                                                "javacPluginServicePresent":  false,
+                                                "javacPlugins":  [
+
+                                                                 ],
+                                                "moduleInfoPresent":  false
+                                            },
+                                            {
+                                                "name":  "mosaic-interactions-25.2.jar",
+                                                "path":  "C:\\Users\\raffa\\IdeaProjects\\maga-core\\tmp\\mosaic-25.2\\lib\\mosaic\\mosaic-interactions-25.2.jar",
+                                                "sha256":  "5bde68685bf8e4eb5fc9b945fd967f36bd79fe8ade6261e3c1aa4622479ff65f",
+                                                "annotationProcessorServicePresent":  false,
+                                                "annotationProcessors":  [
+
+                                                                         ],
+                                                "javacPluginServicePresent":  false,
+                                                "javacPlugins":  [
+
+                                                                 ],
+                                                "moduleInfoPresent":  false
+                                            },
+                                            {
+                                                "name":  "mosaic-utils-25.2.jar",
+                                                "path":  "C:\\Users\\raffa\\IdeaProjects\\maga-core\\tmp\\mosaic-25.2\\lib\\mosaic\\mosaic-utils-25.2.jar",
+                                                "sha256":  "a7d6dba16e24517611c54f1158de8ee9904aae225015fa420f253477dd080494",
+                                                "annotationProcessorServicePresent":  false,
+                                                "annotationProcessors":  [
+
+                                                                         ],
+                                                "javacPluginServicePresent":  false,
+                                                "javacPlugins":  [
+
+                                                                 ],
+                                                "moduleInfoPresent":  false
+                                            },
+                                            {
+                                                "name":  "mosaic-rti-api-25.2.jar",
+                                                "path":  "C:\\Users\\raffa\\IdeaProjects\\maga-core\\tmp\\mosaic-25.2\\lib\\mosaic\\mosaic-rti-api-25.2.jar",
+                                                "sha256":  "3991c728b2924f2e4f04ce4e3d74b056daf7043f8ae469876cc262b1922ed53d",
+                                                "annotationProcessorServicePresent":  false,
+                                                "annotationProcessors":  [
+
+                                                                         ],
+                                                "javacPluginServicePresent":  false,
+                                                "javacPlugins":  [
+
+                                                                 ],
+                                                "moduleInfoPresent":  false
+                                            },
+                                            {
+                                                "name":  "gson-2.10.1.jar",
+                                                "path":  "C:\\Users\\raffa\\IdeaProjects\\maga-core\\tmp\\mosaic-25.2\\lib\\third-party\\gson-2.10.1.jar",
+                                                "sha256":  "4241c14a7727c34feea6507ec801318a3d4a90f070e4525681079fb94ee4c593",
+                                                "annotationProcessorServicePresent":  false,
+                                                "annotationProcessors":  [
+
+                                                                         ],
+                                                "javacPluginServicePresent":  false,
+                                                "javacPlugins":  [
+
+                                                                 ],
+                                                "moduleInfoPresent":  false
+                                            },
+                                            {
+                                                "name":  "slf4j-api-2.0.12.jar",
+                                                "path":  "C:\\Users\\raffa\\IdeaProjects\\maga-core\\tmp\\mosaic-25.2\\lib\\third-party\\slf4j-api-2.0.12.jar",
+                                                "sha256":  "a79502b8abdfbd722846a27691226a4088682d6d35654f9b80e2a9ccacf7ed47",
+                                                "annotationProcessorServicePresent":  false,
+                                                "annotationProcessors":  [
+
+                                                                         ],
+                                                "javacPluginServicePresent":  false,
+                                                "javacPlugins":  [
+
+                                                                 ],
+                                                "moduleInfoPresent":  false
+                                            },
+                                            {
+                                                "name":  "jackson-annotations-2.16.1.jar",
+                                                "path":  "C:\\Users\\raffa\\IdeaProjects\\maga-core\\tmp\\mosaic-25.2\\lib\\third-party\\jackson-annotations-2.16.1.jar",
+                                                "sha256":  "a4730771e6a495dd3793a42cdb8ce6bddb96c77e15f40c98fd8d9a7ae09e7286",
+                                                "annotationProcessorServicePresent":  false,
+                                                "annotationProcessors":  [
+
+                                                                         ],
+                                                "javacPluginServicePresent":  false,
+                                                "javacPlugins":  [
+
+                                                                 ],
+                                                "moduleInfoPresent":  true
+                                            },
+                                            {
+                                                "name":  "jackson-core-2.16.1.jar",
+                                                "path":  "C:\\Users\\raffa\\IdeaProjects\\maga-core\\tmp\\mosaic-25.2\\lib\\third-party\\jackson-core-2.16.1.jar",
+                                                "sha256":  "f5f8ef90609e64fec82eb908e497dc7d81b2eb983fe509b870292a193cde4dfb",
+                                                "annotationProcessorServicePresent":  false,
+                                                "annotationProcessors":  [
+
+                                                                         ],
+                                                "javacPluginServicePresent":  false,
+                                                "javacPlugins":  [
+
+                                                                 ],
+                                                "moduleInfoPresent":  false
+                                            },
+                                            {
+                                                "name":  "jackson-databind-2.16.1.jar",
+                                                "path":  "C:\\Users\\raffa\\IdeaProjects\\maga-core\\tmp\\mosaic-25.2\\lib\\third-party\\jackson-databind-2.16.1.jar",
+                                                "sha256":  "baf8a8ebee8f45ef68cdd5e2dd3923b3e296c0937b96ec0b4806aa3a31bccd1d",
+                                                "annotationProcessorServicePresent":  false,
+                                                "annotationProcessors":  [
+
+                                                                         ],
+                                                "javacPluginServicePresent":  false,
+                                                "javacPlugins":  [
+
+                                                                 ],
+                                                "moduleInfoPresent":  false
+                                            }
+                                        ]
+                           },
+    "externalWorkspace":  {
+                              "path":  "C:\\Users\\raffa\\AppData\\Local\\Temp\\maga-g01d-20260621-140948",
+                              "outsideIdeaProjects":  true,
+                              "sourceFileCount":  198,
+                              "copiedJarCount":  11,
+                              "copiedJarSha256AllMatch":  true
+                          },
+    "minimalNoClasspathTest":  {
+                                   "command":  "C:\\Program Files\\Java\\jdk-17\\bin\\javac.exe -d C:\\Users\\raffa\\AppData\\Local\\Temp\\maga-g01d-20260621-140948\\control-no-classpath\\classes C:\\Users\\raffa\\AppData\\Local\\Temp\\maga-g01d-20260621-140948\\control-no-classpath\\MinimalControl.java",
+                                   "exitCode":  0,
+                                   "durationSeconds":  1.03,
+                                   "stdout":  "C:\\Users\\raffa\\IdeaProjects\\maga-core\\test-results\\final-campaign\\G01_pipeline_validation\\PRE-03-SMOKE\\runtime_jdk_workspace_isolation\\d1_minimal_no_classpath_stdout.txt",
+                                   "stderr":  "C:\\Users\\raffa\\IdeaProjects\\maga-core\\test-results\\final-campaign\\G01_pipeline_validation\\PRE-03-SMOKE\\runtime_jdk_workspace_isolation\\d1_minimal_no_classpath_stderr.txt",
+                                   "accessDeniedException":  false,
+                                   "compilerException":  false,
+                                   "stackTraceJar":  null,
+                                   "status":  "PASS",
+                                   "classReport":  {
+                                                       "classFileCount":  1,
+                                                       "minimalControlClassPresent":  true
+                                                   }
+                               },
+    "minimalFullClasspathTest":  {
+                                     "command":  "C:\\Program Files\\Java\\jdk-17\\bin\\javac.exe -cp C:\\Users\\raffa\\IdeaProjects\\maga-core\\tmp\\mosaic-25.2\\lib\\mosaic\\mosaic-application-25.2.jar;C:\\Users\\raffa\\IdeaProjects\\maga-core\\tmp\\mosaic-25.2\\lib\\mosaic\\mosaic-objects-25.2.jar;C:\\Users\\raffa\\IdeaProjects\\maga-core\\tmp\\mosaic-25.2\\lib\\mosaic\\mosaic-geomath-25.2.jar;C:\\Users\\raffa\\IdeaProjects\\maga-core\\tmp\\mosaic-25.2\\lib\\mosaic\\mosaic-interactions-25.2.jar;C:\\Users\\raffa\\IdeaProjects\\maga-core\\tmp\\mosaic-25.2\\lib\\mosaic\\mosaic-utils-25.2.jar;C:\\Users\\raffa\\IdeaProjects\\maga-core\\tmp\\mosaic-25.2\\lib\\mosaic\\mosaic-rti-api-25.2.jar;C:\\Users\\raffa\\IdeaProjects\\maga-core\\tmp\\mosaic-25.2\\lib\\third-party\\gson-2.10.1.jar;C:\\Users\\raffa\\IdeaProjects\\maga-core\\tmp\\mosaic-25.2\\lib\\third-party\\slf4j-api-2.0.12.jar;C:\\Users\\raffa\\IdeaProjects\\maga-core\\tmp\\mosaic-25.2\\lib\\third-party\\jackson-annotations-2.16.1.jar;C:\\Users\\raffa\\IdeaProjects\\maga-core\\tmp\\mosaic-25.2\\lib\\third-party\\jackson-core-2.16.1.jar;C:\\Users\\raffa\\IdeaProjects\\maga-core\\tmp\\mosaic-25.2\\lib\\third-party\\jackson-databind-2.16.1.jar -d C:\\Users\\raffa\\AppData\\Local\\Temp\\maga-g01d-20260621-140948\\control-full-classpath\\classes C:\\Users\\raffa\\AppData\\Local\\Temp\\maga-g01d-20260621-140948\\control-full-classpath\\MinimalControl.java",
+                                     "exitCode":  0,
+                                     "durationSeconds":  1.028,
+                                     "stdout":  "C:\\Users\\raffa\\IdeaProjects\\maga-core\\test-results\\final-campaign\\G01_pipeline_validation\\PRE-03-SMOKE\\runtime_jdk_workspace_isolation\\d2_minimal_full_classpath_stdout.txt",
+                                     "stderr":  "C:\\Users\\raffa\\IdeaProjects\\maga-core\\test-results\\final-campaign\\G01_pipeline_validation\\PRE-03-SMOKE\\runtime_jdk_workspace_isolation\\d2_minimal_full_classpath_stderr.txt",
+                                     "accessDeniedException":  false,
+                                     "compilerException":  false,
+                                     "stackTraceJar":  null,
+                                     "status":  "PASS",
+                                     "classReport":  {
+                                                         "classFileCount":  1,
+                                                         "minimalControlClassPresent":  true
+                                                     }
+                                 },
+    "fullExternalCurrentJdkTest":  {
+                                       "command":  "C:\\Program Files\\Java\\jdk-17\\bin\\javac.exe -cp C:\\Users\\raffa\\AppData\\Local\\Temp\\maga-g01d-20260621-140948\\full-external-current-jdk\\classpath\\gson-2.10.1.jar;C:\\Users\\raffa\\AppData\\Local\\Temp\\maga-g01d-20260621-140948\\full-external-current-jdk\\classpath\\jackson-annotations-2.16.1.jar;C:\\Users\\raffa\\AppData\\Local\\Temp\\maga-g01d-20260621-140948\\full-external-current-jdk\\classpath\\jackson-core-2.16.1.jar;C:\\Users\\raffa\\AppData\\Local\\Temp\\maga-g01d-20260621-140948\\full-external-current-jdk\\classpath\\jackson-databind-2.16.1.jar;C:\\Users\\raffa\\AppData\\Local\\Temp\\maga-g01d-20260621-140948\\full-external-current-jdk\\classpath\\mosaic-application-25.2.jar;C:\\Users\\raffa\\AppData\\Local\\Temp\\maga-g01d-20260621-140948\\full-external-current-jdk\\classpath\\mosaic-geomath-25.2.jar;C:\\Users\\raffa\\AppData\\Local\\Temp\\maga-g01d-20260621-140948\\full-external-current-jdk\\classpath\\mosaic-interactions-25.2.jar;C:\\Users\\raffa\\AppData\\Local\\Temp\\maga-g01d-20260621-140948\\full-external-current-jdk\\classpath\\mosaic-objects-25.2.jar;C:\\Users\\raffa\\AppData\\Local\\Temp\\maga-g01d-20260621-140948\\full-external-current-jdk\\classpath\\mosaic-rti-api-25.2.jar;C:\\Users\\raffa\\AppData\\Local\\Temp\\maga-g01d-20260621-140948\\full-external-current-jdk\\classpath\\mosaic-utils-25.2.jar;C:\\Users\\raffa\\AppData\\Local\\Temp\\maga-g01d-20260621-140948\\full-external-current-jdk\\classpath\\slf4j-api-2.0.12.jar -d C:\\Users\\raffa\\AppData\\Local\\Temp\\maga-g01d-20260621-140948\\full-external-current-jdk\\classes @C:\\Users\\raffa\\AppData\\Local\\Temp\\maga-g01d-20260621-140948\\full-external-current-jdk\\sources.txt",
+                                       "exitCode":  0,
+                                       "durationSeconds":  6.048,
+                                       "stdout":  "C:\\Users\\raffa\\IdeaProjects\\maga-core\\test-results\\final-campaign\\G01_pipeline_validation\\PRE-03-SMOKE\\runtime_jdk_workspace_isolation\\d3_full_external_stdout.txt",
+                                       "stderr":  "C:\\Users\\raffa\\IdeaProjects\\maga-core\\test-results\\final-campaign\\G01_pipeline_validation\\PRE-03-SMOKE\\runtime_jdk_workspace_isolation\\d3_full_external_stderr.txt",
+                                       "accessDeniedException":  false,
+                                       "compilerException":  false,
+                                       "stackTraceJar":  null,
+                                       "status":  "PASS",
+                                       "classReport":  {
+                                                           "classFileCount":  252,
+                                                           "expectedMissingClasses":  [
+
+                                                                                      ]
+                                                       },
+                                       "sourceFileCount":  198,
+                                       "copiedJarChecks":  [
+                                                               {
+                                                                   "name":  "mosaic-application-25.2.jar",
+                                                                   "sourcePath":  "C:\\Users\\raffa\\IdeaProjects\\maga-core\\tmp\\mosaic-25.2\\lib\\mosaic\\mosaic-application-25.2.jar",
+                                                                   "copiedPath":  "C:\\Users\\raffa\\AppData\\Local\\Temp\\maga-g01d-20260621-140948\\full-external-current-jdk\\classpath\\mosaic-application-25.2.jar",
+                                                                   "sourceSha256":  "2491403b9d235f8d79247ef71353dffca49097b1224ba3ae29462fec79387b80",
+                                                                   "copiedSha256":  "2491403b9d235f8d79247ef71353dffca49097b1224ba3ae29462fec79387b80",
+                                                                   "sha256Match":  true
+                                                               },
+                                                               {
+                                                                   "name":  "mosaic-objects-25.2.jar",
+                                                                   "sourcePath":  "C:\\Users\\raffa\\IdeaProjects\\maga-core\\tmp\\mosaic-25.2\\lib\\mosaic\\mosaic-objects-25.2.jar",
+                                                                   "copiedPath":  "C:\\Users\\raffa\\AppData\\Local\\Temp\\maga-g01d-20260621-140948\\full-external-current-jdk\\classpath\\mosaic-objects-25.2.jar",
+                                                                   "sourceSha256":  "072d362c56fe85d84dff71e04444266b1de1b18e47c36deeab025f8bfadf4411",
+                                                                   "copiedSha256":  "072d362c56fe85d84dff71e04444266b1de1b18e47c36deeab025f8bfadf4411",
+                                                                   "sha256Match":  true
+                                                               },
+                                                               {
+                                                                   "name":  "mosaic-geomath-25.2.jar",
+                                                                   "sourcePath":  "C:\\Users\\raffa\\IdeaProjects\\maga-core\\tmp\\mosaic-25.2\\lib\\mosaic\\mosaic-geomath-25.2.jar",
+                                                                   "copiedPath":  "C:\\Users\\raffa\\AppData\\Local\\Temp\\maga-g01d-20260621-140948\\full-external-current-jdk\\classpath\\mosaic-geomath-25.2.jar",
+                                                                   "sourceSha256":  "e5ce150b566fac801841c71d9a1d55449925db43870fba14deb80db63b8638a2",
+                                                                   "copiedSha256":  "e5ce150b566fac801841c71d9a1d55449925db43870fba14deb80db63b8638a2",
+                                                                   "sha256Match":  true
+                                                               },
+                                                               {
+                                                                   "name":  "mosaic-interactions-25.2.jar",
+                                                                   "sourcePath":  "C:\\Users\\raffa\\IdeaProjects\\maga-core\\tmp\\mosaic-25.2\\lib\\mosaic\\mosaic-interactions-25.2.jar",
+                                                                   "copiedPath":  "C:\\Users\\raffa\\AppData\\Local\\Temp\\maga-g01d-20260621-140948\\full-external-current-jdk\\classpath\\mosaic-interactions-25.2.jar",
+                                                                   "sourceSha256":  "5bde68685bf8e4eb5fc9b945fd967f36bd79fe8ade6261e3c1aa4622479ff65f",
+                                                                   "copiedSha256":  "5bde68685bf8e4eb5fc9b945fd967f36bd79fe8ade6261e3c1aa4622479ff65f",
+                                                                   "sha256Match":  true
+                                                               },
+                                                               {
+                                                                   "name":  "mosaic-utils-25.2.jar",
+                                                                   "sourcePath":  "C:\\Users\\raffa\\IdeaProjects\\maga-core\\tmp\\mosaic-25.2\\lib\\mosaic\\mosaic-utils-25.2.jar",
+                                                                   "copiedPath":  "C:\\Users\\raffa\\AppData\\Local\\Temp\\maga-g01d-20260621-140948\\full-external-current-jdk\\classpath\\mosaic-utils-25.2.jar",
+                                                                   "sourceSha256":  "a7d6dba16e24517611c54f1158de8ee9904aae225015fa420f253477dd080494",
+                                                                   "copiedSha256":  "a7d6dba16e24517611c54f1158de8ee9904aae225015fa420f253477dd080494",
+                                                                   "sha256Match":  true
+                                                               },
+                                                               {
+                                                                   "name":  "mosaic-rti-api-25.2.jar",
+                                                                   "sourcePath":  "C:\\Users\\raffa\\IdeaProjects\\maga-core\\tmp\\mosaic-25.2\\lib\\mosaic\\mosaic-rti-api-25.2.jar",
+                                                                   "copiedPath":  "C:\\Users\\raffa\\AppData\\Local\\Temp\\maga-g01d-20260621-140948\\full-external-current-jdk\\classpath\\mosaic-rti-api-25.2.jar",
+                                                                   "sourceSha256":  "3991c728b2924f2e4f04ce4e3d74b056daf7043f8ae469876cc262b1922ed53d",
+                                                                   "copiedSha256":  "3991c728b2924f2e4f04ce4e3d74b056daf7043f8ae469876cc262b1922ed53d",
+                                                                   "sha256Match":  true
+                                                               },
+                                                               {
+                                                                   "name":  "gson-2.10.1.jar",
+                                                                   "sourcePath":  "C:\\Users\\raffa\\IdeaProjects\\maga-core\\tmp\\mosaic-25.2\\lib\\third-party\\gson-2.10.1.jar",
+                                                                   "copiedPath":  "C:\\Users\\raffa\\AppData\\Local\\Temp\\maga-g01d-20260621-140948\\full-external-current-jdk\\classpath\\gson-2.10.1.jar",
+                                                                   "sourceSha256":  "4241c14a7727c34feea6507ec801318a3d4a90f070e4525681079fb94ee4c593",
+                                                                   "copiedSha256":  "4241c14a7727c34feea6507ec801318a3d4a90f070e4525681079fb94ee4c593",
+                                                                   "sha256Match":  true
+                                                               },
+                                                               {
+                                                                   "name":  "slf4j-api-2.0.12.jar",
+                                                                   "sourcePath":  "C:\\Users\\raffa\\IdeaProjects\\maga-core\\tmp\\mosaic-25.2\\lib\\third-party\\slf4j-api-2.0.12.jar",
+                                                                   "copiedPath":  "C:\\Users\\raffa\\AppData\\Local\\Temp\\maga-g01d-20260621-140948\\full-external-current-jdk\\classpath\\slf4j-api-2.0.12.jar",
+                                                                   "sourceSha256":  "a79502b8abdfbd722846a27691226a4088682d6d35654f9b80e2a9ccacf7ed47",
+                                                                   "copiedSha256":  "a79502b8abdfbd722846a27691226a4088682d6d35654f9b80e2a9ccacf7ed47",
+                                                                   "sha256Match":  true
+                                                               },
+                                                               {
+                                                                   "name":  "jackson-annotations-2.16.1.jar",
+                                                                   "sourcePath":  "C:\\Users\\raffa\\IdeaProjects\\maga-core\\tmp\\mosaic-25.2\\lib\\third-party\\jackson-annotations-2.16.1.jar",
+                                                                   "copiedPath":  "C:\\Users\\raffa\\AppData\\Local\\Temp\\maga-g01d-20260621-140948\\full-external-current-jdk\\classpath\\jackson-annotations-2.16.1.jar",
+                                                                   "sourceSha256":  "a4730771e6a495dd3793a42cdb8ce6bddb96c77e15f40c98fd8d9a7ae09e7286",
+                                                                   "copiedSha256":  "a4730771e6a495dd3793a42cdb8ce6bddb96c77e15f40c98fd8d9a7ae09e7286",
+                                                                   "sha256Match":  true
+                                                               },
+                                                               {
+                                                                   "name":  "jackson-core-2.16.1.jar",
+                                                                   "sourcePath":  "C:\\Users\\raffa\\IdeaProjects\\maga-core\\tmp\\mosaic-25.2\\lib\\third-party\\jackson-core-2.16.1.jar",
+                                                                   "copiedPath":  "C:\\Users\\raffa\\AppData\\Local\\Temp\\maga-g01d-20260621-140948\\full-external-current-jdk\\classpath\\jackson-core-2.16.1.jar",
+                                                                   "sourceSha256":  "f5f8ef90609e64fec82eb908e497dc7d81b2eb983fe509b870292a193cde4dfb",
+                                                                   "copiedSha256":  "f5f8ef90609e64fec82eb908e497dc7d81b2eb983fe509b870292a193cde4dfb",
+                                                                   "sha256Match":  true
+                                                               },
+                                                               {
+                                                                   "name":  "jackson-databind-2.16.1.jar",
+                                                                   "sourcePath":  "C:\\Users\\raffa\\IdeaProjects\\maga-core\\tmp\\mosaic-25.2\\lib\\third-party\\jackson-databind-2.16.1.jar",
+                                                                   "copiedPath":  "C:\\Users\\raffa\\AppData\\Local\\Temp\\maga-g01d-20260621-140948\\full-external-current-jdk\\classpath\\jackson-databind-2.16.1.jar",
+                                                                   "sourceSha256":  "baf8a8ebee8f45ef68cdd5e2dd3923b3e296c0937b96ec0b4806aa3a31bccd1d",
+                                                                   "copiedSha256":  "baf8a8ebee8f45ef68cdd5e2dd3923b3e296c0937b96ec0b4806aa3a31bccd1d",
+                                                                   "sha256Match":  true
+                                                               }
+                                                           ]
+                                   },
+    "fullExternalProcNoneTest":  {
+                                     "executed":  false,
+                                     "status":  "NOT_EXECUTED",
+                                     "reason":  "D3 did not fail"
+                                 },
+    "alternateJdkTests":  [
+                              {
+                                  "vendor":  "Eclipse Adoptium",
+                                  "version":  "17.0.8.1",
+                                  "majorVersion":  17,
+                                  "javaHome":  "C:\\Program Files\\Eclipse Adoptium\\jdk-17.0.8.101-hotspot",
+                                  "javaPath":  "C:\\Program Files\\Eclipse Adoptium\\jdk-17.0.8.101-hotspot\\bin\\java.exe",
+                                  "javacPath":  "C:\\Program Files\\Eclipse Adoptium\\jdk-17.0.8.101-hotspot\\bin\\javac.exe",
+                                  "jarPath":  "C:\\Program Files\\Eclipse Adoptium\\jdk-17.0.8.101-hotspot\\bin\\jar.exe",
+                                  "command":  "C:\\Program Files\\Eclipse Adoptium\\jdk-17.0.8.101-hotspot\\bin\\javac.exe -cp C:\\Users\\raffa\\AppData\\Local\\Temp\\maga-g01d-20260621-140948\\full-external-current-jdk\\classpath\\gson-2.10.1.jar;C:\\Users\\raffa\\AppData\\Local\\Temp\\maga-g01d-20260621-140948\\full-external-current-jdk\\classpath\\jackson-annotations-2.16.1.jar;C:\\Users\\raffa\\AppData\\Local\\Temp\\maga-g01d-20260621-140948\\full-external-current-jdk\\classpath\\jackson-core-2.16.1.jar;C:\\Users\\raffa\\AppData\\Local\\Temp\\maga-g01d-20260621-140948\\full-external-current-jdk\\classpath\\jackson-databind-2.16.1.jar;C:\\Users\\raffa\\AppData\\Local\\Temp\\maga-g01d-20260621-140948\\full-external-current-jdk\\classpath\\mosaic-application-25.2.jar;C:\\Users\\raffa\\AppData\\Local\\Temp\\maga-g01d-20260621-140948\\full-external-current-jdk\\classpath\\mosaic-geomath-25.2.jar;C:\\Users\\raffa\\AppData\\Local\\Temp\\maga-g01d-20260621-140948\\full-external-current-jdk\\classpath\\mosaic-interactions-25.2.jar;C:\\Users\\raffa\\AppData\\Local\\Temp\\maga-g01d-20260621-140948\\full-external-current-jdk\\classpath\\mosaic-objects-25.2.jar;C:\\Users\\raffa\\AppData\\Local\\Temp\\maga-g01d-20260621-140948\\full-external-current-jdk\\classpath\\mosaic-rti-api-25.2.jar;C:\\Users\\raffa\\AppData\\Local\\Temp\\maga-g01d-20260621-140948\\full-external-current-jdk\\classpath\\mosaic-utils-25.2.jar;C:\\Users\\raffa\\AppData\\Local\\Temp\\maga-g01d-20260621-140948\\full-external-current-jdk\\classpath\\slf4j-api-2.0.12.jar -d C:\\Users\\raffa\\AppData\\Local\\Temp\\maga-g01d-20260621-140948\\alternate-jdks\\jdk-17.0.8.101-hotspot-17.0.8.1\\classes @C:\\Users\\raffa\\AppData\\Local\\Temp\\maga-g01d-20260621-140948\\full-external-current-jdk\\sources.txt",
+                                  "exitCode":  0,
+                                  "stdout":  "C:\\Users\\raffa\\IdeaProjects\\maga-core\\test-results\\final-campaign\\G01_pipeline_validation\\PRE-03-SMOKE\\runtime_jdk_workspace_isolation\\d5_jdk-17.0.8.101-hotspot-17.0.8.1_stdout.txt",
+                                  "stderr":  "C:\\Users\\raffa\\IdeaProjects\\maga-core\\test-results\\final-campaign\\G01_pipeline_validation\\PRE-03-SMOKE\\runtime_jdk_workspace_isolation\\d5_jdk-17.0.8.101-hotspot-17.0.8.1_stderr.txt",
+                                  "durationSeconds":  6.066,
+                                  "status":  "PASS",
+                                  "classFileCount":  252,
+                                  "expectedMissingClasses":  [
+
+                                                             ],
+                                  "accessDeniedException":  false,
+                                  "compilerException":  false,
+                                  "javapMajorVersion":  61,
+                                  "javapMajorVersionIs61":  true
+                              },
+                              {
+                                  "vendor":  "Oracle Corporation",
+                                  "version":  "20.0.2",
+                                  "majorVersion":  20,
+                                  "javaHome":  "C:\\Program Files\\Java\\jdk-20",
+                                  "javaPath":  "C:\\Program Files\\Java\\jdk-20\\bin\\java.exe",
+                                  "javacPath":  "C:\\Program Files\\Java\\jdk-20\\bin\\javac.exe",
+                                  "jarPath":  "C:\\Program Files\\Java\\jdk-20\\bin\\jar.exe",
+                                  "command":  "C:\\Program Files\\Java\\jdk-20\\bin\\javac.exe --release 17 -cp C:\\Users\\raffa\\AppData\\Local\\Temp\\maga-g01d-20260621-140948\\full-external-current-jdk\\classpath\\gson-2.10.1.jar;C:\\Users\\raffa\\AppData\\Local\\Temp\\maga-g01d-20260621-140948\\full-external-current-jdk\\classpath\\jackson-annotations-2.16.1.jar;C:\\Users\\raffa\\AppData\\Local\\Temp\\maga-g01d-20260621-140948\\full-external-current-jdk\\classpath\\jackson-core-2.16.1.jar;C:\\Users\\raffa\\AppData\\Local\\Temp\\maga-g01d-20260621-140948\\full-external-current-jdk\\classpath\\jackson-databind-2.16.1.jar;C:\\Users\\raffa\\AppData\\Local\\Temp\\maga-g01d-20260621-140948\\full-external-current-jdk\\classpath\\mosaic-application-25.2.jar;C:\\Users\\raffa\\AppData\\Local\\Temp\\maga-g01d-20260621-140948\\full-external-current-jdk\\classpath\\mosaic-geomath-25.2.jar;C:\\Users\\raffa\\AppData\\Local\\Temp\\maga-g01d-20260621-140948\\full-external-current-jdk\\classpath\\mosaic-interactions-25.2.jar;C:\\Users\\raffa\\AppData\\Local\\Temp\\maga-g01d-20260621-140948\\full-external-current-jdk\\classpath\\mosaic-objects-25.2.jar;C:\\Users\\raffa\\AppData\\Local\\Temp\\maga-g01d-20260621-140948\\full-external-current-jdk\\classpath\\mosaic-rti-api-25.2.jar;C:\\Users\\raffa\\AppData\\Local\\Temp\\maga-g01d-20260621-140948\\full-external-current-jdk\\classpath\\mosaic-utils-25.2.jar;C:\\Users\\raffa\\AppData\\Local\\Temp\\maga-g01d-20260621-140948\\full-external-current-jdk\\classpath\\slf4j-api-2.0.12.jar -d C:\\Users\\raffa\\AppData\\Local\\Temp\\maga-g01d-20260621-140948\\alternate-jdks\\jdk-20-20.0.2\\classes @C:\\Users\\raffa\\AppData\\Local\\Temp\\maga-g01d-20260621-140948\\full-external-current-jdk\\sources.txt",
+                                  "exitCode":  0,
+                                  "stdout":  "C:\\Users\\raffa\\IdeaProjects\\maga-core\\test-results\\final-campaign\\G01_pipeline_validation\\PRE-03-SMOKE\\runtime_jdk_workspace_isolation\\d5_jdk-20-20.0.2_stdout.txt",
+                                  "stderr":  "C:\\Users\\raffa\\IdeaProjects\\maga-core\\test-results\\final-campaign\\G01_pipeline_validation\\PRE-03-SMOKE\\runtime_jdk_workspace_isolation\\d5_jdk-20-20.0.2_stderr.txt",
+                                  "durationSeconds":  6.049,
+                                  "status":  "PASS",
+                                  "classFileCount":  252,
+                                  "expectedMissingClasses":  [
+
+                                                             ],
+                                  "accessDeniedException":  false,
+                                  "compilerException":  false,
+                                  "javapMajorVersion":  61,
+                                  "javapMajorVersionIs61":  true
+                              },
+                              {
+                                  "vendor":  "Oracle Corporation",
+                                  "version":  "21.0.2",
+                                  "majorVersion":  21,
+                                  "javaHome":  "C:\\Program Files\\Java\\jdk-21",
+                                  "javaPath":  "C:\\Program Files\\Java\\jdk-21\\bin\\java.exe",
+                                  "javacPath":  "C:\\Program Files\\Java\\jdk-21\\bin\\javac.exe",
+                                  "jarPath":  "C:\\Program Files\\Java\\jdk-21\\bin\\jar.exe",
+                                  "command":  "C:\\Program Files\\Java\\jdk-21\\bin\\javac.exe --release 17 -cp C:\\Users\\raffa\\AppData\\Local\\Temp\\maga-g01d-20260621-140948\\full-external-current-jdk\\classpath\\gson-2.10.1.jar;C:\\Users\\raffa\\AppData\\Local\\Temp\\maga-g01d-20260621-140948\\full-external-current-jdk\\classpath\\jackson-annotations-2.16.1.jar;C:\\Users\\raffa\\AppData\\Local\\Temp\\maga-g01d-20260621-140948\\full-external-current-jdk\\classpath\\jackson-core-2.16.1.jar;C:\\Users\\raffa\\AppData\\Local\\Temp\\maga-g01d-20260621-140948\\full-external-current-jdk\\classpath\\jackson-databind-2.16.1.jar;C:\\Users\\raffa\\AppData\\Local\\Temp\\maga-g01d-20260621-140948\\full-external-current-jdk\\classpath\\mosaic-application-25.2.jar;C:\\Users\\raffa\\AppData\\Local\\Temp\\maga-g01d-20260621-140948\\full-external-current-jdk\\classpath\\mosaic-geomath-25.2.jar;C:\\Users\\raffa\\AppData\\Local\\Temp\\maga-g01d-20260621-140948\\full-external-current-jdk\\classpath\\mosaic-interactions-25.2.jar;C:\\Users\\raffa\\AppData\\Local\\Temp\\maga-g01d-20260621-140948\\full-external-current-jdk\\classpath\\mosaic-objects-25.2.jar;C:\\Users\\raffa\\AppData\\Local\\Temp\\maga-g01d-20260621-140948\\full-external-current-jdk\\classpath\\mosaic-rti-api-25.2.jar;C:\\Users\\raffa\\AppData\\Local\\Temp\\maga-g01d-20260621-140948\\full-external-current-jdk\\classpath\\mosaic-utils-25.2.jar;C:\\Users\\raffa\\AppData\\Local\\Temp\\maga-g01d-20260621-140948\\full-external-current-jdk\\classpath\\slf4j-api-2.0.12.jar -d C:\\Users\\raffa\\AppData\\Local\\Temp\\maga-g01d-20260621-140948\\alternate-jdks\\jdk-21-21.0.2\\classes @C:\\Users\\raffa\\AppData\\Local\\Temp\\maga-g01d-20260621-140948\\full-external-current-jdk\\sources.txt",
+                                  "exitCode":  0,
+                                  "stdout":  "C:\\Users\\raffa\\IdeaProjects\\maga-core\\test-results\\final-campaign\\G01_pipeline_validation\\PRE-03-SMOKE\\runtime_jdk_workspace_isolation\\d5_jdk-21-21.0.2_stdout.txt",
+                                  "stderr":  "C:\\Users\\raffa\\IdeaProjects\\maga-core\\test-results\\final-campaign\\G01_pipeline_validation\\PRE-03-SMOKE\\runtime_jdk_workspace_isolation\\d5_jdk-21-21.0.2_stderr.txt",
+                                  "durationSeconds":  6.032,
+                                  "status":  "FAIL",
+                                  "classFileCount":  249,
+                                  "expectedMissingClasses":  [
+
+                                                             ],
+                                  "accessDeniedException":  false,
+                                  "compilerException":  false,
+                                  "javapMajorVersion":  61,
+                                  "javapMajorVersionIs61":  true
+                              }
+                          ],
+    "previousRepositoryFailureObserved":  true,
+    "classification":  "WORKSPACE_OR_SCANNER_INTERFERENCE",
+    "recommendedNextStep":  "Repeat the canonical build after isolating workspace-scanner interference or moving the build workspace; no automatic fix applied.",
+    "limitations":  [
+                        "No deploy, SUMO, or MOSAIC execution was performed.",
+                        "No build script, Java source, core source, JAVA_HOME, PATH, process, ACL, owner, or security setting was modified.",
+                        "Alternate JDK search was limited to already installed locations requested by the G01D protocol."
+                    ]
+}

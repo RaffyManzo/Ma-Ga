@@ -1,0 +1,45 @@
+{
+  "campaignId": "final-test-campaign",
+  "groupId": "G01",
+  "configId": "CFG-SMOKE",
+  "requestedMaterializationId": "MAT-SMOKE-104729",
+  "materializationId": "MAT-CFG-SMOKE-104729",
+  "runId": "PRE-03-SMOKE",
+  "frozenCommit": "5a9477735a3d707a5f000a64653cd2a6fc7f2007",
+  "campaignCommit": "6449978026d205c3f0949cd5532782fd447fed1d",
+  "mosaicRunName": null,
+  "mosaicRunDirectory": null,
+  "simulationStart": null,
+  "simulationEnd": null,
+  "sourceFiles": [
+    "data/docs/testing/final-campaign/scenario_instance_plan.csv",
+    "tmp/materialized-literature-scenarios/final-test-campaign/G01_pipeline_validation/CFG-SMOKE/104729/final_campaign_manifest.json",
+    "tmp/materialized-literature-scenarios/final-test-campaign/G01_pipeline_validation/CFG-SMOKE/104729/reports/final_campaign_validation_report.json",
+    "tools/intas-literature-scenario/run_literature_scenario.ps1",
+    "tools/intas-literature-scenario/deploy_materialized_literature_scenario.ps1"
+  ],
+  "copiedFiles": [
+    "test-results/final-campaign/G01_pipeline_validation/PRE-03-SMOKE/pre_execution_checks.json",
+    "test-results/final-campaign/G01_pipeline_validation/PRE-03-SMOKE/environment_preparation.json",
+    "test-results/final-campaign/G01_pipeline_validation/PRE-03-SMOKE/run_literature_scenario_console.log",
+    "test-results/final-campaign/G01_pipeline_validation/PRE-03-SMOKE/deploy_validation_failure.json"
+  ],
+  "sha256": {
+    "data/docs/testing/final-campaign/scenario_instance_plan.csv": "2cb312a23d507e410728ba116971754be00420be938d7ec95f3f5092f167cbe4",
+    "tmp/materialized-literature-scenarios/final-test-campaign/G01_pipeline_validation/CFG-SMOKE/104729/final_campaign_manifest.json": "056c59c69d60a69e8e6e8042135ad778c7dc1de96b404ba445a612c7f1972b96",
+    "tmp/materialized-literature-scenarios/final-test-campaign/G01_pipeline_validation/CFG-SMOKE/104729/reports/final_campaign_validation_report.json": "80c88e8ea7c2acf1781e5ca6aa4cf9900cfff5727704c04612185f3b36732bc8",
+    "tools/intas-literature-scenario/run_literature_scenario.ps1": "a91a0c8b0a3ba909b9f8913812aa8f294524b8f3bdafb731e3531b6d2a04e8ba",
+    "tools/intas-literature-scenario/deploy_materialized_literature_scenario.ps1": "c00b114747052ae504827478752e1c8f2446425f556fc0133573ba052a3d1ed1",
+    "test-results/final-campaign/G01_pipeline_validation/PRE-03-SMOKE/pre_execution_checks.json": "4b5ddf67cf28a4093adc1e30be4d8187154a64225eeafa162e414283132fc6c7",
+    "test-results/final-campaign/G01_pipeline_validation/PRE-03-SMOKE/environment_preparation.json": "f771d9fcc4f6b2216992bb0e5f1981ef1a325c89615a8e01fb690c42194d0109",
+    "test-results/final-campaign/G01_pipeline_validation/PRE-03-SMOKE/run_literature_scenario_console.log": "debada51fa50a793d6ebf6c214c8d227aee365f3c42b45f762d262a936938a5d",
+    "test-results/final-campaign/G01_pipeline_validation/PRE-03-SMOKE/deploy_validation_failure.json": "6816ab9696d6d523b3e1bdf4bea4937cd973a418b75517b358c2b82fe44cc5ef"
+  },
+  "validatorStatus": "FAILED_DEPLOY_VALIDATOR",
+  "deployValidatorStatus": "INVALID_MATERIALIZED_SCENARIO",
+  "mosaicExecuted": false,
+  "limitations": [
+    "MOSAIC was not executed because the canonical deploy validator rejected the materialized scenario.",
+    "No task completion or strategy performance conclusion can be derived from this failed smoke attempt."
+  ]
+}

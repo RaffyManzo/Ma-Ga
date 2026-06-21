@@ -1,0 +1,10 @@
+JDK javac: C:\Program Files\Java\jdk-17\bin\javac.exe
+JDK jar: C:\Program Files\Java\jdk-17\bin\jar.exe
+MOSAIC root: C:\Users\raffa\IdeaProjects\maga-core\tmp\mosaic-25.2
+Compiling core, live state layer, and live MA-GA runtime...
+Source counts:
+  core=151
+  live-state-layer=27
+  live-maga-runtime=20
+Build completed: C:\Users\raffa\IdeaProjects\maga-core\tools\mosaic-live-maga-runtime\out\maga-live-maga-runtime.jar
+Generated JAR is intentionally kept out of versioned scenarios.

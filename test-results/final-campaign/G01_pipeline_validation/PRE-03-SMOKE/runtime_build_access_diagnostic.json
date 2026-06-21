@@ -1,0 +1,445 @@
+﻿{
+    "campaignId":  "final-test-campaign",
+    "groupId":  "G01",
+    "runId":  "PRE-03-SMOKE",
+    "timestampUtc":  "2026-06-21T10:12:08Z",
+    "gitBranch":  "testing/final-campaign",
+    "gitHead":  "6449978026d205c3f0949cd5532782fd447fed1d",
+    "restartAfterNetworkInterruption":  true,
+    "partialArtifactsArchived":  true,
+    "partialArchivePath":  "see tmp/archive/final-test-campaign-interrupted-G01B-*",
+    "resultsProducedFromCleanRestart":  true,
+    "preconditions":  {
+                          "expectedHead":  "6449978026d205c3f0949cd5532782fd447fed1d",
+                          "statusShort":  [
+                                              " M test-audits/final-campaign/G00_scenario_preparation_generation/anomalies_G00.csv",
+                                              " M test-audits/final-campaign/G00_scenario_preparation_generation/audit_G00_scenario_preparation_generation.md",
+                                              " M test-audits/final-campaign/G00_scenario_preparation_generation/evidence_manifest_G00.json",
+                                              " M test-audits/final-campaign/G00_scenario_preparation_generation/git_diff_check_G00F.txt",
+                                              " M test-audits/final-campaign/G00_scenario_preparation_generation/git_diff_name_only_G00F.txt",
+                                              " M test-audits/final-campaign/G00_scenario_preparation_generation/git_status_short_G00F.txt",
+                                              " M test-audits/final-campaign/G00_scenario_preparation_generation/materialization_summary_all.json",
+                                              " M test-audits/final-campaign/G00_scenario_preparation_generation/metrics_G00.csv",
+                                              " M test-results/final-campaign/G00_scenario_preparation_generation/materialization_input_index.csv",
+                                              " M test-results/final-campaign/G03_reproducibility_duration/repro_materialization_comparison.json",
+                                              " M tools/intas-literature-scenario/final_campaign/README.md",
+                                              " M tools/intas-literature-scenario/final_campaign/materialize_final_campaign.py",
+                                              " M tools/intas-literature-scenario/final_campaign/validate_final_campaign.py",
+                                              "?? test-audits/final-campaign/G01_pipeline_validation/",
+                                              "?? test-results/final-campaign/G00_scenario_preparation_generation/canonical_deploy_compatibility_matrix.csv",
+                                              "?? test-results/final-campaign/G00_scenario_preparation_generation/canonical_metadata_repair_report.json",
+                                              "?? test-results/final-campaign/G00_scenario_preparation_generation/canonical_validator_reports/",
+                                              "?? test-results/final-campaign/G01_pipeline_validation/"
+                                          ],
+                          "diffCheck":  [
+                                            "warning: in the working copy of \u0027test-audits/final-campaign/G00_scenario_preparation_generation/anomalies_G00.csv\u0027, LF will be replaced by CRLF the next time Git touches it",
+                                            "warning: in the working copy of \u0027test-audits/final-campaign/G00_scenario_preparation_generation/metrics_G00.csv\u0027, LF will be replaced by CRLF the next time Git touches it",
+                                            "warning: in the working copy of \u0027test-results/final-campaign/G00_scenario_preparation_generation/materialization_input_index.csv\u0027, LF will be replaced by CRLF the next time Git touches it",
+                                            "warning: in the working copy of \u0027tools/intas-literature-scenario/final_campaign/README.md\u0027, LF will be replaced by CRLF the next time Git touches it",
+                                            "warning: in the working copy of \u0027tools/intas-literature-scenario/final_campaign/materialize_final_campaign.py\u0027, LF will be replaced by CRLF the next time Git touches it",
+                                            "warning: in the working copy of \u0027tools/intas-literature-scenario/final_campaign/validate_final_campaign.py\u0027, LF will be replaced by CRLF the next time Git touches it"
+                                        ],
+                          "frozenJavaDiff":  [
+
+                                             ]
+                      },
+    "buildScriptBehavior":  [
+                                "deletes tools/mosaic-live-maga-runtime/out/",
+                                "copies MOSAIC dependencies into out/classpath/",
+                                "builds the javac classpath using copied dependencies",
+                                "invokes javac",
+                                "creates the runtime JAR only after javac returns"
+                            ],
+    "javaEnvironment":  {
+                            "javaWhere":  [
+                                              "C:\\Program Files\\Java\\jdk-17\\bin\\java.exe"
+                                          ],
+                            "javacWhere":  [
+                                               "C:\\Program Files\\Java\\jdk-17\\bin\\javac.exe"
+                                           ],
+                            "jarWhere":  [
+                                             "C:\\Program Files\\Java\\jdk-17\\bin\\jar.exe"
+                                         ],
+                            "javaExecutable":  "C:\\Program Files\\Java\\jdk-17\\bin\\java.exe",
+                            "javacExecutable":  "C:\\Program Files\\Java\\jdk-17\\bin\\javac.exe",
+                            "jarExecutable":  "C:\\Program Files\\Java\\jdk-17\\bin\\jar.exe",
+                            "javaVersion":  "java.exe : java version \"17.0.12\" 2024-07-16 LTS\r\nIn C:\\Users\\raffa\\IdeaProjects\\maga-core\\tmp\\final-campaign-build-diagnostics\\G01B\\run_g01b_diagnostic.ps1:60 car:19\r\n+         $output = \u0026 $FilePath @Arguments 2\u003e\u00261\r\n+                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~\r\n    + CategoryInfo          : NotSpecified: (java version \"17.0.12\" 2024-07-16 LTS:String) [], RemoteException\r\n    + FullyQualifiedErrorId : NativeCommandError\r\n \r\nJava(TM) SE Runtime Environment (build 17.0.12+8-LTS-286)\r\nJava HotSpot(TM) 64-Bit Server VM (build 17.0.12+8-LTS-286, mixed mode, sharing)",
+                            "javacVersion":  "javac 17.0.12",
+                            "jarVersion":  "jar 17.0.12",
+                            "JAVA_HOME":  "C:\\Program Files\\Java\\jdk-17",
+                            "sameJdk":  true,
+                            "sameJdkReason":  "java/javac/jar bin directories: C:\\Program Files\\Java\\jdk-17\\bin | C:\\Program Files\\Java\\jdk-17\\bin | C:\\Program Files\\Java\\jdk-17\\bin"
+                        },
+    "canonicalBuild":  {
+                           "status":  "FAIL",
+                           "exitCode":  0,
+                           "durationSeconds":  13.134,
+                           "stdout":  "test-results/final-campaign/G01_pipeline_validation/PRE-03-SMOKE/runtime_build_access_diagnostic/canonical_build_stdout.txt",
+                           "stderr":  "test-results/final-campaign/G01_pipeline_validation/PRE-03-SMOKE/runtime_build_access_diagnostic/canonical_build_stderr.txt",
+                           "archiveBeforeBuild":  {
+                                                      "source":  "tools/mosaic-live-maga-runtime/out",
+                                                      "existed":  false,
+                                                      "action":  "NOTHING_TO_ARCHIVE",
+                                                      "destination":  "NOT_APPLICABLE"
+                                                  },
+                           "accessDeniedExceptionPresent":  true,
+                           "compilerExceptionPresent":  true,
+                           "jarPresent":  true,
+                           "jarSizeBytes":  491454,
+                           "jarSha256":  "e8b607330e0f869bde0adecb9491fb065846f1c1d0e39bbc742d77e6d55630ea",
+                           "jarTfExitCode":  0,
+                           "expectedClassesMissing":  [
+
+                                                      ],
+                           "jarTfOutput":  "tmp/final-campaign-build-diagnostics/G01B/canonical_jar_tf.txt"
+                       },
+    "directOriginalClasspathTest":  {
+                                        "status":  "FAIL",
+                                        "exitCode":  0,
+                                        "durationSeconds":  9.131,
+                                        "stdout":  "test-results/final-campaign/G01_pipeline_validation/PRE-03-SMOKE/runtime_build_access_diagnostic/direct_original_stdout.txt",
+                                        "stderr":  "test-results/final-campaign/G01_pipeline_validation/PRE-03-SMOKE/runtime_build_access_diagnostic/direct_original_stderr.txt",
+                                        "accessDeniedExceptionPresent":  true,
+                                        "compilerExceptionPresent":  true,
+                                        "classFileCount":  252,
+                                        "classpathMode":  "direct_original",
+                                        "sourcesFile":  "tmp/final-campaign-build-diagnostics/G01B/direct_original_sources.txt",
+                                        "classpathJarCount":  11
+                                    },
+    "directCopiedClasspathTest":  {
+                                      "status":  "FAIL",
+                                      "exitCode":  0,
+                                      "durationSeconds":  9.143,
+                                      "stdout":  "test-results/final-campaign/G01_pipeline_validation/PRE-03-SMOKE/runtime_build_access_diagnostic/direct_copied_stdout.txt",
+                                      "stderr":  "test-results/final-campaign/G01_pipeline_validation/PRE-03-SMOKE/runtime_build_access_diagnostic/direct_copied_stderr.txt",
+                                      "accessDeniedExceptionPresent":  true,
+                                      "compilerExceptionPresent":  true,
+                                      "classFileCount":  252,
+                                      "classpathMode":  "direct_copied",
+                                      "sourcesFile":  "tmp/final-campaign-build-diagnostics/G01B/direct_copied_sources.txt",
+                                      "classpathJarCount":  11,
+                                      "copyAccess":  [
+                                                         {
+                                                             "source":  "tmp/mosaic-25.2/lib/mosaic/mosaic-application-25.2.jar",
+                                                             "destination":  "tmp/final-campaign-build-diagnostics/G01B/copied-classpath/mosaic-application-25.2.jar",
+                                                             "sourceSha256":  "2491403b9d235f8d79247ef71353dffca49097b1224ba3ae29462fec79387b80",
+                                                             "destinationSha256":  "2491403b9d235f8d79247ef71353dffca49097b1224ba3ae29462fec79387b80",
+                                                             "shaMatches":  true,
+                                                             "fileShareNoneOpened":  true,
+                                                             "waitSeconds":  0,
+                                                             "lastException":  ""
+                                                         },
+                                                         {
+                                                             "source":  "tmp/mosaic-25.2/lib/mosaic/mosaic-objects-25.2.jar",
+                                                             "destination":  "tmp/final-campaign-build-diagnostics/G01B/copied-classpath/mosaic-objects-25.2.jar",
+                                                             "sourceSha256":  "072d362c56fe85d84dff71e04444266b1de1b18e47c36deeab025f8bfadf4411",
+                                                             "destinationSha256":  "072d362c56fe85d84dff71e04444266b1de1b18e47c36deeab025f8bfadf4411",
+                                                             "shaMatches":  true,
+                                                             "fileShareNoneOpened":  true,
+                                                             "waitSeconds":  0,
+                                                             "lastException":  ""
+                                                         },
+                                                         {
+                                                             "source":  "tmp/mosaic-25.2/lib/mosaic/mosaic-geomath-25.2.jar",
+                                                             "destination":  "tmp/final-campaign-build-diagnostics/G01B/copied-classpath/mosaic-geomath-25.2.jar",
+                                                             "sourceSha256":  "e5ce150b566fac801841c71d9a1d55449925db43870fba14deb80db63b8638a2",
+                                                             "destinationSha256":  "e5ce150b566fac801841c71d9a1d55449925db43870fba14deb80db63b8638a2",
+                                                             "shaMatches":  true,
+                                                             "fileShareNoneOpened":  true,
+                                                             "waitSeconds":  0,
+                                                             "lastException":  ""
+                                                         },
+                                                         {
+                                                             "source":  "tmp/mosaic-25.2/lib/mosaic/mosaic-interactions-25.2.jar",
+                                                             "destination":  "tmp/final-campaign-build-diagnostics/G01B/copied-classpath/mosaic-interactions-25.2.jar",
+                                                             "sourceSha256":  "5bde68685bf8e4eb5fc9b945fd967f36bd79fe8ade6261e3c1aa4622479ff65f",
+                                                             "destinationSha256":  "5bde68685bf8e4eb5fc9b945fd967f36bd79fe8ade6261e3c1aa4622479ff65f",
+                                                             "shaMatches":  true,
+                                                             "fileShareNoneOpened":  true,
+                                                             "waitSeconds":  0,
+                                                             "lastException":  ""
+                                                         },
+                                                         {
+                                                             "source":  "tmp/mosaic-25.2/lib/mosaic/mosaic-utils-25.2.jar",
+                                                             "destination":  "tmp/final-campaign-build-diagnostics/G01B/copied-classpath/mosaic-utils-25.2.jar",
+                                                             "sourceSha256":  "a7d6dba16e24517611c54f1158de8ee9904aae225015fa420f253477dd080494",
+                                                             "destinationSha256":  "a7d6dba16e24517611c54f1158de8ee9904aae225015fa420f253477dd080494",
+                                                             "shaMatches":  true,
+                                                             "fileShareNoneOpened":  true,
+                                                             "waitSeconds":  0,
+                                                             "lastException":  ""
+                                                         },
+                                                         {
+                                                             "source":  "tmp/mosaic-25.2/lib/mosaic/mosaic-rti-api-25.2.jar",
+                                                             "destination":  "tmp/final-campaign-build-diagnostics/G01B/copied-classpath/mosaic-rti-api-25.2.jar",
+                                                             "sourceSha256":  "3991c728b2924f2e4f04ce4e3d74b056daf7043f8ae469876cc262b1922ed53d",
+                                                             "destinationSha256":  "3991c728b2924f2e4f04ce4e3d74b056daf7043f8ae469876cc262b1922ed53d",
+                                                             "shaMatches":  true,
+                                                             "fileShareNoneOpened":  true,
+                                                             "waitSeconds":  0,
+                                                             "lastException":  ""
+                                                         },
+                                                         {
+                                                             "source":  "tmp/mosaic-25.2/lib/third-party/gson-2.10.1.jar",
+                                                             "destination":  "tmp/final-campaign-build-diagnostics/G01B/copied-classpath/gson-2.10.1.jar",
+                                                             "sourceSha256":  "4241c14a7727c34feea6507ec801318a3d4a90f070e4525681079fb94ee4c593",
+                                                             "destinationSha256":  "4241c14a7727c34feea6507ec801318a3d4a90f070e4525681079fb94ee4c593",
+                                                             "shaMatches":  true,
+                                                             "fileShareNoneOpened":  true,
+                                                             "waitSeconds":  0,
+                                                             "lastException":  ""
+                                                         },
+                                                         {
+                                                             "source":  "tmp/mosaic-25.2/lib/third-party/slf4j-api-2.0.12.jar",
+                                                             "destination":  "tmp/final-campaign-build-diagnostics/G01B/copied-classpath/slf4j-api-2.0.12.jar",
+                                                             "sourceSha256":  "a79502b8abdfbd722846a27691226a4088682d6d35654f9b80e2a9ccacf7ed47",
+                                                             "destinationSha256":  "a79502b8abdfbd722846a27691226a4088682d6d35654f9b80e2a9ccacf7ed47",
+                                                             "shaMatches":  true,
+                                                             "fileShareNoneOpened":  true,
+                                                             "waitSeconds":  0,
+                                                             "lastException":  ""
+                                                         },
+                                                         {
+                                                             "source":  "tmp/mosaic-25.2/lib/third-party/jackson-annotations-2.16.1.jar",
+                                                             "destination":  "tmp/final-campaign-build-diagnostics/G01B/copied-classpath/jackson-annotations-2.16.1.jar",
+                                                             "sourceSha256":  "a4730771e6a495dd3793a42cdb8ce6bddb96c77e15f40c98fd8d9a7ae09e7286",
+                                                             "destinationSha256":  "a4730771e6a495dd3793a42cdb8ce6bddb96c77e15f40c98fd8d9a7ae09e7286",
+                                                             "shaMatches":  true,
+                                                             "fileShareNoneOpened":  true,
+                                                             "waitSeconds":  0,
+                                                             "lastException":  ""
+                                                         },
+                                                         {
+                                                             "source":  "tmp/mosaic-25.2/lib/third-party/jackson-core-2.16.1.jar",
+                                                             "destination":  "tmp/final-campaign-build-diagnostics/G01B/copied-classpath/jackson-core-2.16.1.jar",
+                                                             "sourceSha256":  "f5f8ef90609e64fec82eb908e497dc7d81b2eb983fe509b870292a193cde4dfb",
+                                                             "destinationSha256":  "f5f8ef90609e64fec82eb908e497dc7d81b2eb983fe509b870292a193cde4dfb",
+                                                             "shaMatches":  true,
+                                                             "fileShareNoneOpened":  true,
+                                                             "waitSeconds":  0,
+                                                             "lastException":  ""
+                                                         },
+                                                         {
+                                                             "source":  "tmp/mosaic-25.2/lib/third-party/jackson-databind-2.16.1.jar",
+                                                             "destination":  "tmp/final-campaign-build-diagnostics/G01B/copied-classpath/jackson-databind-2.16.1.jar",
+                                                             "sourceSha256":  "baf8a8ebee8f45ef68cdd5e2dd3923b3e296c0937b96ec0b4806aa3a31bccd1d",
+                                                             "destinationSha256":  "baf8a8ebee8f45ef68cdd5e2dd3923b3e296c0937b96ec0b4806aa3a31bccd1d",
+                                                             "shaMatches":  true,
+                                                             "fileShareNoneOpened":  true,
+                                                             "waitSeconds":  0,
+                                                             "lastException":  ""
+                                                         }
+                                                     ],
+                                      "maximumCopyAccessWaitSeconds":  0
+                                  },
+    "sourceJarInspection":  {
+                                "path":  "C:\\Users\\raffa\\IdeaProjects\\maga-core\\tmp\\mosaic-25.2\\lib\\mosaic\\mosaic-objects-25.2.jar",
+                                "exists":  true,
+                                "sizeBytes":  222754,
+                                "sha256":  "072d362c56fe85d84dff71e04444266b1de1b18e47c36deeab025f8bfadf4411",
+                                "creationTimeUtc":  "2026-06-02T14:12:33Z",
+                                "lastWriteTimeUtc":  "2025-12-15T13:05:52Z",
+                                "attributes":  "Archive",
+                                "acl":  [
+                                            {
+                                                "identity":  "S-1-5-21-3781663057-19504373-218852625-2190412190",
+                                                "rights":  "DeleteSubdirectoriesAndFiles, Modify, Synchronize",
+                                                "type":  "Allow",
+                                                "inherited":  true
+                                            },
+                                            {
+                                                "identity":  "S-1-5-21-1315515646-3733460256-2234520879-3350403250",
+                                                "rights":  "DeleteSubdirectoriesAndFiles, Modify, Synchronize",
+                                                "type":  "Allow",
+                                                "inherited":  true
+                                            },
+                                            {
+                                                "identity":  "Raffaele-pc\\CodexSandboxUsers",
+                                                "rights":  "DeleteSubdirectoriesAndFiles, Modify, Synchronize",
+                                                "type":  "Allow",
+                                                "inherited":  true
+                                            },
+                                            {
+                                                "identity":  "S-1-5-21-2248048085-312327295-385506281-3600884711",
+                                                "rights":  "DeleteSubdirectoriesAndFiles, Modify, Synchronize",
+                                                "type":  "Allow",
+                                                "inherited":  true
+                                            },
+                                            {
+                                                "identity":  "NT AUTHORITY\\SYSTEM",
+                                                "rights":  "FullControl",
+                                                "type":  "Allow",
+                                                "inherited":  true
+                                            },
+                                            {
+                                                "identity":  "BUILTIN\\Administrators",
+                                                "rights":  "FullControl",
+                                                "type":  "Allow",
+                                                "inherited":  true
+                                            },
+                                            {
+                                                "identity":  "Raffaele-pc\\raffa",
+                                                "rights":  "FullControl",
+                                                "type":  "Allow",
+                                                "inherited":  true
+                                            }
+                                        ],
+                                "owner":  "Raffaele-pc\\CodexSandboxOffline",
+                                "alternateDataStreams":  [
+                                                             {
+                                                                 "stream":  ":$DATA",
+                                                                 "length":  222754
+                                                             }
+                                                         ],
+                                "pathLength":  88
+                            },
+    "copiedJarInspection":  {
+                                "path":  "C:\\Users\\raffa\\IdeaProjects\\maga-core\\tools\\mosaic-live-maga-runtime\\out\\classpath\\mosaic-objects-25.2.jar",
+                                "exists":  true,
+                                "sizeBytes":  222754,
+                                "sha256":  "072d362c56fe85d84dff71e04444266b1de1b18e47c36deeab025f8bfadf4411",
+                                "creationTimeUtc":  "2026-06-21T10:11:33Z",
+                                "lastWriteTimeUtc":  "2025-12-15T13:05:52Z",
+                                "attributes":  "Archive",
+                                "acl":  [
+                                            {
+                                                "identity":  "S-1-5-21-1315515646-3733460256-2234520879-3350403250",
+                                                "rights":  "DeleteSubdirectoriesAndFiles, Modify, Synchronize",
+                                                "type":  "Allow",
+                                                "inherited":  true
+                                            },
+                                            {
+                                                "identity":  "Raffaele-pc\\CodexSandboxUsers",
+                                                "rights":  "DeleteSubdirectoriesAndFiles, Modify, Synchronize",
+                                                "type":  "Allow",
+                                                "inherited":  true
+                                            },
+                                            {
+                                                "identity":  "S-1-5-21-2248048085-312327295-385506281-3600884711",
+                                                "rights":  "DeleteSubdirectoriesAndFiles, Modify, Synchronize",
+                                                "type":  "Allow",
+                                                "inherited":  true
+                                            },
+                                            {
+                                                "identity":  "NT AUTHORITY\\SYSTEM",
+                                                "rights":  "FullControl",
+                                                "type":  "Allow",
+                                                "inherited":  true
+                                            },
+                                            {
+                                                "identity":  "BUILTIN\\Administrators",
+                                                "rights":  "FullControl",
+                                                "type":  "Allow",
+                                                "inherited":  true
+                                            },
+                                            {
+                                                "identity":  "Raffaele-pc\\raffa",
+                                                "rights":  "FullControl",
+                                                "type":  "Allow",
+                                                "inherited":  true
+                                            }
+                                        ],
+                                "owner":  "Raffaele-pc\\CodexSandboxOffline",
+                                "alternateDataStreams":  [
+                                                             {
+                                                                 "stream":  ":$DATA",
+                                                                 "length":  222754
+                                                             }
+                                                         ],
+                                "pathLength":  106
+                            },
+    "processInventory":  [
+                             {
+                                 "ProcessName":  "Codex",
+                                 "Id":  396,
+                                 "Path":  "C:\\Program Files\\WindowsApps\\OpenAI.Codex_26.506.3741.0_x64__2p2nqsd0c76g0\\app\\Codex.exe",
+                                 "StartTime":  "2026-06-17T16:58:18.9527574+02:00"
+                             },
+                             {
+                                 "ProcessName":  "Codex",
+                                 "Id":  4968,
+                                 "Path":  null,
+                                 "StartTime":  ""
+                             },
+                             {
+                                 "ProcessName":  "Codex",
+                                 "Id":  18880,
+                                 "Path":  "C:\\Program Files\\WindowsApps\\OpenAI.Codex_26.506.3741.0_x64__2p2nqsd0c76g0\\app\\Codex.exe",
+                                 "StartTime":  "2026-06-17T16:58:17.9388909+02:00"
+                             },
+                             {
+                                 "ProcessName":  "Codex",
+                                 "Id":  22612,
+                                 "Path":  null,
+                                 "StartTime":  ""
+                             },
+                             {
+                                 "ProcessName":  "Codex",
+                                 "Id":  25208,
+                                 "Path":  "C:\\Program Files\\WindowsApps\\OpenAI.Codex_26.506.3741.0_x64__2p2nqsd0c76g0\\app\\Codex.exe",
+                                 "StartTime":  "2026-06-17T16:58:19.2626836+02:00"
+                             },
+                             {
+                                 "ProcessName":  "codex",
+                                 "Id":  25268,
+                                 "Path":  "C:\\Users\\raffa\\AppData\\Local\\OpenAI\\Codex\\bin\\codex.exe",
+                                 "StartTime":  "2026-06-20T09:56:08.1583930+02:00"
+                             },
+                             {
+                                 "ProcessName":  "Codex",
+                                 "Id":  25444,
+                                 "Path":  null,
+                                 "StartTime":  ""
+                             },
+                             {
+                                 "ProcessName":  "codex",
+                                 "Id":  25492,
+                                 "Path":  "C:\\Program Files\\WindowsApps\\OpenAI.Codex_26.506.3741.0_x64__2p2nqsd0c76g0\\app\\resources\\codex.exe",
+                                 "StartTime":  "2026-06-17T16:58:20.8243301+02:00"
+                             },
+                             {
+                                 "ProcessName":  "codex-command-runner-0.130.0-alpha.5",
+                                 "Id":  26440,
+                                 "Path":  "C:\\Users\\raffa\\.codex\\.sandbox-bin\\codex-command-runner-0.130.0-alpha.5.exe",
+                                 "StartTime":  "2026-06-20T09:56:09.3031494+02:00"
+                             },
+                             {
+                                 "ProcessName":  "codex-command-runner-0.130.0-alpha.5",
+                                 "Id":  34676,
+                                 "Path":  "C:\\Users\\raffa\\.codex\\.sandbox-bin\\codex-command-runner-0.130.0-alpha.5.exe",
+                                 "StartTime":  "2026-06-21T12:11:29.7331837+02:00"
+                             },
+                             {
+                                 "ProcessName":  "powershell",
+                                 "Id":  23936,
+                                 "Path":  "C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe",
+                                 "StartTime":  "2026-06-17T17:02:35.2177272+02:00"
+                             },
+                             {
+                                 "ProcessName":  "powershell",
+                                 "Id":  25804,
+                                 "Path":  "C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe",
+                                 "StartTime":  "2026-06-21T12:11:30.1137213+02:00"
+                             },
+                             {
+                                 "ProcessName":  "powershell",
+                                 "Id":  33428,
+                                 "Path":  "C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe",
+                                 "StartTime":  "2026-06-21T12:11:29.7986165+02:00"
+                             },
+                             {
+                                 "ProcessName":  "powershell",
+                                 "Id":  34644,
+                                 "Path":  "C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe",
+                                 "StartTime":  "2026-06-21T10:13:07.1655880+02:00"
+                             }
+                         ],
+    "processInventoryCsv":  "test-results/final-campaign/G01_pipeline_validation/PRE-03-SMOKE/runtime_build_access_diagnostic/process_inventory.csv",
+    "jarAccessTests":  "test-results/final-campaign/G01_pipeline_validation/PRE-03-SMOKE/runtime_build_access_diagnostic/jar_access_tests.json",
+    "classification":  "JDK_OR_SOURCE_DEPENDENCY_PROBLEM",
+    "recommendedNextStep":  "Inspect JDK/source/dependency compatibility before changing build orchestration.",
+    "limitations":  [
+                        "No build script, Java source, deploy, SUMO or MOSAIC execution was performed beyond the requested build diagnostics.",
+                        "Test A, B and C were executed once in this clean restart; only copy-access waiting used the allowed one-second polling loop."
+                    ]
+}

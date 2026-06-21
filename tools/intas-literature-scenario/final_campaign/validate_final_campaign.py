@@ -243,6 +243,33 @@ def validate_resources(
     check_equal(errors, "diagnosticArtificialGaDelayMs", runtime.get("diagnosticArtificialGaDelayMs"), manifest.get("diagnosticArtificialGaDelayMs", 0), abs_tol=0)
 
 
+def validate_canonical_deploy_metadata(
+    errors: list[str],
+    manifest: dict[str, Any],
+    runtime: dict[str, Any],
+    canonical_report: dict[str, Any],
+    canonical_manifest: dict[str, Any],
+) -> None:
+    expected_mobility = "SYNTHETIC_CALIBRATED_ON_INTAS_SUBNETWORK"
+    check_equal(errors, "canonical report mobilityMode", canonical_report.get("mobilityMode"), expected_mobility)
+    check_equal(errors, "canonical manifest mobilityMode", canonical_manifest.get("mobilityMode"), expected_mobility)
+
+    expected_mode = "ADAPTIVE" if manifest.get("configId") == "CFG-G-ADAPTIVE" else "STATIC"
+    runtime_mode = runtime.get("gaParameterScalingMode")
+    report_mode = canonical_report.get("gaParameterScalingMode")
+    canonical_manifest_mode = canonical_manifest.get("gaParameterScalingMode")
+    campaign_manifest_mode = manifest.get("gaParameterScalingMode")
+    check_equal(errors, "runtime config gaParameterScalingMode", runtime_mode, expected_mode)
+    check_equal(errors, "campaign manifest gaParameterScalingMode", campaign_manifest_mode, expected_mode)
+    check_equal(errors, "canonical report gaParameterScalingMode", report_mode, expected_mode)
+    check_equal(errors, "canonical manifest gaParameterScalingMode", canonical_manifest_mode, expected_mode)
+    if len({str(runtime_mode), str(report_mode), str(canonical_manifest_mode)}) != 1:
+        errors.append(
+            "canonical GA metadata diverges across runtime config, "
+            "materialization report and materialization manifest"
+        )
+
+
 def validate_routes(
     errors: list[str],
     warnings: list[str],
@@ -352,8 +379,9 @@ def validate_scenario(scenario_root: Path, spec: dict[str, Any]) -> dict[str, An
     regions_path = root / "cell" / "regions.json"
     scenario_config_path = root / "scenario_config.json"
     report_path = root / "reports" / "intas_literature_materialization_report.json"
+    canonical_manifest_path = root / "materialization_manifest.json"
 
-    required_json = [live_state_path, runtime_path, sns_path, network_path, regions_path, scenario_config_path, report_path]
+    required_json = [live_state_path, runtime_path, sns_path, network_path, regions_path, scenario_config_path, report_path, canonical_manifest_path]
     for path in required_json:
         if not path.exists():
             errors.append(f"required JSON missing: {path.relative_to(root)}")
@@ -367,8 +395,10 @@ def validate_scenario(scenario_root: Path, spec: dict[str, Any]) -> dict[str, An
     regions = read_json(regions_path)
     scenario_config = read_json(scenario_config_path)
     report = read_json(report_path)
+    canonical_manifest = read_json(canonical_manifest_path)
 
     check_equal(errors, "scenario_config simulation duration", parse_seconds(scenario_config.get("simulation", {}).get("duration")), manifest["durationSeconds"])
+    validate_canonical_deploy_metadata(errors, manifest, runtime, report, canonical_manifest)
     validate_workload(errors, live_state, manifest, spec)
     validate_resources(errors, live_state, runtime, sns, network, regions, manifest, spec)
     metrics.update(validate_routes(errors, warnings, root, manifest, report, spec))

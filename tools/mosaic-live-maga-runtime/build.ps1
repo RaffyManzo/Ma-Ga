@@ -1,6 +1,7 @@
 param(
     [string]$MosaicRoot = ".\tmp\mosaic-25.2",
-    [string]$ScenarioName = "MaGaLiveMagaRuntimeStudy"
+    [string]$ScenarioName = "MaGaLiveMagaRuntimeStudy",
+    [string]$ExternalBuildRoot = ""
 )
 
 $ErrorActionPreference = "Stop"
@@ -31,6 +32,108 @@ function Assert-SafeScenarioName {
         throw "Invalid ScenarioName: $Name"
     }
 }
+
+function Resolve-FullPathForBuild {
+    param([string]$Path)
+    if ([IO.Path]::IsPathRooted($Path)) {
+        return [IO.Path]::GetFullPath($Path)
+    }
+    return [IO.Path]::GetFullPath((Join-Path (Get-Location).Path $Path))
+}
+
+function Assert-ExternalBuildRoot {
+    param([string]$BuildRoot)
+    $RepoFull = [IO.Path]::GetFullPath($RepoRoot).TrimEnd("\") + "\"
+    $BuildFull = [IO.Path]::GetFullPath($BuildRoot).TrimEnd("\")
+    $MosaicFull = [IO.Path]::GetFullPath($ResolvedMosaicRoot).TrimEnd("\")
+    if ($BuildFull.Equals($RepoFull.TrimEnd("\"), [StringComparison]::OrdinalIgnoreCase) -or
+            ($BuildFull + "\").StartsWith($RepoFull, [StringComparison]::OrdinalIgnoreCase)) {
+        throw "ExternalBuildRoot must be outside the repository root: $BuildFull"
+    }
+    if ($BuildFull.Equals($MosaicFull, [StringComparison]::OrdinalIgnoreCase)) {
+        throw "ExternalBuildRoot must not coincide with the MOSAIC root: $BuildFull"
+    }
+    if ((Test-Path -LiteralPath $BuildFull -PathType Container) -and
+            (Get-ChildItem -LiteralPath $BuildFull -Force | Select-Object -First 1)) {
+        throw "ExternalBuildRoot must be empty or absent: $BuildFull"
+    }
+}
+
+function Resolve-RelativePath {
+    param([string]$Base, [string]$Path)
+    $BaseFull = [IO.Path]::GetFullPath($Base).TrimEnd("\") + "\"
+    $PathFull = [IO.Path]::GetFullPath($Path)
+    $BaseUri = [Uri]::new($BaseFull)
+    $PathUri = [Uri]::new($PathFull)
+    return [Uri]::UnescapeDataString($BaseUri.MakeRelativeUri($PathUri).ToString()).Replace("/", "\")
+}
+
+function Copy-SourceTree {
+    param(
+        [string]$SourceRoot,
+        [string]$DestinationRoot
+    )
+    $Count = 0
+    New-Item -ItemType Directory -Path $DestinationRoot -Force | Out-Null
+    foreach ($SourceFile in Get-ChildItem -LiteralPath $SourceRoot -Recurse -Filter "*.java" -File) {
+        $RelativePath = Resolve-RelativePath -Base $SourceRoot -Path $SourceFile.FullName
+        $Destination = Join-Path $DestinationRoot $RelativePath
+        New-Item -ItemType Directory -Path (Split-Path -Parent $Destination) -Force | Out-Null
+        Copy-Item -LiteralPath $SourceFile.FullName -Destination $Destination -Force
+        $Count += 1
+    }
+    return $Count
+}
+
+function Invoke-NativeCaptured {
+    param(
+        [string]$FilePath,
+        [string[]]$Arguments,
+        [string]$WorkingDirectory,
+        [string]$StdoutPath,
+        [string]$StderrPath
+    )
+    if (Test-Path -LiteralPath $StdoutPath) {
+        Remove-Item -LiteralPath $StdoutPath -Force
+    }
+    if (Test-Path -LiteralPath $StderrPath) {
+        Remove-Item -LiteralPath $StderrPath -Force
+    }
+    $Process = Start-Process `
+        -FilePath $FilePath `
+        -ArgumentList $Arguments `
+        -WorkingDirectory $WorkingDirectory `
+        -RedirectStandardOutput $StdoutPath `
+        -RedirectStandardError $StderrPath `
+        -Wait `
+        -PassThru `
+        -NoNewWindow
+    $StdoutText = if (Test-Path -LiteralPath $StdoutPath) { [IO.File]::ReadAllText($StdoutPath) } else { "" }
+    $StderrText = if (Test-Path -LiteralPath $StderrPath) { [IO.File]::ReadAllText($StderrPath) } else { "" }
+    if (-not [string]::IsNullOrWhiteSpace($StdoutText)) {
+        Write-Host $StdoutText.TrimEnd()
+    }
+    if (-not [string]::IsNullOrWhiteSpace($StderrText)) {
+        $Host.UI.WriteErrorLine($StderrText.TrimEnd())
+    }
+    return [pscustomobject]@{
+        ExitCode = $Process.ExitCode
+        Stdout = $StdoutText
+        Stderr = $StderrText
+        Combined = "$StdoutText`n$StderrText"
+    }
+}
+
+function Assert-NoJavacInternalFailure {
+    param([string]$Output)
+    if ($Output -match "AccessDeniedException") {
+        throw "javac output contains AccessDeniedException"
+    }
+    if ($Output -match "An exception has occurred in the compiler") {
+        throw "javac output contains an internal compiler exception"
+    }
+}
+
 Assert-SafeScenarioName -Name $ScenarioName
 
 if (-not (Test-Path -LiteralPath $ResolvedMosaicRoot -PathType Container)) {
@@ -41,6 +144,30 @@ foreach ($CommandName in @("javac", "jar")) {
         throw "$CommandName not found in PATH"
     }
 }
+
+$Timestamp = Get-Date -Format "yyyyMMddHHmmssfff"
+if ([string]::IsNullOrWhiteSpace($ExternalBuildRoot)) {
+    $BuildStagingRoot = Join-Path $env:TEMP "maga-live-maga-runtime-build-$PID-$Timestamp"
+} else {
+    $BuildStagingRoot = Resolve-FullPathForBuild -Path $ExternalBuildRoot
+}
+$BuildStagingRoot = [IO.Path]::GetFullPath($BuildStagingRoot)
+Assert-ExternalBuildRoot -BuildRoot $BuildStagingRoot
+
+$StagingSourceRoot = Join-Path $BuildStagingRoot "source"
+$StagingCoreSourceRoot = Join-Path $StagingSourceRoot "core"
+$StagingStateLayerSourceRoot = Join-Path $StagingSourceRoot "live-state-layer"
+$StagingRuntimeSourceRoot = Join-Path $StagingSourceRoot "live-runtime"
+$StagingBuildRoot = Join-Path $BuildStagingRoot "build"
+$StagingClassesDir = Join-Path $StagingBuildRoot "classes"
+$StagingClasspathDir = Join-Path $StagingBuildRoot "classpath"
+$StagingSourcesFile = Join-Path $StagingBuildRoot "sources.txt"
+$StagingJarFile = Join-Path $StagingBuildRoot "maga-live-maga-runtime.jar"
+$JavacStdoutFile = Join-Path $StagingBuildRoot "javac.stdout.txt"
+$JavacStderrFile = Join-Path $StagingBuildRoot "javac.stderr.txt"
+$JarStdoutFile = Join-Path $StagingBuildRoot "jar.stdout.txt"
+$JarStderrFile = Join-Path $StagingBuildRoot "jar.stderr.txt"
+$PublishRoot = Join-Path $ToolRoot "out.publish-$PID-$Timestamp"
 
 $DependencyJarPaths = @(
     "lib\mosaic\mosaic-application-25.2.jar",
@@ -71,39 +198,6 @@ if ($SourceFiles.Count -eq 0) {
     throw "No Java source files found"
 }
 
-if (Test-Path -LiteralPath $OutRoot) {
-    Remove-Item -LiteralPath $OutRoot -Recurse -Force
-}
-New-Item -ItemType Directory -Path $ClassesDir -Force | Out-Null
-New-Item -ItemType Directory -Path $ClasspathDir -Force | Out-Null
-$Utf8NoBom = New-Object System.Text.UTF8Encoding($false)
-[System.IO.File]::WriteAllLines(
-    $SourcesFile,
-    [string[]]($SourceFiles | ForEach-Object { $_.FullName }),
-    $Utf8NoBom
-)
-
-$CopiedDependencyJars = foreach ($DependencyJar in $DependencyJars) {
-    $Destination = Join-Path $ClasspathDir $DependencyJar.Name
-    Copy-Item -LiteralPath $DependencyJar.FullName -Destination $Destination -Force
-    Get-Item -LiteralPath $Destination
-}
-
-$Classpath = ($CopiedDependencyJars | ForEach-Object { $_.FullName }) -join [IO.Path]::PathSeparator
-Write-Host "JDK javac: $((Get-Command javac).Source)"
-Write-Host "JDK jar: $((Get-Command jar).Source)"
-Write-Host "MOSAIC root: $ResolvedMosaicRoot"
-Write-Host "Compiling core, live state layer, and live MA-GA runtime..."
-Write-Host "Source counts:"
-Write-Host "  core=$((Get-ChildItem -LiteralPath $CoreSourceRoot -Recurse -Filter '*.java' -File).Count)"
-Write-Host "  live-state-layer=$((Get-ChildItem -LiteralPath $StateLayerSourceRoot -Recurse -Filter '*.java' -File).Count)"
-Write-Host "  live-maga-runtime=$((Get-ChildItem -LiteralPath $RuntimeSourceRoot -Recurse -Filter '*.java' -File).Count)"
-
-& javac -cp $Classpath -d $ClassesDir "@$SourcesFile"
-if ($LASTEXITCODE -ne 0) {
-    throw "javac failed with exit code $LASTEXITCODE"
-}
-
 $ExpectedClassFiles = @(
     "org\eclipse\mosaic\app\maga\liveruntime\MaGaLiveRuntimeCoordinatorApp.class",
     "org\eclipse\mosaic\app\maga\liveruntime\MaGaLiveMosaicSnapshotBridge.class",
@@ -115,27 +209,142 @@ $ExpectedClassFiles = @(
     "window\core\TemporalWindowManager.class",
     "ga\core\MaGaOptimizer.class"
 )
-foreach ($ExpectedClassFile in $ExpectedClassFiles) {
-    $ClassPath = Join-Path $ClassesDir $ExpectedClassFile
-    if (-not (Test-Path -LiteralPath $ClassPath -PathType Leaf)) {
-        throw "Expected compiled class missing: $ClassPath"
-    }
-}
 
-& jar cf $JarFile -C $ClassesDir .
-if ($LASTEXITCODE -ne 0) {
-    throw "jar failed with exit code $LASTEXITCODE"
-}
+try {
+    New-Item -ItemType Directory -Path $StagingClassesDir -Force | Out-Null
+    New-Item -ItemType Directory -Path $StagingClasspathDir -Force | Out-Null
 
-$JarEntries = & jar tf $JarFile
-if ($LASTEXITCODE -ne 0) {
-    throw "jar tf failed with exit code $LASTEXITCODE"
-}
-foreach ($ExpectedClassFile in $ExpectedClassFiles) {
-    $ExpectedJarEntry = $ExpectedClassFile.Replace("\", "/")
-    if (-not ($JarEntries -contains $ExpectedJarEntry)) {
-        throw "Expected JAR entry missing: $ExpectedJarEntry"
+    $CopiedSourceCount = 0
+    $CopiedSourceCount += Copy-SourceTree -SourceRoot $CoreSourceRoot -DestinationRoot $StagingCoreSourceRoot
+    $CopiedSourceCount += Copy-SourceTree -SourceRoot $StateLayerSourceRoot -DestinationRoot $StagingStateLayerSourceRoot
+    $CopiedSourceCount += Copy-SourceTree -SourceRoot $RuntimeSourceRoot -DestinationRoot $StagingRuntimeSourceRoot
+    if ($CopiedSourceCount -ne $SourceFiles.Count) {
+        throw "Copied source count mismatch: copied=$CopiedSourceCount original=$($SourceFiles.Count)"
     }
+
+    $StagingSourceFiles = Get-ChildItem -LiteralPath $StagingSourceRoot -Recurse -Filter "*.java" -File
+    if ($StagingSourceFiles.Count -ne $SourceFiles.Count) {
+        throw "Staging source count mismatch: staging=$($StagingSourceFiles.Count) original=$($SourceFiles.Count)"
+    }
+
+    $Utf8NoBom = New-Object System.Text.UTF8Encoding($false)
+    [System.IO.File]::WriteAllLines(
+        $StagingSourcesFile,
+        [string[]]($StagingSourceFiles | ForEach-Object { $_.FullName }),
+        $Utf8NoBom
+    )
+
+    $CopiedDependencyJars = foreach ($DependencyJar in $DependencyJars) {
+        $Destination = Join-Path $StagingClasspathDir $DependencyJar.Name
+        Copy-Item -LiteralPath $DependencyJar.FullName -Destination $Destination -Force
+        Get-Item -LiteralPath $Destination
+    }
+
+    $Classpath = ($CopiedDependencyJars | ForEach-Object { $_.FullName }) -join [IO.Path]::PathSeparator
+    Write-Host "JDK javac: $((Get-Command javac).Source)"
+    Write-Host "JDK jar: $((Get-Command jar).Source)"
+    Write-Host "MOSAIC root: $ResolvedMosaicRoot"
+    Write-Host "External build root: $BuildStagingRoot"
+    Write-Host "Compiling core, live state layer, and live MA-GA runtime in external staging..."
+    Write-Host "Source counts:"
+    Write-Host "  core=$((Get-ChildItem -LiteralPath $CoreSourceRoot -Recurse -Filter '*.java' -File).Count)"
+    Write-Host "  live-state-layer=$((Get-ChildItem -LiteralPath $StateLayerSourceRoot -Recurse -Filter '*.java' -File).Count)"
+    Write-Host "  live-maga-runtime=$((Get-ChildItem -LiteralPath $RuntimeSourceRoot -Recurse -Filter '*.java' -File).Count)"
+
+    $JavacResult = Invoke-NativeCaptured `
+        -FilePath (Get-Command javac).Source `
+        -Arguments @("-cp", $Classpath, "-d", $StagingClassesDir, "@$StagingSourcesFile") `
+        -WorkingDirectory $StagingBuildRoot `
+        -StdoutPath $JavacStdoutFile `
+        -StderrPath $JavacStderrFile
+    if ($JavacResult.ExitCode -ne 0) {
+        throw "javac failed with exit code $($JavacResult.ExitCode)"
+    }
+    Assert-NoJavacInternalFailure -Output $JavacResult.Combined
+
+    # Expected class count for the frozen MA-GA + MOSAIC live runtime source set.
+    $ExpectedFrozenClassCount = 252
+    $ActualClassCount = (Get-ChildItem -LiteralPath $StagingClassesDir -Recurse -Filter "*.class" -File).Count
+    if ($ActualClassCount -ne $ExpectedFrozenClassCount) {
+        throw "Unexpected class count: expected=$ExpectedFrozenClassCount actual=$ActualClassCount"
+    }
+
+    foreach ($ExpectedClassFile in $ExpectedClassFiles) {
+        $ClassPath = Join-Path $StagingClassesDir $ExpectedClassFile
+        if (-not (Test-Path -LiteralPath $ClassPath -PathType Leaf)) {
+            throw "Expected compiled class missing: $ClassPath"
+        }
+    }
+
+    $JarCreateResult = Invoke-NativeCaptured `
+        -FilePath (Get-Command jar).Source `
+        -Arguments @("cf", $StagingJarFile, "-C", $StagingClassesDir, ".") `
+        -WorkingDirectory $StagingBuildRoot `
+        -StdoutPath $JarStdoutFile `
+        -StderrPath $JarStderrFile
+    if ($JarCreateResult.ExitCode -ne 0) {
+        throw "jar failed with exit code $($JarCreateResult.ExitCode)"
+    }
+
+    $JarEntries = & jar tf $StagingJarFile
+    if ($LASTEXITCODE -ne 0) {
+        throw "jar tf failed with exit code $LASTEXITCODE"
+    }
+    foreach ($ExpectedClassFile in $ExpectedClassFiles) {
+        $ExpectedJarEntry = $ExpectedClassFile.Replace("\", "/")
+        if (-not ($JarEntries -contains $ExpectedJarEntry)) {
+            throw "Expected JAR entry missing: $ExpectedJarEntry"
+        }
+    }
+
+    New-Item -ItemType Directory -Path $PublishRoot -Force | Out-Null
+    $PublishClassesDir = Join-Path $PublishRoot "classes"
+    $PublishClasspathDir = Join-Path $PublishRoot "classpath"
+    New-Item -ItemType Directory -Path $PublishClassesDir -Force | Out-Null
+    New-Item -ItemType Directory -Path $PublishClasspathDir -Force | Out-Null
+    Copy-Item -Path (Join-Path $StagingClassesDir "*") -Destination $PublishClassesDir -Recurse -Force
+    Copy-Item -Path (Join-Path $StagingClasspathDir "*") -Destination $PublishClasspathDir -Recurse -Force
+    [System.IO.File]::WriteAllLines(
+        (Join-Path $PublishRoot "sources.txt"),
+        [string[]]($SourceFiles | ForEach-Object { $_.FullName }),
+        $Utf8NoBom
+    )
+    Copy-Item -LiteralPath $StagingJarFile -Destination (Join-Path $PublishRoot "maga-live-maga-runtime.jar") -Force
+
+    $PublishedJarFile = Join-Path $PublishRoot "maga-live-maga-runtime.jar"
+    if (-not (Test-Path -LiteralPath $PublishedJarFile -PathType Leaf)) {
+        throw "Published JAR missing before out swap: $PublishedJarFile"
+    }
+    $PublishedJarEntries = & jar tf $PublishedJarFile
+    if ($LASTEXITCODE -ne 0) {
+        throw "published jar tf failed with exit code $LASTEXITCODE"
+    }
+    foreach ($ExpectedClassFile in $ExpectedClassFiles) {
+        $ExpectedJarEntry = $ExpectedClassFile.Replace("\", "/")
+        if (-not ($PublishedJarEntries -contains $ExpectedJarEntry)) {
+            throw "Expected published JAR entry missing: $ExpectedJarEntry"
+        }
+    }
+    $PublishedClassCount = (Get-ChildItem -LiteralPath $PublishClassesDir -Recurse -Filter "*.class" -File).Count
+    if ($PublishedClassCount -ne $ExpectedFrozenClassCount) {
+        throw "Unexpected published class count: expected=$ExpectedFrozenClassCount actual=$PublishedClassCount"
+    }
+
+    if (Test-Path -LiteralPath $OutRoot) {
+        Remove-Item -LiteralPath $OutRoot -Recurse -Force
+    }
+    Move-Item -LiteralPath $PublishRoot -Destination $OutRoot
+
+    Remove-Item -LiteralPath $BuildStagingRoot -Recurse -Force
+    Write-Host "External staging removed: $BuildStagingRoot"
+} catch {
+    if (Test-Path -LiteralPath $PublishRoot) {
+        Remove-Item -LiteralPath $PublishRoot -Recurse -Force
+    }
+    if (Test-Path -LiteralPath $BuildStagingRoot) {
+        Write-Host "External staging preserved for diagnostics: $BuildStagingRoot"
+    }
+    throw
 }
 
 foreach ($ProtectedPath in @(

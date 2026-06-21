@@ -30,7 +30,11 @@ from validate_final_campaign import validate_scenario  # noqa: E402
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--mode", choices=["check", "archive", "pilot", "all", "materialization", "audit"], default="check")
+    parser.add_argument(
+        "--mode",
+        choices=["check", "archive", "pilot", "all", "materialization", "audit", "repair-canonical-metadata"],
+        default="check",
+    )
     parser.add_argument("--materialization-id", help="Materialization_ID for --mode materialization.")
     parser.add_argument("--repo-root", default=str(REPO_ROOT))
     parser.add_argument("--spec", default=str(DEFAULT_SPEC))
@@ -526,28 +530,78 @@ def collect_generated_file_hashes(root: Path) -> list[dict[str, Any]]:
     return result
 
 
-def write_materialization_manifest(row: dict[str, str], target_root: Path, database_path: Path, repo_root: Path, spec: dict[str, Any]) -> None:
+def sha256_or_none(path: Path) -> str | None:
+    return sha256_file(path) if path.exists() else None
+
+
+def runtime_ga_mode(target_root: Path) -> str:
+    runtime_path = target_root / "application" / "ma_ga_live_runtime_config.json"
+    runtime = read_json(runtime_path)
+    return str(runtime.get("gaParameterScalingMode", "STATIC"))
+
+
+def sync_canonical_deploy_metadata(
+    row: dict[str, str],
+    target_root: Path,
+    database_path: Path,
+    repo_root: Path,
+    spec: dict[str, Any],
+) -> dict[str, Any]:
+    """Preserve builder metadata while adding campaign deploy-compatible fields."""
+    manifest_path = target_root / "materialization_manifest.json"
+    report_path = target_root / "reports" / "intas_literature_materialization_report.json"
+    runtime_path = target_root / "application" / "ma_ga_live_runtime_config.json"
     net_file = target_root / "sumo" / f"{SUBSCENARIO_NAME}.net.xml"
     route_file = target_root / "sumo" / f"{SUBSCENARIO_NAME}_{row['density']}.rou.xml"
-    payload = {
-        "scenarioName": SCENARIO_NAME,
-        "campaignId": spec["campaignId"],
-        "materializationId": row["materialization_id"],
-        "density": row["density"],
-        "durationProfile": duration_profile_for(parse_duration_seconds(row["duration"])),
-        "seed": int(row["seed"]),
-        "networkChecksum": sha256_file(net_file),
-        "routeChecksum": sha256_file(route_file),
-        "databaseChecksum": sha256_file(database_path),
-        "databasePath": rel(database_path, repo_root),
-        "databaseSizeBytes": database_path.stat().st_size,
-        "materializerVersion": {
-            "builderSha256": sha256_file(repo_root / spec["paths"]["canonicalBuilder"]),
-            "campaignOrchestratorSha256": sha256_file(SCRIPT_DIR / "materialize_final_campaign.py"),
-            "campaignValidatorSha256": sha256_file(SCRIPT_DIR / "validate_final_campaign.py")
+
+    canonical_manifest = read_json(manifest_path) if manifest_path.exists() else {}
+    canonical_report = read_json(report_path)
+    runtime = read_json(runtime_path)
+    ga_mode = str(runtime.get("gaParameterScalingMode", "STATIC"))
+    mobility_mode = str(
+        canonical_report.get("mobilityMode")
+        or canonical_manifest.get("mobilityMode")
+        or "SYNTHETIC_CALIBRATED_ON_INTAS_SUBNETWORK"
+    )
+
+    canonical_report["gaParameterScalingMode"] = ga_mode
+    write_json_file(report_path, canonical_report)
+
+    canonical_manifest.update(
+        {
+            "scenarioName": canonical_manifest.get("scenarioName", SCENARIO_NAME),
+            "mobilityMode": mobility_mode,
+            "gaParameterScalingMode": ga_mode,
+            "campaignId": spec["campaignId"],
+            "materializationId": row["materialization_id"],
+            "density": row["density"],
+            "durationProfile": duration_profile_for(parse_duration_seconds(row["duration"])),
+            "seed": int(row["seed"]),
+            "networkChecksum": sha256_file(net_file),
+            "routeChecksum": sha256_file(route_file),
+            "databaseChecksum": sha256_file(database_path),
+            "databasePath": rel(database_path, repo_root),
+            "databaseSizeBytes": database_path.stat().st_size,
+            "materializerVersion": {
+                "builderSha256": sha256_file(repo_root / spec["paths"]["canonicalBuilder"]),
+                "campaignOrchestratorSha256": sha256_file(SCRIPT_DIR / "materialize_final_campaign.py"),
+                "campaignValidatorSha256": sha256_file(SCRIPT_DIR / "validate_final_campaign.py"),
+            },
         }
+    )
+    if "selectedCandidateId" in canonical_report and "selectedCandidateId" not in canonical_manifest:
+        canonical_manifest["selectedCandidateId"] = canonical_report["selectedCandidateId"]
+    write_json_file(manifest_path, canonical_manifest)
+    return {
+        "mobilityMode": mobility_mode,
+        "gaParameterScalingMode": ga_mode,
+        "manifestPath": manifest_path,
+        "reportPath": report_path,
     }
-    write_json_file(target_root / "materialization_manifest.json", payload)
+
+
+def write_materialization_manifest(row: dict[str, str], target_root: Path, database_path: Path, repo_root: Path, spec: dict[str, Any]) -> None:
+    sync_canonical_deploy_metadata(row, target_root, database_path, repo_root, spec)
 
 
 def write_final_manifest(
@@ -620,6 +674,7 @@ def update_manifest_validation(target_root: Path, validation: dict[str, Any]) ->
         "warningCount": len(validation.get("warnings", [])),
         "report": "reports/final_campaign_validation_report.json",
     }
+    manifest["generatedFiles"] = collect_generated_file_hashes(target_root)
     write_json_file(manifest_path, manifest)
 
 
@@ -1407,6 +1462,8 @@ def create_audit(repo_root: Path, spec: dict[str, Any], plan: list[dict[str, str
     write_csv_rows(metrics_path, metric_rows, metric_fields)
 
     anomalies_path = audit_root / "anomalies_G00.csv"
+    canonical_repair_path = repo_root / "test-results" / "final-campaign" / "G00_scenario_preparation_generation" / "canonical_metadata_repair_report.json"
+    canonical_matrix_path = repo_root / "test-results" / "final-campaign" / "G00_scenario_preparation_generation" / "canonical_deploy_compatibility_matrix.csv"
     archived_anomalies, archived_failure_paths = collect_archived_failure_anomalies(repo_root)
     recovered_intermediate_path = audit_root / "g00f_recovered_intermediate_statuses.json"
     write_json(recovered_intermediate_path, summary.get("intermediateAnomalies", []))
@@ -1525,6 +1582,20 @@ def create_audit(repo_root: Path, spec: dict[str, Any], plan: list[dict[str, str
             "EV-G00-INPUT-INDEX",
             "The manifest sourceFiles hash records the operational plan at materialization time.",
         )
+    if canonical_repair_path.exists():
+        add_anomaly(
+            "MEDIUM",
+            "ALL",
+            "ALL",
+            "T-020",
+            "G00 campaign validator initially did not verify canonical deploy metadata",
+            "Campaign validation also checks canonical deploy metadata required by the canonical deploy validator.",
+            "G01 deploy was blocked before MOSAIC execution. No scenario mobility, workload, resource or GA configuration was corrupted.",
+            "RESOLVED",
+            "no",
+            "EV-G00-CANONICAL-METADATA-REPAIR",
+            "G00C repaired metadata only: materialization_manifest.json, reports/intas_literature_materialization_report.json, final_campaign_manifest.json and reports/final_campaign_validation_report.json.",
+        )
     write_csv_rows(anomalies_path, anomaly_rows, anomaly_fields)
 
     cleanup = summary.get("cleanup", {})
@@ -1613,6 +1684,11 @@ def create_audit(repo_root: Path, spec: dict[str, Any], plan: list[dict[str, str
         "",
         "The campaign-specific tooling produced one manifest and one validation report for each planned materialization. Direct route profiles are explicitly marked as directed engineering profiles and are excluded from main factorial claims. The ADAPTIVE GA case remains non-canonical and is accepted only by the campaign validator.",
         "",
+        "### Canonical deploy compatibility correction",
+        "",
+        "G00C identified and resolved a metadata compatibility issue exposed by the failed G01 deploy attempt. The campaign validator now checks the canonical `materialization_manifest.json` and `reports/intas_literature_materialization_report.json` metadata required by the deploy validator. The repair updated only metadata and validation reports; it did not change mobility, workload, resource or GA runtime configuration files.",
+        "",
+        "",
         "## 12. Risultati riutilizzabili nella tesi",
         "",
         "Le 69 istanze previste dalla matrice sono state materializzate.",
@@ -1676,6 +1752,10 @@ def create_audit(repo_root: Path, spec: dict[str, Any], plan: list[dict[str, str
     add_evidence("EV-G00-RECOVERED-INTERMEDIATE-STATUSES", recovered_intermediate_path, "summary", "Recovered intermediate G00 pilot/history statuses.", test_ids=["T-001"])
     add_evidence("EV-G00-REPRO-COMPARISON", repro_path, "summary", "CFG-REPRO raw and logical comparison.", config_id="CFG-REPRO", materialization_id="MAT-CFG-REPRO-104729-A;MAT-CFG-REPRO-104729-B", test_ids=["T-014"])
     add_evidence("EV-G00-INPUT-INDEX", input_index_path, "summary", "Immutable materialized input index.", test_ids=["T-001", "T-002"])
+    if canonical_repair_path.exists():
+        add_evidence("EV-G00-CANONICAL-METADATA-REPAIR", canonical_repair_path, "summary", "G00C canonical deploy metadata repair report.", test_ids=["T-020"])
+    if canonical_matrix_path.exists():
+        add_evidence("EV-G00-CANONICAL-COMPATIBILITY-MATRIX", canonical_matrix_path, "summary", "G00C canonical deploy compatibility matrix.", test_ids=["T-020"])
     add_evidence("EV-G00-AUDIT-MD", audit_path, "summary", "Normalized G00 audit markdown.", test_ids=["T-001"])
     add_evidence("EV-G00-METRICS", metrics_path, "metric", "G00 long-format metrics.", test_ids=["T-001", "T-002", "T-014"])
     add_evidence("EV-G00-ANOMALIES", anomalies_path, "summary", "G00 anomalies.", test_ids=["T-001", "T-002", "T-014"])
@@ -1743,6 +1823,237 @@ def create_audit(repo_root: Path, spec: dict[str, Any], plan: list[dict[str, str
     write_json(evidence_path, evidence)
 
 
+def run_canonical_materialized_validator(repo_root: Path, spec: dict[str, Any], target_root: Path, output_path: Path) -> dict[str, Any]:
+    validator = repo_root / spec["paths"]["canonicalMaterializedValidator"]
+    command = [
+        sys.executable,
+        str(validator),
+        "--scenario-root",
+        str(target_root),
+        "--repo-root",
+        str(repo_root),
+        "--json-output",
+        str(output_path),
+    ]
+    completed = subprocess.run(command, cwd=repo_root, text=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, check=False)
+    output_path.parent.mkdir(parents=True, exist_ok=True)
+    console_path = output_path.with_name("canonical_validator_console.log")
+    console_path.write_text(completed.stdout or "", encoding="utf-8", errors="replace")
+    if output_path.exists():
+        result = read_json(output_path)
+    else:
+        result = {
+            "status": "CANONICAL_VALIDATOR_NOT_RUN",
+            "errors": [f"canonical validator exited {completed.returncode} without JSON output"],
+            "warnings": [],
+        }
+        write_json(output_path, result)
+    result["returnCode"] = completed.returncode
+    return result
+
+
+def canonical_compatibility_category(config_id: str, canonical_status: str, canonical_errors: list[str], spec: dict[str, Any]) -> tuple[str, str]:
+    if canonical_status == "VALID_MATERIALIZED_SCENARIO":
+        return "CANONICAL_COMPATIBLE", "canonical validator passed"
+    if config_id == "CFG-G-ADAPTIVE":
+        return "CAMPAIGN_VARIANT_EXPECTED_CANONICAL_REJECTION", "ADAPTIVE GA scaling is intentionally accepted only by the campaign validator"
+    if config_id in spec["directRouteProfiles"]:
+        return "CAMPAIGN_VARIANT_EXPECTED_CANONICAL_REJECTION", "direct engineering route profiles may violate canonical calibrated mobility assumptions"
+    return "UNEXPECTED_CANONICAL_REJECTION", "; ".join(canonical_errors)
+
+
+def write_canonical_compatibility_matrix(
+    repo_root: Path,
+    spec: dict[str, Any],
+    plan: list[dict[str, str]],
+    repair_items: list[dict[str, Any]],
+) -> Path:
+    output = repo_root / "test-results" / "final-campaign" / "G00_scenario_preparation_generation" / "canonical_deploy_compatibility_matrix.csv"
+    rows: list[dict[str, str]] = []
+    repair_by_id = {item["materializationId"]: item for item in repair_items}
+    for row in plan:
+        item = repair_by_id[row["materialization_id"]]
+        canonical = item.get("canonicalValidator", {})
+        campaign = item.get("campaignValidator", {})
+        canonical_errors = [str(error) for error in canonical.get("errors", [])]
+        canonical_status = str(canonical.get("status", "NOT_RUN"))
+        category, reason = canonical_compatibility_category(row["config_id"], canonical_status, canonical_errors, spec)
+        rows.append({
+            "config_id": row["config_id"],
+            "materialization_id": row["materialization_id"],
+            "classification": item.get("classification", ""),
+            "ga_parameter_scaling_mode": item.get("gaParameterScalingMode", ""),
+            "campaign_validator_status": "PASS" if campaign.get("status") == "MATERIALIZED_VALIDATED" else "WARN" if campaign.get("status") == "MATERIALIZED_WITH_WARNINGS" else "FAIL",
+            "canonical_validator_status": "PASS" if canonical_status == "VALID_MATERIALIZED_SCENARIO" else "FAIL",
+            "canonical_error_count": str(len(canonical_errors)),
+            "canonical_errors": " | ".join(canonical_errors),
+            "expected_canonical_compatibility": category,
+            "compatibility_reason": reason,
+        })
+    write_csv_rows(
+        output,
+        rows,
+        [
+            "config_id",
+            "materialization_id",
+            "classification",
+            "ga_parameter_scaling_mode",
+            "campaign_validator_status",
+            "canonical_validator_status",
+            "canonical_error_count",
+            "canonical_errors",
+            "expected_canonical_compatibility",
+            "compatibility_reason",
+        ],
+    )
+    return output
+
+
+def update_g01_root_cause(repo_root: Path) -> None:
+    anomaly_path = repo_root / "test-audits" / "final-campaign" / "G01_pipeline_validation" / "anomalies_G01.csv"
+    audit_path = repo_root / "test-audits" / "final-campaign" / "G01_pipeline_validation" / "audit_G01_pipeline_validation.md"
+    if anomaly_path.exists():
+        rows = read_csv_rows(anomaly_path)
+        for row in rows:
+            if row.get("anomaly_id") == "AN-G01-0001":
+                row["status"] = "OPEN"
+                row["decision_required"] = "yes"
+                row["notes"] = append_note(
+                    row.get("notes", ""),
+                    "G00C root cause identified: campaign metadata overwrote or omitted canonical deploy fields; resolution pending G01 retry",
+                )
+        write_csv_rows(anomaly_path, rows, list(rows[0].keys()))
+    if audit_path.exists():
+        text = audit_path.read_text(encoding="utf-8")
+        note = (
+            "\n### G00C root cause update\n\n"
+            "Root cause identified: the campaign metadata layer overwrote or omitted canonical deploy metadata "
+            "required by the canonical deploy validator. The G01 blocker remains `OPEN` until a retry run "
+            "passes deploy and the literature smoke validator.\n"
+        )
+        if "### G00C root cause update" not in text:
+            marker = "## 11. Interpretazione tecnica\n"
+            if marker in text:
+                text = text.replace(marker, marker + note + "\n", 1)
+            else:
+                text += note
+            audit_path.write_text(text, encoding="utf-8")
+
+
+def repair_canonical_metadata_mode(repo_root: Path, spec: dict[str, Any], plan: list[dict[str, str]]) -> dict[str, Any]:
+    campaign_root = (repo_root / spec["paths"]["campaignScenarioRoot"]).resolve()
+    found_manifests = sorted(campaign_root.rglob("final_campaign_manifest.json"))
+    if len(plan) != int(spec["expectedMaterializationCount"]) or len(found_manifests) != int(spec["expectedMaterializationCount"]):
+        raise RuntimeError(f"expected exactly 69 materializations, found plan={len(plan)} manifests={len(found_manifests)}")
+
+    output_root = repo_root / "test-results" / "final-campaign" / "G00_scenario_preparation_generation"
+    canonical_reports_root = output_root / "canonical_validator_reports"
+    repair_items: list[dict[str, Any]] = []
+    modified_files: list[str] = []
+    failed: list[dict[str, Any]] = []
+    unchanged = 0
+
+    for row in plan:
+        target_root = ensure_target_under_campaign(row, repo_root, spec)
+        final_manifest_path = target_root / "final_campaign_manifest.json"
+        canonical_manifest_path = target_root / "materialization_manifest.json"
+        canonical_report_path = target_root / "reports" / "intas_literature_materialization_report.json"
+        campaign_report_path = target_root / "reports" / "final_campaign_validation_report.json"
+        database_path = target_root / "application" / "intas_literature_urban.db"
+        touched_paths = [canonical_manifest_path, canonical_report_path, final_manifest_path, campaign_report_path]
+        before = {rel(path, repo_root): sha256_or_none(path) for path in touched_paths}
+        item: dict[str, Any] = {
+            "materializationId": row["materialization_id"],
+            "configId": row["config_id"],
+            "targetDirectory": row["target_directory"],
+            "beforeSha256": before,
+            "afterSha256": {},
+            "modifiedFiles": [],
+            "campaignValidator": {},
+            "canonicalValidator": {},
+        }
+        try:
+            sync_canonical_deploy_metadata(row, target_root, database_path, repo_root, spec)
+            final_manifest = read_json(final_manifest_path)
+            final_manifest["gaParameterScalingMode"] = runtime_ga_mode(target_root)
+            final_manifest["generatedFiles"] = collect_generated_file_hashes(target_root)
+            write_json_file(final_manifest_path, final_manifest)
+
+            campaign_validation = validate_scenario(target_root, spec)
+            write_json(campaign_report_path, campaign_validation)
+            update_manifest_validation(target_root, campaign_validation)
+            final_manifest = read_json(final_manifest_path)
+
+            canonical_output = canonical_reports_root / row["materialization_id"] / "materialized_literature_scenario_validation.json"
+            canonical_validation = run_canonical_materialized_validator(repo_root, spec, target_root, canonical_output)
+            after = {rel(path, repo_root): sha256_or_none(path) for path in touched_paths}
+            changed = [path for path in after if before.get(path) != after.get(path)]
+            if not changed:
+                unchanged += 1
+            modified_files.extend(changed)
+            item.update(
+                {
+                    "afterSha256": after,
+                    "modifiedFiles": changed,
+                    "classification": final_manifest.get("classification", ""),
+                    "gaParameterScalingMode": final_manifest.get("gaParameterScalingMode", ""),
+                    "campaignValidator": campaign_validation,
+                    "canonicalValidator": canonical_validation,
+                }
+            )
+        except Exception as exc:  # noqa: BLE001 - repair report must preserve per-instance diagnostics.
+            failed.append({"materializationId": row["materialization_id"], "error": str(exc)})
+            item["error"] = str(exc)
+        repair_items.append(item)
+
+    matrix_path = write_canonical_compatibility_matrix(repo_root, spec, plan, repair_items)
+    campaign_counts = Counter(
+        "PASS" if item.get("campaignValidator", {}).get("status") == "MATERIALIZED_VALIDATED"
+        else "WARN" if item.get("campaignValidator", {}).get("status") == "MATERIALIZED_WITH_WARNINGS"
+        else "FAIL"
+        for item in repair_items
+    )
+    canonical_counts = Counter(
+        "PASS" if item.get("canonicalValidator", {}).get("status") == "VALID_MATERIALIZED_SCENARIO" else "FAIL"
+        for item in repair_items
+    )
+    matrix_rows = read_csv_rows(matrix_path)
+    category_counts = Counter(row["expected_canonical_compatibility"] for row in matrix_rows)
+    smoke = next((row for row in matrix_rows if row["materialization_id"] == "MAT-CFG-SMOKE-104729"), None)
+    report = {
+        "plannedInstances": len(plan),
+        "repairedInstances": len(repair_items) - len(failed),
+        "unchangedInstances": unchanged,
+        "failedInstances": len(failed),
+        "modifiedFiles": sorted(set(modified_files)),
+        "beforeSha256": {item["materializationId"]: item.get("beforeSha256", {}) for item in repair_items},
+        "afterSha256": {item["materializationId"]: item.get("afterSha256", {}) for item in repair_items},
+        "campaignValidatorStatus": dict(campaign_counts),
+        "canonicalValidatorStatus": dict(canonical_counts),
+        "compatibilityCounts": dict(category_counts),
+        "canonicalCompatibilityMatrix": rel(matrix_path, repo_root),
+        "instances": repair_items,
+        "failed": failed,
+    }
+    report_path = output_root / "canonical_metadata_repair_report.json"
+    write_json(report_path, report)
+    if not smoke or smoke["campaign_validator_status"] != "PASS" or smoke["canonical_validator_status"] != "PASS" or smoke["expected_canonical_compatibility"] != "CANONICAL_COMPATIBLE":
+        raise RuntimeError(f"MAT-CFG-SMOKE-104729 is not deploy compatible after repair: {smoke}")
+    if failed:
+        raise RuntimeError(f"canonical metadata repair failed for {len(failed)} materializations")
+    materialized_results = load_materialized_results(repo_root, spec, plan)
+    repro = compare_repro(repo_root, spec, plan)
+    summary = summarize_results(plan, materialized_results, None, repro)
+    summary["scenarioRootSizeBytes"] = scenario_root_size(repo_root, spec)
+    summary["canonicalMetadataRepair"] = rel(report_path, repo_root)
+    summary["canonicalDeployCompatibilityMatrix"] = rel(matrix_path, repo_root)
+    summary["intermediateAnomalies"] = merge_known_g00_intermediate_history(plan, collect_intermediate_status_anomalies(plan))
+    write_json(repo_root / spec["paths"]["auditRoot"] / "materialization_summary_all.json", summary)
+    create_audit(repo_root, spec, plan, summary)
+    update_g01_root_cause(repo_root)
+    return report
+
+
 def run_materialization_mode(args: argparse.Namespace, repo_root: Path, spec: dict[str, Any], plan: list[dict[str, str]], configs: list[dict[str, str]]) -> dict[str, Any]:
     scenario_convert_path = find_scenario_convert(repo_root, args.scenario_convert)
     scenario_convert_root_path = scenario_convert_root(scenario_convert_path)
@@ -1793,6 +2104,10 @@ def main() -> int:
     if args.mode == "archive":
         cleanup = archive_campaign_root(repo_root, spec)
         print(json.dumps(cleanup, indent=2, sort_keys=True))
+        return 0
+    if args.mode == "repair-canonical-metadata":
+        report = repair_canonical_metadata_mode(repo_root, spec, plan)
+        print(json.dumps(report, indent=2, sort_keys=True))
         return 0
     if args.mode in {"pilot", "all", "materialization"}:
         try:

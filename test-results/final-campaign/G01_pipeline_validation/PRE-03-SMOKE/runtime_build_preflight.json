@@ -1,0 +1,33 @@
+﻿{
+    "campaignId":  "final-test-campaign",
+    "groupId":  "G01",
+    "runId":  "PRE-03-SMOKE",
+    "purpose":  "runtime clean build preflight before G01 retry",
+    "createdAtUtc":  "2026-06-21T09:11:36Z",
+    "archivedOut":  {
+                        "source":  "tools/mosaic-live-maga-runtime/out",
+                        "sourceExistsBeforeBuild":  false,
+                        "action":  "MOVED_TO_ARCHIVE_BEFORE_SINGLE_BUILD",
+                        "archiveRoot":  "tmp/archive/final-test-campaign-pre-G01-retry-runtime-out-20260621-111001",
+                        "destination":  "tmp/archive/final-test-campaign-pre-G01-retry-runtime-out-20260621-111001/out",
+                        "fileCount":  265,
+                        "sizeBytes":  5019482
+                    },
+    "command":  "powershell -NoProfile -ExecutionPolicy Bypass -File tools/mosaic-live-maga-runtime/build.ps1 -MosaicRoot .\\tmp\\mosaic-25.2 -ScenarioName MaGaLiteratureBasedUrbanStudy",
+    "exitCode":  0,
+    "stdout":  "test-results/final-campaign/G01_pipeline_validation/PRE-03-SMOKE/runtime_build_preflight_stdout.log",
+    "stderr":  "test-results/final-campaign/G01_pipeline_validation/PRE-03-SMOKE/runtime_build_preflight_stderr.log",
+    "buildCompletedMarkerPresent":  true,
+    "accessDeniedExceptionPresent":  true,
+    "compilerExceptionPresent":  true,
+    "jar":  {
+                "path":  "tools/mosaic-live-maga-runtime/out/maga-live-maga-runtime.jar",
+                "exists":  true,
+                "sizeBytes":  491454,
+                "sha256":  "ab106abc90f45e3500148df1dd36c2923bc05f30bd4de7dbf92e1f49c475ae09",
+                "jarTfExitCode":  0,
+                "jarTfOutput":  "test-results/final-campaign/G01_pipeline_validation/PRE-03-SMOKE/runtime_build_preflight_jar_tf.txt"
+            },
+    "status":  "FAIL",
+    "note":  "JSON assembled after the single build process because the previous PowerShell report expression failed after build completion."
+}

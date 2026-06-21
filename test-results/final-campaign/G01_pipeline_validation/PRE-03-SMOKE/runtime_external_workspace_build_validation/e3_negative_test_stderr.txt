@@ -1,0 +1,9 @@
+Resolve-Path : Impossibile trovare il percorso 
+'C:\Users\raffa\IdeaProjects\maga-core\.\tmp\mosaic-25.2-does-not-exist-G01E' perché non esiste.
+In C:\Users\raffa\IdeaProjects\maga-core\tools\mosaic-live-maga-runtime\build.ps1:12 car:24
++ ... saicRoot = (Resolve-Path -LiteralPath (Join-Path $RepoRoot $MosaicRoo ...
++                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : ObjectNotFound: (C:\Users\raffa\...-not-exist-G01E:String) [Resolve-Path], ItemNotFoundE 
+   xception
+    + FullyQualifiedErrorId : PathNotFound,Microsoft.PowerShell.Commands.ResolvePathCommand
+ 

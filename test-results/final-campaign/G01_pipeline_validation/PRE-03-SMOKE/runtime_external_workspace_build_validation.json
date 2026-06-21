@@ -1,0 +1,213 @@
+﻿{
+    "campaignId":  "final-test-campaign",
+    "groupId":  "G01",
+    "runId":  "PRE-03-SMOKE",
+    "timestampUtc":  "2026-06-21T13:20:22Z",
+    "gitBranch":  "testing/final-campaign",
+    "gitHead":  "6449978026d205c3f0949cd5532782fd447fed1d",
+    "rootCause":  "WORKSPACE_OR_SCANNER_INTERFERENCE",
+    "sourceCount":  198,
+    "expectedClassCount":  252,
+    "dependencyJarCount":  11,
+    "outConsumerInventory":  {
+                                 "path":  "test-results/final-campaign/G01_pipeline_validation/PRE-03-SMOKE/runtime_out_consumer_inventory.json",
+                                 "consumerCount":  31,
+                                 "requiredOutputs":  {
+                                                         "jar":  true,
+                                                         "classes":  true,
+                                                         "classpathCopies":  true,
+                                                         "sourcesFile":  true
+                                                     }
+                             },
+    "externalValidationTest":  {
+                                   "status":  "PASS",
+                                   "externalRoot":  "C:\\Users\\raffa\\AppData\\Local\\Temp\\maga-g01e-validation-20260621-151418",
+                                   "sourceCount":  198,
+                                   "sourceHashesOk":  true,
+                                   "dependencyJarCount":  11,
+                                   "dependencyHashesOk":  true,
+                                   "compile":  {
+                                                   "command":  "C:\\Program Files\\Java\\jdk-17\\bin\\javac.exe -cp C:\\Users\\raffa\\AppData\\Local\\Temp\\maga-g01e-validation-20260621-151418\\build\\classpath\\gson-2.10.1.jar;C:\\Users\\raffa\\AppData\\Local\\Temp\\maga-g01e-validation-20260621-151418\\build\\classpath\\jackson-annotations-2.16.1.jar;C:\\Users\\raffa\\AppData\\Local\\Temp\\maga-g01e-validation-20260621-151418\\build\\classpath\\jackson-core-2.16.1.jar;C:\\Users\\raffa\\AppData\\Local\\Temp\\maga-g01e-validation-20260621-151418\\build\\classpath\\jackson-databind-2.16.1.jar;C:\\Users\\raffa\\AppData\\Local\\Temp\\maga-g01e-validation-20260621-151418\\build\\classpath\\mosaic-application-25.2.jar;C:\\Users\\raffa\\AppData\\Local\\Temp\\maga-g01e-validation-20260621-151418\\build\\classpath\\mosaic-geomath-25.2.jar;C:\\Users\\raffa\\AppData\\Local\\Temp\\maga-g01e-validation-20260621-151418\\build\\classpath\\mosaic-interactions-25.2.jar;C:\\Users\\raffa\\AppData\\Local\\Temp\\maga-g01e-validation-20260621-151418\\build\\classpath\\mosaic-objects-25.2.jar;C:\\Users\\raffa\\AppData\\Local\\Temp\\maga-g01e-validation-20260621-151418\\build\\classpath\\mosaic-rti-api-25.2.jar;C:\\Users\\raffa\\AppData\\Local\\Temp\\maga-g01e-validation-20260621-151418\\build\\classpath\\mosaic-utils-25.2.jar;C:\\Users\\raffa\\AppData\\Local\\Temp\\maga-g01e-validation-20260621-151418\\build\\classpath\\slf4j-api-2.0.12.jar -d C:\\Users\\raffa\\AppData\\Local\\Temp\\maga-g01e-validation-20260621-151418\\build\\classes @C:\\Users\\raffa\\AppData\\Local\\Temp\\maga-g01e-validation-20260621-151418\\build\\sources.txt",
+                                                   "exitCode":  0,
+                                                   "durationSeconds":  5.08,
+                                                   "stdout":  "C:\\Users\\raffa\\IdeaProjects\\maga-core\\test-results\\final-campaign\\G01_pipeline_validation\\PRE-03-SMOKE\\runtime_external_workspace_build_validation\\e1_external_validation_stdout.txt",
+                                                   "stderr":  "C:\\Users\\raffa\\IdeaProjects\\maga-core\\test-results\\final-campaign\\G01_pipeline_validation\\PRE-03-SMOKE\\runtime_external_workspace_build_validation\\e1_external_validation_stderr.txt",
+                                                   "accessDeniedException":  false,
+                                                   "compilerException":  false
+                                               },
+                                   "classFileCount":  252,
+                                   "expectedMissingClasses":  [
+
+                                                              ],
+                                   "jarCreate":  {
+                                                     "command":  "C:\\Program Files\\Java\\jdk-17\\bin\\jar.exe cf C:\\Users\\raffa\\AppData\\Local\\Temp\\maga-g01e-validation-20260621-151418\\build\\maga-live-maga-runtime.jar -C C:\\Users\\raffa\\AppData\\Local\\Temp\\maga-g01e-validation-20260621-151418\\build\\classes .",
+                                                     "exitCode":  0,
+                                                     "durationSeconds":  3.044,
+                                                     "stdout":  "C:\\Users\\raffa\\IdeaProjects\\maga-core\\test-results\\final-campaign\\G01_pipeline_validation\\PRE-03-SMOKE\\runtime_external_workspace_build_validation\\e1_external_validation_stdout.txt",
+                                                     "stderr":  "C:\\Users\\raffa\\IdeaProjects\\maga-core\\test-results\\final-campaign\\G01_pipeline_validation\\PRE-03-SMOKE\\runtime_external_workspace_build_validation\\e1_external_validation_stderr.txt",
+                                                     "accessDeniedException":  false,
+                                                     "compilerException":  false
+                                                 },
+                                   "jarTf":  {
+                                                 "command":  "C:\\Program Files\\Java\\jdk-17\\bin\\jar.exe tf C:\\Users\\raffa\\AppData\\Local\\Temp\\maga-g01e-validation-20260621-151418\\build\\maga-live-maga-runtime.jar",
+                                                 "exitCode":  0,
+                                                 "durationSeconds":  1.06,
+                                                 "stdout":  "C:\\Users\\raffa\\AppData\\Local\\Temp\\maga-g01e-validation-20260621-151418\\build\\jar_entries.txt",
+                                                 "stderr":  "C:\\Users\\raffa\\IdeaProjects\\maga-core\\test-results\\final-campaign\\G01_pipeline_validation\\PRE-03-SMOKE\\runtime_external_workspace_build_validation\\e1_external_validation_stderr.txt",
+                                                 "accessDeniedException":  false,
+                                                 "compilerException":  false
+                                             },
+                                   "missingJarEntries":  [
+
+                                                         ],
+                                   "jarPath":  "C:\\Users\\raffa\\AppData\\Local\\Temp\\maga-g01e-validation-20260621-151418\\build\\maga-live-maga-runtime.jar",
+                                   "jarSizeBytes":  491454,
+                                   "jarSha256":  "c871666f7970509d31c0aad7c8e18f298242693cd2191d274fb377d79979a7eb",
+                                   "javapResults":  [
+                                                        {
+                                                            "className":  "ga.core.MaGaOptimizer",
+                                                            "exitCode":  0,
+                                                            "majorVersion":  61,
+                                                            "majorVersionIs61":  true
+                                                        },
+                                                        {
+                                                            "className":  "window.core.TemporalWindowManager",
+                                                            "exitCode":  0,
+                                                            "majorVersion":  61,
+                                                            "majorVersionIs61":  true
+                                                        },
+                                                        {
+                                                            "className":  "org.eclipse.mosaic.app.maga.liveruntime.MaGaLiveRuntimeCoordinatorApp",
+                                                            "exitCode":  0,
+                                                            "majorVersion":  61,
+                                                            "majorVersionIs61":  true
+                                                        }
+                                                    ],
+                                   "accessDeniedException":  false,
+                                   "compilerException":  false,
+                                   "consumerCount":  31
+                               },
+    "buildScriptModified":  true,
+    "canonicalExternalBuildTest":  {
+                                       "status":  "PASS",
+                                       "exitCode":  0,
+                                       "durationSeconds":  10.118,
+                                       "stdout":  "C:\\Users\\raffa\\IdeaProjects\\maga-core\\test-results\\final-campaign\\G01_pipeline_validation\\PRE-03-SMOKE\\runtime_external_workspace_build_validation\\e2_canonical_build_stdout.txt",
+                                       "stderr":  "C:\\Users\\raffa\\IdeaProjects\\maga-core\\test-results\\final-campaign\\G01_pipeline_validation\\PRE-03-SMOKE\\runtime_external_workspace_build_validation\\e2_canonical_build_stderr.txt",
+                                       "accessDeniedException":  false,
+                                       "compilerException":  false,
+                                       "archiveBeforeBuild":  "C:\\Users\\raffa\\IdeaProjects\\maga-core\\tmp\\archive\\final-test-campaign-pre-G01E-external-build-20260621-152004\\out",
+                                       "stagingPath":  "C:\\Users\\raffa\\AppData\\Local\\Temp\\maga-live-maga-runtime-build-19332-20260621152005200",
+                                       "stagingRemovedPath":  "C:\\Users\\raffa\\AppData\\Local\\Temp\\maga-live-maga-runtime-build-19332-20260621152005200",
+                                       "stagingRemovedAfterSuccess":  true,
+                                       "publishedOut":  {
+                                                            "status":  "PASS",
+                                                            "outRoot":  "C:\\Users\\raffa\\IdeaProjects\\maga-core\\tools\\mosaic-live-maga-runtime\\out",
+                                                            "classFileCount":  252,
+                                                            "expectedMissingClasses":  [
+
+                                                                                       ],
+                                                            "classpathJarCount":  11,
+                                                            "sourceLineCount":  198,
+                                                            "jarPath":  "C:\\Users\\raffa\\IdeaProjects\\maga-core\\tools\\mosaic-live-maga-runtime\\out\\maga-live-maga-runtime.jar",
+                                                            "jarExists":  true,
+                                                            "jarSizeBytes":  491454,
+                                                            "jarSha256":  "8280e7838a7e971a358a0384eac2e0170cffa528d22519e3a343912850d8752f",
+                                                            "jarTfPass":  true,
+                                                            "missingJarEntries":  [
+
+                                                                                  ],
+                                                            "javapResults":  [
+                                                                                 {
+                                                                                     "className":  "ga.core.MaGaOptimizer",
+                                                                                     "majorVersion":  61,
+                                                                                     "majorVersionIs61":  true
+                                                                                 },
+                                                                                 {
+                                                                                     "className":  "window.core.TemporalWindowManager",
+                                                                                     "majorVersion":  61,
+                                                                                     "majorVersionIs61":  true
+                                                                                 },
+                                                                                 {
+                                                                                     "className":  "org.eclipse.mosaic.app.maga.liveruntime.MaGaLiveRuntimeCoordinatorApp",
+                                                                                     "majorVersion":  61,
+                                                                                     "majorVersionIs61":  true
+                                                                                 }
+                                                                             ]
+                                                        }
+                                   },
+    "negativePublicationSafetyTest":  {
+                                          "status":  "PASS",
+                                          "exitCode":  1,
+                                          "stdout":  "C:\\Users\\raffa\\IdeaProjects\\maga-core\\test-results\\final-campaign\\G01_pipeline_validation\\PRE-03-SMOKE\\runtime_external_workspace_build_validation\\e3_negative_test_stdout.txt",
+                                          "stderr":  "C:\\Users\\raffa\\IdeaProjects\\maga-core\\test-results\\final-campaign\\G01_pipeline_validation\\PRE-03-SMOKE\\runtime_external_workspace_build_validation\\e3_negative_test_stderr.txt",
+                                          "oldOutPreserved":  true,
+                                          "partialPublishedOutput":  false,
+                                          "newPublishCandidates":  [
+
+                                                                   ],
+                                          "externalBuildRoot":  "C:\\Users\\raffa\\AppData\\Local\\Temp\\maga-g01e-negative-20260621-152004"
+                                      },
+    "publishedOutStructure":  {
+                                  "status":  "PASS",
+                                  "outRoot":  "C:\\Users\\raffa\\IdeaProjects\\maga-core\\tools\\mosaic-live-maga-runtime\\out",
+                                  "classFileCount":  252,
+                                  "expectedMissingClasses":  [
+
+                                                             ],
+                                  "classpathJarCount":  11,
+                                  "sourceLineCount":  198,
+                                  "jarPath":  "C:\\Users\\raffa\\IdeaProjects\\maga-core\\tools\\mosaic-live-maga-runtime\\out\\maga-live-maga-runtime.jar",
+                                  "jarExists":  true,
+                                  "jarSizeBytes":  491454,
+                                  "jarSha256":  "8280e7838a7e971a358a0384eac2e0170cffa528d22519e3a343912850d8752f",
+                                  "jarTfPass":  true,
+                                  "missingJarEntries":  [
+
+                                                        ],
+                                  "javapResults":  [
+                                                       {
+                                                           "className":  "ga.core.MaGaOptimizer",
+                                                           "majorVersion":  61,
+                                                           "majorVersionIs61":  true
+                                                       },
+                                                       {
+                                                           "className":  "window.core.TemporalWindowManager",
+                                                           "majorVersion":  61,
+                                                           "majorVersionIs61":  true
+                                                       },
+                                                       {
+                                                           "className":  "org.eclipse.mosaic.app.maga.liveruntime.MaGaLiveRuntimeCoordinatorApp",
+                                                           "majorVersion":  61,
+                                                           "majorVersionIs61":  true
+                                                       }
+                                                   ]
+                              },
+    "runtimeJarPath":  "C:\\Users\\raffa\\IdeaProjects\\maga-core\\tools\\mosaic-live-maga-runtime\\out\\maga-live-maga-runtime.jar",
+    "runtimeJarSizeBytes":  491454,
+    "runtimeJarSha256":  "8280e7838a7e971a358a0384eac2e0170cffa528d22519e3a343912850d8752f",
+    "classMajorVersion":  [
+                              {
+                                  "className":  "ga.core.MaGaOptimizer",
+                                  "majorVersion":  61,
+                                  "majorVersionIs61":  true
+                              },
+                              {
+                                  "className":  "window.core.TemporalWindowManager",
+                                  "majorVersion":  61,
+                                  "majorVersionIs61":  true
+                              },
+                              {
+                                  "className":  "org.eclipse.mosaic.app.maga.liveruntime.MaGaLiveRuntimeCoordinatorApp",
+                                  "majorVersion":  61,
+                                  "majorVersionIs61":  true
+                              }
+                          ],
+    "stagingRemovedAfterSuccess":  true,
+    "classification":  "EXTERNAL_BUILD_WORKSPACE_VALIDATED",
+    "limitations":  [
+                        "No deploy, SUMO, or MOSAIC execution was performed.",
+                        "No Java source, frozen core behavior, dependency JAR, antivirus/scanner, IntelliJ, JAVA_HOME, or PATH was modified.",
+                        "The G01 deploy blocker remains open until a new end-to-end smoke run succeeds."
+                    ]
+}

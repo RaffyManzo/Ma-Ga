@@ -1,0 +1,44 @@
+{
+  "campaignId": "final-test-campaign",
+  "groupId": "G01",
+  "runId": "PRE-03-SMOKE",
+  "gitBranch": "testing/final-campaign",
+  "gitHead": "6449978026d205c3f0949cd5532782fd447fed1d",
+  "jdkVersion": {
+    "java": "java version \"17.0.12\" 2024-07-16 LTS\nJava(TM) SE Runtime Environment (build 17.0.12+8-LTS-286)\nJava HotSpot(TM) 64-Bit Server VM (build 17.0.12+8-LTS-286, mixed mode, sharing)",
+    "javac": "javac 17.0.12",
+    "jar": "jar 17.0.12"
+  },
+  "openJdkIssue": "JDK-8338675",
+  "classpathJarCount": 11,
+  "classpathJarsContainingJavaSources": [],
+  "classpathJavaEntryTotal": 0,
+  "classpathJavaClassPairTotal": 0,
+  "classpathInventory": "test-results/final-campaign/G01_pipeline_validation/PRE-03-SMOKE/runtime_classpath_source_inventory.json",
+  "directImplicitNoneTest": {
+    "status": "FAIL",
+    "exitCode": 0,
+    "stdout": "test-results/final-campaign/G01_pipeline_validation/PRE-03-SMOKE/runtime_build_implicit_none_validation/direct_implicit_none_stdout.txt",
+    "stderr": "test-results/final-campaign/G01_pipeline_validation/PRE-03-SMOKE/runtime_build_implicit_none_validation/direct_implicit_none_stderr.txt",
+    "accessDeniedExceptionPresent": true,
+    "compilerExceptionPresent": true,
+    "classFileCount": 252,
+    "expectedClassesMissing": [],
+    "sourcesFile": "tmp/final-campaign-build-diagnostics/G01C/implicit-none/sources.txt",
+    "sourceFileCount": 198,
+    "classesDirectory": "tmp/final-campaign-build-diagnostics/G01C/implicit-none/classes"
+  },
+  "buildScriptModified": false,
+  "canonicalBuildAfterModification": null,
+  "classFileCount": 252,
+  "runtimeJarPath": null,
+  "runtimeJarSizeBytes": null,
+  "runtimeJarSha256": null,
+  "classification": "IMPLICIT_NONE_WORKAROUND_NOT_EFFECTIVE",
+  "limitations": [
+    "The direct -implicit:none validation failed, so build.ps1 was not modified.",
+    "No canonical confirmation build, deploy, SUMO or MOSAIC execution was performed in G01C.",
+    "The test used the original MOSAIC dependency JARs and the 198 Java source list reconstructed from the canonical build roots."
+  ],
+  "createdAtUtc": "2026-06-21T11:29:48Z"
+}

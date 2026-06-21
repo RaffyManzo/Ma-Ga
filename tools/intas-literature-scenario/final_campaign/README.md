@@ -22,7 +22,8 @@ The tooling must not modify:
   route profiles, baseline resource values, pilot list, and expected paths.
 - `materialize_final_campaign.py`: checkpoint-aware orchestrator for syntax
   checks, cleanup archival, materialization, validation, plan updates, repro
-  comparison, and G00 audit generation.
+  comparison, canonical metadata repair, compatibility checks, and G00 audit
+  generation.
 - `validate_final_campaign.py`: campaign validator for a single materialized
   instance.
 - `materialize_final_campaign.ps1`: PowerShell entry point.
@@ -36,6 +37,7 @@ python tools/intas-literature-scenario/final_campaign/materialize_final_campaign
 python tools/intas-literature-scenario/final_campaign/materialize_final_campaign.py --mode archive
 python tools/intas-literature-scenario/final_campaign/materialize_final_campaign.py --mode pilot
 python tools/intas-literature-scenario/final_campaign/materialize_final_campaign.py --mode all
+python tools/intas-literature-scenario/final_campaign/materialize_final_campaign.py --mode repair-canonical-metadata
 ```
 
 The PowerShell wrapper accepts the same `mode` values:
@@ -43,6 +45,25 @@ The PowerShell wrapper accepts the same `mode` values:
 ```powershell
 tools/intas-literature-scenario/final_campaign/materialize_final_campaign.ps1 -Mode check
 ```
+
+## Canonical deploy metadata repair
+
+`--mode repair-canonical-metadata` is a metadata-only mode for already
+materialized final campaign instances. It operates only under
+`tmp/materialized-literature-scenarios/final-test-campaign/`, expects exactly
+69 instances, and does not invoke the builder, Scenario-Convert, SUMO, MOSAIC,
+deploy scripts, or Java code. It may modify only:
+
+- `materialization_manifest.json`
+- `reports/intas_literature_materialization_report.json`
+- `final_campaign_manifest.json`
+- `reports/final_campaign_validation_report.json`
+
+The mode preserves canonical builder fields, synchronizes
+`gaParameterScalingMode` across runtime config, canonical report and canonical
+manifest, refreshes campaign hashes, reruns the campaign validator, and writes
+the canonical deploy compatibility report/matrix under
+`test-results/final-campaign/G00_scenario_preparation_generation/`.
 
 ## Outputs
 

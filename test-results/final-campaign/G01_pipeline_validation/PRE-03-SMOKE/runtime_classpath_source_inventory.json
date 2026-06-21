@@ -1,0 +1,156 @@
+﻿[
+    {
+        "name":  "mosaic-application-25.2.jar",
+        "path":  "tmp/mosaic-25.2/lib/mosaic/mosaic-application-25.2.jar",
+        "sha256":  "2491403b9d235f8d79247ef71353dffca49097b1224ba3ae29462fec79387b80",
+        "totalEntryCount":  154,
+        "javaEntryCount":  0,
+        "classEntryCount":  121,
+        "javaEntries":  [
+
+                        ],
+        "javaClassPairs":  [
+
+                           ]
+    },
+    {
+        "name":  "mosaic-objects-25.2.jar",
+        "path":  "tmp/mosaic-25.2/lib/mosaic/mosaic-objects-25.2.jar",
+        "sha256":  "072d362c56fe85d84dff71e04444266b1de1b18e47c36deeab025f8bfadf4411",
+        "totalEntryCount":  182,
+        "javaEntryCount":  0,
+        "classEntryCount":  149,
+        "javaEntries":  [
+
+                        ],
+        "javaClassPairs":  [
+
+                           ]
+    },
+    {
+        "name":  "mosaic-geomath-25.2.jar",
+        "path":  "tmp/mosaic-25.2/lib/mosaic/mosaic-geomath-25.2.jar",
+        "sha256":  "e5ce150b566fac801841c71d9a1d55449925db43870fba14deb80db63b8638a2",
+        "totalEntryCount":  117,
+        "javaEntryCount":  0,
+        "classEntryCount":  98,
+        "javaEntries":  [
+
+                        ],
+        "javaClassPairs":  [
+
+                           ]
+    },
+    {
+        "name":  "mosaic-interactions-25.2.jar",
+        "path":  "tmp/mosaic-25.2/lib/mosaic/mosaic-interactions-25.2.jar",
+        "sha256":  "5bde68685bf8e4eb5fc9b945fd967f36bd79fe8ade6261e3c1aa4622479ff65f",
+        "totalEntryCount":  94,
+        "javaEntryCount":  0,
+        "classEntryCount":  71,
+        "javaEntries":  [
+
+                        ],
+        "javaClassPairs":  [
+
+                           ]
+    },
+    {
+        "name":  "mosaic-utils-25.2.jar",
+        "path":  "tmp/mosaic-25.2/lib/mosaic/mosaic-utils-25.2.jar",
+        "sha256":  "a7d6dba16e24517611c54f1158de8ee9904aae225015fa420f253477dd080494",
+        "totalEntryCount":  109,
+        "javaEntryCount":  0,
+        "classEntryCount":  90,
+        "javaEntries":  [
+
+                        ],
+        "javaClassPairs":  [
+
+                           ]
+    },
+    {
+        "name":  "mosaic-rti-api-25.2.jar",
+        "path":  "tmp/mosaic-25.2/lib/mosaic/mosaic-rti-api-25.2.jar",
+        "sha256":  "3991c728b2924f2e4f04ce4e3d74b056daf7043f8ae469876cc262b1922ed53d",
+        "totalEntryCount":  55,
+        "javaEntryCount":  0,
+        "classEntryCount":  36,
+        "javaEntries":  [
+
+                        ],
+        "javaClassPairs":  [
+
+                           ]
+    },
+    {
+        "name":  "gson-2.10.1.jar",
+        "path":  "tmp/mosaic-25.2/lib/third-party/gson-2.10.1.jar",
+        "sha256":  "4241c14a7727c34feea6507ec801318a3d4a90f070e4525681079fb94ee4c593",
+        "totalEntryCount":  238,
+        "javaEntryCount":  0,
+        "classEntryCount":  218,
+        "javaEntries":  [
+
+                        ],
+        "javaClassPairs":  [
+
+                           ]
+    },
+    {
+        "name":  "slf4j-api-2.0.12.jar",
+        "path":  "tmp/mosaic-25.2/lib/third-party/slf4j-api-2.0.12.jar",
+        "sha256":  "a79502b8abdfbd722846a27691226a4088682d6d35654f9b80e2a9ccacf7ed47",
+        "totalEntryCount":  70,
+        "javaEntryCount":  0,
+        "classEntryCount":  55,
+        "javaEntries":  [
+
+                        ],
+        "javaClassPairs":  [
+
+                           ]
+    },
+    {
+        "name":  "jackson-annotations-2.16.1.jar",
+        "path":  "tmp/mosaic-25.2/lib/third-party/jackson-annotations-2.16.1.jar",
+        "sha256":  "a4730771e6a495dd3793a42cdb8ce6bddb96c77e15f40c98fd8d9a7ae09e7286",
+        "totalEntryCount":  87,
+        "javaEntryCount":  0,
+        "classEntryCount":  74,
+        "javaEntries":  [
+
+                        ],
+        "javaClassPairs":  [
+
+                           ]
+    },
+    {
+        "name":  "jackson-core-2.16.1.jar",
+        "path":  "tmp/mosaic-25.2/lib/third-party/jackson-core-2.16.1.jar",
+        "sha256":  "f5f8ef90609e64fec82eb908e497dc7d81b2eb983fe509b870292a193cde4dfb",
+        "totalEntryCount":  269,
+        "javaEntryCount":  0,
+        "classEntryCount":  215,
+        "javaEntries":  [
+
+                        ],
+        "javaClassPairs":  [
+
+                           ]
+    },
+    {
+        "name":  "jackson-databind-2.16.1.jar",
+        "path":  "tmp/mosaic-25.2/lib/third-party/jackson-databind-2.16.1.jar",
+        "sha256":  "baf8a8ebee8f45ef68cdd5e2dd3923b3e296c0937b96ec0b4806aa3a31bccd1d",
+        "totalEntryCount":  818,
+        "javaEntryCount":  0,
+        "classEntryCount":  779,
+        "javaEntries":  [
+
+                        ],
+        "javaClassPairs":  [
+
+                           ]
+    }
+]

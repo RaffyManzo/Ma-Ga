@@ -1,0 +1,21 @@
+{
+  "campaignId": "final-test-campaign",
+  "groupId": "G01",
+  "configId": "CFG-SMOKE",
+  "requestedMaterializationId": "MAT-SMOKE-104729",
+  "actualMaterializationId": "MAT-CFG-SMOKE-104729",
+  "runId": "PRE-03-SMOKE",
+  "status": "FAILED_DEPLOY_VALIDATOR",
+  "mosaicExecuted": false,
+  "sumoExecuted": false,
+  "validatorStatus": "INVALID_MATERIALIZED_SCENARIO",
+  "deployValidationErrors": [
+    "Materialization manifest must declare synthetic-calibrated InTAS mobility mode.",
+    "Materialization report must declare gaParameterScalingMode = STATIC.",
+    "Materialization manifest must declare gaParameterScalingMode = STATIC."
+  ],
+  "gaParameterScalingMode": "STATIC",
+  "mobilityMode": "SYNTHETIC_CALIBRATED_ON_INTAS_SUBNETWORK",
+  "consoleLog": "test-results/final-campaign/G01_pipeline_validation/PRE-03-SMOKE/run_literature_scenario_console.log",
+  "limitation": "The canonical deploy validator rejected the already materialized G00 smoke scenario before MOSAIC launch; no end-to-end runtime metrics were produced."
+}

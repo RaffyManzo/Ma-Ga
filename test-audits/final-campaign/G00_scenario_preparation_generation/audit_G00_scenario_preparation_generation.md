@@ -12,7 +12,7 @@
 - frozen_branch: `MOSAIC/SUMO-integration`
 - frozen_commit: `5a9477735a3d707a5f000a64653cd2a6fc7f2007`
 - campaign_branch: `testing/final-campaign`
-- campaign_head_before_g00_commit: `b7230d18075ecfe78088f09b8cd1dfc6b4d66dfd`
+- campaign_head_before_g00_commit: `6449978026d205c3f0949cd5532782fd447fed1d`
 - frozen Java path diff: empty at G00F precondition
 
 Working tree status at audit generation is captured in `git_status_short_G00F.txt`.
@@ -69,11 +69,16 @@ The 69 validation reports record `63` `MATERIALIZED_VALIDATED` instances and `6`
 
 ## 10. Anomalie
 
-`anomalies_G00.csv` contains `19` rows. The six direct engineering profiles are accepted limitations. Intermediate failed or blocked attempts are marked `RESOLVED`. The raw/logical CFG-REPRO distinction and the post-materialization plan hash change are documented limitations, not materialization errors.
+`anomalies_G00.csv` contains `20` rows. The six direct engineering profiles are accepted limitations. Intermediate failed or blocked attempts are marked `RESOLVED`. The raw/logical CFG-REPRO distinction and the post-materialization plan hash change are documented limitations, not materialization errors.
 
 ## 11. Interpretazione tecnica
 
 The campaign-specific tooling produced one manifest and one validation report for each planned materialization. Direct route profiles are explicitly marked as directed engineering profiles and are excluded from main factorial claims. The ADAPTIVE GA case remains non-canonical and is accepted only by the campaign validator.
+
+### Canonical deploy compatibility correction
+
+G00C identified and resolved a metadata compatibility issue exposed by the failed G01 deploy attempt. The campaign validator now checks the canonical `materialization_manifest.json` and `reports/intas_literature_materialization_report.json` metadata required by the deploy validator. The repair updated only metadata and validation reports; it did not change mobility, workload, resource or GA runtime configuration files.
+
 
 ## 12. Risultati riutilizzabili nella tesi
 

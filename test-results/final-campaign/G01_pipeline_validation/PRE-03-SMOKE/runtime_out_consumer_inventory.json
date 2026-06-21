@@ -1,0 +1,338 @@
+﻿{
+    "campaignId":  "final-test-campaign",
+    "groupId":  "G01",
+    "runId":  "PRE-03-SMOKE",
+    "timestampUtc":  "2026-06-21T13:15:03Z",
+    "excludedRoots":  [
+                          ".git",
+                          "tmp",
+                          "out",
+                          "test-results",
+                          "test-audits"
+                      ],
+    "patterns":  [
+                     "tools/mosaic-live-maga-runtime/out",
+                     "maga-live-maga-runtime.jar",
+                     "out/classes",
+                     "out/classpath",
+                     "out/sources.txt"
+                 ],
+    "consumers":  [
+                      {
+                          "file":  ".gitignore",
+                          "line":  5,
+                          "matchedPath":  "maga-live-maga-runtime.jar",
+                          "consumerPurpose":  "documentation-or-archive-reference",
+                          "requiresJar":  true,
+                          "requiresClasses":  false,
+                          "requiresClasspathCopies":  false,
+                          "requiresSourcesFile":  false
+                      },
+                      {
+                          "file":  "archive\\archive_manifest.csv",
+                          "line":  10,
+                          "matchedPath":  "maga-live-maga-runtime.jar",
+                          "consumerPurpose":  "documentation-or-archive-reference",
+                          "requiresJar":  true,
+                          "requiresClasses":  false,
+                          "requiresClasspathCopies":  false,
+                          "requiresSourcesFile":  false
+                      },
+                      {
+                          "file":  "archive\\local-cleanup-report.md",
+                          "line":  7,
+                          "matchedPath":  "tools/mosaic-live-maga-runtime/out",
+                          "consumerPurpose":  "documentation-or-archive-reference",
+                          "requiresJar":  true,
+                          "requiresClasses":  false,
+                          "requiresClasspathCopies":  false,
+                          "requiresSourcesFile":  false
+                      },
+                      {
+                          "file":  "archive\\local-cleanup-report.md",
+                          "line":  7,
+                          "matchedPath":  "maga-live-maga-runtime.jar",
+                          "consumerPurpose":  "documentation-or-archive-reference",
+                          "requiresJar":  true,
+                          "requiresClasses":  false,
+                          "requiresClasspathCopies":  false,
+                          "requiresSourcesFile":  false
+                      },
+                      {
+                          "file":  "archive\\local-cleanup-report.md",
+                          "line":  12,
+                          "matchedPath":  "tools/mosaic-live-maga-runtime/out",
+                          "consumerPurpose":  "documentation-or-archive-reference",
+                          "requiresJar":  true,
+                          "requiresClasses":  false,
+                          "requiresClasspathCopies":  false,
+                          "requiresSourcesFile":  false
+                      },
+                      {
+                          "file":  "archive\\freeze-manifest\\cleanup-stage5-final-active-output-rebuild-20260609-011306\\regenerated-jars.csv",
+                          "line":  4,
+                          "matchedPath":  "maga-live-maga-runtime.jar",
+                          "consumerPurpose":  "documentation-or-archive-reference",
+                          "requiresJar":  true,
+                          "requiresClasses":  false,
+                          "requiresClasspathCopies":  false,
+                          "requiresSourcesFile":  false
+                      },
+                      {
+                          "file":  "archive\\freeze-manifest\\cleanup-stage6-materialized-validation-deploy-20260609-011545\\injected-jar-hash-comparison.csv",
+                          "line":  2,
+                          "matchedPath":  "maga-live-maga-runtime.jar",
+                          "consumerPurpose":  "documentation-or-archive-reference",
+                          "requiresJar":  true,
+                          "requiresClasses":  false,
+                          "requiresClasspathCopies":  false,
+                          "requiresSourcesFile":  false
+                      },
+                      {
+                          "file":  "archive\\freeze-manifest\\cleanup-stage7-recovery-smoke-validation-20260609-012225\\injected-jar-hash-verification.csv",
+                          "line":  2,
+                          "matchedPath":  "maga-live-maga-runtime.jar",
+                          "consumerPurpose":  "documentation-or-archive-reference",
+                          "requiresJar":  true,
+                          "requiresClasses":  false,
+                          "requiresClasspathCopies":  false,
+                          "requiresSourcesFile":  false
+                      },
+                      {
+                          "file":  "archive\\historical-tools\\mosaic-cell-traffic-diagnostic\\README.md",
+                          "line":  188,
+                          "matchedPath":  "out/classpath",
+                          "consumerPurpose":  "documentation-or-archive-reference",
+                          "requiresJar":  false,
+                          "requiresClasses":  false,
+                          "requiresClasspathCopies":  true,
+                          "requiresSourcesFile":  false
+                      },
+                      {
+                          "file":  "archive\\regression-tools\\json-time-full-horizon-validation\\build.ps1",
+                          "line":  8,
+                          "matchedPath":  "out/classes",
+                          "consumerPurpose":  "archived regression tool expects out classes or sources",
+                          "requiresJar":  false,
+                          "requiresClasses":  true,
+                          "requiresClasspathCopies":  false,
+                          "requiresSourcesFile":  false
+                      },
+                      {
+                          "file":  "archive\\regression-tools\\json-time-full-horizon-validation\\build.ps1",
+                          "line":  9,
+                          "matchedPath":  "out/sources.txt",
+                          "consumerPurpose":  "archived regression tool expects out classes or sources",
+                          "requiresJar":  false,
+                          "requiresClasses":  false,
+                          "requiresClasspathCopies":  false,
+                          "requiresSourcesFile":  true
+                      },
+                      {
+                          "file":  "archive\\regression-tools\\json-time-full-horizon-validation\\run.ps1",
+                          "line":  27,
+                          "matchedPath":  "out/classes",
+                          "consumerPurpose":  "archived regression tool expects out classes or sources",
+                          "requiresJar":  false,
+                          "requiresClasses":  true,
+                          "requiresClasspathCopies":  false,
+                          "requiresSourcesFile":  false
+                      },
+                      {
+                          "file":  "archive\\regression-tools\\replay-bootstrap-validation\\build.ps1",
+                          "line":  8,
+                          "matchedPath":  "out/classes",
+                          "consumerPurpose":  "archived regression tool expects out classes or sources",
+                          "requiresJar":  false,
+                          "requiresClasses":  true,
+                          "requiresClasspathCopies":  false,
+                          "requiresSourcesFile":  false
+                      },
+                      {
+                          "file":  "archive\\regression-tools\\replay-bootstrap-validation\\build.ps1",
+                          "line":  9,
+                          "matchedPath":  "out/sources.txt",
+                          "consumerPurpose":  "archived regression tool expects out classes or sources",
+                          "requiresJar":  false,
+                          "requiresClasses":  false,
+                          "requiresClasspathCopies":  false,
+                          "requiresSourcesFile":  true
+                      },
+                      {
+                          "file":  "archive\\regression-tools\\replay-bootstrap-validation\\run.ps1",
+                          "line":  12,
+                          "matchedPath":  "out/classes",
+                          "consumerPurpose":  "archived regression tool expects out classes or sources",
+                          "requiresJar":  false,
+                          "requiresClasses":  true,
+                          "requiresClasspathCopies":  false,
+                          "requiresSourcesFile":  false
+                      },
+                      {
+                          "file":  "archive\\regression-tools\\snapshot-contract-validation\\build.ps1",
+                          "line":  8,
+                          "matchedPath":  "out/classes",
+                          "consumerPurpose":  "archived regression tool expects out classes or sources",
+                          "requiresJar":  false,
+                          "requiresClasses":  true,
+                          "requiresClasspathCopies":  false,
+                          "requiresSourcesFile":  false
+                      },
+                      {
+                          "file":  "archive\\regression-tools\\snapshot-contract-validation\\build.ps1",
+                          "line":  9,
+                          "matchedPath":  "out/sources.txt",
+                          "consumerPurpose":  "archived regression tool expects out classes or sources",
+                          "requiresJar":  false,
+                          "requiresClasses":  false,
+                          "requiresClasspathCopies":  false,
+                          "requiresSourcesFile":  true
+                      },
+                      {
+                          "file":  "archive\\regression-tools\\snapshot-contract-validation\\run.ps1",
+                          "line":  8,
+                          "matchedPath":  "out/classes",
+                          "consumerPurpose":  "archived regression tool expects out classes or sources",
+                          "requiresJar":  false,
+                          "requiresClasses":  true,
+                          "requiresClasspathCopies":  false,
+                          "requiresSourcesFile":  false
+                      },
+                      {
+                          "file":  "data\\docs\\mosaic-study\\14C4_1_persistent_materialization_and_literature_smoke_test.md",
+                          "line":  151,
+                          "matchedPath":  "tools/mosaic-live-maga-runtime/out",
+                          "consumerPurpose":  "documentation-or-archive-reference",
+                          "requiresJar":  true,
+                          "requiresClasses":  false,
+                          "requiresClasspathCopies":  false,
+                          "requiresSourcesFile":  false
+                      },
+                      {
+                          "file":  "data\\docs\\mosaic-study\\14C4_1_persistent_materialization_and_literature_smoke_test.md",
+                          "line":  151,
+                          "matchedPath":  "maga-live-maga-runtime.jar",
+                          "consumerPurpose":  "documentation-or-archive-reference",
+                          "requiresJar":  true,
+                          "requiresClasses":  false,
+                          "requiresClasspathCopies":  false,
+                          "requiresSourcesFile":  false
+                      },
+                      {
+                          "file":  "data\\docs\\mosaic-study\\MOSAIC_LIVE_INTEGRATION_AND_EXECUTION_GUIDE.md",
+                          "line":  193,
+                          "matchedPath":  "tools/mosaic-live-maga-runtime/out",
+                          "consumerPurpose":  "documentation-or-archive-reference",
+                          "requiresJar":  true,
+                          "requiresClasses":  false,
+                          "requiresClasspathCopies":  false,
+                          "requiresSourcesFile":  false
+                      },
+                      {
+                          "file":  "data\\mosaic-study\\diagnostics\\precalibration_operational_packaging_validation.json",
+                          "line":  26,
+                          "matchedPath":  "tools/mosaic-live-maga-runtime/out",
+                          "consumerPurpose":  "documentation-or-archive-reference",
+                          "requiresJar":  true,
+                          "requiresClasses":  false,
+                          "requiresClasspathCopies":  false,
+                          "requiresSourcesFile":  false
+                      },
+                      {
+                          "file":  "tools\\intas-literature-scenario\\deploy_materialized_literature_scenario.ps1",
+                          "line":  40,
+                          "matchedPath":  "maga-live-maga-runtime.jar",
+                          "consumerPurpose":  "deploy copies generated runtime JAR",
+                          "requiresJar":  true,
+                          "requiresClasses":  false,
+                          "requiresClasspathCopies":  false,
+                          "requiresSourcesFile":  false
+                      },
+                      {
+                          "file":  "tools\\intas-literature-scenario\\deploy_materialized_literature_scenario.ps1",
+                          "line":  78,
+                          "matchedPath":  "maga-live-maga-runtime.jar",
+                          "consumerPurpose":  "deploy copies generated runtime JAR",
+                          "requiresJar":  true,
+                          "requiresClasses":  false,
+                          "requiresClasspathCopies":  false,
+                          "requiresSourcesFile":  false
+                      },
+                      {
+                          "file":  "tools\\mosaic-live-maga-runtime\\build.ps1",
+                          "line":  19,
+                          "matchedPath":  "maga-live-maga-runtime.jar",
+                          "consumerPurpose":  "build producer defines generated JAR",
+                          "requiresJar":  true,
+                          "requiresClasses":  false,
+                          "requiresClasspathCopies":  false,
+                          "requiresSourcesFile":  false
+                      },
+                      {
+                          "file":  "tools\\mosaic-live-maga-runtime\\deploy.ps1",
+                          "line":  14,
+                          "matchedPath":  "maga-live-maga-runtime.jar",
+                          "consumerPurpose":  "deploy copies generated runtime JAR",
+                          "requiresJar":  true,
+                          "requiresClasses":  false,
+                          "requiresClasspathCopies":  false,
+                          "requiresSourcesFile":  false
+                      },
+                      {
+                          "file":  "tools\\mosaic-live-maga-runtime\\deploy.ps1",
+                          "line":  54,
+                          "matchedPath":  "maga-live-maga-runtime.jar",
+                          "consumerPurpose":  "deploy copies generated runtime JAR",
+                          "requiresJar":  true,
+                          "requiresClasses":  false,
+                          "requiresClasspathCopies":  false,
+                          "requiresSourcesFile":  false
+                      },
+                      {
+                          "file":  "tools\\mosaic-live-maga-runtime\\README.md",
+                          "line":  58,
+                          "matchedPath":  "tools/mosaic-live-maga-runtime/out",
+                          "consumerPurpose":  "documentation-or-archive-reference",
+                          "requiresJar":  true,
+                          "requiresClasses":  false,
+                          "requiresClasspathCopies":  false,
+                          "requiresSourcesFile":  false
+                      },
+                      {
+                          "file":  "tools\\mosaic-live-maga-runtime\\README.md",
+                          "line":  58,
+                          "matchedPath":  "maga-live-maga-runtime.jar",
+                          "consumerPurpose":  "documentation-or-archive-reference",
+                          "requiresJar":  true,
+                          "requiresClasses":  false,
+                          "requiresClasspathCopies":  false,
+                          "requiresSourcesFile":  false
+                      },
+                      {
+                          "file":  "tools\\mosaic-live-maga-runtime\\README.md",
+                          "line":  81,
+                          "matchedPath":  "maga-live-maga-runtime.jar",
+                          "consumerPurpose":  "documentation-or-archive-reference",
+                          "requiresJar":  true,
+                          "requiresClasses":  false,
+                          "requiresClasspathCopies":  false,
+                          "requiresSourcesFile":  false
+                      },
+                      {
+                          "file":  "tools\\mosaic-live-maga-runtime\\harness\\run_phase14c3r_reporting_harness.ps1",
+                          "line":  12,
+                          "matchedPath":  "maga-live-maga-runtime.jar",
+                          "consumerPurpose":  "runtime harness consumes generated JAR",
+                          "requiresJar":  true,
+                          "requiresClasses":  false,
+                          "requiresClasspathCopies":  false,
+                          "requiresSourcesFile":  false
+                      }
+                  ],
+    "requiredOutputs":  {
+                            "jar":  true,
+                            "classes":  true,
+                            "classpathCopies":  true,
+                            "sourcesFile":  true
+                        }
+}

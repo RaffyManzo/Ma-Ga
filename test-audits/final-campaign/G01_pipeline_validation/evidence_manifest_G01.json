@@ -1,0 +1,248 @@
+﻿{
+    "campaign_id":  "final-test-campaign",
+    "group_id":  "G01",
+    "created_at_utc":  "2026-06-21T14:15:36Z",
+    "git":  {
+                "branch":  "testing/final-campaign",
+                "frozen_branch":  "MOSAIC/SUMO-integration",
+                "frozen_commit":  "5a9477735a3d707a5f000a64653cd2a6fc7f2007",
+                "campaign_head_before_g01_run":  "6449978026d205c3f0949cd5532782fd447fed1d",
+                "working_tree_status_short":  [
+
+                                              ]
+            },
+    "workbook":  {
+                     "source":  "Matrice_test_MA_GA_MOSAIC_SUMO_Fase0_completa.xlsx",
+                     "counts_verified":  true,
+                     "config_count":  30,
+                     "materialization_count":  69,
+                     "test_id_count":  87
+                 },
+    "entries":  [
+                    {
+                        "evidence_id":  "EV-G01-0001",
+                        "config_id":  "CFG-SMOKE",
+                        "materialization_id":  "MAT-CFG-SMOKE-104729",
+                        "run_id":  "PRE-03-SMOKE",
+                        "test_ids":  [
+                                         "T-011",
+                                         "T-015",
+                                         "T-017",
+                                         "T-020",
+                                         "T-021"
+                                     ],
+                        "kind":  "summary",
+                        "path":  "test-results/final-campaign/G01_pipeline_validation/PRE-03-SMOKE/pre_execution_checks.json",
+                        "sha256":  "4b5ddf67cf28a4093adc1e30be4d8187154a64225eeafa162e414283132fc6c7",
+                        "created_at_utc":  "2026-06-21T13:35:04Z",
+                        "description":  "Pre-execution checks and canonical materialization id resolution."
+                    },
+                    {
+                        "evidence_id":  "EV-G01-0002",
+                        "config_id":  "CFG-SMOKE",
+                        "materialization_id":  "MAT-CFG-SMOKE-104729",
+                        "run_id":  "PRE-03-SMOKE",
+                        "test_ids":  [
+                                         "T-020"
+                                     ],
+                        "kind":  "summary",
+                        "path":  "test-results/final-campaign/G01_pipeline_validation/PRE-03-SMOKE/environment_preparation.json",
+                        "sha256":  "f771d9fcc4f6b2216992bb0e5f1981ef1a325c89615a8e01fb690c42194d0109",
+                        "created_at_utc":  "2026-06-21T13:35:04Z",
+                        "description":  "MOSAIC scenario archive/preparation record."
+                    },
+                    {
+                        "evidence_id":  "EV-G01-0003",
+                        "config_id":  "CFG-SMOKE",
+                        "materialization_id":  "MAT-CFG-SMOKE-104729",
+                        "run_id":  "PRE-03-SMOKE",
+                        "test_ids":  [
+                                         "T-011",
+                                         "T-015",
+                                         "T-017",
+                                         "T-020",
+                                         "T-021",
+                                         "T-002"
+                                     ],
+                        "kind":  "raw-log",
+                        "path":  "test-results/final-campaign/G01_pipeline_validation/PRE-03-SMOKE/run_literature_scenario_console.log",
+                        "sha256":  "debada51fa50a793d6ebf6c214c8d227aee365f3c42b45f762d262a936938a5d",
+                        "created_at_utc":  "2026-06-21T13:35:04Z",
+                        "description":  "Full console log from the single canonical run attempt."
+                    },
+                    {
+                        "evidence_id":  "EV-G01-0004",
+                        "config_id":  "CFG-SMOKE",
+                        "materialization_id":  "MAT-CFG-SMOKE-104729",
+                        "run_id":  "PRE-03-SMOKE",
+                        "test_ids":  [
+                                         "T-011",
+                                         "T-015",
+                                         "T-017",
+                                         "T-020",
+                                         "T-021"
+                                     ],
+                        "kind":  "validator",
+                        "path":  "test-results/final-campaign/G01_pipeline_validation/PRE-03-SMOKE/deploy_validation_failure.json",
+                        "sha256":  "6816ab9696d6d523b3e1bdf4bea4937cd973a418b75517b358c2b82fe44cc5ef",
+                        "created_at_utc":  "2026-06-21T13:35:04Z",
+                        "description":  "Parsed deploy validator failure summary."
+                    },
+                    {
+                        "evidence_id":  "EV-G01-0005",
+                        "config_id":  "CFG-SMOKE",
+                        "materialization_id":  "MAT-CFG-SMOKE-104729",
+                        "run_id":  "PRE-03-SMOKE",
+                        "test_ids":  [
+                                         "T-011",
+                                         "T-015",
+                                         "T-017",
+                                         "T-020",
+                                         "T-021"
+                                     ],
+                        "kind":  "manifest",
+                        "path":  "test-results/final-campaign/G01_pipeline_validation/PRE-03-SMOKE/run_evidence_index.json",
+                        "sha256":  "1bfb8f9de593b1f80807c888eaaecdbf4eb58d8685883c3322d684eb6eff18b8",
+                        "created_at_utc":  "2026-06-21T13:35:04Z",
+                        "description":  "Run evidence index for PRE-03-SMOKE."
+                    },
+                    {
+                        "evidence_id":  "EV-G01-0006",
+                        "config_id":  "CFG-SMOKE",
+                        "materialization_id":  "MAT-CFG-SMOKE-104729",
+                        "run_id":  "PRE-03-SMOKE",
+                        "test_ids":  [
+                                         "T-011",
+                                         "T-015",
+                                         "T-017",
+                                         "T-020",
+                                         "T-021"
+                                     ],
+                        "kind":  "metric",
+                        "path":  "test-audits/final-campaign/G01_pipeline_validation/metrics_G01.csv",
+                        "sha256":  "2031a878e742c30c29e5bf0df36f611fb9cbbec4dc388eba09ba7a1414e031b2",
+                        "created_at_utc":  "2026-06-21T13:35:04Z",
+                        "description":  "G01 metrics in long format."
+                    },
+                    {
+                        "evidence_id":  "EV-G01-0007",
+                        "config_id":  "CFG-SMOKE",
+                        "materialization_id":  "MAT-CFG-SMOKE-104729",
+                        "run_id":  "PRE-03-SMOKE",
+                        "test_ids":  [
+                                         "T-011",
+                                         "T-015",
+                                         "T-017",
+                                         "T-020",
+                                         "T-021"
+                                     ],
+                        "kind":  "summary",
+                        "path":  "test-audits/final-campaign/G01_pipeline_validation/anomalies_G01.csv",
+                        "sha256":  "a0ff94514dc44d91da31f778d793e8dcc843f6dc11d7067955763ad157f187b4",
+                        "created_at_utc":  "2026-06-21T13:35:04Z",
+                        "description":  "G01 anomalies."
+                    },
+                    {
+                        "evidence_id":  "EV-G01-0008",
+                        "config_id":  "CFG-SMOKE",
+                        "materialization_id":  "MAT-CFG-SMOKE-104729",
+                        "run_id":  "PRE-03-SMOKE",
+                        "test_ids":  [
+                                         "T-011",
+                                         "T-015",
+                                         "T-017",
+                                         "T-020",
+                                         "T-021"
+                                     ],
+                        "kind":  "summary",
+                        "path":  "test-audits/final-campaign/G01_pipeline_validation/audit_G01_pipeline_validation.md",
+                        "sha256":  "e2f077c5f3445425ca392e26813d2bd3ce94efa7a3b3f957a90753d0368c379c",
+                        "created_at_utc":  "2026-06-21T13:35:04Z",
+                        "description":  "G01 audit markdown."
+                    },
+                    {
+                        "evidence_id":  "EV-G01-RUNTIME-BUILD-PREFLIGHT",
+                        "config_id":  "CFG-SMOKE",
+                        "materialization_id":  "MAT-CFG-SMOKE-104729",
+                        "run_id":  "PRE-03-SMOKE",
+                        "test_ids":  [
+                                         "T-002"
+                                     ],
+                        "kind":  "diagnostic",
+                        "path":  "test-results/final-campaign/G01_pipeline_validation/PRE-03-SMOKE/runtime_build_preflight.json",
+                        "sha256":  "af0f081f287a7b6a424d5d81d1209803e6ee0864fec7c5811eb115ea1a7d3f3f",
+                        "created_at_utc":  "2026-06-21T13:35:04Z",
+                        "description":  "Runtime build preflight produced during the first G01 diagnostic sequence."
+                    },
+                    {
+                        "evidence_id":  "EV-G01-RUNTIME-BUILD-ACCESS-DIAGNOSTIC",
+                        "config_id":  "CFG-SMOKE",
+                        "materialization_id":  "MAT-CFG-SMOKE-104729",
+                        "run_id":  "PRE-03-SMOKE",
+                        "test_ids":  [
+                                         "T-002"
+                                     ],
+                        "kind":  "diagnostic",
+                        "path":  "test-results/final-campaign/G01_pipeline_validation/PRE-03-SMOKE/runtime_build_access_diagnostic.json",
+                        "sha256":  "f568844755531b87a171e4dc1843e1a3f9069672d7a74d08bcc57de00bb7991f",
+                        "created_at_utc":  "2026-06-21T13:35:04Z",
+                        "description":  "Controlled AccessDeniedException diagnostic for the runtime build."
+                    },
+                    {
+                        "evidence_id":  "EV-G01-RUNTIME-IMPLICIT-NONE-VALIDATION",
+                        "config_id":  "CFG-SMOKE",
+                        "materialization_id":  "MAT-CFG-SMOKE-104729",
+                        "run_id":  "PRE-03-SMOKE",
+                        "test_ids":  [
+                                         "T-002"
+                                     ],
+                        "kind":  "diagnostic",
+                        "path":  "test-results/final-campaign/G01_pipeline_validation/PRE-03-SMOKE/runtime_build_implicit_none_validation.json",
+                        "sha256":  "abe307fabb7256006354a44c1b548664964ffdf619c6a8a607ad41499c080b07",
+                        "created_at_utc":  "2026-06-21T13:35:04Z",
+                        "description":  "Validation showing that -implicit:none did not resolve the javac ZipFS close failure."
+                    },
+                    {
+                        "evidence_id":  "EV-G01-RUNTIME-JDK-WORKSPACE-ISOLATION",
+                        "config_id":  "CFG-SMOKE",
+                        "materialization_id":  "MAT-CFG-SMOKE-104729",
+                        "run_id":  "PRE-03-SMOKE",
+                        "test_ids":  [
+                                         "T-002"
+                                     ],
+                        "kind":  "diagnostic",
+                        "path":  "test-results/final-campaign/G01_pipeline_validation/PRE-03-SMOKE/runtime_jdk_workspace_isolation.json",
+                        "sha256":  "97c312bbe2b26f6466bc6845016d3d854183ba8d75a400272f5f08f6f31109a6",
+                        "created_at_utc":  "2026-06-21T13:35:04Z",
+                        "description":  "JDK, workspace, source-set, and external-workspace isolation diagnostic."
+                    },
+                    {
+                        "evidence_id":  "EV-G01-RUNTIME-OUT-CONSUMER-INVENTORY",
+                        "config_id":  "CFG-SMOKE",
+                        "materialization_id":  "MAT-CFG-SMOKE-104729",
+                        "run_id":  "PRE-03-SMOKE",
+                        "test_ids":  [
+                                         "T-002"
+                                     ],
+                        "kind":  "diagnostic",
+                        "path":  "test-results/final-campaign/G01_pipeline_validation/PRE-03-SMOKE/runtime_out_consumer_inventory.json",
+                        "sha256":  "a166f8bb9409c8d3476f32a32bcc6de87affa703e8af385900acaf1c8bfb36d2",
+                        "created_at_utc":  "2026-06-21T13:35:04Z",
+                        "description":  "Inventory of versioned consumers that rely on the runtime out/ structure."
+                    },
+                    {
+                        "evidence_id":  "EV-G01-RUNTIME-EXTERNAL-WORKSPACE-BUILD",
+                        "config_id":  "CFG-SMOKE",
+                        "materialization_id":  "MAT-CFG-SMOKE-104729",
+                        "run_id":  "PRE-03-SMOKE",
+                        "test_ids":  [
+                                         "T-002"
+                                     ],
+                        "kind":  "diagnostic",
+                        "path":  "test-results/final-campaign/G01_pipeline_validation/PRE-03-SMOKE/runtime_external_workspace_build_validation.json",
+                        "sha256":  "86db3f974bd4b4e2a5d7c96a71ea0f81bd6beeb672414a2339e7dbddc2995a18",
+                        "created_at_utc":  "2026-06-21T13:35:04Z",
+                        "description":  "Validation of external runtime build staging, safe publication, and negative publication-safety behavior."
+                    }
+                ]
+}
