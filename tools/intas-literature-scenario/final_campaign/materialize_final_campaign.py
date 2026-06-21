@@ -14,6 +14,7 @@ import sys
 import xml.etree.ElementTree as ET
 from collections import Counter
 from datetime import UTC, datetime
+from decimal import Decimal
 from hashlib import sha256 as _sha256
 from pathlib import Path
 from typing import Any
@@ -32,7 +33,16 @@ def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument(
         "--mode",
-        choices=["check", "archive", "pilot", "all", "materialization", "audit", "repair-canonical-metadata"],
+        choices=[
+            "check",
+            "archive",
+            "pilot",
+            "all",
+            "materialization",
+            "audit",
+            "repair-canonical-metadata",
+            "repair-bandwidth-serialization",
+        ],
         default="check",
     )
     parser.add_argument("--materialization-id", help="Materialization_ID for --mode materialization.")
@@ -261,7 +271,23 @@ def verify_scenario_convert(root: Path) -> None:
 
 
 def format_bps(value: float) -> str:
-    return f"{value:g} bps"
+    decimal_value = Decimal(str(value))
+
+    if not decimal_value.is_finite():
+        raise ValueError(f"Bandwidth must be finite: {value!r}")
+
+    if decimal_value < 0:
+        raise ValueError(f"Bandwidth must be non-negative: {value!r}")
+
+    text = format(decimal_value, "f")
+
+    if "." in text:
+        text = text.rstrip("0").rstrip(".")
+
+    if text in {"", "-0"}:
+        text = "0"
+
+    return f"{text} bps"
 
 
 def delay_object(seconds: float) -> dict[str, str]:
@@ -1383,6 +1409,10 @@ def create_audit(repo_root: Path, spec: dict[str, Any], plan: list[dict[str, str
     repro = summary.get("repro", {})
     raw_repro = repro.get("rawComparison", {})
     logical_repro = repro.get("logicalComparison", {})
+    bandwidth_repair_path = repo_root / "test-results" / "final-campaign" / "G00_scenario_preparation_generation" / "bandwidth_serialization_repair_report.json"
+    bandwidth_scan_before_path = repo_root / "test-results" / "final-campaign" / "G00_scenario_preparation_generation" / "bandwidth_serialization_scan_before.csv"
+    bandwidth_scan_after_path = repo_root / "test-results" / "final-campaign" / "G00_scenario_preparation_generation" / "bandwidth_serialization_scan_after.csv"
+    bandwidth_repair = read_json(bandwidth_repair_path) if bandwidth_repair_path.exists() else {}
     sumo_errors_total = sum(int(result.get("metrics", {}).get("sumoErrors") or 0) for result in summary["results"])
     teleport_mentions_total = sum(int(result.get("metrics", {}).get("teleportMentions") or 0) for result in summary["results"])
     emergency_braking_mentions_total = sum(int(result.get("metrics", {}).get("emergencyBrakingMentions") or 0) for result in summary["results"])
@@ -1445,6 +1475,11 @@ def create_audit(repo_root: Path, spec: dict[str, Any], plan: list[dict[str, str
     add_metric(metric_rows, summary, "teleport_mentions_total", teleport_mentions_total, "T-002", summary_rel, "PASS")
     add_metric(metric_rows, summary, "emergency_braking_mentions_total", emergency_braking_mentions_total, "T-002", summary_rel, "PASS")
     add_metric(metric_rows, summary, "scenario_root_size_bytes", summary.get("scenarioRootSizeBytes", 0), "T-001", summary_rel, "NOT_APPLICABLE", metric_unit="bytes")
+    if bandwidth_repair:
+        bandwidth_rel = rel(bandwidth_repair_path, repo_root)
+        add_metric(metric_rows, summary, "bandwidth_serialization_affected_materializations", bandwidth_repair.get("affectedMaterializations", 0), "T-020", bandwidth_rel, "WARN")
+        add_metric(metric_rows, summary, "bandwidth_serialization_repaired_materializations", bandwidth_repair.get("repairedMaterializations", 0), "T-020", bandwidth_rel, "PASS")
+        add_metric(metric_rows, summary, "bandwidth_serialization_remaining_incompatible_fields", bandwidth_repair.get("afterScan", {}).get("mosaicIncompatibleFieldCount", 0), "T-020", bandwidth_rel, "PASS")
     metric_fields = [
         "campaign_id",
         "group_id",
@@ -1596,6 +1631,20 @@ def create_audit(repo_root: Path, spec: dict[str, Any], plan: list[dict[str, str
             "EV-G00-CANONICAL-METADATA-REPAIR",
             "G00C repaired metadata only: materialization_manifest.json, reports/intas_literature_materialization_report.json, final_campaign_manifest.json and reports/final_campaign_validation_report.json.",
         )
+    if bandwidth_repair:
+        add_anomaly(
+            "MEDIUM",
+            "ALL",
+            "ALL",
+            "T-020",
+            "Campaign bandwidth strings were serialized in scientific notation accepted by the Python validator but rejected by Eclipse MOSAIC.",
+            "Bandwidth strings in MOSAIC text configuration fields must use fixed-point MOSAIC-compatible notation.",
+            "RETRY-02 MOSAIC initialization failed in the Cell Ambassador before runtime reports. The calibrated bandwidth values were correct; only their string serialization was incompatible.",
+            "RESOLVED",
+            "no",
+            "EV-G00-BANDWIDTH-SERIALIZATION-REPAIR",
+            "G00D repaired textual bandwidth serialization in ma_ga_live_state_config.json and cell/network.json, then reran campaign and canonical validators without changing database, routes, workload, seeds, duration, density, Java or core logic.",
+        )
     write_csv_rows(anomalies_path, anomaly_rows, anomaly_fields)
 
     cleanup = summary.get("cleanup", {})
@@ -1688,6 +1737,10 @@ def create_audit(repo_root: Path, spec: dict[str, Any], plan: list[dict[str, str
         "",
         "G00C identified and resolved a metadata compatibility issue exposed by the failed G01 deploy attempt. The campaign validator now checks the canonical `materialization_manifest.json` and `reports/intas_literature_materialization_report.json` metadata required by the deploy validator. The repair updated only metadata and validation reports; it did not change mobility, workload, resource or GA runtime configuration files.",
         "",
+        "### MOSAIC bandwidth serialization compatibility repair",
+        "",
+        "G00D identified and resolved a MOSAIC configuration serialization issue exposed by RETRY-02. The bandwidth values calibrated by the campaign were numerically correct, but Python `:g` formatting serialized values such as `49200000` as `4.92e+07 bps`, which Eclipse MOSAIC rejected in textual bandwidth fields. The repair changed only tooling serialization and the affected JSON text fields, then reran campaign and canonical validators.",
+        "",
         "",
         "## 12. Risultati riutilizzabili nella tesi",
         "",
@@ -1756,6 +1809,12 @@ def create_audit(repo_root: Path, spec: dict[str, Any], plan: list[dict[str, str
         add_evidence("EV-G00-CANONICAL-METADATA-REPAIR", canonical_repair_path, "summary", "G00C canonical deploy metadata repair report.", test_ids=["T-020"])
     if canonical_matrix_path.exists():
         add_evidence("EV-G00-CANONICAL-COMPATIBILITY-MATRIX", canonical_matrix_path, "summary", "G00C canonical deploy compatibility matrix.", test_ids=["T-020"])
+    if bandwidth_scan_before_path.exists():
+        add_evidence("EV-G00-BANDWIDTH-SCAN-BEFORE", bandwidth_scan_before_path, "summary", "G00D bandwidth serialization scan before repair.", test_ids=["T-020"])
+    if bandwidth_scan_after_path.exists():
+        add_evidence("EV-G00-BANDWIDTH-SCAN-AFTER", bandwidth_scan_after_path, "summary", "G00D bandwidth serialization scan after repair.", test_ids=["T-020"])
+    if bandwidth_repair_path.exists():
+        add_evidence("EV-G00-BANDWIDTH-SERIALIZATION-REPAIR", bandwidth_repair_path, "summary", "G00D MOSAIC bandwidth serialization repair report.", test_ids=["T-020"])
     add_evidence("EV-G00-AUDIT-MD", audit_path, "summary", "Normalized G00 audit markdown.", test_ids=["T-001"])
     add_evidence("EV-G00-METRICS", metrics_path, "metric", "G00 long-format metrics.", test_ids=["T-001", "T-002", "T-014"])
     add_evidence("EV-G00-ANOMALIES", anomalies_path, "summary", "G00 anomalies.", test_ids=["T-001", "T-002", "T-014"])
@@ -1860,6 +1919,131 @@ def canonical_compatibility_category(config_id: str, canonical_status: str, cano
     if config_id in spec["directRouteProfiles"]:
         return "CAMPAIGN_VARIANT_EXPECTED_CANONICAL_REJECTION", "direct engineering route profiles may violate canonical calibrated mobility assumptions"
     return "UNEXPECTED_CANONICAL_REJECTION", "; ".join(canonical_errors)
+
+
+def expected_cell_capacity_bits_per_second(manifest: dict[str, Any], spec: dict[str, Any]) -> float:
+    multipliers = {**spec["defaultResourceMultipliers"], **manifest.get("resourceMultipliers", {})}
+    return float(spec["baselineResources"]["cellCapacityBitsPerSecond"]) * float(multipliers["cellBandwidth"])
+
+
+def parse_bandwidth_for_scan(value: Any) -> float | None:
+    if isinstance(value, (int, float)):
+        return float(value)
+    match = re.fullmatch(
+        r"([+-]?(?:\d+(?:\.\d*)?|\.\d+)(?:[eE][+-]?\d+)?)\s*(bps|kbps|mbps|gbps)",
+        str(value).strip(),
+        re.IGNORECASE,
+    )
+    if not match:
+        return None
+    amount = float(match.group(1))
+    scale = {"bps": 1.0, "kbps": 1.0e3, "mbps": 1.0e6, "gbps": 1.0e9}[match.group(2).lower()]
+    return amount * scale
+
+
+def is_mosaic_compatible_bandwidth_text(value: Any) -> bool:
+    if not isinstance(value, str):
+        return False
+    match = re.fullmatch(r"([0-9]+(?:\.[0-9]+)?)\s*(bps|kbps|mbps|gbps)", value.strip(), re.IGNORECASE)
+    return bool(match) and "e" not in match.group(1).lower()
+
+
+def decimal_text(value: float | None) -> str:
+    if value is None:
+        return ""
+    text = format(Decimal(str(value)), "f")
+    if "." in text:
+        text = text.rstrip("0").rstrip(".")
+    return text or "0"
+
+
+def scan_bandwidth_serialization(repo_root: Path, spec: dict[str, Any], plan: list[dict[str, str]], suffix: str) -> dict[str, Any]:
+    campaign_root = (repo_root / spec["paths"]["campaignScenarioRoot"]).resolve()
+    found_manifests = sorted(campaign_root.rglob("final_campaign_manifest.json"))
+    if len(plan) != int(spec["expectedMaterializationCount"]) or len(found_manifests) != int(spec["expectedMaterializationCount"]):
+        raise RuntimeError(f"expected exactly 69 materializations, found plan={len(plan)} manifests={len(found_manifests)}")
+
+    output = repo_root / "test-results" / "final-campaign" / "G00_scenario_preparation_generation" / f"bandwidth_serialization_scan_{suffix}.csv"
+    rows: list[dict[str, Any]] = []
+    exponent_field_count = 0
+    incompatible_field_count = 0
+    mismatch_field_count = 0
+    affected_materializations: set[str] = set()
+    for row in plan:
+        target_root = ensure_target_under_campaign(row, repo_root, spec)
+        manifest = read_json(target_root / "final_campaign_manifest.json")
+        network = read_json(target_root / "cell" / "network.json")
+        live_state = read_json(target_root / "application" / "ma_ga_live_state_config.json")
+        expected = expected_cell_capacity_bits_per_second(manifest, spec)
+        values = {
+            "network_default_downlink": str(network.get("defaultDownlinkCapacity", "")),
+            "network_default_uplink": str(network.get("defaultUplinkCapacity", "")),
+            "live_state_max_downlink": str(live_state.get("cellDiagnosticAccounting", {}).get("maxDownlinkBitrate", "")),
+            "live_state_max_uplink": str(live_state.get("cellDiagnosticAccounting", {}).get("maxUplinkBitrate", "")),
+        }
+        parsed = {key: parse_bandwidth_for_scan(value) for key, value in values.items()}
+        contains_exponent = {key: bool(re.search(r"[eE]", value.split()[0] if value.split() else value)) for key, value in values.items()}
+        compatible = {key: is_mosaic_compatible_bandwidth_text(value) for key, value in values.items()}
+        matches = {key: parsed[key] is not None and abs(float(parsed[key]) - expected) <= 0.001 for key in values}
+        for key in values:
+            if contains_exponent[key]:
+                exponent_field_count += 1
+                affected_materializations.add(row["materialization_id"])
+            if not compatible[key]:
+                incompatible_field_count += 1
+                affected_materializations.add(row["materialization_id"])
+            if not matches[key]:
+                mismatch_field_count += 1
+                affected_materializations.add(row["materialization_id"])
+        rows.append({
+            "materialization_id": row["materialization_id"],
+            "config_id": row["config_id"],
+            "target_directory": row["target_directory"].rstrip("/\\"),
+            "expected_capacity_bits_per_second": decimal_text(expected),
+            "network_default_downlink": values["network_default_downlink"],
+            "network_default_uplink": values["network_default_uplink"],
+            "live_state_max_downlink": values["live_state_max_downlink"],
+            "live_state_max_uplink": values["live_state_max_uplink"],
+            "network_downlink_contains_exponent": str(contains_exponent["network_default_downlink"]),
+            "network_uplink_contains_exponent": str(contains_exponent["network_default_uplink"]),
+            "live_state_downlink_contains_exponent": str(contains_exponent["live_state_max_downlink"]),
+            "live_state_uplink_contains_exponent": str(contains_exponent["live_state_max_uplink"]),
+            "parsed_network_downlink_bps": decimal_text(parsed["network_default_downlink"]),
+            "parsed_network_uplink_bps": decimal_text(parsed["network_default_uplink"]),
+            "parsed_live_state_downlink_bps": decimal_text(parsed["live_state_max_downlink"]),
+            "parsed_live_state_uplink_bps": decimal_text(parsed["live_state_max_uplink"]),
+            "all_values_match_expected": str(all(matches.values())),
+            "mosaic_compatible_format": str(all(compatible.values())),
+        })
+    fieldnames = [
+        "materialization_id",
+        "config_id",
+        "target_directory",
+        "expected_capacity_bits_per_second",
+        "network_default_downlink",
+        "network_default_uplink",
+        "live_state_max_downlink",
+        "live_state_max_uplink",
+        "network_downlink_contains_exponent",
+        "network_uplink_contains_exponent",
+        "live_state_downlink_contains_exponent",
+        "live_state_uplink_contains_exponent",
+        "parsed_network_downlink_bps",
+        "parsed_network_uplink_bps",
+        "parsed_live_state_downlink_bps",
+        "parsed_live_state_uplink_bps",
+        "all_values_match_expected",
+        "mosaic_compatible_format",
+    ]
+    write_csv_rows(output, rows, fieldnames)
+    return {
+        "path": rel(output, repo_root),
+        "scannedMaterializations": len(rows),
+        "affectedMaterializations": len(affected_materializations),
+        "scientificNotationFieldCount": exponent_field_count,
+        "mosaicIncompatibleFieldCount": incompatible_field_count,
+        "capacityMismatchFieldCount": mismatch_field_count,
+    }
 
 
 def write_canonical_compatibility_matrix(
@@ -2054,6 +2238,173 @@ def repair_canonical_metadata_mode(repo_root: Path, spec: dict[str, Any], plan: 
     return report
 
 
+def repair_bandwidth_serialization_mode(repo_root: Path, spec: dict[str, Any], plan: list[dict[str, str]]) -> dict[str, Any]:
+    campaign_root = (repo_root / spec["paths"]["campaignScenarioRoot"]).resolve()
+    found_manifests = sorted(campaign_root.rglob("final_campaign_manifest.json"))
+    if len(plan) != int(spec["expectedMaterializationCount"]) or len(found_manifests) != int(spec["expectedMaterializationCount"]):
+        raise RuntimeError(f"expected exactly 69 materializations, found plan={len(plan)} manifests={len(found_manifests)}")
+
+    output_root = repo_root / "test-results" / "final-campaign" / "G00_scenario_preparation_generation"
+    canonical_reports_root = output_root / "canonical_validator_reports"
+    before_scan = scan_bandwidth_serialization(repo_root, spec, plan, "before")
+    repair_items: list[dict[str, Any]] = []
+    failed: list[dict[str, Any]] = []
+    modified_files: list[str] = []
+    before_sha: dict[str, dict[str, str | None]] = {}
+    after_sha: dict[str, dict[str, str | None]] = {}
+
+    for row in plan:
+        target_root = ensure_target_under_campaign(row, repo_root, spec)
+        live_state_path = target_root / "application" / "ma_ga_live_state_config.json"
+        network_path = target_root / "cell" / "network.json"
+        final_manifest_path = target_root / "final_campaign_manifest.json"
+        campaign_report_path = target_root / "reports" / "final_campaign_validation_report.json"
+        touched_paths = [live_state_path, network_path, final_manifest_path, campaign_report_path]
+        before = {rel(path, repo_root): sha256_or_none(path) for path in touched_paths}
+        before_sha[row["materialization_id"]] = before
+        item: dict[str, Any] = {
+            "materializationId": row["materialization_id"],
+            "configId": row["config_id"],
+            "targetDirectory": row["target_directory"],
+            "beforeSha256": before,
+            "afterSha256": {},
+            "modifiedFiles": [],
+            "campaignValidator": {},
+            "canonicalValidator": {},
+        }
+        try:
+            final_manifest = read_json(final_manifest_path)
+            expected_capacity = expected_cell_capacity_bits_per_second(final_manifest, spec)
+            serialized_capacity = format_bps(expected_capacity)
+            live_state = read_json(live_state_path)
+            network = read_json(network_path)
+            accounting = live_state.setdefault("cellDiagnosticAccounting", {})
+            network_changed = False
+            live_state_changed = False
+            for key in ("defaultDownlinkCapacity", "defaultUplinkCapacity"):
+                if network.get(key) != serialized_capacity:
+                    network[key] = serialized_capacity
+                    network_changed = True
+            for key in ("maxDownlinkBitrate", "maxUplinkBitrate"):
+                if accounting.get(key) != serialized_capacity:
+                    accounting[key] = serialized_capacity
+                    live_state_changed = True
+            if network_changed:
+                write_json_file(network_path, network)
+            if live_state_changed:
+                write_json_file(live_state_path, live_state)
+            final_manifest["generatedFiles"] = collect_generated_file_hashes(target_root)
+            write_json_file(final_manifest_path, final_manifest)
+
+            campaign_validation = validate_scenario(target_root, spec)
+            write_json(campaign_report_path, campaign_validation)
+            update_manifest_validation(target_root, campaign_validation)
+            final_manifest = read_json(final_manifest_path)
+
+            canonical_output = canonical_reports_root / row["materialization_id"] / "materialized_literature_scenario_validation.json"
+            canonical_validation = run_canonical_materialized_validator(repo_root, spec, target_root, canonical_output)
+            after = {rel(path, repo_root): sha256_or_none(path) for path in touched_paths}
+            after_sha[row["materialization_id"]] = after
+            changed = [path for path in after if before.get(path) != after.get(path)]
+            modified_files.extend(changed)
+            item.update(
+                {
+                    "afterSha256": after,
+                    "modifiedFiles": changed,
+                    "classification": final_manifest.get("classification", ""),
+                    "gaParameterScalingMode": final_manifest.get("gaParameterScalingMode", ""),
+                    "serializedCapacity": serialized_capacity,
+                    "campaignValidator": campaign_validation,
+                    "canonicalValidator": canonical_validation,
+                }
+            )
+        except Exception as exc:  # noqa: BLE001 - repair report must preserve per-instance diagnostics.
+            failed.append({"materializationId": row["materialization_id"], "error": str(exc)})
+            item["error"] = str(exc)
+        repair_items.append(item)
+
+    matrix_path = write_canonical_compatibility_matrix(repo_root, spec, plan, repair_items)
+    after_scan = scan_bandwidth_serialization(repo_root, spec, plan, "after")
+    campaign_counts = Counter(
+        "PASS" if item.get("campaignValidator", {}).get("status") == "MATERIALIZED_VALIDATED"
+        else "WARN" if item.get("campaignValidator", {}).get("status") == "MATERIALIZED_WITH_WARNINGS"
+        else "FAIL"
+        for item in repair_items
+    )
+    canonical_counts = Counter(
+        "PASS" if item.get("canonicalValidator", {}).get("status") == "VALID_MATERIALIZED_SCENARIO" else "FAIL"
+        for item in repair_items
+    )
+    matrix_rows = read_csv_rows(matrix_path)
+    category_counts = Counter(row["expected_canonical_compatibility"] for row in matrix_rows)
+    smoke = next((row for row in matrix_rows if row["materialization_id"] == "MAT-CFG-SMOKE-104729"), None)
+    modified_unique = sorted(set(modified_files))
+    unchanged = sum(1 for item in repair_items if not item.get("modifiedFiles"))
+    repaired = len(repair_items) - unchanged - len(failed)
+    report = {
+        "campaignId": spec["campaignId"],
+        "timestampUtc": utc_now(),
+        "gitBranch": git_output(repo_root, "branch", "--show-current"),
+        "gitHead": git_output(repo_root, "rev-parse", "HEAD"),
+        "plannedMaterializations": len(plan),
+        "scannedMaterializations": before_scan["scannedMaterializations"],
+        "affectedMaterializations": before_scan["affectedMaterializations"],
+        "repairedMaterializations": repaired,
+        "unchangedMaterializations": unchanged,
+        "failedMaterializations": len(failed),
+        "affectedFieldCount": before_scan["scientificNotationFieldCount"],
+        "modifiedFileCount": len(modified_unique),
+        "rootCause": "Campaign bandwidth strings were serialized with Python :g formatting, producing scientific notation rejected by Eclipse MOSAIC text bandwidth parsing.",
+        "previousFormatter": 'return f"{value:g} bps"',
+        "newFormatterPolicy": "Decimal fixed-point formatting without scientific notation; reject negative or non-finite bandwidth values.",
+        "beforeScan": before_scan,
+        "afterScan": after_scan,
+        "campaignValidatorCounts": dict(campaign_counts),
+        "canonicalValidatorCounts": dict(canonical_counts),
+        "canonicalCompatibilityCounts": dict(category_counts),
+        "smokeMaterialization": smoke,
+        "modifiedFiles": modified_unique,
+        "beforeSha256": before_sha,
+        "afterSha256": after_sha,
+        "instances": repair_items,
+        "failed": failed,
+        "canonicalCompatibilityMatrix": rel(matrix_path, repo_root),
+        "classification": "MOSAIC_BANDWIDTH_SERIALIZATION_REPAIRED",
+        "limitations": [
+            "Repair modified only textual bandwidth serialization and validation metadata.",
+            "No runtime build, deploy, SUMO, MOSAIC, database regeneration, route regeneration, workload change, seed change, duration change or density change was performed.",
+        ],
+    }
+    report_path = output_root / "bandwidth_serialization_repair_report.json"
+    write_json(report_path, report)
+
+    if failed:
+        raise RuntimeError(f"bandwidth serialization repair failed for {len(failed)} materializations")
+    if after_scan["scannedMaterializations"] != int(spec["expectedMaterializationCount"]):
+        raise RuntimeError(f"after scan did not cover 69 materializations: {after_scan}")
+    if after_scan["scientificNotationFieldCount"] != 0 or after_scan["mosaicIncompatibleFieldCount"] != 0 or after_scan["capacityMismatchFieldCount"] != 0:
+        raise RuntimeError(f"bandwidth serialization after-scan still has invalid fields: {after_scan}")
+    if dict(campaign_counts) != {"PASS": 63, "WARN": 6}:
+        raise RuntimeError(f"unexpected campaign validator counts after repair: {dict(campaign_counts)}")
+    if dict(canonical_counts) != {"PASS": 67, "FAIL": 2}:
+        raise RuntimeError(f"unexpected canonical validator counts after repair: {dict(canonical_counts)}")
+    if category_counts.get("UNEXPECTED_CANONICAL_REJECTION", 0) != 0:
+        raise RuntimeError(f"unexpected canonical rejection after repair: {dict(category_counts)}")
+    if not smoke or smoke["campaign_validator_status"] != "PASS" or smoke["canonical_validator_status"] != "PASS":
+        raise RuntimeError(f"MAT-CFG-SMOKE-104729 is not validator-compatible after bandwidth repair: {smoke}")
+
+    materialized_results = load_materialized_results(repo_root, spec, plan)
+    repro = compare_repro(repo_root, spec, plan)
+    summary = summarize_results(plan, materialized_results, None, repro)
+    summary["scenarioRootSizeBytes"] = scenario_root_size(repo_root, spec)
+    summary["bandwidthSerializationRepair"] = rel(report_path, repo_root)
+    summary["canonicalDeployCompatibilityMatrix"] = rel(matrix_path, repo_root)
+    summary["intermediateAnomalies"] = merge_known_g00_intermediate_history(plan, collect_intermediate_status_anomalies(plan))
+    write_json(repo_root / spec["paths"]["auditRoot"] / "materialization_summary_all.json", summary)
+    create_audit(repo_root, spec, plan, summary)
+    return report
+
+
 def run_materialization_mode(args: argparse.Namespace, repo_root: Path, spec: dict[str, Any], plan: list[dict[str, str]], configs: list[dict[str, str]]) -> dict[str, Any]:
     scenario_convert_path = find_scenario_convert(repo_root, args.scenario_convert)
     scenario_convert_root_path = scenario_convert_root(scenario_convert_path)
@@ -2107,6 +2458,10 @@ def main() -> int:
         return 0
     if args.mode == "repair-canonical-metadata":
         report = repair_canonical_metadata_mode(repo_root, spec, plan)
+        print(json.dumps(report, indent=2, sort_keys=True))
+        return 0
+    if args.mode == "repair-bandwidth-serialization":
+        report = repair_bandwidth_serialization_mode(repo_root, spec, plan)
         print(json.dumps(report, indent=2, sort_keys=True))
         return 0
     if args.mode in {"pilot", "all", "materialization"}:

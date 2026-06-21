@@ -9,6 +9,7 @@ import re
 import sqlite3
 import sys
 import xml.etree.ElementTree as ET
+from decimal import Decimal
 from hashlib import sha256 as _sha256
 from pathlib import Path
 from typing import Any
@@ -77,13 +78,40 @@ def parse_seconds(value: Any) -> float:
 def parse_capacity(value: Any) -> float:
     if isinstance(value, (int, float)):
         return float(value)
-    text = str(value).strip().lower()
-    match = re.fullmatch(r"([0-9.]+)\s*([kmg]?bps)", text)
+    amount, unit = parse_mosaic_bandwidth_text(value)
+    scale = {"bps": 1.0, "kbps": 1.0e3, "mbps": 1.0e6, "gbps": 1.0e9}[unit]
+    return float(amount * Decimal(str(scale)))
+
+
+def parse_mosaic_bandwidth_text(value: Any) -> tuple[Decimal, str]:
+    text = str(value).strip()
+    match = re.fullmatch(r"([0-9]+(?:\.[0-9]+)?)\s*(bps|kbps|mbps|gbps)", text, re.IGNORECASE)
     if not match:
-        return float(text)
-    amount = float(match.group(1))
-    scale = {"bps": 1.0, "kbps": 1.0e3, "mbps": 1.0e6, "gbps": 1.0e9}[match.group(2)]
-    return amount * scale
+        raise ValueError(f"not a MOSAIC-compatible bandwidth string: {value!r}")
+    numeric_text = match.group(1)
+    if "e" in numeric_text.lower():
+        raise ValueError(f"scientific notation is not MOSAIC-compatible: {value!r}")
+    amount = Decimal(numeric_text)
+    if not amount.is_finite():
+        raise ValueError(f"bandwidth must be finite: {value!r}")
+    return amount, match.group(2).lower()
+
+
+def validate_mosaic_bandwidth_field(errors: list[str], label: str, value: Any, expected: Any) -> None:
+    if isinstance(value, (int, float)):
+        errors.append(f"{label}: expected MOSAIC-compatible text bandwidth, found numeric value {value!r}")
+        return
+    text = str(value).strip()
+    numeric_part = text.split()[0] if text.split() else text
+    if "e" in numeric_part.lower():
+        errors.append(f"{label}: scientific notation is not MOSAIC-compatible: {value!r}")
+        return
+    try:
+        parsed = parse_capacity(value)
+    except ValueError as exc:
+        errors.append(f"{label}: {exc}")
+        return
+    check_equal(errors, label, parsed, expected)
 
 
 def check_equal(errors: list[str], label: str, actual: Any, expected: Any, rel: float = 1.0e-9, abs_tol: float = 1.0e-6) -> None:
@@ -210,6 +238,32 @@ def validate_resources(
     check_equal(errors, "configuredCellProfile.symmetricOneWayDelaySeconds", profile.get("symmetricOneWayDelaySeconds"), expected["cellOneWayDelaySeconds"])
     for index, pool in enumerate(live_state.get("cellDiagnosticAccounting", {}).get("gatewayPools", [])):
         check_equal(errors, f"gatewayPools[{index}].nominalCapacityBitsPerSecond", pool.get("nominalCapacityBitsPerSecond"), expected["cellCapacityBitsPerSecond"])
+
+    validate_mosaic_bandwidth_field(
+        errors,
+        "network.defaultDownlinkCapacity",
+        network.get("defaultDownlinkCapacity"),
+        expected["cellCapacityBitsPerSecond"],
+    )
+    validate_mosaic_bandwidth_field(
+        errors,
+        "network.defaultUplinkCapacity",
+        network.get("defaultUplinkCapacity"),
+        expected["cellCapacityBitsPerSecond"],
+    )
+    accounting = live_state.get("cellDiagnosticAccounting", {})
+    validate_mosaic_bandwidth_field(
+        errors,
+        "live_state.cellDiagnosticAccounting.maxDownlinkBitrate",
+        accounting.get("maxDownlinkBitrate"),
+        expected["cellCapacityBitsPerSecond"],
+    )
+    validate_mosaic_bandwidth_field(
+        errors,
+        "live_state.cellDiagnosticAccounting.maxUplinkBitrate",
+        accounting.get("maxUplinkBitrate"),
+        expected["cellCapacityBitsPerSecond"],
+    )
 
     global_network = network.get("globalNetwork", {})
     check_equal(errors, "network.globalNetwork.uplink.capacity", parse_capacity(global_network.get("uplink", {}).get("capacity")), expected["cellCapacityBitsPerSecond"])

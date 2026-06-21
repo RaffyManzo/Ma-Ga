@@ -3,16 +3,155 @@ $ git -c safe.directory=C:/Users/raffa/IdeaProjects/maga-core status --short
 
 [stdout]
  M test-audits/final-campaign/G00_scenario_preparation_generation/materialization_summary_all.json
+ M test-audits/final-campaign/G01_pipeline_validation/anomalies_G01.csv
+ M test-audits/final-campaign/G01_pipeline_validation/audit_G01_pipeline_validation.md
+ M test-audits/final-campaign/G01_pipeline_validation/evidence_manifest_G01.json
+ M test-results/final-campaign/G00_scenario_preparation_generation/canonical_validator_reports/MAT-CFG-G-ADAPTIVE-104729/canonical_validator_console.log
+ M test-results/final-campaign/G00_scenario_preparation_generation/canonical_validator_reports/MAT-CFG-G-ADAPTIVE-104729/materialized_literature_scenario_validation.json
+ M test-results/final-campaign/G00_scenario_preparation_generation/canonical_validator_reports/MAT-CFG-G-SPARSE-104729/canonical_validator_console.log
+ M test-results/final-campaign/G00_scenario_preparation_generation/canonical_validator_reports/MAT-CFG-G-SPARSE-104729/materialized_literature_scenario_validation.json
+ M test-results/final-campaign/G00_scenario_preparation_generation/canonical_validator_reports/MAT-CFG-G-STALE-104729/canonical_validator_console.log
+ M test-results/final-campaign/G00_scenario_preparation_generation/canonical_validator_reports/MAT-CFG-G-STALE-104729/materialized_literature_scenario_validation.json
+ M test-results/final-campaign/G00_scenario_preparation_generation/canonical_validator_reports/MAT-CFG-H-E-104729/canonical_validator_console.log
+ M test-results/final-campaign/G00_scenario_preparation_generation/canonical_validator_reports/MAT-CFG-H-E-104729/materialized_literature_scenario_validation.json
+ M test-results/final-campaign/G00_scenario_preparation_generation/canonical_validator_reports/MAT-CFG-H-E-130363/canonical_validator_console.log
+ M test-results/final-campaign/G00_scenario_preparation_generation/canonical_validator_reports/MAT-CFG-H-E-130363/materialized_literature_scenario_validation.json
+ M test-results/final-campaign/G00_scenario_preparation_generation/canonical_validator_reports/MAT-CFG-H-E-155921/canonical_validator_console.log
+ M test-results/final-campaign/G00_scenario_preparation_generation/canonical_validator_reports/MAT-CFG-H-E-155921/materialized_literature_scenario_validation.json
+ M test-results/final-campaign/G00_scenario_preparation_generation/canonical_validator_reports/MAT-CFG-H-E-181081/canonical_validator_console.log
+ M test-results/final-campaign/G00_scenario_preparation_generation/canonical_validator_reports/MAT-CFG-H-E-181081/materialized_literature_scenario_validation.json
+ M test-results/final-campaign/G00_scenario_preparation_generation/canonical_validator_reports/MAT-CFG-H-E-207547/canonical_validator_console.log
+ M test-results/final-campaign/G00_scenario_preparation_generation/canonical_validator_reports/MAT-CFG-H-E-207547/materialized_literature_scenario_validation.json
+ M test-results/final-campaign/G00_scenario_preparation_generation/canonical_validator_reports/MAT-CFG-H-I-104729/canonical_validator_console.log
+ M test-results/final-campaign/G00_scenario_preparation_generation/canonical_validator_reports/MAT-CFG-H-I-104729/materialized_literature_scenario_validation.json
+ M test-results/final-campaign/G00_scenario_preparation_generation/canonical_validator_reports/MAT-CFG-H-I-130363/canonical_validator_console.log
+ M test-results/final-campaign/G00_scenario_preparation_generation/canonical_validator_reports/MAT-CFG-H-I-130363/materialized_literature_scenario_validation.json
+ M test-results/final-campaign/G00_scenario_preparation_generation/canonical_validator_reports/MAT-CFG-H-I-155921/canonical_validator_console.log
+ M test-results/final-campaign/G00_scenario_preparation_generation/canonical_validator_reports/MAT-CFG-H-I-155921/materialized_literature_scenario_validation.json
+ M test-results/final-campaign/G00_scenario_preparation_generation/canonical_validator_reports/MAT-CFG-H-I-181081/canonical_validator_console.log
+ M test-results/final-campaign/G00_scenario_preparation_generation/canonical_validator_reports/MAT-CFG-H-I-181081/materialized_literature_scenario_validation.json
+ M test-results/final-campaign/G00_scenario_preparation_generation/canonical_validator_reports/MAT-CFG-H-I-207547/canonical_validator_console.log
+ M test-results/final-campaign/G00_scenario_preparation_generation/canonical_validator_reports/MAT-CFG-H-I-207547/materialized_literature_scenario_validation.json
+ M test-results/final-campaign/G00_scenario_preparation_generation/canonical_validator_reports/MAT-CFG-H-S-104729/canonical_validator_console.log
+ M test-results/final-campaign/G00_scenario_preparation_generation/canonical_validator_reports/MAT-CFG-H-S-104729/materialized_literature_scenario_validation.json
+ M test-results/final-campaign/G00_scenario_preparation_generation/canonical_validator_reports/MAT-CFG-H-S-130363/canonical_validator_console.log
+ M test-results/final-campaign/G00_scenario_preparation_generation/canonical_validator_reports/MAT-CFG-H-S-130363/materialized_literature_scenario_validation.json
+ M test-results/final-campaign/G00_scenario_preparation_generation/canonical_validator_reports/MAT-CFG-H-S-155921/canonical_validator_console.log
+ M test-results/final-campaign/G00_scenario_preparation_generation/canonical_validator_reports/MAT-CFG-H-S-155921/materialized_literature_scenario_validation.json
+ M test-results/final-campaign/G00_scenario_preparation_generation/canonical_validator_reports/MAT-CFG-H-S-181081/canonical_validator_console.log
+ M test-results/final-campaign/G00_scenario_preparation_generation/canonical_validator_reports/MAT-CFG-H-S-181081/materialized_literature_scenario_validation.json
+ M test-results/final-campaign/G00_scenario_preparation_generation/canonical_validator_reports/MAT-CFG-H-S-207547/canonical_validator_console.log
+ M test-results/final-campaign/G00_scenario_preparation_generation/canonical_validator_reports/MAT-CFG-H-S-207547/materialized_literature_scenario_validation.json
+ M test-results/final-campaign/G00_scenario_preparation_generation/canonical_validator_reports/MAT-CFG-H-S-EXT-104729/canonical_validator_console.log
+ M test-results/final-campaign/G00_scenario_preparation_generation/canonical_validator_reports/MAT-CFG-H-S-EXT-104729/materialized_literature_scenario_validation.json
+ M test-results/final-campaign/G00_scenario_preparation_generation/canonical_validator_reports/MAT-CFG-L-E-104729/canonical_validator_console.log
+ M test-results/final-campaign/G00_scenario_preparation_generation/canonical_validator_reports/MAT-CFG-L-E-104729/materialized_literature_scenario_validation.json
+ M test-results/final-campaign/G00_scenario_preparation_generation/canonical_validator_reports/MAT-CFG-L-E-130363/canonical_validator_console.log
+ M test-results/final-campaign/G00_scenario_preparation_generation/canonical_validator_reports/MAT-CFG-L-E-130363/materialized_literature_scenario_validation.json
+ M test-results/final-campaign/G00_scenario_preparation_generation/canonical_validator_reports/MAT-CFG-L-E-155921/canonical_validator_console.log
+ M test-results/final-campaign/G00_scenario_preparation_generation/canonical_validator_reports/MAT-CFG-L-E-155921/materialized_literature_scenario_validation.json
+ M test-results/final-campaign/G00_scenario_preparation_generation/canonical_validator_reports/MAT-CFG-L-E-181081/canonical_validator_console.log
+ M test-results/final-campaign/G00_scenario_preparation_generation/canonical_validator_reports/MAT-CFG-L-E-181081/materialized_literature_scenario_validation.json
+ M test-results/final-campaign/G00_scenario_preparation_generation/canonical_validator_reports/MAT-CFG-L-E-207547/canonical_validator_console.log
+ M test-results/final-campaign/G00_scenario_preparation_generation/canonical_validator_reports/MAT-CFG-L-E-207547/materialized_literature_scenario_validation.json
+ M test-results/final-campaign/G00_scenario_preparation_generation/canonical_validator_reports/MAT-CFG-L-I-104729/canonical_validator_console.log
+ M test-results/final-campaign/G00_scenario_preparation_generation/canonical_validator_reports/MAT-CFG-L-I-104729/materialized_literature_scenario_validation.json
+ M test-results/final-campaign/G00_scenario_preparation_generation/canonical_validator_reports/MAT-CFG-L-I-130363/canonical_validator_console.log
+ M test-results/final-campaign/G00_scenario_preparation_generation/canonical_validator_reports/MAT-CFG-L-I-130363/materialized_literature_scenario_validation.json
+ M test-results/final-campaign/G00_scenario_preparation_generation/canonical_validator_reports/MAT-CFG-L-I-155921/canonical_validator_console.log
+ M test-results/final-campaign/G00_scenario_preparation_generation/canonical_validator_reports/MAT-CFG-L-I-155921/materialized_literature_scenario_validation.json
+ M test-results/final-campaign/G00_scenario_preparation_generation/canonical_validator_reports/MAT-CFG-L-I-181081/canonical_validator_console.log
+ M test-results/final-campaign/G00_scenario_preparation_generation/canonical_validator_reports/MAT-CFG-L-I-181081/materialized_literature_scenario_validation.json
+ M test-results/final-campaign/G00_scenario_preparation_generation/canonical_validator_reports/MAT-CFG-L-I-207547/canonical_validator_console.log
+ M test-results/final-campaign/G00_scenario_preparation_generation/canonical_validator_reports/MAT-CFG-L-I-207547/materialized_literature_scenario_validation.json
+ M test-results/final-campaign/G00_scenario_preparation_generation/canonical_validator_reports/MAT-CFG-L-S-104729/canonical_validator_console.log
+ M test-results/final-campaign/G00_scenario_preparation_generation/canonical_validator_reports/MAT-CFG-L-S-104729/materialized_literature_scenario_validation.json
+ M test-results/final-campaign/G00_scenario_preparation_generation/canonical_validator_reports/MAT-CFG-L-S-130363/canonical_validator_console.log
+ M test-results/final-campaign/G00_scenario_preparation_generation/canonical_validator_reports/MAT-CFG-L-S-130363/materialized_literature_scenario_validation.json
+ M test-results/final-campaign/G00_scenario_preparation_generation/canonical_validator_reports/MAT-CFG-L-S-155921/canonical_validator_console.log
+ M test-results/final-campaign/G00_scenario_preparation_generation/canonical_validator_reports/MAT-CFG-L-S-155921/materialized_literature_scenario_validation.json
+ M test-results/final-campaign/G00_scenario_preparation_generation/canonical_validator_reports/MAT-CFG-L-S-181081/canonical_validator_console.log
+ M test-results/final-campaign/G00_scenario_preparation_generation/canonical_validator_reports/MAT-CFG-L-S-181081/materialized_literature_scenario_validation.json
+ M test-results/final-campaign/G00_scenario_preparation_generation/canonical_validator_reports/MAT-CFG-L-S-207547/canonical_validator_console.log
+ M test-results/final-campaign/G00_scenario_preparation_generation/canonical_validator_reports/MAT-CFG-L-S-207547/materialized_literature_scenario_validation.json
+ M test-results/final-campaign/G00_scenario_preparation_generation/canonical_validator_reports/MAT-CFG-M-BACKGROUND-104729/canonical_validator_console.log
+ M test-results/final-campaign/G00_scenario_preparation_generation/canonical_validator_reports/MAT-CFG-M-BACKGROUND-104729/materialized_literature_scenario_validation.json
+ M test-results/final-campaign/G00_scenario_preparation_generation/canonical_validator_reports/MAT-CFG-M-RSU0-104729/canonical_validator_console.log
+ M test-results/final-campaign/G00_scenario_preparation_generation/canonical_validator_reports/MAT-CFG-M-RSU0-104729/materialized_literature_scenario_validation.json
+ M test-results/final-campaign/G00_scenario_preparation_generation/canonical_validator_reports/MAT-CFG-M-RSU1-104729/canonical_validator_console.log
+ M test-results/final-campaign/G00_scenario_preparation_generation/canonical_validator_reports/MAT-CFG-M-RSU1-104729/materialized_literature_scenario_validation.json
+ M test-results/final-campaign/G00_scenario_preparation_generation/canonical_validator_reports/MAT-CFG-M-SWITCH-104729/canonical_validator_console.log
+ M test-results/final-campaign/G00_scenario_preparation_generation/canonical_validator_reports/MAT-CFG-M-SWITCH-104729/materialized_literature_scenario_validation.json
+ M test-results/final-campaign/G00_scenario_preparation_generation/canonical_validator_reports/MAT-CFG-M-V2V-104729/canonical_validator_console.log
+ M test-results/final-campaign/G00_scenario_preparation_generation/canonical_validator_reports/MAT-CFG-M-V2V-104729/materialized_literature_scenario_validation.json
+ M test-results/final-campaign/G00_scenario_preparation_generation/canonical_validator_reports/MAT-CFG-N-E-104729/canonical_validator_console.log
+ M test-results/final-campaign/G00_scenario_preparation_generation/canonical_validator_reports/MAT-CFG-N-E-104729/materialized_literature_scenario_validation.json
+ M test-results/final-campaign/G00_scenario_preparation_generation/canonical_validator_reports/MAT-CFG-N-E-130363/canonical_validator_console.log
+ M test-results/final-campaign/G00_scenario_preparation_generation/canonical_validator_reports/MAT-CFG-N-E-130363/materialized_literature_scenario_validation.json
+ M test-results/final-campaign/G00_scenario_preparation_generation/canonical_validator_reports/MAT-CFG-N-E-155921/canonical_validator_console.log
+ M test-results/final-campaign/G00_scenario_preparation_generation/canonical_validator_reports/MAT-CFG-N-E-155921/materialized_literature_scenario_validation.json
+ M test-results/final-campaign/G00_scenario_preparation_generation/canonical_validator_reports/MAT-CFG-N-E-181081/canonical_validator_console.log
+ M test-results/final-campaign/G00_scenario_preparation_generation/canonical_validator_reports/MAT-CFG-N-E-181081/materialized_literature_scenario_validation.json
+ M test-results/final-campaign/G00_scenario_preparation_generation/canonical_validator_reports/MAT-CFG-N-E-207547/canonical_validator_console.log
+ M test-results/final-campaign/G00_scenario_preparation_generation/canonical_validator_reports/MAT-CFG-N-E-207547/materialized_literature_scenario_validation.json
+ M test-results/final-campaign/G00_scenario_preparation_generation/canonical_validator_reports/MAT-CFG-N-I-104729/canonical_validator_console.log
+ M test-results/final-campaign/G00_scenario_preparation_generation/canonical_validator_reports/MAT-CFG-N-I-104729/materialized_literature_scenario_validation.json
+ M test-results/final-campaign/G00_scenario_preparation_generation/canonical_validator_reports/MAT-CFG-N-I-130363/canonical_validator_console.log
+ M test-results/final-campaign/G00_scenario_preparation_generation/canonical_validator_reports/MAT-CFG-N-I-130363/materialized_literature_scenario_validation.json
+ M test-results/final-campaign/G00_scenario_preparation_generation/canonical_validator_reports/MAT-CFG-N-I-155921/canonical_validator_console.log
+ M test-results/final-campaign/G00_scenario_preparation_generation/canonical_validator_reports/MAT-CFG-N-I-155921/materialized_literature_scenario_validation.json
+ M test-results/final-campaign/G00_scenario_preparation_generation/canonical_validator_reports/MAT-CFG-N-I-181081/canonical_validator_console.log
+ M test-results/final-campaign/G00_scenario_preparation_generation/canonical_validator_reports/MAT-CFG-N-I-181081/materialized_literature_scenario_validation.json
+ M test-results/final-campaign/G00_scenario_preparation_generation/canonical_validator_reports/MAT-CFG-N-I-207547/canonical_validator_console.log
+ M test-results/final-campaign/G00_scenario_preparation_generation/canonical_validator_reports/MAT-CFG-N-I-207547/materialized_literature_scenario_validation.json
+ M test-results/final-campaign/G00_scenario_preparation_generation/canonical_validator_reports/MAT-CFG-N-I-EXT-104729/canonical_validator_console.log
+ M test-results/final-campaign/G00_scenario_preparation_generation/canonical_validator_reports/MAT-CFG-N-I-EXT-104729/materialized_literature_scenario_validation.json
+ M test-results/final-campaign/G00_scenario_preparation_generation/canonical_validator_reports/MAT-CFG-N-I-EXT-130363/canonical_validator_console.log
+ M test-results/final-campaign/G00_scenario_preparation_generation/canonical_validator_reports/MAT-CFG-N-I-EXT-130363/materialized_literature_scenario_validation.json
+ M test-results/final-campaign/G00_scenario_preparation_generation/canonical_validator_reports/MAT-CFG-N-I-EXT-155921/canonical_validator_console.log
+ M test-results/final-campaign/G00_scenario_preparation_generation/canonical_validator_reports/MAT-CFG-N-I-EXT-155921/materialized_literature_scenario_validation.json
+ M test-results/final-campaign/G00_scenario_preparation_generation/canonical_validator_reports/MAT-CFG-N-I-EXT-181081/canonical_validator_console.log
+ M test-results/final-campaign/G00_scenario_preparation_generation/canonical_validator_reports/MAT-CFG-N-I-EXT-181081/materialized_literature_scenario_validation.json
+ M test-results/final-campaign/G00_scenario_preparation_generation/canonical_validator_reports/MAT-CFG-N-I-EXT-207547/canonical_validator_console.log
+ M test-results/final-campaign/G00_scenario_preparation_generation/canonical_validator_reports/MAT-CFG-N-I-EXT-207547/materialized_literature_scenario_validation.json
+ M test-results/final-campaign/G00_scenario_preparation_generation/canonical_validator_reports/MAT-CFG-N-S-104729/canonical_validator_console.log
+ M test-results/final-campaign/G00_scenario_preparation_generation/canonical_validator_reports/MAT-CFG-N-S-104729/materialized_literature_scenario_validation.json
+ M test-results/final-campaign/G00_scenario_preparation_generation/canonical_validator_reports/MAT-CFG-N-S-130363/canonical_validator_console.log
+ M test-results/final-campaign/G00_scenario_preparation_generation/canonical_validator_reports/MAT-CFG-N-S-130363/materialized_literature_scenario_validation.json
+ M test-results/final-campaign/G00_scenario_preparation_generation/canonical_validator_reports/MAT-CFG-N-S-155921/canonical_validator_console.log
+ M test-results/final-campaign/G00_scenario_preparation_generation/canonical_validator_reports/MAT-CFG-N-S-155921/materialized_literature_scenario_validation.json
+ M test-results/final-campaign/G00_scenario_preparation_generation/canonical_validator_reports/MAT-CFG-N-S-181081/canonical_validator_console.log
+ M test-results/final-campaign/G00_scenario_preparation_generation/canonical_validator_reports/MAT-CFG-N-S-181081/materialized_literature_scenario_validation.json
+ M test-results/final-campaign/G00_scenario_preparation_generation/canonical_validator_reports/MAT-CFG-N-S-207547/canonical_validator_console.log
+ M test-results/final-campaign/G00_scenario_preparation_generation/canonical_validator_reports/MAT-CFG-N-S-207547/materialized_literature_scenario_validation.json
+ M test-results/final-campaign/G00_scenario_preparation_generation/canonical_validator_reports/MAT-CFG-R-CELLBW-104729/canonical_validator_console.log
+ M test-results/final-campaign/G00_scenario_preparation_generation/canonical_validator_reports/MAT-CFG-R-CELLBW-104729/materialized_literature_scenario_validation.json
+ M test-results/final-campaign/G00_scenario_preparation_generation/canonical_validator_reports/MAT-CFG-R-CLOUDCPU-104729/canonical_validator_console.log
+ M test-results/final-campaign/G00_scenario_preparation_generation/canonical_validator_reports/MAT-CFG-R-CLOUDCPU-104729/materialized_literature_scenario_validation.json
+ M test-results/final-campaign/G00_scenario_preparation_generation/canonical_validator_reports/MAT-CFG-R-EDGECPU-104729/canonical_validator_console.log
+ M test-results/final-campaign/G00_scenario_preparation_generation/canonical_validator_reports/MAT-CFG-R-EDGECPU-104729/materialized_literature_scenario_validation.json
+ M test-results/final-campaign/G00_scenario_preparation_generation/canonical_validator_reports/MAT-CFG-R-LOCALCPU-104729/canonical_validator_console.log
+ M test-results/final-campaign/G00_scenario_preparation_generation/canonical_validator_reports/MAT-CFG-R-LOCALCPU-104729/materialized_literature_scenario_validation.json
+ M test-results/final-campaign/G00_scenario_preparation_generation/canonical_validator_reports/MAT-CFG-R-RTT-104729/canonical_validator_console.log
+ M test-results/final-campaign/G00_scenario_preparation_generation/canonical_validator_reports/MAT-CFG-R-RTT-104729/materialized_literature_scenario_validation.json
+ M test-results/final-campaign/G00_scenario_preparation_generation/canonical_validator_reports/MAT-CFG-R-V2VBW-104729/canonical_validator_console.log
+ M test-results/final-campaign/G00_scenario_preparation_generation/canonical_validator_reports/MAT-CFG-R-V2VBW-104729/materialized_literature_scenario_validation.json
+ M test-results/final-campaign/G00_scenario_preparation_generation/canonical_validator_reports/MAT-CFG-REPRO-104729-A/canonical_validator_console.log
+ M test-results/final-campaign/G00_scenario_preparation_generation/canonical_validator_reports/MAT-CFG-REPRO-104729-A/materialized_literature_scenario_validation.json
+ M test-results/final-campaign/G00_scenario_preparation_generation/canonical_validator_reports/MAT-CFG-REPRO-104729-B/canonical_validator_console.log
+ M test-results/final-campaign/G00_scenario_preparation_generation/canonical_validator_reports/MAT-CFG-REPRO-104729-B/materialized_literature_scenario_validation.json
+ M test-results/final-campaign/G00_scenario_preparation_generation/canonical_validator_reports/MAT-CFG-RUNTIME-REPEAT-104729/canonical_validator_console.log
+ M test-results/final-campaign/G00_scenario_preparation_generation/canonical_validator_reports/MAT-CFG-RUNTIME-REPEAT-104729/materialized_literature_scenario_validation.json
+ M test-results/final-campaign/G00_scenario_preparation_generation/canonical_validator_reports/MAT-CFG-SMOKE-104729/canonical_validator_console.log
+ M test-results/final-campaign/G00_scenario_preparation_generation/canonical_validator_reports/MAT-CFG-SMOKE-104729/materialized_literature_scenario_validation.json
  M test-results/final-campaign/G00_scenario_preparation_generation/materialization_input_index.csv
  M test-results/final-campaign/G03_reproducibility_duration/repro_materialization_comparison.json
- M tools/intas-literature-scenario/final_campaign/README.md
  M tools/intas-literature-scenario/final_campaign/materialize_final_campaign.py
  M tools/intas-literature-scenario/final_campaign/validate_final_campaign.py
-?? test-audits/final-campaign/G01_pipeline_validation/
-?? test-results/final-campaign/G00_scenario_preparation_generation/canonical_deploy_compatibility_matrix.csv
-?? test-results/final-campaign/G00_scenario_preparation_generation/canonical_metadata_repair_report.json
-?? test-results/final-campaign/G00_scenario_preparation_generation/canonical_validator_reports/
-?? test-results/final-campaign/G01_pipeline_validation/
+?? test-results/final-campaign/G00_scenario_preparation_generation/bandwidth_serialization_repair_report.json
+?? test-results/final-campaign/G00_scenario_preparation_generation/bandwidth_serialization_scan_after.csv
+?? test-results/final-campaign/G00_scenario_preparation_generation/bandwidth_serialization_scan_before.csv
+?? test-results/final-campaign/G01_pipeline_validation/PRE-03-SMOKE/retry-02/
 ?? tools/intas-literature-scenario/final_campaign/__pycache__/
 
 [stderr]

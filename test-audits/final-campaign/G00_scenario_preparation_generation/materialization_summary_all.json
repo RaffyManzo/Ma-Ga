@@ -1,8 +1,8 @@
 {
+  "bandwidthSerializationRepair": "test-results/final-campaign/G00_scenario_preparation_generation/bandwidth_serialization_repair_report.json",
   "blockedMaterializations": 0,
   "campaignSeedCount": 5,
   "canonicalDeployCompatibilityMatrix": "test-results/final-campaign/G00_scenario_preparation_generation/canonical_deploy_compatibility_matrix.csv",
-  "canonicalMetadataRepair": "test-results/final-campaign/G00_scenario_preparation_generation/canonical_metadata_repair_report.json",
   "cleanup": {},
   "completedMaterializations": 69,
   "configCounts": {
@@ -186,9 +186,9 @@
         },
         {
           "equal": false,
-          "leftSha256": "e8d187e3a00e62f66bd226dad699d9c4631c76771ac357fed1351fd0c9774475",
+          "leftSha256": "c6eb721bf872476de3f034b450ea73a6af7e07060f186fb18368e41eb3569e55",
           "path": "final_campaign_manifest.json",
-          "rightSha256": "ebdd943fca17d57927327f53631dbded70175b5b0cd4c2ae335904faa60d000b"
+          "rightSha256": "4410709ed78e72a2a459f238ae32d81c469222e0411d93a19008d70b57e520bc"
         },
         {
           "equal": false,
@@ -1494,7 +1494,7 @@
       "warnings": []
     }
   ],
-  "scenarioRootSizeBytes": 47411416,
+  "scenarioRootSizeBytes": 47410935,
   "statusCounts": {
     "MATERIALIZED_VALIDATED": 63,
     "MATERIALIZED_WITH_WARNINGS": 6

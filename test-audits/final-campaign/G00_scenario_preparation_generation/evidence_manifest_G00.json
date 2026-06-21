@@ -1,10 +1,10 @@
 {
   "campaign_id": "final-test-campaign",
-  "created_at_utc": "2026-06-21T09:08:41Z",
+  "created_at_utc": "2026-06-21T16:57:49Z",
   "entries": [
     {
       "config_id": "",
-      "created_at_utc": "2026-06-21T09:08:41Z",
+      "created_at_utc": "2026-06-21T16:57:49Z",
       "description": "G00 tooling README.",
       "evidence_id": "EV-G00-TOOL-README",
       "kind": "summary",
@@ -18,7 +18,7 @@
     },
     {
       "config_id": "",
-      "created_at_utc": "2026-06-21T09:08:41Z",
+      "created_at_utc": "2026-06-21T16:57:49Z",
       "description": "Campaign specification.",
       "evidence_id": "EV-G00-TOOL-SPEC",
       "kind": "manifest",
@@ -32,35 +32,35 @@
     },
     {
       "config_id": "",
-      "created_at_utc": "2026-06-21T09:08:41Z",
+      "created_at_utc": "2026-06-21T16:57:49Z",
       "description": "Campaign orchestrator.",
       "evidence_id": "EV-G00-TOOL-ORCHESTRATOR",
       "kind": "summary",
       "materialization_id": "",
       "path": "tools/intas-literature-scenario/final_campaign/materialize_final_campaign.py",
       "run_id": "",
-      "sha256": "c32174ef7e0fca67776a90d5fa56d76a1c233b396413ec43ef052e0614e663a3",
+      "sha256": "9754165c2f5b96b01d25a03c20b10abb779bf9bde63f0a5ea146a04b1f459054",
       "test_ids": [
         "T-001"
       ]
     },
     {
       "config_id": "",
-      "created_at_utc": "2026-06-21T09:08:41Z",
+      "created_at_utc": "2026-06-21T16:57:49Z",
       "description": "Campaign validator.",
       "evidence_id": "EV-G00-TOOL-VALIDATOR",
       "kind": "validator",
       "materialization_id": "",
       "path": "tools/intas-literature-scenario/final_campaign/validate_final_campaign.py",
       "run_id": "",
-      "sha256": "83541a14d6308c525085e2cabb0f1d6850c7df65cb731631097722d1f97cf21b",
+      "sha256": "8ad97dbd0005f73fbb5e4a8028d37ee5a9450d68f21743cf9403349aeba4e62f",
       "test_ids": [
         "T-002"
       ]
     },
     {
       "config_id": "",
-      "created_at_utc": "2026-06-21T09:08:41Z",
+      "created_at_utc": "2026-06-21T16:57:49Z",
       "description": "PowerShell wrapper.",
       "evidence_id": "EV-G00-TOOL-POWERSHELL",
       "kind": "command-output",
@@ -74,7 +74,7 @@
     },
     {
       "config_id": "",
-      "created_at_utc": "2026-06-21T09:08:41Z",
+      "created_at_utc": "2026-06-21T16:57:49Z",
       "description": "Current scenario instance plan after G00F normalization.",
       "evidence_id": "EV-G00-PLAN",
       "kind": "summary",
@@ -88,7 +88,7 @@
     },
     {
       "config_id": "",
-      "created_at_utc": "2026-06-21T09:08:41Z",
+      "created_at_utc": "2026-06-21T16:57:49Z",
       "description": "Current configuration mapping after G00.",
       "evidence_id": "EV-G00-CONFIG-MAPPING",
       "kind": "summary",
@@ -102,7 +102,7 @@
     },
     {
       "config_id": "",
-      "created_at_utc": "2026-06-21T09:08:41Z",
+      "created_at_utc": "2026-06-21T16:57:49Z",
       "description": "Test_ID group mapping.",
       "evidence_id": "EV-G00-TEST-MAPPING",
       "kind": "summary",
@@ -116,7 +116,7 @@
     },
     {
       "config_id": "",
-      "created_at_utc": "2026-06-21T09:08:41Z",
+      "created_at_utc": "2026-06-21T16:57:49Z",
       "description": "Audit bundle schema.",
       "evidence_id": "EV-G00-SCHEMA",
       "kind": "summary",
@@ -130,14 +130,14 @@
     },
     {
       "config_id": "",
-      "created_at_utc": "2026-06-21T09:08:41Z",
+      "created_at_utc": "2026-06-21T16:57:49Z",
       "description": "G00 all-materialization summary.",
       "evidence_id": "EV-G00-SUMMARY-ALL",
       "kind": "summary",
       "materialization_id": "",
       "path": "test-audits/final-campaign/G00_scenario_preparation_generation/materialization_summary_all.json",
       "run_id": "",
-      "sha256": "09959fa86601ebf0369c11d08d216e8e27d3c60d1e958aa85e1dc94a63acd0a2",
+      "sha256": "98347b07ebd5148b76e1da7033cd4ef003294dd2d265be37719687cc23fe889d",
       "test_ids": [
         "T-001",
         "T-002"
@@ -145,7 +145,7 @@
     },
     {
       "config_id": "",
-      "created_at_utc": "2026-06-21T09:08:41Z",
+      "created_at_utc": "2026-06-21T16:57:49Z",
       "description": "Recovered intermediate G00 pilot/history statuses.",
       "evidence_id": "EV-G00-RECOVERED-INTERMEDIATE-STATUSES",
       "kind": "summary",
@@ -159,28 +159,28 @@
     },
     {
       "config_id": "CFG-REPRO",
-      "created_at_utc": "2026-06-21T09:08:41Z",
+      "created_at_utc": "2026-06-21T16:57:49Z",
       "description": "CFG-REPRO raw and logical comparison.",
       "evidence_id": "EV-G00-REPRO-COMPARISON",
       "kind": "summary",
       "materialization_id": "MAT-CFG-REPRO-104729-A;MAT-CFG-REPRO-104729-B",
       "path": "test-results/final-campaign/G03_reproducibility_duration/repro_materialization_comparison.json",
       "run_id": "",
-      "sha256": "0987ff45fce76f61c2a16e6e43d03ed2934082a32a8708558eb55767f3d9997f",
+      "sha256": "16d771bd8a33f401334bfbab311a292ad49b1b01e4bd7c12e3afe031f670f437",
       "test_ids": [
         "T-014"
       ]
     },
     {
       "config_id": "",
-      "created_at_utc": "2026-06-21T09:08:41Z",
+      "created_at_utc": "2026-06-21T16:57:49Z",
       "description": "Immutable materialized input index.",
       "evidence_id": "EV-G00-INPUT-INDEX",
       "kind": "summary",
       "materialization_id": "",
       "path": "test-results/final-campaign/G00_scenario_preparation_generation/materialization_input_index.csv",
       "run_id": "",
-      "sha256": "eb1f178de3704167e42ca0f968b1c5f133643d569676c5b2d1fc47e7dae94836",
+      "sha256": "1cadc0dca25fc2632293e412d428f8ab04de3030c0881effbaf7494809586517",
       "test_ids": [
         "T-001",
         "T-002"
@@ -188,7 +188,7 @@
     },
     {
       "config_id": "",
-      "created_at_utc": "2026-06-21T09:08:41Z",
+      "created_at_utc": "2026-06-21T16:57:49Z",
       "description": "G00C canonical deploy metadata repair report.",
       "evidence_id": "EV-G00-CANONICAL-METADATA-REPAIR",
       "kind": "summary",
@@ -202,7 +202,7 @@
     },
     {
       "config_id": "",
-      "created_at_utc": "2026-06-21T09:08:41Z",
+      "created_at_utc": "2026-06-21T16:57:49Z",
       "description": "G00C canonical deploy compatibility matrix.",
       "evidence_id": "EV-G00-CANONICAL-COMPATIBILITY-MATRIX",
       "kind": "summary",
@@ -216,28 +216,70 @@
     },
     {
       "config_id": "",
-      "created_at_utc": "2026-06-21T09:08:41Z",
+      "created_at_utc": "2026-06-21T16:57:49Z",
+      "description": "G00D bandwidth serialization scan before repair.",
+      "evidence_id": "EV-G00-BANDWIDTH-SCAN-BEFORE",
+      "kind": "summary",
+      "materialization_id": "",
+      "path": "test-results/final-campaign/G00_scenario_preparation_generation/bandwidth_serialization_scan_before.csv",
+      "run_id": "",
+      "sha256": "c18924ada319b4a54d9074954b9eb6674a27834cb3cec7cfdea44da527955ecc",
+      "test_ids": [
+        "T-020"
+      ]
+    },
+    {
+      "config_id": "",
+      "created_at_utc": "2026-06-21T16:57:49Z",
+      "description": "G00D bandwidth serialization scan after repair.",
+      "evidence_id": "EV-G00-BANDWIDTH-SCAN-AFTER",
+      "kind": "summary",
+      "materialization_id": "",
+      "path": "test-results/final-campaign/G00_scenario_preparation_generation/bandwidth_serialization_scan_after.csv",
+      "run_id": "",
+      "sha256": "c4f651cc668449c21eb651163f216a3e0944dfbded9488b81c7e430ede183380",
+      "test_ids": [
+        "T-020"
+      ]
+    },
+    {
+      "config_id": "",
+      "created_at_utc": "2026-06-21T16:57:49Z",
+      "description": "G00D MOSAIC bandwidth serialization repair report.",
+      "evidence_id": "EV-G00-BANDWIDTH-SERIALIZATION-REPAIR",
+      "kind": "summary",
+      "materialization_id": "",
+      "path": "test-results/final-campaign/G00_scenario_preparation_generation/bandwidth_serialization_repair_report.json",
+      "run_id": "",
+      "sha256": "c01199aec86c63f33be5145dec8ffcf95d8b8faaab1a86497d8ac93813c848b4",
+      "test_ids": [
+        "T-020"
+      ]
+    },
+    {
+      "config_id": "",
+      "created_at_utc": "2026-06-21T16:57:49Z",
       "description": "Normalized G00 audit markdown.",
       "evidence_id": "EV-G00-AUDIT-MD",
       "kind": "summary",
       "materialization_id": "",
       "path": "test-audits/final-campaign/G00_scenario_preparation_generation/audit_G00_scenario_preparation_generation.md",
       "run_id": "",
-      "sha256": "d323f3252ffdb4d11cb59c2fcb6bd1e6b17a053fb0c6f4d875aed16ecba35a10",
+      "sha256": "ec9e51fbf3d89b2376321ba559c063da8294c1868b89ea8952d4e498cff1256e",
       "test_ids": [
         "T-001"
       ]
     },
     {
       "config_id": "",
-      "created_at_utc": "2026-06-21T09:08:41Z",
+      "created_at_utc": "2026-06-21T16:57:49Z",
       "description": "G00 long-format metrics.",
       "evidence_id": "EV-G00-METRICS",
       "kind": "metric",
       "materialization_id": "",
       "path": "test-audits/final-campaign/G00_scenario_preparation_generation/metrics_G00.csv",
       "run_id": "",
-      "sha256": "511b17a5f8e331e9307eba56b59123298f052a2dac6b47c20b49604886db3034",
+      "sha256": "7774bfa8c08955452f359922580580f02e453b4e9bcdfcb21a1289d1e634c47c",
       "test_ids": [
         "T-001",
         "T-002",
@@ -246,14 +288,14 @@
     },
     {
       "config_id": "",
-      "created_at_utc": "2026-06-21T09:08:41Z",
+      "created_at_utc": "2026-06-21T16:57:49Z",
       "description": "G00 anomalies.",
       "evidence_id": "EV-G00-ANOMALIES",
       "kind": "summary",
       "materialization_id": "",
       "path": "test-audits/final-campaign/G00_scenario_preparation_generation/anomalies_G00.csv",
       "run_id": "",
-      "sha256": "5f13d124c2b389bf8a5bfd61641f6dfaedd0047a0413b253ef5aa883d9ef3375",
+      "sha256": "79435d05d2d671fb865ffd22948118f084d491905cf83a581b4a3e75098eb4db",
       "test_ids": [
         "T-001",
         "T-002",
@@ -262,7 +304,7 @@
     },
     {
       "config_id": "",
-      "created_at_utc": "2026-06-21T09:08:41Z",
+      "created_at_utc": "2026-06-21T16:57:49Z",
       "description": "cleanup_inventory_G00.json",
       "evidence_id": "EV-G00-CLEANUP-INVENTORY-G00",
       "kind": "summary",
@@ -276,7 +318,7 @@
     },
     {
       "config_id": "",
-      "created_at_utc": "2026-06-21T09:08:41Z",
+      "created_at_utc": "2026-06-21T16:57:49Z",
       "description": "checkpoint_1_check.json",
       "evidence_id": "EV-G00-CHECKPOINT-1-CHECK",
       "kind": "summary",
@@ -290,7 +332,7 @@
     },
     {
       "config_id": "",
-      "created_at_utc": "2026-06-21T09:08:41Z",
+      "created_at_utc": "2026-06-21T16:57:49Z",
       "description": "materialization_summary_pilot.json",
       "evidence_id": "EV-G00-MATERIALIZATION-SUMMARY-PILOT",
       "kind": "summary",
@@ -304,7 +346,7 @@
     },
     {
       "config_id": "CFG-SMOKE",
-      "created_at_utc": "2026-06-21T09:08:41Z",
+      "created_at_utc": "2026-06-21T16:57:49Z",
       "description": "Archived intermediate materialization failure.",
       "evidence_id": "EV-G00-ARCHIVED-FAILURE-MAT-CFG-SMOKE-104729",
       "kind": "raw-log",
@@ -318,7 +360,7 @@
     },
     {
       "config_id": "CFG-M-RSU1",
-      "created_at_utc": "2026-06-21T09:08:41Z",
+      "created_at_utc": "2026-06-21T16:57:49Z",
       "description": "Archived intermediate materialization failure.",
       "evidence_id": "EV-G00-ARCHIVED-FAILURE-MAT-CFG-M-RSU1-104729",
       "kind": "raw-log",
@@ -332,49 +374,49 @@
     },
     {
       "config_id": "",
-      "created_at_utc": "2026-06-21T09:08:41Z",
+      "created_at_utc": "2026-06-21T16:57:49Z",
       "description": "git_status_short_G00F.txt",
       "evidence_id": "EV-G00-GIT-GIT-STATUS-SHORT-G00F",
       "kind": "command-output",
       "materialization_id": "",
       "path": "test-audits/final-campaign/G00_scenario_preparation_generation/git_status_short_G00F.txt",
       "run_id": "",
-      "sha256": "6322baeaedcffd64ab0707595b0a83c3b881b83d5a9cc55c42cff2e6a7966f90",
+      "sha256": "32c848aa72386d0aa45596c5325a95682f71bcfdd70204ccd6bf2adeaf060ffe",
       "test_ids": [
         "T-001"
       ]
     },
     {
       "config_id": "",
-      "created_at_utc": "2026-06-21T09:08:41Z",
+      "created_at_utc": "2026-06-21T16:57:49Z",
       "description": "git_diff_name_only_G00F.txt",
       "evidence_id": "EV-G00-GIT-GIT-DIFF-NAME-ONLY-G00F",
       "kind": "command-output",
       "materialization_id": "",
       "path": "test-audits/final-campaign/G00_scenario_preparation_generation/git_diff_name_only_G00F.txt",
       "run_id": "",
-      "sha256": "ffa657decdaed796e751bf6cfb0b2ae1181a5397d820665dd482acd3803d9b1c",
+      "sha256": "8c898a29af3d189300e1620f724604f895863a2dec88153b5f40d0134e723942",
       "test_ids": [
         "T-001"
       ]
     },
     {
       "config_id": "",
-      "created_at_utc": "2026-06-21T09:08:41Z",
+      "created_at_utc": "2026-06-21T16:57:49Z",
       "description": "git_diff_check_G00F.txt",
       "evidence_id": "EV-G00-GIT-GIT-DIFF-CHECK-G00F",
       "kind": "command-output",
       "materialization_id": "",
       "path": "test-audits/final-campaign/G00_scenario_preparation_generation/git_diff_check_G00F.txt",
       "run_id": "",
-      "sha256": "f4bcc64bf4878a619edfaf018d6305e53aa842a58dccd80545312555b151a8a1",
+      "sha256": "ab6a9259893f5cc6f730a8b424d059066c20e27eee3467d0f10206f08e3cd057",
       "test_ids": [
         "T-001"
       ]
     },
     {
       "config_id": "",
-      "created_at_utc": "2026-06-21T09:08:41Z",
+      "created_at_utc": "2026-06-21T16:57:49Z",
       "description": "git_frozen_diff_name_only_G00F.txt",
       "evidence_id": "EV-G00-GIT-GIT-FROZEN-DIFF-NAME-ONLY-G00F",
       "kind": "command-output",
@@ -388,21 +430,21 @@
     },
     {
       "config_id": "CFG-SMOKE",
-      "created_at_utc": "2026-06-21T09:08:41Z",
+      "created_at_utc": "2026-06-21T16:57:49Z",
       "description": "Final campaign manifest.",
       "evidence_id": "EV-G00-MANIFEST-MAT-CFG-SMOKE-104729",
       "kind": "manifest",
       "materialization_id": "MAT-CFG-SMOKE-104729",
       "path": "tmp/materialized-literature-scenarios/final-test-campaign/G01_pipeline_validation/CFG-SMOKE/104729/final_campaign_manifest.json",
       "run_id": "",
-      "sha256": "5f2a4814fdb6aeb3f6a2c134c8f1baba257fa06740ff15d7f159b06560a959fa",
+      "sha256": "1dc5de45170bb151b1d6bf5060b4ce67717cc7d050a928c45c7122d3b5509fc7",
       "test_ids": [
         "T-002"
       ]
     },
     {
       "config_id": "CFG-SMOKE",
-      "created_at_utc": "2026-06-21T09:08:41Z",
+      "created_at_utc": "2026-06-21T16:57:49Z",
       "description": "Final campaign validation report.",
       "evidence_id": "EV-G00-VALIDATION-MAT-CFG-SMOKE-104729",
       "kind": "validator",
@@ -416,21 +458,21 @@
     },
     {
       "config_id": "CFG-REPRO",
-      "created_at_utc": "2026-06-21T09:08:41Z",
+      "created_at_utc": "2026-06-21T16:57:49Z",
       "description": "Final campaign manifest.",
       "evidence_id": "EV-G00-MANIFEST-MAT-CFG-REPRO-104729-A",
       "kind": "manifest",
       "materialization_id": "MAT-CFG-REPRO-104729-A",
       "path": "tmp/materialized-literature-scenarios/final-test-campaign/G03_reproducibility_duration/CFG-REPRO/104729/A/final_campaign_manifest.json",
       "run_id": "",
-      "sha256": "e8d187e3a00e62f66bd226dad699d9c4631c76771ac357fed1351fd0c9774475",
+      "sha256": "c6eb721bf872476de3f034b450ea73a6af7e07060f186fb18368e41eb3569e55",
       "test_ids": [
         "T-002"
       ]
     },
     {
       "config_id": "CFG-REPRO",
-      "created_at_utc": "2026-06-21T09:08:41Z",
+      "created_at_utc": "2026-06-21T16:57:49Z",
       "description": "Final campaign validation report.",
       "evidence_id": "EV-G00-VALIDATION-MAT-CFG-REPRO-104729-A",
       "kind": "validator",
@@ -444,21 +486,21 @@
     },
     {
       "config_id": "CFG-REPRO",
-      "created_at_utc": "2026-06-21T09:08:41Z",
+      "created_at_utc": "2026-06-21T16:57:49Z",
       "description": "Final campaign manifest.",
       "evidence_id": "EV-G00-MANIFEST-MAT-CFG-REPRO-104729-B",
       "kind": "manifest",
       "materialization_id": "MAT-CFG-REPRO-104729-B",
       "path": "tmp/materialized-literature-scenarios/final-test-campaign/G03_reproducibility_duration/CFG-REPRO/104729/B/final_campaign_manifest.json",
       "run_id": "",
-      "sha256": "ebdd943fca17d57927327f53631dbded70175b5b0cd4c2ae335904faa60d000b",
+      "sha256": "4410709ed78e72a2a459f238ae32d81c469222e0411d93a19008d70b57e520bc",
       "test_ids": [
         "T-002"
       ]
     },
     {
       "config_id": "CFG-REPRO",
-      "created_at_utc": "2026-06-21T09:08:41Z",
+      "created_at_utc": "2026-06-21T16:57:49Z",
       "description": "Final campaign validation report.",
       "evidence_id": "EV-G00-VALIDATION-MAT-CFG-REPRO-104729-B",
       "kind": "validator",
@@ -472,21 +514,21 @@
     },
     {
       "config_id": "CFG-RUNTIME-REPEAT",
-      "created_at_utc": "2026-06-21T09:08:41Z",
+      "created_at_utc": "2026-06-21T16:57:49Z",
       "description": "Final campaign manifest.",
       "evidence_id": "EV-G00-MANIFEST-MAT-CFG-RUNTIME-REPEAT-104729",
       "kind": "manifest",
       "materialization_id": "MAT-CFG-RUNTIME-REPEAT-104729",
       "path": "tmp/materialized-literature-scenarios/final-test-campaign/G03_reproducibility_duration/CFG-RUNTIME-REPEAT/104729/final_campaign_manifest.json",
       "run_id": "",
-      "sha256": "52e88077bb5c4ff860582d4aa36fe1c40b316ca5a0f22ab1c4e35c5996a2d418",
+      "sha256": "20646d1cb979f206965ce9b07de76393c67d91eba4e4f0dd87f300711b8aa35d",
       "test_ids": [
         "T-002"
       ]
     },
     {
       "config_id": "CFG-RUNTIME-REPEAT",
-      "created_at_utc": "2026-06-21T09:08:41Z",
+      "created_at_utc": "2026-06-21T16:57:49Z",
       "description": "Final campaign validation report.",
       "evidence_id": "EV-G00-VALIDATION-MAT-CFG-RUNTIME-REPEAT-104729",
       "kind": "validator",
@@ -500,21 +542,21 @@
     },
     {
       "config_id": "CFG-L-E",
-      "created_at_utc": "2026-06-21T09:08:41Z",
+      "created_at_utc": "2026-06-21T16:57:49Z",
       "description": "Final campaign manifest.",
       "evidence_id": "EV-G00-MANIFEST-MAT-CFG-L-E-104729",
       "kind": "manifest",
       "materialization_id": "MAT-CFG-L-E-104729",
       "path": "tmp/materialized-literature-scenarios/final-test-campaign/G02_main_factorial_experiments/CFG-L-E/104729/final_campaign_manifest.json",
       "run_id": "",
-      "sha256": "66ace720790e6e819dabfa5a35ae69a15659eddb62b9802997bbfc4d2850d763",
+      "sha256": "17f50034fa0ce157a84fd480948a37b92addb7ca689c9ab7bb97d2a54098502b",
       "test_ids": [
         "T-002"
       ]
     },
     {
       "config_id": "CFG-L-E",
-      "created_at_utc": "2026-06-21T09:08:41Z",
+      "created_at_utc": "2026-06-21T16:57:49Z",
       "description": "Final campaign validation report.",
       "evidence_id": "EV-G00-VALIDATION-MAT-CFG-L-E-104729",
       "kind": "validator",
@@ -528,21 +570,21 @@
     },
     {
       "config_id": "CFG-L-E",
-      "created_at_utc": "2026-06-21T09:08:41Z",
+      "created_at_utc": "2026-06-21T16:57:49Z",
       "description": "Final campaign manifest.",
       "evidence_id": "EV-G00-MANIFEST-MAT-CFG-L-E-130363",
       "kind": "manifest",
       "materialization_id": "MAT-CFG-L-E-130363",
       "path": "tmp/materialized-literature-scenarios/final-test-campaign/G02_main_factorial_experiments/CFG-L-E/130363/final_campaign_manifest.json",
       "run_id": "",
-      "sha256": "58b9eee657dcd83de7ea930534778e7ecd80319aabd15400e9065102ed0bbe31",
+      "sha256": "62511e764b0189cea69fca005f7f801e5d6997d89d62f518911eef95d0d2727c",
       "test_ids": [
         "T-002"
       ]
     },
     {
       "config_id": "CFG-L-E",
-      "created_at_utc": "2026-06-21T09:08:41Z",
+      "created_at_utc": "2026-06-21T16:57:49Z",
       "description": "Final campaign validation report.",
       "evidence_id": "EV-G00-VALIDATION-MAT-CFG-L-E-130363",
       "kind": "validator",
@@ -556,21 +598,21 @@
     },
     {
       "config_id": "CFG-L-E",
-      "created_at_utc": "2026-06-21T09:08:41Z",
+      "created_at_utc": "2026-06-21T16:57:49Z",
       "description": "Final campaign manifest.",
       "evidence_id": "EV-G00-MANIFEST-MAT-CFG-L-E-155921",
       "kind": "manifest",
       "materialization_id": "MAT-CFG-L-E-155921",
       "path": "tmp/materialized-literature-scenarios/final-test-campaign/G02_main_factorial_experiments/CFG-L-E/155921/final_campaign_manifest.json",
       "run_id": "",
-      "sha256": "d0dee7194b7031fc4a4bd91edc9ae0f8f2e7b3fcc88038ec843de97fd5ea9eb6",
+      "sha256": "107bfed87380fc14f714d1c52c9568b5d4acb36e451f966656bdf6d619e657ac",
       "test_ids": [
         "T-002"
       ]
     },
     {
       "config_id": "CFG-L-E",
-      "created_at_utc": "2026-06-21T09:08:41Z",
+      "created_at_utc": "2026-06-21T16:57:49Z",
       "description": "Final campaign validation report.",
       "evidence_id": "EV-G00-VALIDATION-MAT-CFG-L-E-155921",
       "kind": "validator",
@@ -584,21 +626,21 @@
     },
     {
       "config_id": "CFG-L-E",
-      "created_at_utc": "2026-06-21T09:08:41Z",
+      "created_at_utc": "2026-06-21T16:57:49Z",
       "description": "Final campaign manifest.",
       "evidence_id": "EV-G00-MANIFEST-MAT-CFG-L-E-181081",
       "kind": "manifest",
       "materialization_id": "MAT-CFG-L-E-181081",
       "path": "tmp/materialized-literature-scenarios/final-test-campaign/G02_main_factorial_experiments/CFG-L-E/181081/final_campaign_manifest.json",
       "run_id": "",
-      "sha256": "8a02302c18f9baa2c654b25d5067234c6c988d6ff0f7e9ec6cc27d9abbc130c1",
+      "sha256": "1da634898e6021ddefd24e2f87a67228a9d7233a2f911060329e9d34e4c60369",
       "test_ids": [
         "T-002"
       ]
     },
     {
       "config_id": "CFG-L-E",
-      "created_at_utc": "2026-06-21T09:08:41Z",
+      "created_at_utc": "2026-06-21T16:57:49Z",
       "description": "Final campaign validation report.",
       "evidence_id": "EV-G00-VALIDATION-MAT-CFG-L-E-181081",
       "kind": "validator",
@@ -612,21 +654,21 @@
     },
     {
       "config_id": "CFG-L-E",
-      "created_at_utc": "2026-06-21T09:08:41Z",
+      "created_at_utc": "2026-06-21T16:57:49Z",
       "description": "Final campaign manifest.",
       "evidence_id": "EV-G00-MANIFEST-MAT-CFG-L-E-207547",
       "kind": "manifest",
       "materialization_id": "MAT-CFG-L-E-207547",
       "path": "tmp/materialized-literature-scenarios/final-test-campaign/G02_main_factorial_experiments/CFG-L-E/207547/final_campaign_manifest.json",
       "run_id": "",
-      "sha256": "4b045eb690c73a585d2770b7ab36c56c9245c94c39ef248f4ef789005c5b71cf",
+      "sha256": "8ef392b545d1799549e9594b41316a898b1fca4556d089a019129d708134a220",
       "test_ids": [
         "T-002"
       ]
     },
     {
       "config_id": "CFG-L-E",
-      "created_at_utc": "2026-06-21T09:08:41Z",
+      "created_at_utc": "2026-06-21T16:57:49Z",
       "description": "Final campaign validation report.",
       "evidence_id": "EV-G00-VALIDATION-MAT-CFG-L-E-207547",
       "kind": "validator",
@@ -640,21 +682,21 @@
     },
     {
       "config_id": "CFG-L-I",
-      "created_at_utc": "2026-06-21T09:08:41Z",
+      "created_at_utc": "2026-06-21T16:57:49Z",
       "description": "Final campaign manifest.",
       "evidence_id": "EV-G00-MANIFEST-MAT-CFG-L-I-104729",
       "kind": "manifest",
       "materialization_id": "MAT-CFG-L-I-104729",
       "path": "tmp/materialized-literature-scenarios/final-test-campaign/G02_main_factorial_experiments/CFG-L-I/104729/final_campaign_manifest.json",
       "run_id": "",
-      "sha256": "a63c86870b92ff359700831519be2b46dff9d54f833ab50eba946c0b0592c4ff",
+      "sha256": "3f65756dfa19be4ee0a7fb24197ddd2b734e22ed161b42b5bf8867cc5126bb15",
       "test_ids": [
         "T-002"
       ]
     },
     {
       "config_id": "CFG-L-I",
-      "created_at_utc": "2026-06-21T09:08:41Z",
+      "created_at_utc": "2026-06-21T16:57:49Z",
       "description": "Final campaign validation report.",
       "evidence_id": "EV-G00-VALIDATION-MAT-CFG-L-I-104729",
       "kind": "validator",
@@ -668,21 +710,21 @@
     },
     {
       "config_id": "CFG-L-I",
-      "created_at_utc": "2026-06-21T09:08:41Z",
+      "created_at_utc": "2026-06-21T16:57:49Z",
       "description": "Final campaign manifest.",
       "evidence_id": "EV-G00-MANIFEST-MAT-CFG-L-I-130363",
       "kind": "manifest",
       "materialization_id": "MAT-CFG-L-I-130363",
       "path": "tmp/materialized-literature-scenarios/final-test-campaign/G02_main_factorial_experiments/CFG-L-I/130363/final_campaign_manifest.json",
       "run_id": "",
-      "sha256": "f98b1c49b2df8dc37db46cf3b86d71dd0582b43fed80c5e6d77a065e1ea374fe",
+      "sha256": "c01369d58170c42b08248bd85ff73a703905bf3121cb59fa7c59068fd3ef5e59",
       "test_ids": [
         "T-002"
       ]
     },
     {
       "config_id": "CFG-L-I",
-      "created_at_utc": "2026-06-21T09:08:41Z",
+      "created_at_utc": "2026-06-21T16:57:49Z",
       "description": "Final campaign validation report.",
       "evidence_id": "EV-G00-VALIDATION-MAT-CFG-L-I-130363",
       "kind": "validator",
@@ -696,21 +738,21 @@
     },
     {
       "config_id": "CFG-L-I",
-      "created_at_utc": "2026-06-21T09:08:41Z",
+      "created_at_utc": "2026-06-21T16:57:49Z",
       "description": "Final campaign manifest.",
       "evidence_id": "EV-G00-MANIFEST-MAT-CFG-L-I-155921",
       "kind": "manifest",
       "materialization_id": "MAT-CFG-L-I-155921",
       "path": "tmp/materialized-literature-scenarios/final-test-campaign/G02_main_factorial_experiments/CFG-L-I/155921/final_campaign_manifest.json",
       "run_id": "",
-      "sha256": "d22bc2faf74ae8c3359964852355f7d0920e40203bb977215a965c13fc62f426",
+      "sha256": "1eab4959e2962942ce2f9b3c99e5d7ac2fb896f3c5d84cc827c50fe784e4a911",
       "test_ids": [
         "T-002"
       ]
     },
     {
       "config_id": "CFG-L-I",
-      "created_at_utc": "2026-06-21T09:08:41Z",
+      "created_at_utc": "2026-06-21T16:57:49Z",
       "description": "Final campaign validation report.",
       "evidence_id": "EV-G00-VALIDATION-MAT-CFG-L-I-155921",
       "kind": "validator",
@@ -724,21 +766,21 @@
     },
     {
       "config_id": "CFG-L-I",
-      "created_at_utc": "2026-06-21T09:08:41Z",
+      "created_at_utc": "2026-06-21T16:57:49Z",
       "description": "Final campaign manifest.",
       "evidence_id": "EV-G00-MANIFEST-MAT-CFG-L-I-181081",
       "kind": "manifest",
       "materialization_id": "MAT-CFG-L-I-181081",
       "path": "tmp/materialized-literature-scenarios/final-test-campaign/G02_main_factorial_experiments/CFG-L-I/181081/final_campaign_manifest.json",
       "run_id": "",
-      "sha256": "1cd79481bb9af39ba650f132becd111a31786b591b0ef59dd824f6bb4aa774e2",
+      "sha256": "58febdf8cf4bbefc89a494d152a771c157462165b03a7ec22d712dce81ef28fb",
       "test_ids": [
         "T-002"
       ]
     },
     {
       "config_id": "CFG-L-I",
-      "created_at_utc": "2026-06-21T09:08:41Z",
+      "created_at_utc": "2026-06-21T16:57:49Z",
       "description": "Final campaign validation report.",
       "evidence_id": "EV-G00-VALIDATION-MAT-CFG-L-I-181081",
       "kind": "validator",
@@ -752,21 +794,21 @@
     },
     {
       "config_id": "CFG-L-I",
-      "created_at_utc": "2026-06-21T09:08:41Z",
+      "created_at_utc": "2026-06-21T16:57:49Z",
       "description": "Final campaign manifest.",
       "evidence_id": "EV-G00-MANIFEST-MAT-CFG-L-I-207547",
       "kind": "manifest",
       "materialization_id": "MAT-CFG-L-I-207547",
       "path": "tmp/materialized-literature-scenarios/final-test-campaign/G02_main_factorial_experiments/CFG-L-I/207547/final_campaign_manifest.json",
       "run_id": "",
-      "sha256": "f06fa4d005f531c89efeb8f35c28e84900cf44a1803f6b675e2d40bc98f23cd8",
+      "sha256": "40392dabd2f3821112eb20184f086a0891a1b1a44e1b41841fa3df6dab336c2a",
       "test_ids": [
         "T-002"
       ]
     },
     {
       "config_id": "CFG-L-I",
-      "created_at_utc": "2026-06-21T09:08:41Z",
+      "created_at_utc": "2026-06-21T16:57:49Z",
       "description": "Final campaign validation report.",
       "evidence_id": "EV-G00-VALIDATION-MAT-CFG-L-I-207547",
       "kind": "validator",
@@ -780,21 +822,21 @@
     },
     {
       "config_id": "CFG-L-S",
-      "created_at_utc": "2026-06-21T09:08:41Z",
+      "created_at_utc": "2026-06-21T16:57:49Z",
       "description": "Final campaign manifest.",
       "evidence_id": "EV-G00-MANIFEST-MAT-CFG-L-S-104729",
       "kind": "manifest",
       "materialization_id": "MAT-CFG-L-S-104729",
       "path": "tmp/materialized-literature-scenarios/final-test-campaign/G02_main_factorial_experiments/CFG-L-S/104729/final_campaign_manifest.json",
       "run_id": "",
-      "sha256": "a459cd0a7161cb91b581ea7eaecec6fbd171e449fd643630ac00c202f1a9b041",
+      "sha256": "7c9375bab609a7ba3ec4e1619a36445625f39d7e1adb75aa324c12808695bff9",
       "test_ids": [
         "T-002"
       ]
     },
     {
       "config_id": "CFG-L-S",
-      "created_at_utc": "2026-06-21T09:08:41Z",
+      "created_at_utc": "2026-06-21T16:57:49Z",
       "description": "Final campaign validation report.",
       "evidence_id": "EV-G00-VALIDATION-MAT-CFG-L-S-104729",
       "kind": "validator",
@@ -808,21 +850,21 @@
     },
     {
       "config_id": "CFG-L-S",
-      "created_at_utc": "2026-06-21T09:08:41Z",
+      "created_at_utc": "2026-06-21T16:57:49Z",
       "description": "Final campaign manifest.",
       "evidence_id": "EV-G00-MANIFEST-MAT-CFG-L-S-130363",
       "kind": "manifest",
       "materialization_id": "MAT-CFG-L-S-130363",
       "path": "tmp/materialized-literature-scenarios/final-test-campaign/G02_main_factorial_experiments/CFG-L-S/130363/final_campaign_manifest.json",
       "run_id": "",
-      "sha256": "e3c2c955b84fa9ac9283d405c02d1c6561e5c2c8c8d90d8de0a9f27b043b6380",
+      "sha256": "60e60a155c63bd5b8a7577bdb4d483984c9bb5666de841d9bf4409c874f6a8a6",
       "test_ids": [
         "T-002"
       ]
     },
     {
       "config_id": "CFG-L-S",
-      "created_at_utc": "2026-06-21T09:08:41Z",
+      "created_at_utc": "2026-06-21T16:57:49Z",
       "description": "Final campaign validation report.",
       "evidence_id": "EV-G00-VALIDATION-MAT-CFG-L-S-130363",
       "kind": "validator",
@@ -836,21 +878,21 @@
     },
     {
       "config_id": "CFG-L-S",
-      "created_at_utc": "2026-06-21T09:08:41Z",
+      "created_at_utc": "2026-06-21T16:57:49Z",
       "description": "Final campaign manifest.",
       "evidence_id": "EV-G00-MANIFEST-MAT-CFG-L-S-155921",
       "kind": "manifest",
       "materialization_id": "MAT-CFG-L-S-155921",
       "path": "tmp/materialized-literature-scenarios/final-test-campaign/G02_main_factorial_experiments/CFG-L-S/155921/final_campaign_manifest.json",
       "run_id": "",
-      "sha256": "7aab6ab702752a1738fc2bd1166e02b63fc4a9203933123d452ac89981b97d25",
+      "sha256": "65d87afbeeadd98af85fd95542916c9200ec1dba05876e67bd6422e5371a2a03",
       "test_ids": [
         "T-002"
       ]
     },
     {
       "config_id": "CFG-L-S",
-      "created_at_utc": "2026-06-21T09:08:41Z",
+      "created_at_utc": "2026-06-21T16:57:49Z",
       "description": "Final campaign validation report.",
       "evidence_id": "EV-G00-VALIDATION-MAT-CFG-L-S-155921",
       "kind": "validator",
@@ -864,21 +906,21 @@
     },
     {
       "config_id": "CFG-L-S",
-      "created_at_utc": "2026-06-21T09:08:41Z",
+      "created_at_utc": "2026-06-21T16:57:49Z",
       "description": "Final campaign manifest.",
       "evidence_id": "EV-G00-MANIFEST-MAT-CFG-L-S-181081",
       "kind": "manifest",
       "materialization_id": "MAT-CFG-L-S-181081",
       "path": "tmp/materialized-literature-scenarios/final-test-campaign/G02_main_factorial_experiments/CFG-L-S/181081/final_campaign_manifest.json",
       "run_id": "",
-      "sha256": "5d290927f1944f76595083db6a9c34ae8a43004739f854521d28c62b0a8e3461",
+      "sha256": "5fcf56b1569a7f57b509f27a6a9b1b489e0a3d03891455433e23dca098f1b454",
       "test_ids": [
         "T-002"
       ]
     },
     {
       "config_id": "CFG-L-S",
-      "created_at_utc": "2026-06-21T09:08:41Z",
+      "created_at_utc": "2026-06-21T16:57:49Z",
       "description": "Final campaign validation report.",
       "evidence_id": "EV-G00-VALIDATION-MAT-CFG-L-S-181081",
       "kind": "validator",
@@ -892,21 +934,21 @@
     },
     {
       "config_id": "CFG-L-S",
-      "created_at_utc": "2026-06-21T09:08:41Z",
+      "created_at_utc": "2026-06-21T16:57:49Z",
       "description": "Final campaign manifest.",
       "evidence_id": "EV-G00-MANIFEST-MAT-CFG-L-S-207547",
       "kind": "manifest",
       "materialization_id": "MAT-CFG-L-S-207547",
       "path": "tmp/materialized-literature-scenarios/final-test-campaign/G02_main_factorial_experiments/CFG-L-S/207547/final_campaign_manifest.json",
       "run_id": "",
-      "sha256": "c12949fb8757d4006650a2190a2a68f6708977bf6cd01277d946cfd8975640a1",
+      "sha256": "a11d5f94b3d8a24c4e74d009fc1b4ea54bb1d3780cf60f49bdbef36ef78fded8",
       "test_ids": [
         "T-002"
       ]
     },
     {
       "config_id": "CFG-L-S",
-      "created_at_utc": "2026-06-21T09:08:41Z",
+      "created_at_utc": "2026-06-21T16:57:49Z",
       "description": "Final campaign validation report.",
       "evidence_id": "EV-G00-VALIDATION-MAT-CFG-L-S-207547",
       "kind": "validator",
@@ -920,21 +962,21 @@
     },
     {
       "config_id": "CFG-N-E",
-      "created_at_utc": "2026-06-21T09:08:41Z",
+      "created_at_utc": "2026-06-21T16:57:49Z",
       "description": "Final campaign manifest.",
       "evidence_id": "EV-G00-MANIFEST-MAT-CFG-N-E-104729",
       "kind": "manifest",
       "materialization_id": "MAT-CFG-N-E-104729",
       "path": "tmp/materialized-literature-scenarios/final-test-campaign/G02_main_factorial_experiments/CFG-N-E/104729/final_campaign_manifest.json",
       "run_id": "",
-      "sha256": "9bac26d424aaf8ddb0f702d0314001e917e9239edf28e40fe74ca0989ffb548e",
+      "sha256": "aac8caa065bd2508937e37741d869ebd8c036cb1984df8dc46f3ba7afb9d653b",
       "test_ids": [
         "T-002"
       ]
     },
     {
       "config_id": "CFG-N-E",
-      "created_at_utc": "2026-06-21T09:08:41Z",
+      "created_at_utc": "2026-06-21T16:57:49Z",
       "description": "Final campaign validation report.",
       "evidence_id": "EV-G00-VALIDATION-MAT-CFG-N-E-104729",
       "kind": "validator",
@@ -948,21 +990,21 @@
     },
     {
       "config_id": "CFG-N-E",
-      "created_at_utc": "2026-06-21T09:08:41Z",
+      "created_at_utc": "2026-06-21T16:57:49Z",
       "description": "Final campaign manifest.",
       "evidence_id": "EV-G00-MANIFEST-MAT-CFG-N-E-130363",
       "kind": "manifest",
       "materialization_id": "MAT-CFG-N-E-130363",
       "path": "tmp/materialized-literature-scenarios/final-test-campaign/G02_main_factorial_experiments/CFG-N-E/130363/final_campaign_manifest.json",
       "run_id": "",
-      "sha256": "fb0a825e6e734ab9f646c05aac169899c85df0426db3af4eb2c5461f623383d0",
+      "sha256": "4739fff25e4af741a595a3bb423184ea2cf731669db112015a6f6b7e610b42fd",
       "test_ids": [
         "T-002"
       ]
     },
     {
       "config_id": "CFG-N-E",
-      "created_at_utc": "2026-06-21T09:08:41Z",
+      "created_at_utc": "2026-06-21T16:57:49Z",
       "description": "Final campaign validation report.",
       "evidence_id": "EV-G00-VALIDATION-MAT-CFG-N-E-130363",
       "kind": "validator",
@@ -976,21 +1018,21 @@
     },
     {
       "config_id": "CFG-N-E",
-      "created_at_utc": "2026-06-21T09:08:41Z",
+      "created_at_utc": "2026-06-21T16:57:49Z",
       "description": "Final campaign manifest.",
       "evidence_id": "EV-G00-MANIFEST-MAT-CFG-N-E-155921",
       "kind": "manifest",
       "materialization_id": "MAT-CFG-N-E-155921",
       "path": "tmp/materialized-literature-scenarios/final-test-campaign/G02_main_factorial_experiments/CFG-N-E/155921/final_campaign_manifest.json",
       "run_id": "",
-      "sha256": "482637da7fb52f92ec15657eea8c3f5a6dcd90bde6e018c8810e6273b124e5c9",
+      "sha256": "4a49fb232c589457a48490546edb58d6c795deb11a1c17f90ed36a02b64dabd8",
       "test_ids": [
         "T-002"
       ]
     },
     {
       "config_id": "CFG-N-E",
-      "created_at_utc": "2026-06-21T09:08:41Z",
+      "created_at_utc": "2026-06-21T16:57:49Z",
       "description": "Final campaign validation report.",
       "evidence_id": "EV-G00-VALIDATION-MAT-CFG-N-E-155921",
       "kind": "validator",
@@ -1004,21 +1046,21 @@
     },
     {
       "config_id": "CFG-N-E",
-      "created_at_utc": "2026-06-21T09:08:41Z",
+      "created_at_utc": "2026-06-21T16:57:49Z",
       "description": "Final campaign manifest.",
       "evidence_id": "EV-G00-MANIFEST-MAT-CFG-N-E-181081",
       "kind": "manifest",
       "materialization_id": "MAT-CFG-N-E-181081",
       "path": "tmp/materialized-literature-scenarios/final-test-campaign/G02_main_factorial_experiments/CFG-N-E/181081/final_campaign_manifest.json",
       "run_id": "",
-      "sha256": "91e9f161bd32bf6d9be73d123dd730e6c61e50c87e19ef1a9c6a12d466c2b627",
+      "sha256": "293e58a00f7e98668680dcadbb0c32459e32f339b28eb2f7f2f6bfd9ceac2296",
       "test_ids": [
         "T-002"
       ]
     },
     {
       "config_id": "CFG-N-E",
-      "created_at_utc": "2026-06-21T09:08:41Z",
+      "created_at_utc": "2026-06-21T16:57:49Z",
       "description": "Final campaign validation report.",
       "evidence_id": "EV-G00-VALIDATION-MAT-CFG-N-E-181081",
       "kind": "validator",
@@ -1032,21 +1074,21 @@
     },
     {
       "config_id": "CFG-N-E",
-      "created_at_utc": "2026-06-21T09:08:41Z",
+      "created_at_utc": "2026-06-21T16:57:49Z",
       "description": "Final campaign manifest.",
       "evidence_id": "EV-G00-MANIFEST-MAT-CFG-N-E-207547",
       "kind": "manifest",
       "materialization_id": "MAT-CFG-N-E-207547",
       "path": "tmp/materialized-literature-scenarios/final-test-campaign/G02_main_factorial_experiments/CFG-N-E/207547/final_campaign_manifest.json",
       "run_id": "",
-      "sha256": "2d81a13df2c5f2c0b0595b308d35e97b80688b14788dff9aca131e0d0d769d89",
+      "sha256": "b0bac043bff2075fb0fd90469de53610900e270778b368174457fbe67cb750fd",
       "test_ids": [
         "T-002"
       ]
     },
     {
       "config_id": "CFG-N-E",
-      "created_at_utc": "2026-06-21T09:08:41Z",
+      "created_at_utc": "2026-06-21T16:57:49Z",
       "description": "Final campaign validation report.",
       "evidence_id": "EV-G00-VALIDATION-MAT-CFG-N-E-207547",
       "kind": "validator",
@@ -1060,21 +1102,21 @@
     },
     {
       "config_id": "CFG-N-I",
-      "created_at_utc": "2026-06-21T09:08:41Z",
+      "created_at_utc": "2026-06-21T16:57:49Z",
       "description": "Final campaign manifest.",
       "evidence_id": "EV-G00-MANIFEST-MAT-CFG-N-I-104729",
       "kind": "manifest",
       "materialization_id": "MAT-CFG-N-I-104729",
       "path": "tmp/materialized-literature-scenarios/final-test-campaign/G02_main_factorial_experiments/CFG-N-I/104729/final_campaign_manifest.json",
       "run_id": "",
-      "sha256": "2d1d77c6328b5ab9df9d7460d297576d77bc769916b1d48d0d79f9b6c707cb13",
+      "sha256": "bf6f0698c99f98a580d2821097e1c98bb060608d3fff087d4f34505e776838b1",
       "test_ids": [
         "T-002"
       ]
     },
     {
       "config_id": "CFG-N-I",
-      "created_at_utc": "2026-06-21T09:08:41Z",
+      "created_at_utc": "2026-06-21T16:57:49Z",
       "description": "Final campaign validation report.",
       "evidence_id": "EV-G00-VALIDATION-MAT-CFG-N-I-104729",
       "kind": "validator",
@@ -1088,21 +1130,21 @@
     },
     {
       "config_id": "CFG-N-I",
-      "created_at_utc": "2026-06-21T09:08:41Z",
+      "created_at_utc": "2026-06-21T16:57:49Z",
       "description": "Final campaign manifest.",
       "evidence_id": "EV-G00-MANIFEST-MAT-CFG-N-I-130363",
       "kind": "manifest",
       "materialization_id": "MAT-CFG-N-I-130363",
       "path": "tmp/materialized-literature-scenarios/final-test-campaign/G02_main_factorial_experiments/CFG-N-I/130363/final_campaign_manifest.json",
       "run_id": "",
-      "sha256": "7f7b67fe91070eb8d5632f2dd81e7f622e87f63eb324f9aefe100c91380215a4",
+      "sha256": "b0f873b18e129eb8c0360031d8e290499815590d06289ffbb7b5bac76efe02c5",
       "test_ids": [
         "T-002"
       ]
     },
     {
       "config_id": "CFG-N-I",
-      "created_at_utc": "2026-06-21T09:08:41Z",
+      "created_at_utc": "2026-06-21T16:57:49Z",
       "description": "Final campaign validation report.",
       "evidence_id": "EV-G00-VALIDATION-MAT-CFG-N-I-130363",
       "kind": "validator",
@@ -1116,21 +1158,21 @@
     },
     {
       "config_id": "CFG-N-I",
-      "created_at_utc": "2026-06-21T09:08:41Z",
+      "created_at_utc": "2026-06-21T16:57:49Z",
       "description": "Final campaign manifest.",
       "evidence_id": "EV-G00-MANIFEST-MAT-CFG-N-I-155921",
       "kind": "manifest",
       "materialization_id": "MAT-CFG-N-I-155921",
       "path": "tmp/materialized-literature-scenarios/final-test-campaign/G02_main_factorial_experiments/CFG-N-I/155921/final_campaign_manifest.json",
       "run_id": "",
-      "sha256": "3d0af024f86a6f3eeacde7e6435e92dfbeee4035db739c37247f7f68c4aa8664",
+      "sha256": "afb57dd92448caf85b93cdddbb2ef783a17d7f7a1ac1a75be1eb069df2bf3504",
       "test_ids": [
         "T-002"
       ]
     },
     {
       "config_id": "CFG-N-I",
-      "created_at_utc": "2026-06-21T09:08:41Z",
+      "created_at_utc": "2026-06-21T16:57:49Z",
       "description": "Final campaign validation report.",
       "evidence_id": "EV-G00-VALIDATION-MAT-CFG-N-I-155921",
       "kind": "validator",
@@ -1144,21 +1186,21 @@
     },
     {
       "config_id": "CFG-N-I",
-      "created_at_utc": "2026-06-21T09:08:41Z",
+      "created_at_utc": "2026-06-21T16:57:49Z",
       "description": "Final campaign manifest.",
       "evidence_id": "EV-G00-MANIFEST-MAT-CFG-N-I-181081",
       "kind": "manifest",
       "materialization_id": "MAT-CFG-N-I-181081",
       "path": "tmp/materialized-literature-scenarios/final-test-campaign/G02_main_factorial_experiments/CFG-N-I/181081/final_campaign_manifest.json",
       "run_id": "",
-      "sha256": "3ee1eea5bdc1d9f3bdb47add5a4186d38e751a45a049a9cfbfee34874fa9a366",
+      "sha256": "655e9e6b5b14408815494c811f5c33f1702259eee128eaedfedd5f1b52a7f502",
       "test_ids": [
         "T-002"
       ]
     },
     {
       "config_id": "CFG-N-I",
-      "created_at_utc": "2026-06-21T09:08:41Z",
+      "created_at_utc": "2026-06-21T16:57:49Z",
       "description": "Final campaign validation report.",
       "evidence_id": "EV-G00-VALIDATION-MAT-CFG-N-I-181081",
       "kind": "validator",
@@ -1172,21 +1214,21 @@
     },
     {
       "config_id": "CFG-N-I",
-      "created_at_utc": "2026-06-21T09:08:41Z",
+      "created_at_utc": "2026-06-21T16:57:49Z",
       "description": "Final campaign manifest.",
       "evidence_id": "EV-G00-MANIFEST-MAT-CFG-N-I-207547",
       "kind": "manifest",
       "materialization_id": "MAT-CFG-N-I-207547",
       "path": "tmp/materialized-literature-scenarios/final-test-campaign/G02_main_factorial_experiments/CFG-N-I/207547/final_campaign_manifest.json",
       "run_id": "",
-      "sha256": "b2ca7d29e563b7fd59abb82a93a68165ef76c5da6cb05da0a5a13cd9a5469e21",
+      "sha256": "198298864ac4f7acc10e333e7a95d0898d192f4f88f075e51327ee9e065903bb",
       "test_ids": [
         "T-002"
       ]
     },
     {
       "config_id": "CFG-N-I",
-      "created_at_utc": "2026-06-21T09:08:41Z",
+      "created_at_utc": "2026-06-21T16:57:49Z",
       "description": "Final campaign validation report.",
       "evidence_id": "EV-G00-VALIDATION-MAT-CFG-N-I-207547",
       "kind": "validator",
@@ -1200,21 +1242,21 @@
     },
     {
       "config_id": "CFG-N-S",
-      "created_at_utc": "2026-06-21T09:08:41Z",
+      "created_at_utc": "2026-06-21T16:57:49Z",
       "description": "Final campaign manifest.",
       "evidence_id": "EV-G00-MANIFEST-MAT-CFG-N-S-104729",
       "kind": "manifest",
       "materialization_id": "MAT-CFG-N-S-104729",
       "path": "tmp/materialized-literature-scenarios/final-test-campaign/G02_main_factorial_experiments/CFG-N-S/104729/final_campaign_manifest.json",
       "run_id": "",
-      "sha256": "b9f2d9ca20590ac6633f1db46d47b003d3530a39ab467320dcb9bca2cd758efd",
+      "sha256": "8f80bf996e1e699e1b6aff836db181eb6e6418883b4a8a4edf1cc5bd5148ff46",
       "test_ids": [
         "T-002"
       ]
     },
     {
       "config_id": "CFG-N-S",
-      "created_at_utc": "2026-06-21T09:08:41Z",
+      "created_at_utc": "2026-06-21T16:57:49Z",
       "description": "Final campaign validation report.",
       "evidence_id": "EV-G00-VALIDATION-MAT-CFG-N-S-104729",
       "kind": "validator",
@@ -1228,21 +1270,21 @@
     },
     {
       "config_id": "CFG-N-S",
-      "created_at_utc": "2026-06-21T09:08:41Z",
+      "created_at_utc": "2026-06-21T16:57:49Z",
       "description": "Final campaign manifest.",
       "evidence_id": "EV-G00-MANIFEST-MAT-CFG-N-S-130363",
       "kind": "manifest",
       "materialization_id": "MAT-CFG-N-S-130363",
       "path": "tmp/materialized-literature-scenarios/final-test-campaign/G02_main_factorial_experiments/CFG-N-S/130363/final_campaign_manifest.json",
       "run_id": "",
-      "sha256": "6e451f85d4162a3ce331b80a1159109d83855e3e0eafefbb7c86fe8daa7a49b6",
+      "sha256": "db23600c8eafb988a8b3bde454b5f231aa7c0524bc6414fff194ca003abeeeb9",
       "test_ids": [
         "T-002"
       ]
     },
     {
       "config_id": "CFG-N-S",
-      "created_at_utc": "2026-06-21T09:08:41Z",
+      "created_at_utc": "2026-06-21T16:57:49Z",
       "description": "Final campaign validation report.",
       "evidence_id": "EV-G00-VALIDATION-MAT-CFG-N-S-130363",
       "kind": "validator",
@@ -1256,21 +1298,21 @@
     },
     {
       "config_id": "CFG-N-S",
-      "created_at_utc": "2026-06-21T09:08:41Z",
+      "created_at_utc": "2026-06-21T16:57:49Z",
       "description": "Final campaign manifest.",
       "evidence_id": "EV-G00-MANIFEST-MAT-CFG-N-S-155921",
       "kind": "manifest",
       "materialization_id": "MAT-CFG-N-S-155921",
       "path": "tmp/materialized-literature-scenarios/final-test-campaign/G02_main_factorial_experiments/CFG-N-S/155921/final_campaign_manifest.json",
       "run_id": "",
-      "sha256": "8aae618b407f333b4b1ac9c61169ecb8b7cf11dece9a7ef920f9c726d15d404d",
+      "sha256": "41c59b7b4e01765aa33b7ba744017457cace82748c79db3520a827d1877b72d9",
       "test_ids": [
         "T-002"
       ]
     },
     {
       "config_id": "CFG-N-S",
-      "created_at_utc": "2026-06-21T09:08:41Z",
+      "created_at_utc": "2026-06-21T16:57:49Z",
       "description": "Final campaign validation report.",
       "evidence_id": "EV-G00-VALIDATION-MAT-CFG-N-S-155921",
       "kind": "validator",
@@ -1284,21 +1326,21 @@
     },
     {
       "config_id": "CFG-N-S",
-      "created_at_utc": "2026-06-21T09:08:41Z",
+      "created_at_utc": "2026-06-21T16:57:49Z",
       "description": "Final campaign manifest.",
       "evidence_id": "EV-G00-MANIFEST-MAT-CFG-N-S-181081",
       "kind": "manifest",
       "materialization_id": "MAT-CFG-N-S-181081",
       "path": "tmp/materialized-literature-scenarios/final-test-campaign/G02_main_factorial_experiments/CFG-N-S/181081/final_campaign_manifest.json",
       "run_id": "",
-      "sha256": "093e63fa2ca367837c6e86240aefa82456c9fc93f471b636ebc7fb8e1d7fb2b5",
+      "sha256": "2e1570627e3b465195e066c568eb1fa64afbf91060db2357670207f13fa43833",
       "test_ids": [
         "T-002"
       ]
     },
     {
       "config_id": "CFG-N-S",
-      "created_at_utc": "2026-06-21T09:08:41Z",
+      "created_at_utc": "2026-06-21T16:57:49Z",
       "description": "Final campaign validation report.",
       "evidence_id": "EV-G00-VALIDATION-MAT-CFG-N-S-181081",
       "kind": "validator",
@@ -1312,21 +1354,21 @@
     },
     {
       "config_id": "CFG-N-S",
-      "created_at_utc": "2026-06-21T09:08:41Z",
+      "created_at_utc": "2026-06-21T16:57:49Z",
       "description": "Final campaign manifest.",
       "evidence_id": "EV-G00-MANIFEST-MAT-CFG-N-S-207547",
       "kind": "manifest",
       "materialization_id": "MAT-CFG-N-S-207547",
       "path": "tmp/materialized-literature-scenarios/final-test-campaign/G02_main_factorial_experiments/CFG-N-S/207547/final_campaign_manifest.json",
       "run_id": "",
-      "sha256": "bd97f497a657e3361eddca0add4bbcc17ca6bd48ba3c5ee91ec357a2e458a0ff",
+      "sha256": "ea2fba959a7a5c5e9b6a28c728497ff63f677d6ac1c70a04504628a19e73f02a",
       "test_ids": [
         "T-002"
       ]
     },
     {
       "config_id": "CFG-N-S",
-      "created_at_utc": "2026-06-21T09:08:41Z",
+      "created_at_utc": "2026-06-21T16:57:49Z",
       "description": "Final campaign validation report.",
       "evidence_id": "EV-G00-VALIDATION-MAT-CFG-N-S-207547",
       "kind": "validator",
@@ -1340,21 +1382,21 @@
     },
     {
       "config_id": "CFG-H-E",
-      "created_at_utc": "2026-06-21T09:08:41Z",
+      "created_at_utc": "2026-06-21T16:57:49Z",
       "description": "Final campaign manifest.",
       "evidence_id": "EV-G00-MANIFEST-MAT-CFG-H-E-104729",
       "kind": "manifest",
       "materialization_id": "MAT-CFG-H-E-104729",
       "path": "tmp/materialized-literature-scenarios/final-test-campaign/G02_main_factorial_experiments/CFG-H-E/104729/final_campaign_manifest.json",
       "run_id": "",
-      "sha256": "af9864a2a0e59849e6d99fc3420d1a74a417098eb0aea444561e3eda20101aad",
+      "sha256": "7cd524ee73c19f3d1a79fadd7c168cc3cf806bf630540b8ee122fccc2c1cd7a6",
       "test_ids": [
         "T-002"
       ]
     },
     {
       "config_id": "CFG-H-E",
-      "created_at_utc": "2026-06-21T09:08:41Z",
+      "created_at_utc": "2026-06-21T16:57:49Z",
       "description": "Final campaign validation report.",
       "evidence_id": "EV-G00-VALIDATION-MAT-CFG-H-E-104729",
       "kind": "validator",
@@ -1368,21 +1410,21 @@
     },
     {
       "config_id": "CFG-H-E",
-      "created_at_utc": "2026-06-21T09:08:41Z",
+      "created_at_utc": "2026-06-21T16:57:49Z",
       "description": "Final campaign manifest.",
       "evidence_id": "EV-G00-MANIFEST-MAT-CFG-H-E-130363",
       "kind": "manifest",
       "materialization_id": "MAT-CFG-H-E-130363",
       "path": "tmp/materialized-literature-scenarios/final-test-campaign/G02_main_factorial_experiments/CFG-H-E/130363/final_campaign_manifest.json",
       "run_id": "",
-      "sha256": "2455e40cb3eba70257f4201fde679930322b62d4722d136d90181e30c7a26714",
+      "sha256": "b3c062b8711dac8783d5ddfe920f1fc4ea03aa96aa285c6a64718e0feeb2bb64",
       "test_ids": [
         "T-002"
       ]
     },
     {
       "config_id": "CFG-H-E",
-      "created_at_utc": "2026-06-21T09:08:41Z",
+      "created_at_utc": "2026-06-21T16:57:49Z",
       "description": "Final campaign validation report.",
       "evidence_id": "EV-G00-VALIDATION-MAT-CFG-H-E-130363",
       "kind": "validator",
@@ -1396,21 +1438,21 @@
     },
     {
       "config_id": "CFG-H-E",
-      "created_at_utc": "2026-06-21T09:08:41Z",
+      "created_at_utc": "2026-06-21T16:57:49Z",
       "description": "Final campaign manifest.",
       "evidence_id": "EV-G00-MANIFEST-MAT-CFG-H-E-155921",
       "kind": "manifest",
       "materialization_id": "MAT-CFG-H-E-155921",
       "path": "tmp/materialized-literature-scenarios/final-test-campaign/G02_main_factorial_experiments/CFG-H-E/155921/final_campaign_manifest.json",
       "run_id": "",
-      "sha256": "ae0803712e0b02a25d6249f3a0c6e0d7a3140b45b6e0d4fa879da6cb121ea27c",
+      "sha256": "f3b8be022e1d94ae073665d32ceec4d4ad1cd06081857a55061fbc3b69c84d05",
       "test_ids": [
         "T-002"
       ]
     },
     {
       "config_id": "CFG-H-E",
-      "created_at_utc": "2026-06-21T09:08:41Z",
+      "created_at_utc": "2026-06-21T16:57:49Z",
       "description": "Final campaign validation report.",
       "evidence_id": "EV-G00-VALIDATION-MAT-CFG-H-E-155921",
       "kind": "validator",
@@ -1424,21 +1466,21 @@
     },
     {
       "config_id": "CFG-H-E",
-      "created_at_utc": "2026-06-21T09:08:41Z",
+      "created_at_utc": "2026-06-21T16:57:49Z",
       "description": "Final campaign manifest.",
       "evidence_id": "EV-G00-MANIFEST-MAT-CFG-H-E-181081",
       "kind": "manifest",
       "materialization_id": "MAT-CFG-H-E-181081",
       "path": "tmp/materialized-literature-scenarios/final-test-campaign/G02_main_factorial_experiments/CFG-H-E/181081/final_campaign_manifest.json",
       "run_id": "",
-      "sha256": "d6e1dce34805efacc8855d49ceeef447e69f4966b35a523880f0e1768bcfe002",
+      "sha256": "c2a68dca5f9e431c402c668a78c0154e12f170d5dc5e580d12cb8eebac335f89",
       "test_ids": [
         "T-002"
       ]
     },
     {
       "config_id": "CFG-H-E",
-      "created_at_utc": "2026-06-21T09:08:41Z",
+      "created_at_utc": "2026-06-21T16:57:49Z",
       "description": "Final campaign validation report.",
       "evidence_id": "EV-G00-VALIDATION-MAT-CFG-H-E-181081",
       "kind": "validator",
@@ -1452,21 +1494,21 @@
     },
     {
       "config_id": "CFG-H-E",
-      "created_at_utc": "2026-06-21T09:08:41Z",
+      "created_at_utc": "2026-06-21T16:57:49Z",
       "description": "Final campaign manifest.",
       "evidence_id": "EV-G00-MANIFEST-MAT-CFG-H-E-207547",
       "kind": "manifest",
       "materialization_id": "MAT-CFG-H-E-207547",
       "path": "tmp/materialized-literature-scenarios/final-test-campaign/G02_main_factorial_experiments/CFG-H-E/207547/final_campaign_manifest.json",
       "run_id": "",
-      "sha256": "2386a6ff4a608cbda8c6c17ee2f7109a15e761bf3ebcc2a00252d04dc946ba05",
+      "sha256": "bc485b0515464458d50e37ae83652920e54bb962688f79062d9ca5c786f221af",
       "test_ids": [
         "T-002"
       ]
     },
     {
       "config_id": "CFG-H-E",
-      "created_at_utc": "2026-06-21T09:08:41Z",
+      "created_at_utc": "2026-06-21T16:57:49Z",
       "description": "Final campaign validation report.",
       "evidence_id": "EV-G00-VALIDATION-MAT-CFG-H-E-207547",
       "kind": "validator",
@@ -1480,21 +1522,21 @@
     },
     {
       "config_id": "CFG-H-I",
-      "created_at_utc": "2026-06-21T09:08:41Z",
+      "created_at_utc": "2026-06-21T16:57:49Z",
       "description": "Final campaign manifest.",
       "evidence_id": "EV-G00-MANIFEST-MAT-CFG-H-I-104729",
       "kind": "manifest",
       "materialization_id": "MAT-CFG-H-I-104729",
       "path": "tmp/materialized-literature-scenarios/final-test-campaign/G02_main_factorial_experiments/CFG-H-I/104729/final_campaign_manifest.json",
       "run_id": "",
-      "sha256": "c094afc7a4e7955137ca7abf5f5cd2b125844c60a9ba69c57b653209c0b941f5",
+      "sha256": "8e18c9d7f603f596809cb10666e2631a4e534f981d1925d4397a69c8014a8edc",
       "test_ids": [
         "T-002"
       ]
     },
     {
       "config_id": "CFG-H-I",
-      "created_at_utc": "2026-06-21T09:08:41Z",
+      "created_at_utc": "2026-06-21T16:57:49Z",
       "description": "Final campaign validation report.",
       "evidence_id": "EV-G00-VALIDATION-MAT-CFG-H-I-104729",
       "kind": "validator",
@@ -1508,21 +1550,21 @@
     },
     {
       "config_id": "CFG-H-I",
-      "created_at_utc": "2026-06-21T09:08:41Z",
+      "created_at_utc": "2026-06-21T16:57:49Z",
       "description": "Final campaign manifest.",
       "evidence_id": "EV-G00-MANIFEST-MAT-CFG-H-I-130363",
       "kind": "manifest",
       "materialization_id": "MAT-CFG-H-I-130363",
       "path": "tmp/materialized-literature-scenarios/final-test-campaign/G02_main_factorial_experiments/CFG-H-I/130363/final_campaign_manifest.json",
       "run_id": "",
-      "sha256": "9db834dea42b882bdeafa9c4f859732b932b0b13268258ed8c6c221719df6b03",
+      "sha256": "6053d06e1b47832f1b73b30737b18603081f8a3fb898e6ca0b97ebac5d01ae1f",
       "test_ids": [
         "T-002"
       ]
     },
     {
       "config_id": "CFG-H-I",
-      "created_at_utc": "2026-06-21T09:08:41Z",
+      "created_at_utc": "2026-06-21T16:57:49Z",
       "description": "Final campaign validation report.",
       "evidence_id": "EV-G00-VALIDATION-MAT-CFG-H-I-130363",
       "kind": "validator",
@@ -1536,21 +1578,21 @@
     },
     {
       "config_id": "CFG-H-I",
-      "created_at_utc": "2026-06-21T09:08:41Z",
+      "created_at_utc": "2026-06-21T16:57:49Z",
       "description": "Final campaign manifest.",
       "evidence_id": "EV-G00-MANIFEST-MAT-CFG-H-I-155921",
       "kind": "manifest",
       "materialization_id": "MAT-CFG-H-I-155921",
       "path": "tmp/materialized-literature-scenarios/final-test-campaign/G02_main_factorial_experiments/CFG-H-I/155921/final_campaign_manifest.json",
       "run_id": "",
-      "sha256": "4143f7cc8b67d00caf83f77982782d605daa559f2d66a42c0c087924c7120ce5",
+      "sha256": "eea5170c7d24f53319219f907878b50a49c17a3b38266f6e23980d2b5c3adb93",
       "test_ids": [
         "T-002"
       ]
     },
     {
       "config_id": "CFG-H-I",
-      "created_at_utc": "2026-06-21T09:08:41Z",
+      "created_at_utc": "2026-06-21T16:57:49Z",
       "description": "Final campaign validation report.",
       "evidence_id": "EV-G00-VALIDATION-MAT-CFG-H-I-155921",
       "kind": "validator",
@@ -1564,21 +1606,21 @@
     },
     {
       "config_id": "CFG-H-I",
-      "created_at_utc": "2026-06-21T09:08:41Z",
+      "created_at_utc": "2026-06-21T16:57:49Z",
       "description": "Final campaign manifest.",
       "evidence_id": "EV-G00-MANIFEST-MAT-CFG-H-I-181081",
       "kind": "manifest",
       "materialization_id": "MAT-CFG-H-I-181081",
       "path": "tmp/materialized-literature-scenarios/final-test-campaign/G02_main_factorial_experiments/CFG-H-I/181081/final_campaign_manifest.json",
       "run_id": "",
-      "sha256": "cfdd64b90ab135cd15f0d8b7c6fba4bb7d26fdebc6df30e7ad5e013ca2f409c2",
+      "sha256": "c85ddee68ca1b45cd0d6c17176ff23e9b934492e30f4d7e717fa5de5adc0f905",
       "test_ids": [
         "T-002"
       ]
     },
     {
       "config_id": "CFG-H-I",
-      "created_at_utc": "2026-06-21T09:08:41Z",
+      "created_at_utc": "2026-06-21T16:57:49Z",
       "description": "Final campaign validation report.",
       "evidence_id": "EV-G00-VALIDATION-MAT-CFG-H-I-181081",
       "kind": "validator",
@@ -1592,21 +1634,21 @@
     },
     {
       "config_id": "CFG-H-I",
-      "created_at_utc": "2026-06-21T09:08:41Z",
+      "created_at_utc": "2026-06-21T16:57:49Z",
       "description": "Final campaign manifest.",
       "evidence_id": "EV-G00-MANIFEST-MAT-CFG-H-I-207547",
       "kind": "manifest",
       "materialization_id": "MAT-CFG-H-I-207547",
       "path": "tmp/materialized-literature-scenarios/final-test-campaign/G02_main_factorial_experiments/CFG-H-I/207547/final_campaign_manifest.json",
       "run_id": "",
-      "sha256": "b7bebd67630ccd86a8b1b43e0ebcae9ce58640a48ca0442413be2a541f0c9fc6",
+      "sha256": "a3bbaf189a540d5e26761663cdb3116e816f447907747ec55a77dd1f99d43223",
       "test_ids": [
         "T-002"
       ]
     },
     {
       "config_id": "CFG-H-I",
-      "created_at_utc": "2026-06-21T09:08:41Z",
+      "created_at_utc": "2026-06-21T16:57:49Z",
       "description": "Final campaign validation report.",
       "evidence_id": "EV-G00-VALIDATION-MAT-CFG-H-I-207547",
       "kind": "validator",
@@ -1620,21 +1662,21 @@
     },
     {
       "config_id": "CFG-H-S",
-      "created_at_utc": "2026-06-21T09:08:41Z",
+      "created_at_utc": "2026-06-21T16:57:49Z",
       "description": "Final campaign manifest.",
       "evidence_id": "EV-G00-MANIFEST-MAT-CFG-H-S-104729",
       "kind": "manifest",
       "materialization_id": "MAT-CFG-H-S-104729",
       "path": "tmp/materialized-literature-scenarios/final-test-campaign/G02_main_factorial_experiments/CFG-H-S/104729/final_campaign_manifest.json",
       "run_id": "",
-      "sha256": "b822e223db1f228d556b67aa8f342a85d3c401ad4e5e018445e53cfed8905c7d",
+      "sha256": "53e45474dd54882a783b02f9131f83527aeec1f2a79602db0e36074a6679b67b",
       "test_ids": [
         "T-002"
       ]
     },
     {
       "config_id": "CFG-H-S",
-      "created_at_utc": "2026-06-21T09:08:41Z",
+      "created_at_utc": "2026-06-21T16:57:49Z",
       "description": "Final campaign validation report.",
       "evidence_id": "EV-G00-VALIDATION-MAT-CFG-H-S-104729",
       "kind": "validator",
@@ -1648,21 +1690,21 @@
     },
     {
       "config_id": "CFG-H-S",
-      "created_at_utc": "2026-06-21T09:08:41Z",
+      "created_at_utc": "2026-06-21T16:57:49Z",
       "description": "Final campaign manifest.",
       "evidence_id": "EV-G00-MANIFEST-MAT-CFG-H-S-130363",
       "kind": "manifest",
       "materialization_id": "MAT-CFG-H-S-130363",
       "path": "tmp/materialized-literature-scenarios/final-test-campaign/G02_main_factorial_experiments/CFG-H-S/130363/final_campaign_manifest.json",
       "run_id": "",
-      "sha256": "dd0dcde828e8c13f4d9dc2b0ece1b0c40beda01d4ea0928a430fbdd3f307796a",
+      "sha256": "8666c1395e0004b38aedfe2ba1a99993c5caf4c51c209ffff08da4acb4af7cf1",
       "test_ids": [
         "T-002"
       ]
     },
     {
       "config_id": "CFG-H-S",
-      "created_at_utc": "2026-06-21T09:08:41Z",
+      "created_at_utc": "2026-06-21T16:57:49Z",
       "description": "Final campaign validation report.",
       "evidence_id": "EV-G00-VALIDATION-MAT-CFG-H-S-130363",
       "kind": "validator",
@@ -1676,21 +1718,21 @@
     },
     {
       "config_id": "CFG-H-S",
-      "created_at_utc": "2026-06-21T09:08:41Z",
+      "created_at_utc": "2026-06-21T16:57:49Z",
       "description": "Final campaign manifest.",
       "evidence_id": "EV-G00-MANIFEST-MAT-CFG-H-S-155921",
       "kind": "manifest",
       "materialization_id": "MAT-CFG-H-S-155921",
       "path": "tmp/materialized-literature-scenarios/final-test-campaign/G02_main_factorial_experiments/CFG-H-S/155921/final_campaign_manifest.json",
       "run_id": "",
-      "sha256": "20a14428889f2fef7c5b33963cb6329db671baf74e90cb2794352c86bfd546ff",
+      "sha256": "4609c8d56d567da409422c2402d13513a16e7bc327850eede6812e12d99036c6",
       "test_ids": [
         "T-002"
       ]
     },
     {
       "config_id": "CFG-H-S",
-      "created_at_utc": "2026-06-21T09:08:41Z",
+      "created_at_utc": "2026-06-21T16:57:49Z",
       "description": "Final campaign validation report.",
       "evidence_id": "EV-G00-VALIDATION-MAT-CFG-H-S-155921",
       "kind": "validator",
@@ -1704,21 +1746,21 @@
     },
     {
       "config_id": "CFG-H-S",
-      "created_at_utc": "2026-06-21T09:08:41Z",
+      "created_at_utc": "2026-06-21T16:57:49Z",
       "description": "Final campaign manifest.",
       "evidence_id": "EV-G00-MANIFEST-MAT-CFG-H-S-181081",
       "kind": "manifest",
       "materialization_id": "MAT-CFG-H-S-181081",
       "path": "tmp/materialized-literature-scenarios/final-test-campaign/G02_main_factorial_experiments/CFG-H-S/181081/final_campaign_manifest.json",
       "run_id": "",
-      "sha256": "06e6cf431404364a5ef39a7a03dde394339358c069e2cc0737688e34a9dae96a",
+      "sha256": "7fe6948b965555e1a85bfddbc4dc4f89bdb1959ee53d4549b87a55eb8efbce53",
       "test_ids": [
         "T-002"
       ]
     },
     {
       "config_id": "CFG-H-S",
-      "created_at_utc": "2026-06-21T09:08:41Z",
+      "created_at_utc": "2026-06-21T16:57:49Z",
       "description": "Final campaign validation report.",
       "evidence_id": "EV-G00-VALIDATION-MAT-CFG-H-S-181081",
       "kind": "validator",
@@ -1732,21 +1774,21 @@
     },
     {
       "config_id": "CFG-H-S",
-      "created_at_utc": "2026-06-21T09:08:41Z",
+      "created_at_utc": "2026-06-21T16:57:49Z",
       "description": "Final campaign manifest.",
       "evidence_id": "EV-G00-MANIFEST-MAT-CFG-H-S-207547",
       "kind": "manifest",
       "materialization_id": "MAT-CFG-H-S-207547",
       "path": "tmp/materialized-literature-scenarios/final-test-campaign/G02_main_factorial_experiments/CFG-H-S/207547/final_campaign_manifest.json",
       "run_id": "",
-      "sha256": "893e480fde403d7bf6d9a45c8dc62ff58d32ff9ac38e80f44e79eb8ffedbb91a",
+      "sha256": "e79ec77edb130fc1de4e93cc7ef575f788bccff9dd0937156ab65cf16eb7ea3c",
       "test_ids": [
         "T-002"
       ]
     },
     {
       "config_id": "CFG-H-S",
-      "created_at_utc": "2026-06-21T09:08:41Z",
+      "created_at_utc": "2026-06-21T16:57:49Z",
       "description": "Final campaign validation report.",
       "evidence_id": "EV-G00-VALIDATION-MAT-CFG-H-S-207547",
       "kind": "validator",
@@ -1760,21 +1802,21 @@
     },
     {
       "config_id": "CFG-N-I-EXT",
-      "created_at_utc": "2026-06-21T09:08:41Z",
+      "created_at_utc": "2026-06-21T16:57:49Z",
       "description": "Final campaign manifest.",
       "evidence_id": "EV-G00-MANIFEST-MAT-CFG-N-I-EXT-104729",
       "kind": "manifest",
       "materialization_id": "MAT-CFG-N-I-EXT-104729",
       "path": "tmp/materialized-literature-scenarios/final-test-campaign/G03_reproducibility_duration/CFG-N-I-EXT/104729/final_campaign_manifest.json",
       "run_id": "",
-      "sha256": "f34b7646010e496eeae31af6cab8915dafa30e7a77a106d7777f3aa5e1219c8a",
+      "sha256": "554ed717c159df08d73aa055660a2df43a7ea82f4cbfafc736c9796c47230eea",
       "test_ids": [
         "T-002"
       ]
     },
     {
       "config_id": "CFG-N-I-EXT",
-      "created_at_utc": "2026-06-21T09:08:41Z",
+      "created_at_utc": "2026-06-21T16:57:49Z",
       "description": "Final campaign validation report.",
       "evidence_id": "EV-G00-VALIDATION-MAT-CFG-N-I-EXT-104729",
       "kind": "validator",
@@ -1788,21 +1830,21 @@
     },
     {
       "config_id": "CFG-N-I-EXT",
-      "created_at_utc": "2026-06-21T09:08:41Z",
+      "created_at_utc": "2026-06-21T16:57:49Z",
       "description": "Final campaign manifest.",
       "evidence_id": "EV-G00-MANIFEST-MAT-CFG-N-I-EXT-130363",
       "kind": "manifest",
       "materialization_id": "MAT-CFG-N-I-EXT-130363",
       "path": "tmp/materialized-literature-scenarios/final-test-campaign/G03_reproducibility_duration/CFG-N-I-EXT/130363/final_campaign_manifest.json",
       "run_id": "",
-      "sha256": "722ffac3d82105c055af2bd1351326eb8aff5edb5bacecf83002cc4c1f525583",
+      "sha256": "c2151dfd3475518b8b07489207a4bf704a4c666fa6136ef7512ee257ec8809c0",
       "test_ids": [
         "T-002"
       ]
     },
     {
       "config_id": "CFG-N-I-EXT",
-      "created_at_utc": "2026-06-21T09:08:41Z",
+      "created_at_utc": "2026-06-21T16:57:49Z",
       "description": "Final campaign validation report.",
       "evidence_id": "EV-G00-VALIDATION-MAT-CFG-N-I-EXT-130363",
       "kind": "validator",
@@ -1816,21 +1858,21 @@
     },
     {
       "config_id": "CFG-N-I-EXT",
-      "created_at_utc": "2026-06-21T09:08:41Z",
+      "created_at_utc": "2026-06-21T16:57:49Z",
       "description": "Final campaign manifest.",
       "evidence_id": "EV-G00-MANIFEST-MAT-CFG-N-I-EXT-155921",
       "kind": "manifest",
       "materialization_id": "MAT-CFG-N-I-EXT-155921",
       "path": "tmp/materialized-literature-scenarios/final-test-campaign/G03_reproducibility_duration/CFG-N-I-EXT/155921/final_campaign_manifest.json",
       "run_id": "",
-      "sha256": "757c5df3c171a342f1563e6c0509d87aeb38e3f810d9f994afb9660f54612729",
+      "sha256": "522739a38e0af93994c9ad24e85799977d0286e0850ce80f723423a832622515",
       "test_ids": [
         "T-002"
       ]
     },
     {
       "config_id": "CFG-N-I-EXT",
-      "created_at_utc": "2026-06-21T09:08:41Z",
+      "created_at_utc": "2026-06-21T16:57:49Z",
       "description": "Final campaign validation report.",
       "evidence_id": "EV-G00-VALIDATION-MAT-CFG-N-I-EXT-155921",
       "kind": "validator",
@@ -1844,21 +1886,21 @@
     },
     {
       "config_id": "CFG-N-I-EXT",
-      "created_at_utc": "2026-06-21T09:08:41Z",
+      "created_at_utc": "2026-06-21T16:57:49Z",
       "description": "Final campaign manifest.",
       "evidence_id": "EV-G00-MANIFEST-MAT-CFG-N-I-EXT-181081",
       "kind": "manifest",
       "materialization_id": "MAT-CFG-N-I-EXT-181081",
       "path": "tmp/materialized-literature-scenarios/final-test-campaign/G03_reproducibility_duration/CFG-N-I-EXT/181081/final_campaign_manifest.json",
       "run_id": "",
-      "sha256": "2c32593747fde9019d3436b225454d8de239150cf98b86e5fab1f7fbce58f5ec",
+      "sha256": "3358aabe37511a23e3bbc62b7c9a0fb420422acb090ed674e8a9fa142e7d8ac3",
       "test_ids": [
         "T-002"
       ]
     },
     {
       "config_id": "CFG-N-I-EXT",
-      "created_at_utc": "2026-06-21T09:08:41Z",
+      "created_at_utc": "2026-06-21T16:57:49Z",
       "description": "Final campaign validation report.",
       "evidence_id": "EV-G00-VALIDATION-MAT-CFG-N-I-EXT-181081",
       "kind": "validator",
@@ -1872,21 +1914,21 @@
     },
     {
       "config_id": "CFG-N-I-EXT",
-      "created_at_utc": "2026-06-21T09:08:41Z",
+      "created_at_utc": "2026-06-21T16:57:49Z",
       "description": "Final campaign manifest.",
       "evidence_id": "EV-G00-MANIFEST-MAT-CFG-N-I-EXT-207547",
       "kind": "manifest",
       "materialization_id": "MAT-CFG-N-I-EXT-207547",
       "path": "tmp/materialized-literature-scenarios/final-test-campaign/G03_reproducibility_duration/CFG-N-I-EXT/207547/final_campaign_manifest.json",
       "run_id": "",
-      "sha256": "bf1759546ff165043aea94681ddc7b575afce9e6c107d47a2330058d404baaa2",
+      "sha256": "ebdcddb31d6519f17da4368e589c1a89fd8d4eae38467e59867202e47bbe7d6f",
       "test_ids": [
         "T-002"
       ]
     },
     {
       "config_id": "CFG-N-I-EXT",
-      "created_at_utc": "2026-06-21T09:08:41Z",
+      "created_at_utc": "2026-06-21T16:57:49Z",
       "description": "Final campaign validation report.",
       "evidence_id": "EV-G00-VALIDATION-MAT-CFG-N-I-EXT-207547",
       "kind": "validator",
@@ -1900,21 +1942,21 @@
     },
     {
       "config_id": "CFG-H-S-EXT",
-      "created_at_utc": "2026-06-21T09:08:41Z",
+      "created_at_utc": "2026-06-21T16:57:49Z",
       "description": "Final campaign manifest.",
       "evidence_id": "EV-G00-MANIFEST-MAT-CFG-H-S-EXT-104729",
       "kind": "manifest",
       "materialization_id": "MAT-CFG-H-S-EXT-104729",
       "path": "tmp/materialized-literature-scenarios/final-test-campaign/G03_reproducibility_duration/CFG-H-S-EXT/104729/final_campaign_manifest.json",
       "run_id": "",
-      "sha256": "b560a83f210fea100592705ad238c96bbe7bcb1d9db7b3224df41315586c0b84",
+      "sha256": "522dadf00267865324234f949d47a00aa01d554d57f886888067443809dcd7d0",
       "test_ids": [
         "T-002"
       ]
     },
     {
       "config_id": "CFG-H-S-EXT",
-      "created_at_utc": "2026-06-21T09:08:41Z",
+      "created_at_utc": "2026-06-21T16:57:49Z",
       "description": "Final campaign validation report.",
       "evidence_id": "EV-G00-VALIDATION-MAT-CFG-H-S-EXT-104729",
       "kind": "validator",
@@ -1928,21 +1970,21 @@
     },
     {
       "config_id": "CFG-M-BACKGROUND",
-      "created_at_utc": "2026-06-21T09:08:41Z",
+      "created_at_utc": "2026-06-21T16:57:49Z",
       "description": "Final campaign manifest.",
       "evidence_id": "EV-G00-MANIFEST-MAT-CFG-M-BACKGROUND-104729",
       "kind": "manifest",
       "materialization_id": "MAT-CFG-M-BACKGROUND-104729",
       "path": "tmp/materialized-literature-scenarios/final-test-campaign/G04_mobility_connectivity/CFG-M-BACKGROUND/104729/final_campaign_manifest.json",
       "run_id": "",
-      "sha256": "ad1b0b41a4bda9798e2fddea02e627b7a3bdaa8176287498200ca4358a2fa787",
+      "sha256": "6c2d685ff166429b81aafa7a2c62582d36e895ded04d086322827893f471fb0e",
       "test_ids": [
         "T-002"
       ]
     },
     {
       "config_id": "CFG-M-BACKGROUND",
-      "created_at_utc": "2026-06-21T09:08:41Z",
+      "created_at_utc": "2026-06-21T16:57:49Z",
       "description": "Final campaign validation report.",
       "evidence_id": "EV-G00-VALIDATION-MAT-CFG-M-BACKGROUND-104729",
       "kind": "validator",
@@ -1956,21 +1998,21 @@
     },
     {
       "config_id": "CFG-M-RSU0",
-      "created_at_utc": "2026-06-21T09:08:41Z",
+      "created_at_utc": "2026-06-21T16:57:49Z",
       "description": "Final campaign manifest.",
       "evidence_id": "EV-G00-MANIFEST-MAT-CFG-M-RSU0-104729",
       "kind": "manifest",
       "materialization_id": "MAT-CFG-M-RSU0-104729",
       "path": "tmp/materialized-literature-scenarios/final-test-campaign/G04_mobility_connectivity/CFG-M-RSU0/104729/final_campaign_manifest.json",
       "run_id": "",
-      "sha256": "4387364507d211fde5272d13e35b1c5ddc8d0ba1e10fb6f952a75f1be56d85d9",
+      "sha256": "9f213bf20e4bec2d0d5e2733b05b5dde28f999cb7a98e7a6f87a4a900e3791f5",
       "test_ids": [
         "T-002"
       ]
     },
     {
       "config_id": "CFG-M-RSU0",
-      "created_at_utc": "2026-06-21T09:08:41Z",
+      "created_at_utc": "2026-06-21T16:57:49Z",
       "description": "Final campaign validation report.",
       "evidence_id": "EV-G00-VALIDATION-MAT-CFG-M-RSU0-104729",
       "kind": "validator",
@@ -1984,21 +2026,21 @@
     },
     {
       "config_id": "CFG-M-RSU1",
-      "created_at_utc": "2026-06-21T09:08:41Z",
+      "created_at_utc": "2026-06-21T16:57:49Z",
       "description": "Final campaign manifest.",
       "evidence_id": "EV-G00-MANIFEST-MAT-CFG-M-RSU1-104729",
       "kind": "manifest",
       "materialization_id": "MAT-CFG-M-RSU1-104729",
       "path": "tmp/materialized-literature-scenarios/final-test-campaign/G04_mobility_connectivity/CFG-M-RSU1/104729/final_campaign_manifest.json",
       "run_id": "",
-      "sha256": "8a950589c251d6637185bc6bd863dba8bb99530ee9db3bf593381cdaef98cd22",
+      "sha256": "d0ff0e4c6db8e1f2c639fb9860122a1e301a683338948bc43f6c7d76f34172e7",
       "test_ids": [
         "T-002"
       ]
     },
     {
       "config_id": "CFG-M-RSU1",
-      "created_at_utc": "2026-06-21T09:08:41Z",
+      "created_at_utc": "2026-06-21T16:57:49Z",
       "description": "Final campaign validation report.",
       "evidence_id": "EV-G00-VALIDATION-MAT-CFG-M-RSU1-104729",
       "kind": "validator",
@@ -2012,21 +2054,21 @@
     },
     {
       "config_id": "CFG-M-SWITCH",
-      "created_at_utc": "2026-06-21T09:08:41Z",
+      "created_at_utc": "2026-06-21T16:57:49Z",
       "description": "Final campaign manifest.",
       "evidence_id": "EV-G00-MANIFEST-MAT-CFG-M-SWITCH-104729",
       "kind": "manifest",
       "materialization_id": "MAT-CFG-M-SWITCH-104729",
       "path": "tmp/materialized-literature-scenarios/final-test-campaign/G04_mobility_connectivity/CFG-M-SWITCH/104729/final_campaign_manifest.json",
       "run_id": "",
-      "sha256": "d0d6ce9fc987b182f32a56eb6f4a6848cc724421179349a52d2fac98c197962d",
+      "sha256": "12d0324a2e3e7d1ccc401fa48eac226e4a838f48bb461e80fe2f4036dc2635c3",
       "test_ids": [
         "T-002"
       ]
     },
     {
       "config_id": "CFG-M-SWITCH",
-      "created_at_utc": "2026-06-21T09:08:41Z",
+      "created_at_utc": "2026-06-21T16:57:49Z",
       "description": "Final campaign validation report.",
       "evidence_id": "EV-G00-VALIDATION-MAT-CFG-M-SWITCH-104729",
       "kind": "validator",
@@ -2040,21 +2082,21 @@
     },
     {
       "config_id": "CFG-M-V2V",
-      "created_at_utc": "2026-06-21T09:08:41Z",
+      "created_at_utc": "2026-06-21T16:57:49Z",
       "description": "Final campaign manifest.",
       "evidence_id": "EV-G00-MANIFEST-MAT-CFG-M-V2V-104729",
       "kind": "manifest",
       "materialization_id": "MAT-CFG-M-V2V-104729",
       "path": "tmp/materialized-literature-scenarios/final-test-campaign/G04_mobility_connectivity/CFG-M-V2V/104729/final_campaign_manifest.json",
       "run_id": "",
-      "sha256": "60504250d42a605b0e028d2d79536d602aa8601f304bf3fe4be6ce50ca85ec60",
+      "sha256": "6a5ddc7eae6ae159a04aabd16aedaad297f3404d44800ba20b69abf3eb9ad8d5",
       "test_ids": [
         "T-002"
       ]
     },
     {
       "config_id": "CFG-M-V2V",
-      "created_at_utc": "2026-06-21T09:08:41Z",
+      "created_at_utc": "2026-06-21T16:57:49Z",
       "description": "Final campaign validation report.",
       "evidence_id": "EV-G00-VALIDATION-MAT-CFG-M-V2V-104729",
       "kind": "validator",
@@ -2068,21 +2110,21 @@
     },
     {
       "config_id": "CFG-R-LOCALCPU",
-      "created_at_utc": "2026-06-21T09:08:41Z",
+      "created_at_utc": "2026-06-21T16:57:49Z",
       "description": "Final campaign manifest.",
       "evidence_id": "EV-G00-MANIFEST-MAT-CFG-R-LOCALCPU-104729",
       "kind": "manifest",
       "materialization_id": "MAT-CFG-R-LOCALCPU-104729",
       "path": "tmp/materialized-literature-scenarios/final-test-campaign/G05_resource_policies_repair/CFG-R-LOCALCPU/104729/final_campaign_manifest.json",
       "run_id": "",
-      "sha256": "26d655d44e9fa79512e62ab53c7ca4dce9d4f0ef0115c6945b41db871e5c442d",
+      "sha256": "e9fd1e8c1f81199451e2c88e59bed7d5df044d25fa233ce749d224c543d3faa7",
       "test_ids": [
         "T-002"
       ]
     },
     {
       "config_id": "CFG-R-LOCALCPU",
-      "created_at_utc": "2026-06-21T09:08:41Z",
+      "created_at_utc": "2026-06-21T16:57:49Z",
       "description": "Final campaign validation report.",
       "evidence_id": "EV-G00-VALIDATION-MAT-CFG-R-LOCALCPU-104729",
       "kind": "validator",
@@ -2096,21 +2138,21 @@
     },
     {
       "config_id": "CFG-R-EDGECPU",
-      "created_at_utc": "2026-06-21T09:08:41Z",
+      "created_at_utc": "2026-06-21T16:57:49Z",
       "description": "Final campaign manifest.",
       "evidence_id": "EV-G00-MANIFEST-MAT-CFG-R-EDGECPU-104729",
       "kind": "manifest",
       "materialization_id": "MAT-CFG-R-EDGECPU-104729",
       "path": "tmp/materialized-literature-scenarios/final-test-campaign/G05_resource_policies_repair/CFG-R-EDGECPU/104729/final_campaign_manifest.json",
       "run_id": "",
-      "sha256": "cd448f251109819a392117f71b1a183ea2db4ea7572d340a678f6a5ada17f98b",
+      "sha256": "a8bff286192d93a483554fe24e9e605b73adcfdd28eab3ecec684f5e5fee878b",
       "test_ids": [
         "T-002"
       ]
     },
     {
       "config_id": "CFG-R-EDGECPU",
-      "created_at_utc": "2026-06-21T09:08:41Z",
+      "created_at_utc": "2026-06-21T16:57:49Z",
       "description": "Final campaign validation report.",
       "evidence_id": "EV-G00-VALIDATION-MAT-CFG-R-EDGECPU-104729",
       "kind": "validator",
@@ -2124,21 +2166,21 @@
     },
     {
       "config_id": "CFG-R-CLOUDCPU",
-      "created_at_utc": "2026-06-21T09:08:41Z",
+      "created_at_utc": "2026-06-21T16:57:49Z",
       "description": "Final campaign manifest.",
       "evidence_id": "EV-G00-MANIFEST-MAT-CFG-R-CLOUDCPU-104729",
       "kind": "manifest",
       "materialization_id": "MAT-CFG-R-CLOUDCPU-104729",
       "path": "tmp/materialized-literature-scenarios/final-test-campaign/G05_resource_policies_repair/CFG-R-CLOUDCPU/104729/final_campaign_manifest.json",
       "run_id": "",
-      "sha256": "8185b66bc978720fe9bfe949a58b5a4086f2688c5f84fc4156bde4a3eade7954",
+      "sha256": "b343e843cfdb323780d26a40c32ad1bbf819faaeb9b47bd8ee9fd4bc5fc16b23",
       "test_ids": [
         "T-002"
       ]
     },
     {
       "config_id": "CFG-R-CLOUDCPU",
-      "created_at_utc": "2026-06-21T09:08:41Z",
+      "created_at_utc": "2026-06-21T16:57:49Z",
       "description": "Final campaign validation report.",
       "evidence_id": "EV-G00-VALIDATION-MAT-CFG-R-CLOUDCPU-104729",
       "kind": "validator",
@@ -2152,21 +2194,21 @@
     },
     {
       "config_id": "CFG-R-CELLBW",
-      "created_at_utc": "2026-06-21T09:08:41Z",
+      "created_at_utc": "2026-06-21T16:57:49Z",
       "description": "Final campaign manifest.",
       "evidence_id": "EV-G00-MANIFEST-MAT-CFG-R-CELLBW-104729",
       "kind": "manifest",
       "materialization_id": "MAT-CFG-R-CELLBW-104729",
       "path": "tmp/materialized-literature-scenarios/final-test-campaign/G05_resource_policies_repair/CFG-R-CELLBW/104729/final_campaign_manifest.json",
       "run_id": "",
-      "sha256": "f95d81daf6920e96bd52922aa93797fe892a5da386e0c2df162d86f0111428a8",
+      "sha256": "fa9a9bdf1079e885ddd8edc34528898480a8f5a3fb8687809bb83ba4faa17485",
       "test_ids": [
         "T-002"
       ]
     },
     {
       "config_id": "CFG-R-CELLBW",
-      "created_at_utc": "2026-06-21T09:08:41Z",
+      "created_at_utc": "2026-06-21T16:57:49Z",
       "description": "Final campaign validation report.",
       "evidence_id": "EV-G00-VALIDATION-MAT-CFG-R-CELLBW-104729",
       "kind": "validator",
@@ -2180,21 +2222,21 @@
     },
     {
       "config_id": "CFG-R-V2VBW",
-      "created_at_utc": "2026-06-21T09:08:41Z",
+      "created_at_utc": "2026-06-21T16:57:49Z",
       "description": "Final campaign manifest.",
       "evidence_id": "EV-G00-MANIFEST-MAT-CFG-R-V2VBW-104729",
       "kind": "manifest",
       "materialization_id": "MAT-CFG-R-V2VBW-104729",
       "path": "tmp/materialized-literature-scenarios/final-test-campaign/G05_resource_policies_repair/CFG-R-V2VBW/104729/final_campaign_manifest.json",
       "run_id": "",
-      "sha256": "f3ccd8e8b6fac1d0f83cd7647e73317a31e7d823f02035a90711b583bed3051a",
+      "sha256": "c4fec0a95abe61c719d10352a9bd183037c92e6a2c6128e2877e04bd164e60bc",
       "test_ids": [
         "T-002"
       ]
     },
     {
       "config_id": "CFG-R-V2VBW",
-      "created_at_utc": "2026-06-21T09:08:41Z",
+      "created_at_utc": "2026-06-21T16:57:49Z",
       "description": "Final campaign validation report.",
       "evidence_id": "EV-G00-VALIDATION-MAT-CFG-R-V2VBW-104729",
       "kind": "validator",
@@ -2208,21 +2250,21 @@
     },
     {
       "config_id": "CFG-R-RTT",
-      "created_at_utc": "2026-06-21T09:08:41Z",
+      "created_at_utc": "2026-06-21T16:57:49Z",
       "description": "Final campaign manifest.",
       "evidence_id": "EV-G00-MANIFEST-MAT-CFG-R-RTT-104729",
       "kind": "manifest",
       "materialization_id": "MAT-CFG-R-RTT-104729",
       "path": "tmp/materialized-literature-scenarios/final-test-campaign/G05_resource_policies_repair/CFG-R-RTT/104729/final_campaign_manifest.json",
       "run_id": "",
-      "sha256": "b56cba2b4d9f9c9e0c3a98ada3dee34d3ceccfb8dfff211205b729d3dcba8c3e",
+      "sha256": "09804b62ef1625b3cf74f79cc62e431c88981a14ee1056b30d8faaac7e8b67ab",
       "test_ids": [
         "T-002"
       ]
     },
     {
       "config_id": "CFG-R-RTT",
-      "created_at_utc": "2026-06-21T09:08:41Z",
+      "created_at_utc": "2026-06-21T16:57:49Z",
       "description": "Final campaign validation report.",
       "evidence_id": "EV-G00-VALIDATION-MAT-CFG-R-RTT-104729",
       "kind": "validator",
@@ -2236,21 +2278,21 @@
     },
     {
       "config_id": "CFG-G-SPARSE",
-      "created_at_utc": "2026-06-21T09:08:41Z",
+      "created_at_utc": "2026-06-21T16:57:49Z",
       "description": "Final campaign manifest.",
       "evidence_id": "EV-G00-MANIFEST-MAT-CFG-G-SPARSE-104729",
       "kind": "manifest",
       "materialization_id": "MAT-CFG-G-SPARSE-104729",
       "path": "tmp/materialized-literature-scenarios/final-test-campaign/G06_runtime_temporal_policies/CFG-G-SPARSE/104729/final_campaign_manifest.json",
       "run_id": "",
-      "sha256": "f8012b3c2a969ee7c8a61680ab1b08a5c752b02e26dde12b14a0ac4e9309e32c",
+      "sha256": "092e19ccaeab2eb2495e9a6c757a9188f406b576b62f9c2cc42e7df9ab61b8b5",
       "test_ids": [
         "T-002"
       ]
     },
     {
       "config_id": "CFG-G-SPARSE",
-      "created_at_utc": "2026-06-21T09:08:41Z",
+      "created_at_utc": "2026-06-21T16:57:49Z",
       "description": "Final campaign validation report.",
       "evidence_id": "EV-G00-VALIDATION-MAT-CFG-G-SPARSE-104729",
       "kind": "validator",
@@ -2264,21 +2306,21 @@
     },
     {
       "config_id": "CFG-G-ADAPTIVE",
-      "created_at_utc": "2026-06-21T09:08:41Z",
+      "created_at_utc": "2026-06-21T16:57:49Z",
       "description": "Final campaign manifest.",
       "evidence_id": "EV-G00-MANIFEST-MAT-CFG-G-ADAPTIVE-104729",
       "kind": "manifest",
       "materialization_id": "MAT-CFG-G-ADAPTIVE-104729",
       "path": "tmp/materialized-literature-scenarios/final-test-campaign/G06_runtime_temporal_policies/CFG-G-ADAPTIVE/104729/final_campaign_manifest.json",
       "run_id": "",
-      "sha256": "d9734cf1ff573a92164ccab6d22d26686bfe066a5b84ee0e3bb00e64c628606f",
+      "sha256": "bb0f8ccca8d7953f8fa1a54c67826a1d92b5bb4a3195ad88d715a4d93b27b351",
       "test_ids": [
         "T-002"
       ]
     },
     {
       "config_id": "CFG-G-ADAPTIVE",
-      "created_at_utc": "2026-06-21T09:08:41Z",
+      "created_at_utc": "2026-06-21T16:57:49Z",
       "description": "Final campaign validation report.",
       "evidence_id": "EV-G00-VALIDATION-MAT-CFG-G-ADAPTIVE-104729",
       "kind": "validator",
@@ -2292,21 +2334,21 @@
     },
     {
       "config_id": "CFG-G-STALE",
-      "created_at_utc": "2026-06-21T09:08:41Z",
+      "created_at_utc": "2026-06-21T16:57:49Z",
       "description": "Final campaign manifest.",
       "evidence_id": "EV-G00-MANIFEST-MAT-CFG-G-STALE-104729",
       "kind": "manifest",
       "materialization_id": "MAT-CFG-G-STALE-104729",
       "path": "tmp/materialized-literature-scenarios/final-test-campaign/G06_runtime_temporal_policies/CFG-G-STALE/104729/final_campaign_manifest.json",
       "run_id": "",
-      "sha256": "59d33c60187f8879be8c52e305954788e82574b83c95f2b0579923e9fd68347b",
+      "sha256": "334d3781d53f089ecffe3c1248491b03efe63da8d64707fac60b10d8936cffdc",
       "test_ids": [
         "T-002"
       ]
     },
     {
       "config_id": "CFG-G-STALE",
-      "created_at_utc": "2026-06-21T09:08:41Z",
+      "created_at_utc": "2026-06-21T16:57:49Z",
       "description": "Final campaign validation report.",
       "evidence_id": "EV-G00-VALIDATION-MAT-CFG-G-STALE-104729",
       "kind": "validator",
@@ -2321,7 +2363,7 @@
   ],
   "git": {
     "branch": "testing/final-campaign",
-    "campaign_head_before_g00_commit": "6449978026d205c3f0949cd5532782fd447fed1d",
+    "campaign_head_before_g00_commit": "33958c27ef7b312bf27192a79650220beabe1dd4",
     "frozen_branch": "MOSAIC/SUMO-integration",
     "frozen_commit": "5a9477735a3d707a5f000a64653cd2a6fc7f2007",
     "working_tree_status_short": [
@@ -2331,16 +2373,155 @@
       " M test-audits/final-campaign/G00_scenario_preparation_generation/git_status_short_G00F.txt",
       " M test-audits/final-campaign/G00_scenario_preparation_generation/materialization_summary_all.json",
       " M test-audits/final-campaign/G00_scenario_preparation_generation/metrics_G00.csv",
+      " M test-audits/final-campaign/G01_pipeline_validation/anomalies_G01.csv",
+      " M test-audits/final-campaign/G01_pipeline_validation/audit_G01_pipeline_validation.md",
+      " M test-audits/final-campaign/G01_pipeline_validation/evidence_manifest_G01.json",
+      " M test-results/final-campaign/G00_scenario_preparation_generation/canonical_validator_reports/MAT-CFG-G-ADAPTIVE-104729/canonical_validator_console.log",
+      " M test-results/final-campaign/G00_scenario_preparation_generation/canonical_validator_reports/MAT-CFG-G-ADAPTIVE-104729/materialized_literature_scenario_validation.json",
+      " M test-results/final-campaign/G00_scenario_preparation_generation/canonical_validator_reports/MAT-CFG-G-SPARSE-104729/canonical_validator_console.log",
+      " M test-results/final-campaign/G00_scenario_preparation_generation/canonical_validator_reports/MAT-CFG-G-SPARSE-104729/materialized_literature_scenario_validation.json",
+      " M test-results/final-campaign/G00_scenario_preparation_generation/canonical_validator_reports/MAT-CFG-G-STALE-104729/canonical_validator_console.log",
+      " M test-results/final-campaign/G00_scenario_preparation_generation/canonical_validator_reports/MAT-CFG-G-STALE-104729/materialized_literature_scenario_validation.json",
+      " M test-results/final-campaign/G00_scenario_preparation_generation/canonical_validator_reports/MAT-CFG-H-E-104729/canonical_validator_console.log",
+      " M test-results/final-campaign/G00_scenario_preparation_generation/canonical_validator_reports/MAT-CFG-H-E-104729/materialized_literature_scenario_validation.json",
+      " M test-results/final-campaign/G00_scenario_preparation_generation/canonical_validator_reports/MAT-CFG-H-E-130363/canonical_validator_console.log",
+      " M test-results/final-campaign/G00_scenario_preparation_generation/canonical_validator_reports/MAT-CFG-H-E-130363/materialized_literature_scenario_validation.json",
+      " M test-results/final-campaign/G00_scenario_preparation_generation/canonical_validator_reports/MAT-CFG-H-E-155921/canonical_validator_console.log",
+      " M test-results/final-campaign/G00_scenario_preparation_generation/canonical_validator_reports/MAT-CFG-H-E-155921/materialized_literature_scenario_validation.json",
+      " M test-results/final-campaign/G00_scenario_preparation_generation/canonical_validator_reports/MAT-CFG-H-E-181081/canonical_validator_console.log",
+      " M test-results/final-campaign/G00_scenario_preparation_generation/canonical_validator_reports/MAT-CFG-H-E-181081/materialized_literature_scenario_validation.json",
+      " M test-results/final-campaign/G00_scenario_preparation_generation/canonical_validator_reports/MAT-CFG-H-E-207547/canonical_validator_console.log",
+      " M test-results/final-campaign/G00_scenario_preparation_generation/canonical_validator_reports/MAT-CFG-H-E-207547/materialized_literature_scenario_validation.json",
+      " M test-results/final-campaign/G00_scenario_preparation_generation/canonical_validator_reports/MAT-CFG-H-I-104729/canonical_validator_console.log",
+      " M test-results/final-campaign/G00_scenario_preparation_generation/canonical_validator_reports/MAT-CFG-H-I-104729/materialized_literature_scenario_validation.json",
+      " M test-results/final-campaign/G00_scenario_preparation_generation/canonical_validator_reports/MAT-CFG-H-I-130363/canonical_validator_console.log",
+      " M test-results/final-campaign/G00_scenario_preparation_generation/canonical_validator_reports/MAT-CFG-H-I-130363/materialized_literature_scenario_validation.json",
+      " M test-results/final-campaign/G00_scenario_preparation_generation/canonical_validator_reports/MAT-CFG-H-I-155921/canonical_validator_console.log",
+      " M test-results/final-campaign/G00_scenario_preparation_generation/canonical_validator_reports/MAT-CFG-H-I-155921/materialized_literature_scenario_validation.json",
+      " M test-results/final-campaign/G00_scenario_preparation_generation/canonical_validator_reports/MAT-CFG-H-I-181081/canonical_validator_console.log",
+      " M test-results/final-campaign/G00_scenario_preparation_generation/canonical_validator_reports/MAT-CFG-H-I-181081/materialized_literature_scenario_validation.json",
+      " M test-results/final-campaign/G00_scenario_preparation_generation/canonical_validator_reports/MAT-CFG-H-I-207547/canonical_validator_console.log",
+      " M test-results/final-campaign/G00_scenario_preparation_generation/canonical_validator_reports/MAT-CFG-H-I-207547/materialized_literature_scenario_validation.json",
+      " M test-results/final-campaign/G00_scenario_preparation_generation/canonical_validator_reports/MAT-CFG-H-S-104729/canonical_validator_console.log",
+      " M test-results/final-campaign/G00_scenario_preparation_generation/canonical_validator_reports/MAT-CFG-H-S-104729/materialized_literature_scenario_validation.json",
+      " M test-results/final-campaign/G00_scenario_preparation_generation/canonical_validator_reports/MAT-CFG-H-S-130363/canonical_validator_console.log",
+      " M test-results/final-campaign/G00_scenario_preparation_generation/canonical_validator_reports/MAT-CFG-H-S-130363/materialized_literature_scenario_validation.json",
+      " M test-results/final-campaign/G00_scenario_preparation_generation/canonical_validator_reports/MAT-CFG-H-S-155921/canonical_validator_console.log",
+      " M test-results/final-campaign/G00_scenario_preparation_generation/canonical_validator_reports/MAT-CFG-H-S-155921/materialized_literature_scenario_validation.json",
+      " M test-results/final-campaign/G00_scenario_preparation_generation/canonical_validator_reports/MAT-CFG-H-S-181081/canonical_validator_console.log",
+      " M test-results/final-campaign/G00_scenario_preparation_generation/canonical_validator_reports/MAT-CFG-H-S-181081/materialized_literature_scenario_validation.json",
+      " M test-results/final-campaign/G00_scenario_preparation_generation/canonical_validator_reports/MAT-CFG-H-S-207547/canonical_validator_console.log",
+      " M test-results/final-campaign/G00_scenario_preparation_generation/canonical_validator_reports/MAT-CFG-H-S-207547/materialized_literature_scenario_validation.json",
+      " M test-results/final-campaign/G00_scenario_preparation_generation/canonical_validator_reports/MAT-CFG-H-S-EXT-104729/canonical_validator_console.log",
+      " M test-results/final-campaign/G00_scenario_preparation_generation/canonical_validator_reports/MAT-CFG-H-S-EXT-104729/materialized_literature_scenario_validation.json",
+      " M test-results/final-campaign/G00_scenario_preparation_generation/canonical_validator_reports/MAT-CFG-L-E-104729/canonical_validator_console.log",
+      " M test-results/final-campaign/G00_scenario_preparation_generation/canonical_validator_reports/MAT-CFG-L-E-104729/materialized_literature_scenario_validation.json",
+      " M test-results/final-campaign/G00_scenario_preparation_generation/canonical_validator_reports/MAT-CFG-L-E-130363/canonical_validator_console.log",
+      " M test-results/final-campaign/G00_scenario_preparation_generation/canonical_validator_reports/MAT-CFG-L-E-130363/materialized_literature_scenario_validation.json",
+      " M test-results/final-campaign/G00_scenario_preparation_generation/canonical_validator_reports/MAT-CFG-L-E-155921/canonical_validator_console.log",
+      " M test-results/final-campaign/G00_scenario_preparation_generation/canonical_validator_reports/MAT-CFG-L-E-155921/materialized_literature_scenario_validation.json",
+      " M test-results/final-campaign/G00_scenario_preparation_generation/canonical_validator_reports/MAT-CFG-L-E-181081/canonical_validator_console.log",
+      " M test-results/final-campaign/G00_scenario_preparation_generation/canonical_validator_reports/MAT-CFG-L-E-181081/materialized_literature_scenario_validation.json",
+      " M test-results/final-campaign/G00_scenario_preparation_generation/canonical_validator_reports/MAT-CFG-L-E-207547/canonical_validator_console.log",
+      " M test-results/final-campaign/G00_scenario_preparation_generation/canonical_validator_reports/MAT-CFG-L-E-207547/materialized_literature_scenario_validation.json",
+      " M test-results/final-campaign/G00_scenario_preparation_generation/canonical_validator_reports/MAT-CFG-L-I-104729/canonical_validator_console.log",
+      " M test-results/final-campaign/G00_scenario_preparation_generation/canonical_validator_reports/MAT-CFG-L-I-104729/materialized_literature_scenario_validation.json",
+      " M test-results/final-campaign/G00_scenario_preparation_generation/canonical_validator_reports/MAT-CFG-L-I-130363/canonical_validator_console.log",
+      " M test-results/final-campaign/G00_scenario_preparation_generation/canonical_validator_reports/MAT-CFG-L-I-130363/materialized_literature_scenario_validation.json",
+      " M test-results/final-campaign/G00_scenario_preparation_generation/canonical_validator_reports/MAT-CFG-L-I-155921/canonical_validator_console.log",
+      " M test-results/final-campaign/G00_scenario_preparation_generation/canonical_validator_reports/MAT-CFG-L-I-155921/materialized_literature_scenario_validation.json",
+      " M test-results/final-campaign/G00_scenario_preparation_generation/canonical_validator_reports/MAT-CFG-L-I-181081/canonical_validator_console.log",
+      " M test-results/final-campaign/G00_scenario_preparation_generation/canonical_validator_reports/MAT-CFG-L-I-181081/materialized_literature_scenario_validation.json",
+      " M test-results/final-campaign/G00_scenario_preparation_generation/canonical_validator_reports/MAT-CFG-L-I-207547/canonical_validator_console.log",
+      " M test-results/final-campaign/G00_scenario_preparation_generation/canonical_validator_reports/MAT-CFG-L-I-207547/materialized_literature_scenario_validation.json",
+      " M test-results/final-campaign/G00_scenario_preparation_generation/canonical_validator_reports/MAT-CFG-L-S-104729/canonical_validator_console.log",
+      " M test-results/final-campaign/G00_scenario_preparation_generation/canonical_validator_reports/MAT-CFG-L-S-104729/materialized_literature_scenario_validation.json",
+      " M test-results/final-campaign/G00_scenario_preparation_generation/canonical_validator_reports/MAT-CFG-L-S-130363/canonical_validator_console.log",
+      " M test-results/final-campaign/G00_scenario_preparation_generation/canonical_validator_reports/MAT-CFG-L-S-130363/materialized_literature_scenario_validation.json",
+      " M test-results/final-campaign/G00_scenario_preparation_generation/canonical_validator_reports/MAT-CFG-L-S-155921/canonical_validator_console.log",
+      " M test-results/final-campaign/G00_scenario_preparation_generation/canonical_validator_reports/MAT-CFG-L-S-155921/materialized_literature_scenario_validation.json",
+      " M test-results/final-campaign/G00_scenario_preparation_generation/canonical_validator_reports/MAT-CFG-L-S-181081/canonical_validator_console.log",
+      " M test-results/final-campaign/G00_scenario_preparation_generation/canonical_validator_reports/MAT-CFG-L-S-181081/materialized_literature_scenario_validation.json",
+      " M test-results/final-campaign/G00_scenario_preparation_generation/canonical_validator_reports/MAT-CFG-L-S-207547/canonical_validator_console.log",
+      " M test-results/final-campaign/G00_scenario_preparation_generation/canonical_validator_reports/MAT-CFG-L-S-207547/materialized_literature_scenario_validation.json",
+      " M test-results/final-campaign/G00_scenario_preparation_generation/canonical_validator_reports/MAT-CFG-M-BACKGROUND-104729/canonical_validator_console.log",
+      " M test-results/final-campaign/G00_scenario_preparation_generation/canonical_validator_reports/MAT-CFG-M-BACKGROUND-104729/materialized_literature_scenario_validation.json",
+      " M test-results/final-campaign/G00_scenario_preparation_generation/canonical_validator_reports/MAT-CFG-M-RSU0-104729/canonical_validator_console.log",
+      " M test-results/final-campaign/G00_scenario_preparation_generation/canonical_validator_reports/MAT-CFG-M-RSU0-104729/materialized_literature_scenario_validation.json",
+      " M test-results/final-campaign/G00_scenario_preparation_generation/canonical_validator_reports/MAT-CFG-M-RSU1-104729/canonical_validator_console.log",
+      " M test-results/final-campaign/G00_scenario_preparation_generation/canonical_validator_reports/MAT-CFG-M-RSU1-104729/materialized_literature_scenario_validation.json",
+      " M test-results/final-campaign/G00_scenario_preparation_generation/canonical_validator_reports/MAT-CFG-M-SWITCH-104729/canonical_validator_console.log",
+      " M test-results/final-campaign/G00_scenario_preparation_generation/canonical_validator_reports/MAT-CFG-M-SWITCH-104729/materialized_literature_scenario_validation.json",
+      " M test-results/final-campaign/G00_scenario_preparation_generation/canonical_validator_reports/MAT-CFG-M-V2V-104729/canonical_validator_console.log",
+      " M test-results/final-campaign/G00_scenario_preparation_generation/canonical_validator_reports/MAT-CFG-M-V2V-104729/materialized_literature_scenario_validation.json",
+      " M test-results/final-campaign/G00_scenario_preparation_generation/canonical_validator_reports/MAT-CFG-N-E-104729/canonical_validator_console.log",
+      " M test-results/final-campaign/G00_scenario_preparation_generation/canonical_validator_reports/MAT-CFG-N-E-104729/materialized_literature_scenario_validation.json",
+      " M test-results/final-campaign/G00_scenario_preparation_generation/canonical_validator_reports/MAT-CFG-N-E-130363/canonical_validator_console.log",
+      " M test-results/final-campaign/G00_scenario_preparation_generation/canonical_validator_reports/MAT-CFG-N-E-130363/materialized_literature_scenario_validation.json",
+      " M test-results/final-campaign/G00_scenario_preparation_generation/canonical_validator_reports/MAT-CFG-N-E-155921/canonical_validator_console.log",
+      " M test-results/final-campaign/G00_scenario_preparation_generation/canonical_validator_reports/MAT-CFG-N-E-155921/materialized_literature_scenario_validation.json",
+      " M test-results/final-campaign/G00_scenario_preparation_generation/canonical_validator_reports/MAT-CFG-N-E-181081/canonical_validator_console.log",
+      " M test-results/final-campaign/G00_scenario_preparation_generation/canonical_validator_reports/MAT-CFG-N-E-181081/materialized_literature_scenario_validation.json",
+      " M test-results/final-campaign/G00_scenario_preparation_generation/canonical_validator_reports/MAT-CFG-N-E-207547/canonical_validator_console.log",
+      " M test-results/final-campaign/G00_scenario_preparation_generation/canonical_validator_reports/MAT-CFG-N-E-207547/materialized_literature_scenario_validation.json",
+      " M test-results/final-campaign/G00_scenario_preparation_generation/canonical_validator_reports/MAT-CFG-N-I-104729/canonical_validator_console.log",
+      " M test-results/final-campaign/G00_scenario_preparation_generation/canonical_validator_reports/MAT-CFG-N-I-104729/materialized_literature_scenario_validation.json",
+      " M test-results/final-campaign/G00_scenario_preparation_generation/canonical_validator_reports/MAT-CFG-N-I-130363/canonical_validator_console.log",
+      " M test-results/final-campaign/G00_scenario_preparation_generation/canonical_validator_reports/MAT-CFG-N-I-130363/materialized_literature_scenario_validation.json",
+      " M test-results/final-campaign/G00_scenario_preparation_generation/canonical_validator_reports/MAT-CFG-N-I-155921/canonical_validator_console.log",
+      " M test-results/final-campaign/G00_scenario_preparation_generation/canonical_validator_reports/MAT-CFG-N-I-155921/materialized_literature_scenario_validation.json",
+      " M test-results/final-campaign/G00_scenario_preparation_generation/canonical_validator_reports/MAT-CFG-N-I-181081/canonical_validator_console.log",
+      " M test-results/final-campaign/G00_scenario_preparation_generation/canonical_validator_reports/MAT-CFG-N-I-181081/materialized_literature_scenario_validation.json",
+      " M test-results/final-campaign/G00_scenario_preparation_generation/canonical_validator_reports/MAT-CFG-N-I-207547/canonical_validator_console.log",
+      " M test-results/final-campaign/G00_scenario_preparation_generation/canonical_validator_reports/MAT-CFG-N-I-207547/materialized_literature_scenario_validation.json",
+      " M test-results/final-campaign/G00_scenario_preparation_generation/canonical_validator_reports/MAT-CFG-N-I-EXT-104729/canonical_validator_console.log",
+      " M test-results/final-campaign/G00_scenario_preparation_generation/canonical_validator_reports/MAT-CFG-N-I-EXT-104729/materialized_literature_scenario_validation.json",
+      " M test-results/final-campaign/G00_scenario_preparation_generation/canonical_validator_reports/MAT-CFG-N-I-EXT-130363/canonical_validator_console.log",
+      " M test-results/final-campaign/G00_scenario_preparation_generation/canonical_validator_reports/MAT-CFG-N-I-EXT-130363/materialized_literature_scenario_validation.json",
+      " M test-results/final-campaign/G00_scenario_preparation_generation/canonical_validator_reports/MAT-CFG-N-I-EXT-155921/canonical_validator_console.log",
+      " M test-results/final-campaign/G00_scenario_preparation_generation/canonical_validator_reports/MAT-CFG-N-I-EXT-155921/materialized_literature_scenario_validation.json",
+      " M test-results/final-campaign/G00_scenario_preparation_generation/canonical_validator_reports/MAT-CFG-N-I-EXT-181081/canonical_validator_console.log",
+      " M test-results/final-campaign/G00_scenario_preparation_generation/canonical_validator_reports/MAT-CFG-N-I-EXT-181081/materialized_literature_scenario_validation.json",
+      " M test-results/final-campaign/G00_scenario_preparation_generation/canonical_validator_reports/MAT-CFG-N-I-EXT-207547/canonical_validator_console.log",
+      " M test-results/final-campaign/G00_scenario_preparation_generation/canonical_validator_reports/MAT-CFG-N-I-EXT-207547/materialized_literature_scenario_validation.json",
+      " M test-results/final-campaign/G00_scenario_preparation_generation/canonical_validator_reports/MAT-CFG-N-S-104729/canonical_validator_console.log",
+      " M test-results/final-campaign/G00_scenario_preparation_generation/canonical_validator_reports/MAT-CFG-N-S-104729/materialized_literature_scenario_validation.json",
+      " M test-results/final-campaign/G00_scenario_preparation_generation/canonical_validator_reports/MAT-CFG-N-S-130363/canonical_validator_console.log",
+      " M test-results/final-campaign/G00_scenario_preparation_generation/canonical_validator_reports/MAT-CFG-N-S-130363/materialized_literature_scenario_validation.json",
+      " M test-results/final-campaign/G00_scenario_preparation_generation/canonical_validator_reports/MAT-CFG-N-S-155921/canonical_validator_console.log",
+      " M test-results/final-campaign/G00_scenario_preparation_generation/canonical_validator_reports/MAT-CFG-N-S-155921/materialized_literature_scenario_validation.json",
+      " M test-results/final-campaign/G00_scenario_preparation_generation/canonical_validator_reports/MAT-CFG-N-S-181081/canonical_validator_console.log",
+      " M test-results/final-campaign/G00_scenario_preparation_generation/canonical_validator_reports/MAT-CFG-N-S-181081/materialized_literature_scenario_validation.json",
+      " M test-results/final-campaign/G00_scenario_preparation_generation/canonical_validator_reports/MAT-CFG-N-S-207547/canonical_validator_console.log",
+      " M test-results/final-campaign/G00_scenario_preparation_generation/canonical_validator_reports/MAT-CFG-N-S-207547/materialized_literature_scenario_validation.json",
+      " M test-results/final-campaign/G00_scenario_preparation_generation/canonical_validator_reports/MAT-CFG-R-CELLBW-104729/canonical_validator_console.log",
+      " M test-results/final-campaign/G00_scenario_preparation_generation/canonical_validator_reports/MAT-CFG-R-CELLBW-104729/materialized_literature_scenario_validation.json",
+      " M test-results/final-campaign/G00_scenario_preparation_generation/canonical_validator_reports/MAT-CFG-R-CLOUDCPU-104729/canonical_validator_console.log",
+      " M test-results/final-campaign/G00_scenario_preparation_generation/canonical_validator_reports/MAT-CFG-R-CLOUDCPU-104729/materialized_literature_scenario_validation.json",
+      " M test-results/final-campaign/G00_scenario_preparation_generation/canonical_validator_reports/MAT-CFG-R-EDGECPU-104729/canonical_validator_console.log",
+      " M test-results/final-campaign/G00_scenario_preparation_generation/canonical_validator_reports/MAT-CFG-R-EDGECPU-104729/materialized_literature_scenario_validation.json",
+      " M test-results/final-campaign/G00_scenario_preparation_generation/canonical_validator_reports/MAT-CFG-R-LOCALCPU-104729/canonical_validator_console.log",
+      " M test-results/final-campaign/G00_scenario_preparation_generation/canonical_validator_reports/MAT-CFG-R-LOCALCPU-104729/materialized_literature_scenario_validation.json",
+      " M test-results/final-campaign/G00_scenario_preparation_generation/canonical_validator_reports/MAT-CFG-R-RTT-104729/canonical_validator_console.log",
+      " M test-results/final-campaign/G00_scenario_preparation_generation/canonical_validator_reports/MAT-CFG-R-RTT-104729/materialized_literature_scenario_validation.json",
+      " M test-results/final-campaign/G00_scenario_preparation_generation/canonical_validator_reports/MAT-CFG-R-V2VBW-104729/canonical_validator_console.log",
+      " M test-results/final-campaign/G00_scenario_preparation_generation/canonical_validator_reports/MAT-CFG-R-V2VBW-104729/materialized_literature_scenario_validation.json",
+      " M test-results/final-campaign/G00_scenario_preparation_generation/canonical_validator_reports/MAT-CFG-REPRO-104729-A/canonical_validator_console.log",
+      " M test-results/final-campaign/G00_scenario_preparation_generation/canonical_validator_reports/MAT-CFG-REPRO-104729-A/materialized_literature_scenario_validation.json",
+      " M test-results/final-campaign/G00_scenario_preparation_generation/canonical_validator_reports/MAT-CFG-REPRO-104729-B/canonical_validator_console.log",
+      " M test-results/final-campaign/G00_scenario_preparation_generation/canonical_validator_reports/MAT-CFG-REPRO-104729-B/materialized_literature_scenario_validation.json",
+      " M test-results/final-campaign/G00_scenario_preparation_generation/canonical_validator_reports/MAT-CFG-RUNTIME-REPEAT-104729/canonical_validator_console.log",
+      " M test-results/final-campaign/G00_scenario_preparation_generation/canonical_validator_reports/MAT-CFG-RUNTIME-REPEAT-104729/materialized_literature_scenario_validation.json",
+      " M test-results/final-campaign/G00_scenario_preparation_generation/canonical_validator_reports/MAT-CFG-SMOKE-104729/canonical_validator_console.log",
+      " M test-results/final-campaign/G00_scenario_preparation_generation/canonical_validator_reports/MAT-CFG-SMOKE-104729/materialized_literature_scenario_validation.json",
       " M test-results/final-campaign/G00_scenario_preparation_generation/materialization_input_index.csv",
       " M test-results/final-campaign/G03_reproducibility_duration/repro_materialization_comparison.json",
-      " M tools/intas-literature-scenario/final_campaign/README.md",
       " M tools/intas-literature-scenario/final_campaign/materialize_final_campaign.py",
       " M tools/intas-literature-scenario/final_campaign/validate_final_campaign.py",
-      "?? test-audits/final-campaign/G01_pipeline_validation/",
-      "?? test-results/final-campaign/G00_scenario_preparation_generation/canonical_deploy_compatibility_matrix.csv",
-      "?? test-results/final-campaign/G00_scenario_preparation_generation/canonical_metadata_repair_report.json",
-      "?? test-results/final-campaign/G00_scenario_preparation_generation/canonical_validator_reports/",
-      "?? test-results/final-campaign/G01_pipeline_validation/",
+      "?? test-results/final-campaign/G00_scenario_preparation_generation/bandwidth_serialization_repair_report.json",
+      "?? test-results/final-campaign/G00_scenario_preparation_generation/bandwidth_serialization_scan_after.csv",
+      "?? test-results/final-campaign/G00_scenario_preparation_generation/bandwidth_serialization_scan_before.csv",
+      "?? test-results/final-campaign/G01_pipeline_validation/PRE-03-SMOKE/retry-02/",
       "?? tools/intas-literature-scenario/final_campaign/__pycache__/"
     ]
   },

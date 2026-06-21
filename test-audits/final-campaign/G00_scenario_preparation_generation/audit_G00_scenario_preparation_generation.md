@@ -12,7 +12,7 @@
 - frozen_branch: `MOSAIC/SUMO-integration`
 - frozen_commit: `5a9477735a3d707a5f000a64653cd2a6fc7f2007`
 - campaign_branch: `testing/final-campaign`
-- campaign_head_before_g00_commit: `6449978026d205c3f0949cd5532782fd447fed1d`
+- campaign_head_before_g00_commit: `33958c27ef7b312bf27192a79650220beabe1dd4`
 - frozen Java path diff: empty at G00F precondition
 
 Working tree status at audit generation is captured in `git_status_short_G00F.txt`.
@@ -61,7 +61,7 @@ The 69 validation reports record `63` `MATERIALIZED_VALIDATED` instances and `6`
 
 ## 8. Metriche
 
-`metrics_G00.csv` uses the long schema from `audit_bundle_schema.md` and contains `18` rows. Main values: planned=69, completed=69, validated=63, warnings=6, failed=0, blocked=0.
+`metrics_G00.csv` uses the long schema from `audit_bundle_schema.md` and contains `21` rows. Main values: planned=69, completed=69, validated=63, warnings=6, failed=0, blocked=0.
 
 ## 9. Copertura Test_ID
 
@@ -69,7 +69,7 @@ The 69 validation reports record `63` `MATERIALIZED_VALIDATED` instances and `6`
 
 ## 10. Anomalie
 
-`anomalies_G00.csv` contains `20` rows. The six direct engineering profiles are accepted limitations. Intermediate failed or blocked attempts are marked `RESOLVED`. The raw/logical CFG-REPRO distinction and the post-materialization plan hash change are documented limitations, not materialization errors.
+`anomalies_G00.csv` contains `21` rows. The six direct engineering profiles are accepted limitations. Intermediate failed or blocked attempts are marked `RESOLVED`. The raw/logical CFG-REPRO distinction and the post-materialization plan hash change are documented limitations, not materialization errors.
 
 ## 11. Interpretazione tecnica
 
@@ -78,6 +78,10 @@ The campaign-specific tooling produced one manifest and one validation report fo
 ### Canonical deploy compatibility correction
 
 G00C identified and resolved a metadata compatibility issue exposed by the failed G01 deploy attempt. The campaign validator now checks the canonical `materialization_manifest.json` and `reports/intas_literature_materialization_report.json` metadata required by the deploy validator. The repair updated only metadata and validation reports; it did not change mobility, workload, resource or GA runtime configuration files.
+
+### MOSAIC bandwidth serialization compatibility repair
+
+G00D identified and resolved a MOSAIC configuration serialization issue exposed by RETRY-02. The bandwidth values calibrated by the campaign were numerically correct, but Python `:g` formatting serialized values such as `49200000` as `4.92e+07 bps`, which Eclipse MOSAIC rejected in textual bandwidth fields. The repair changed only tooling serialization and the affected JSON text fields, then reran campaign and canonical validators.
 
 
 ## 12. Risultati riutilizzabili nella tesi
