@@ -1,0 +1,6 @@
+javac output contains AccessDeniedException
+In C:\Users\raffa\IdeaProjects\maga-core\tools\mosaic-live-maga-runtime\build.ps1:156 car:9
++         throw "javac output contains AccessDeniedException"
++         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : OperationStopped: (javac output co...DeniedException:String) [], RuntimeException
+    + FullyQualifiedErrorId : javac output contains AccessDeniedException

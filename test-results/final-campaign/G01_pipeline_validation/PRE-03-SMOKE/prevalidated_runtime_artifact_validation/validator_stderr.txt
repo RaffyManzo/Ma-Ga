@@ -1,0 +1,9 @@
+C:\Users\raffa\IdeaProjects\maga-core\tools\mosaic-live-maga-runtime\validate_prevalidated_runtime_artifact.ps1 :
+Required directory missing: C:\Users\raffa\IdeaProjects\maga-core\tools\mosaic-live-maga-runtime\out
+In C:\Users\raffa\IdeaProjects\maga-core\tools\mosaic-live-maga-runtime\validate_prevalidated_runtime_artifact.ps1:303
+car:9
++         Write-Error $ErrorMessage
++         ~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (:) [Write-Error], WriteErrorException
+    + FullyQualifiedErrorId : Microsoft.PowerShell.Commands.WriteErrorException,validate_prevalidated_runtime_artifact
+   .ps1

@@ -1,0 +1,6 @@
+ .../G01_pipeline_validation/anomalies_G01.csv      |    7 +-
+ .../audit_G01_pipeline_validation.md               |   55 +-
+ .../evidence_manifest_G01.json                     | 1479 +++++++++++++-------
+ .../run_literature_scenario.ps1                    |   28 +-
+ tools/mosaic-live-maga-runtime/build.ps1           |   70 +-
+ 5 files changed, 1094 insertions(+), 545 deletions(-)

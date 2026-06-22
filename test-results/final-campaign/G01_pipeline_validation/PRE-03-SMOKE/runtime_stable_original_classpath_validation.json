@@ -1,0 +1,43 @@
+{
+    "campaignId":  "final-test-campaign",
+    "groupId":  "G01",
+    "phase":  "G01H",
+    "timestampUtc":  "2026-06-21T22:38:05Z",
+    "gitBranch":  "testing/final-campaign",
+    "gitHead":  "3e02146c9161e70caeae76c673f4068de5ecf1b7",
+    "rootCause":  "javac ZipFS AccessDeniedException recurred after G01G path normalization, now against an original MOSAIC classpath JAR.",
+    "modifiedFiles":  [
+                          "tools/mosaic-live-maga-runtime/build.ps1"
+                      ],
+    "buildExecutionCount":  1,
+    "buildExitCode":  1,
+    "mosaicRoot":  "C:\\Users\\raffa\\IdeaProjects\\maga-core\\tmp\\mosaic-25.2",
+    "mosaicRootAbsolute":  true,
+    "duplicatePathDetected":  false,
+    "compilationClasspathPolicy":  "ORIGINAL_MOSAIC_ROOT_JARS",
+    "originalDependencyJarCount":  11,
+    "originalDependencyReadableCount":  11,
+    "originalDependencyHashCount":  11,
+    "sourceCount":  198,
+    "classCount":  252,
+    "expectedClassCount":  252,
+    "dependencyJarCount":  11,
+    "accessDeniedExceptionPresent":  true,
+    "compilerExceptionPresent":  true,
+    "accessDeniedTargetPath":  "C:\\Users\\raffa\\IdeaProjects\\maga-core\\tmp\\mosaic-25.2\\lib\\third-party\\jackson-databind-2.16.1.jar",
+    "runtimeJarPath":  null,
+    "runtimeJarSizeBytes":  0,
+    "runtimeJarSha256":  null,
+    "runtimeJarValidationStatus":  "NOT_CREATED",
+    "publishedClasspathJarCount":  0,
+    "publishedClasspathHashMatchCount":  0,
+    "stagingRoot":  "C:\\Users\\raffa\\AppData\\Local\\Temp\\maga-live-maga-runtime-build-11976-20260622003641028",
+    "stagingRemoved":  false,
+    "outPublished":  false,
+    "classification":  "STABLE_ORIGINAL_MOSAIC_CLASSPATH_BUILD_FAILED",
+    "limitations":  [
+                        "Exactly one validation build was executed.",
+                        "No deploy, SUMO, MOSAIC, RETRY-04, Java source modification, commit, or push was performed.",
+                        "Because javac failed, no published classpath manifest was produced by build.ps1; the result artifact contains an empty header-only manifest for evidence completeness."
+                    ]
+}

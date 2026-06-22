@@ -1,0 +1,17 @@
+ M test-audits/final-campaign/G01_pipeline_validation/anomalies_G01.csv
+ M test-audits/final-campaign/G01_pipeline_validation/audit_G01_pipeline_validation.md
+ M test-audits/final-campaign/G01_pipeline_validation/evidence_manifest_G01.json
+ M tools/intas-literature-scenario/run_literature_scenario.ps1
+ M tools/mosaic-live-maga-runtime/build.ps1
+?? test-results/final-campaign/G01_pipeline_validation/PRE-03-SMOKE/explicit_java17_toolchain_validation.json
+?? test-results/final-campaign/G01_pipeline_validation/PRE-03-SMOKE/explicit_java17_toolchain_validation/
+?? test-results/final-campaign/G01_pipeline_validation/PRE-03-SMOKE/prevalidated_runtime_artifact_validation.json
+?? test-results/final-campaign/G01_pipeline_validation/PRE-03-SMOKE/prevalidated_runtime_artifact_validation/
+?? test-results/final-campaign/G01_pipeline_validation/PRE-03-SMOKE/retry-03/
+?? test-results/final-campaign/G01_pipeline_validation/PRE-03-SMOKE/runtime_artifact_recovery_search/
+?? test-results/final-campaign/G01_pipeline_validation/PRE-03-SMOKE/runtime_mosaic_root_resolution_validation.json
+?? test-results/final-campaign/G01_pipeline_validation/PRE-03-SMOKE/runtime_mosaic_root_resolution_validation/
+?? test-results/final-campaign/G01_pipeline_validation/PRE-03-SMOKE/runtime_stable_original_classpath_validation.json
+?? test-results/final-campaign/G01_pipeline_validation/PRE-03-SMOKE/runtime_stable_original_classpath_validation/
+?? test-results/final-campaign/G01_pipeline_validation/PRE-03-SMOKE/validated_java_toolchain_discovery.json
+?? test-results/final-campaign/G01_pipeline_validation/PRE-03-SMOKE/validated_java_toolchain_environment.txt

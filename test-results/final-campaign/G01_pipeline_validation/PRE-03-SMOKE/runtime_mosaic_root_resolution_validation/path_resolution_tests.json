@@ -1,0 +1,16 @@
+{
+    "repoRoot":  "C:\\Users\\raffa\\IdeaProjects\\maga-core",
+    "expected":  "C:\\Users\\raffa\\IdeaProjects\\maga-core\\tmp\\mosaic-25.2",
+    "relativePathTest":  {
+                             "input":  ".\\tmp\\mosaic-25.2",
+                             "resolved":  "C:\\Users\\raffa\\IdeaProjects\\maga-core\\tmp\\mosaic-25.2",
+                             "status":  "PASS"
+                         },
+    "absolutePathTest":  {
+                             "input":  "C:\\Users\\raffa\\IdeaProjects\\maga-core\\tmp\\mosaic-25.2",
+                             "resolved":  "C:\\Users\\raffa\\IdeaProjects\\maga-core\\tmp\\mosaic-25.2",
+                             "status":  "PASS"
+                         },
+    "duplicateNeedle":  "C:\\Users\\raffa\\IdeaProjects\\maga-core\\C:\\Users\\raffa\\IdeaProjects\\maga-core",
+    "duplicatePathDetected":  false
+}

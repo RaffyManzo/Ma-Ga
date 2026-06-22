@@ -1,0 +1,34 @@
+{
+    "campaignId":  "final-test-campaign",
+    "groupId":  "G01",
+    "phase":  "G01K",
+    "timestampUtc":  "2026-06-22T09:01:09Z",
+    "gitBranch":  "testing/final-campaign",
+    "gitHead":  "3e02146c9161e70caeae76c673f4068de5ecf1b7",
+    "expectedFilename":  "maga-live-maga-runtime.jar",
+    "expectedSizeBytes":  491454,
+    "expectedSha256":  "1a0aa6d2b0441f0be38baf5df1acc2d4d889b9f356b6111f7715105cd013a9b4",
+    "searchRoots":  [
+                        "tools",
+                        "tmp"
+                    ],
+    "candidateCount":  9,
+    "exactHashMatchCount":  2,
+    "validRecoverableCandidateCount":  2,
+    "failedStagingCandidateCount":  0,
+    "selectedCandidateId":  "CAND-0007",
+    "selectedCandidateRelativePath":  "tmp/archive/final-test-campaign-pre-G01-retry-03-20260621-220103/MaGaLiteratureBasedUrbanStudy/application/maga-live-maga-runtime.jar",
+    "selectedCandidateAbsolutePath":  "C:\\Users\\raffa\\IdeaProjects\\maga-core\\tmp\\archive\\final-test-campaign-pre-G01-retry-03-20260621-220103\\MaGaLiteratureBasedUrbanStudy\\application\\maga-live-maga-runtime.jar",
+    "selectedCandidateCategory":  "ARCHIVED_DEPLOYED_SCENARIO",
+    "selectedCandidateSizeBytes":  491454,
+    "selectedCandidateSha256":  "1a0aa6d2b0441f0be38baf5df1acc2d4d889b9f356b6111f7715105cd013a9b4",
+    "selectedCandidateJarTfStatus":  "PASS",
+    "selectedCandidateZipOpenStatus":  "PASS",
+    "selectedCandidateExpectedEntriesPresent":  true,
+    "classification":  "VALID_PREVIOUSLY_DEPLOYED_RUNTIME_ARTIFACT_RECOVERED",
+    "limitations":  [
+                        "Read-only search only; no Java compilation, build.ps1 execution, deploy, SUMO, MOSAIC, RETRY-04, commit, or push was performed.",
+                        "ZIP bundles in the workspace were not opened or inspected.",
+                        "No JAR was copied, moved, renamed, deleted, or extracted."
+                    ]
+}

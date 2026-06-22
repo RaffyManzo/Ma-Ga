@@ -1,0 +1,18 @@
+===== STDOUT =====
+PREVALIDATED_RUNTIME_ARTIFACT_VALIDATION_FAIL
+Report: C:\Users\raffa\IdeaProjects\maga-core\test-results\final-campaign\G01_pipeline_validation\PRE-03-SMOKE\prevalidated_runtime_artifact_validation.json
+Inventory: C:\Users\raffa\IdeaProjects\maga-core\test-results\final-campaign\G01_pipeline_validation\PRE-03-SMOKE\prevalidated_runtime_artifact_validation\prevalidated_runtime_artifact_inventory.csv
+Build executed: false
+Runtime JAR SHA-256:
+Classpath hash matches: 0/11
+
+===== STDERR =====
+C:\Users\raffa\IdeaProjects\maga-core\tools\mosaic-live-maga-runtime\validate_prevalidated_runtime_artifact.ps1 :
+Required directory missing: C:\Users\raffa\IdeaProjects\maga-core\tools\mosaic-live-maga-runtime\out
+In C:\Users\raffa\IdeaProjects\maga-core\tools\mosaic-live-maga-runtime\validate_prevalidated_runtime_artifact.ps1:303
+car:9
++         Write-Error $ErrorMessage
++         ~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (:) [Write-Error], WriteErrorException
+    + FullyQualifiedErrorId : Microsoft.PowerShell.Commands.WriteErrorException,validate_prevalidated_runtime_artifact
+   .ps1

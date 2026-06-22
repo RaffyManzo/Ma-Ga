@@ -1,0 +1,11 @@
+{
+    "timestampUtc":  "2026-06-22T09:09:40Z",
+    "runnerContainsRuntimeArtifactMode":  true,
+    "runnerBuildModeAvailable":  true,
+    "runnerRecoveredModeAvailable":  true,
+    "runnerRecoveredBranchPrintsNoBuild":  true,
+    "runnerRecoveredBranchCallsValidator":  true,
+    "runnerRecoveredBranchCallsBuild":  false,
+    "deployExplicitJarSupported":  true,
+    "deployDefaultOutSupported":  true
+}

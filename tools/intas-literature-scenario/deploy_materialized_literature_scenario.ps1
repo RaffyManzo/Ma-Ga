@@ -2,7 +2,10 @@ param(
     [Parameter(Mandatory = $true)]
     [string]$MaterializedScenarioRoot,
     [string]$MosaicRoot = ".\tmp\mosaic-25.2",
-    [string]$ScenarioName = "MaGaLiteratureBasedUrbanStudy"
+    [string]$ScenarioName = "MaGaLiteratureBasedUrbanStudy",
+    [string]$RuntimeJarPath = "",
+    [string]$ExpectedRuntimeJarSha256 = "",
+    [long]$ExpectedRuntimeJarSizeBytes = 0
 )
 
 $ErrorActionPreference = "Stop"
@@ -37,7 +40,14 @@ Assert-SafeScenarioName -Name $ScenarioName
 $ResolvedScenarioRoot = Resolve-MaybeRelative -Path $MaterializedScenarioRoot
 $ResolvedMosaicRoot = Resolve-MaybeRelative -Path $MosaicRoot
 $MosaicBat = Join-Path $ResolvedMosaicRoot "mosaic.bat"
-$GeneratedJar = Join-Path $RepoRoot "tools\mosaic-live-maga-runtime\out\maga-live-maga-runtime.jar"
+$RuntimeArtifactMode = "BUILD_OUTPUT"
+$GeneratedJar = if ([string]::IsNullOrWhiteSpace($RuntimeJarPath)) {
+    Join-Path $RepoRoot "tools\mosaic-live-maga-runtime\out\maga-live-maga-runtime.jar"
+}
+else {
+    $RuntimeArtifactMode = "EXPLICIT_RUNTIME_JAR"
+    Resolve-MaybeRelative -Path $RuntimeJarPath
+}
 $AdHocDiagnosticJar = Join-Path $RepoRoot "tools\mosaic-adhoc-radio-diagnostic\out\maga-adhoc-radio-diagnostic.jar"
 $ScenarioDb = Join-Path $ResolvedScenarioRoot "application\intas_literature_urban.db"
 
@@ -49,6 +59,19 @@ if (-not (Test-Path -LiteralPath $ScenarioDb -PathType Leaf)) {
 }
 if (-not (Test-Path -LiteralPath $GeneratedJar -PathType Leaf)) {
     throw "Build the live MA-GA runtime JAR before deploy: $GeneratedJar"
+}
+if ($RuntimeArtifactMode -eq "EXPLICIT_RUNTIME_JAR") {
+    if ([string]::IsNullOrWhiteSpace($ExpectedRuntimeJarSha256)) {
+        throw "ExpectedRuntimeJarSha256 is required when RuntimeJarPath is set"
+    }
+    & powershell -NoProfile -ExecutionPolicy Bypass `
+        -File (Join-Path $RepoRoot "tools\mosaic-live-maga-runtime\validate_runtime_artifact.ps1") `
+        -RuntimeJarPath $GeneratedJar `
+        -ExpectedSha256 $ExpectedRuntimeJarSha256 `
+        -ExpectedSizeBytes $ExpectedRuntimeJarSizeBytes
+    if ($LASTEXITCODE -ne 0) {
+        throw "Explicit runtime artifact validation failed: $GeneratedJar"
+    }
 }
 if (-not (Test-Path -LiteralPath $AdHocDiagnosticJar -PathType Leaf)) {
     throw "Ad-hoc radio diagnostic JAR not found. Build tools\mosaic-adhoc-radio-diagnostic first without committing generated output: $AdHocDiagnosticJar"
@@ -77,6 +100,12 @@ Copy-Item -LiteralPath $ResolvedScenarioRoot -Destination $TargetScenario -Recur
 $TargetApplication = Join-Path $TargetScenario "application"
 Copy-Item -LiteralPath $GeneratedJar -Destination (Join-Path $TargetApplication "maga-live-maga-runtime.jar") -Force
 Copy-Item -LiteralPath $AdHocDiagnosticJar -Destination (Join-Path $TargetApplication "maga-adhoc-radio-diagnostic.jar") -Force
+
+$RuntimeHash = (Get-FileHash -Algorithm SHA256 -LiteralPath $GeneratedJar).Hash.ToLowerInvariant()
+Write-Host "Runtime artifact source: $GeneratedJar"
+Write-Host "Runtime artifact mode: $RuntimeArtifactMode"
+Write-Host "Runtime artifact SHA-256: $RuntimeHash"
+Write-Host "Runtime artifact fresh build: $(if ($RuntimeArtifactMode -eq 'BUILD_OUTPUT') { 'true' } else { 'false' })"
 
 Write-Host "DEPLOYED_MATERIALIZED_LITERATURE_SCENARIO"
 Write-Host "ScenarioName: $ScenarioName"

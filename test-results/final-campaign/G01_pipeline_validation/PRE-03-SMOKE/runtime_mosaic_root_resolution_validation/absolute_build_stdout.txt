@@ -1,0 +1,28 @@
+JDK javac: C:\Program Files\Java\jdk-17\bin\javac.exe
+JDK jar: C:\Program Files\Java\jdk-17\bin\jar.exe
+MOSAIC root: C:\Users\raffa\IdeaProjects\maga-core\tmp\mosaic-25.2
+External build root: C:\Users\raffa\AppData\Local\Temp\maga-live-maga-runtime-build-31984-20260622001356074
+Compiling core, live state layer, and live MA-GA runtime in external staging...
+Source counts:
+  core=151
+  live-state-layer=27
+  live-maga-runtime=20
+Note: Some input files use or override a deprecated API.
+Note: Recompile with -Xlint:deprecation for details.
+An exception has occurred in the compiler (17.0.12). Please file a bug against the Java compiler via the Java bug reporting page (https://bugreport.java.com) after checking the Bug Database (https://bugs.java.com) for duplicates. Include your program, the following diagnostic, and the parameters passed to the Java compiler in your report. Thank you.
+java.nio.file.AccessDeniedException: C:\Users\raffa\AppData\Local\Temp\maga-live-maga-runtime-build-31984-20260622001356074\build\classpath\mosaic-geomath-25.2.jar
+	at java.base/sun.nio.fs.WindowsException.translateToIOException(WindowsException.java:89)
+	at java.base/sun.nio.fs.WindowsException.rethrowAsIOException(WindowsException.java:96)
+	at java.base/sun.nio.fs.WindowsLinkSupport.getRealPath(WindowsLinkSupport.java:258)
+	at java.base/sun.nio.fs.WindowsPath.toRealPath(WindowsPath.java:933)
+	at java.base/sun.nio.fs.WindowsPath.toRealPath(WindowsPath.java:42)
+	at jdk.zipfs/jdk.nio.zipfs.ZipFileSystemProvider.lambda$removeFileSystem$0(ZipFileSystemProvider.java:322)
+	at java.base/java.security.AccessController.doPrivileged(AccessController.java:569)
+	at jdk.zipfs/jdk.nio.zipfs.ZipFileSystemProvider.removeFileSystem(ZipFileSystemProvider.java:324)
+	at jdk.zipfs/jdk.nio.zipfs.ZipFileSystem.close(ZipFileSystem.java:536)
+	at jdk.compiler/com.sun.tools.javac.file.JavacFileManager$ArchiveContainer.close(JavacFileManager.java:670)
+	at jdk.compiler/com.sun.tools.javac.file.JavacFileManager.close(JavacFileManager.java:748)
+	at jdk.compiler/com.sun.tools.javac.main.Main.compile(Main.java:180)
+	at jdk.compiler/com.sun.tools.javac.Main.compile(Main.java:64)
+	at jdk.compiler/com.sun.tools.javac.Main.main(Main.java:50)
+External staging preserved for diagnostics: C:\Users\raffa\AppData\Local\Temp\maga-live-maga-runtime-build-31984-20260622001356074

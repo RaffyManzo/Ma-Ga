@@ -1,0 +1,6 @@
+PREVALIDATED_RUNTIME_ARTIFACT_VALIDATION_FAIL
+Report: C:\Users\raffa\IdeaProjects\maga-core\test-results\final-campaign\G01_pipeline_validation\PRE-03-SMOKE\prevalidated_runtime_artifact_validation.json
+Inventory: C:\Users\raffa\IdeaProjects\maga-core\test-results\final-campaign\G01_pipeline_validation\PRE-03-SMOKE\prevalidated_runtime_artifact_validation\prevalidated_runtime_artifact_inventory.csv
+Build executed: false
+Runtime JAR SHA-256:
+Classpath hash matches: 0/11

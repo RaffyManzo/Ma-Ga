@@ -3,7 +3,15 @@ param(
     [string]$MaterializedScenarioRoot,
     [string]$MosaicRoot = ".\tmp\mosaic-25.2",
     [string]$ScenarioName = "MaGaLiteratureBasedUrbanStudy",
-    [switch]$PrintDetailedLiveReport
+    [switch]$PrintDetailedLiveReport,
+    [ValidateSet(
+        "BUILD",
+        "RECOVERED_VALIDATED_ARTIFACT"
+    )]
+    [string]$RuntimeArtifactMode = "BUILD",
+    [string]$RuntimeJarPath = "",
+    [string]$ExpectedRuntimeJarSha256 = "",
+    [long]$ExpectedRuntimeJarSizeBytes = 0
 )
 
 $ErrorActionPreference = "Stop"
@@ -51,21 +59,75 @@ if (-not (Test-Path -LiteralPath $LogsRoot -PathType Container)) {
     New-Item -ItemType Directory -Path $LogsRoot -Force | Out-Null
 }
 
-Write-Host "Building live MA-GA runtime JAR..."
-& powershell -NoProfile -ExecutionPolicy Bypass `
-    -File (Join-Path $RepoRoot "tools\mosaic-live-maga-runtime\build.ps1") `
-    -MosaicRoot $MosaicRoot `
-    -ScenarioName $ScenarioName
-if ($LASTEXITCODE -ne 0) {
-    throw "Runtime build failed"
+if ($RuntimeArtifactMode -eq "BUILD") {
+    Write-Host "Building live MA-GA runtime JAR..."
+    $BuildArgs = @(
+        "-NoProfile",
+        "-ExecutionPolicy",
+        "Bypass",
+        "-File",
+        (Join-Path $RepoRoot "tools\mosaic-live-maga-runtime\build.ps1"),
+        "-MosaicRoot",
+        $ResolvedMosaicRoot,
+        "-ScenarioName",
+        $ScenarioName
+    )
+    & powershell @BuildArgs
+    if ($LASTEXITCODE -ne 0) {
+        throw "Runtime build failed"
+    }
+}
+else {
+    if ([string]::IsNullOrWhiteSpace($RuntimeJarPath)) {
+        throw "RuntimeJarPath is required for RECOVERED_VALIDATED_ARTIFACT mode"
+    }
+    if ([string]::IsNullOrWhiteSpace($ExpectedRuntimeJarSha256)) {
+        throw "ExpectedRuntimeJarSha256 is required for RECOVERED_VALIDATED_ARTIFACT mode"
+    }
+    $ResolvedRuntimeJarPath = Resolve-MaybeRelative -Path $RuntimeJarPath
+    Write-Host "Runtime artifact mode:"
+    Write-Host "RECOVERED_VALIDATED_ARTIFACT"
+    Write-Host "Runtime build executed:"
+    Write-Host "false"
+    Write-Host "Runtime artifact path:"
+    Write-Host $ResolvedRuntimeJarPath
+    Write-Host "Runtime artifact expected SHA-256:"
+    Write-Host $ExpectedRuntimeJarSha256
+    & powershell -NoProfile -ExecutionPolicy Bypass `
+        -File (Join-Path $RepoRoot "tools\mosaic-live-maga-runtime\validate_runtime_artifact.ps1") `
+        -RuntimeJarPath $ResolvedRuntimeJarPath `
+        -ExpectedSha256 $ExpectedRuntimeJarSha256 `
+        -ExpectedSizeBytes $ExpectedRuntimeJarSizeBytes
+    if ($LASTEXITCODE -ne 0) {
+        throw "Recovered runtime artifact validation failed"
+    }
 }
 
 Write-Host "Deploying materialized literature scenario..."
-& powershell -NoProfile -ExecutionPolicy Bypass `
-    -File (Join-Path $ToolRoot "deploy_materialized_literature_scenario.ps1") `
-    -MaterializedScenarioRoot $ResolvedScenarioRoot `
-    -MosaicRoot $MosaicRoot `
-    -ScenarioName $ScenarioName
+$DeployArgs = @(
+    "-NoProfile",
+    "-ExecutionPolicy",
+    "Bypass",
+    "-File",
+    (Join-Path $ToolRoot "deploy_materialized_literature_scenario.ps1"),
+    "-MaterializedScenarioRoot",
+    $ResolvedScenarioRoot,
+    "-MosaicRoot",
+    $ResolvedMosaicRoot,
+    "-ScenarioName",
+    $ScenarioName
+)
+if ($RuntimeArtifactMode -eq "RECOVERED_VALIDATED_ARTIFACT") {
+    $DeployArgs += @(
+        "-RuntimeJarPath",
+        $ResolvedRuntimeJarPath,
+        "-ExpectedRuntimeJarSha256",
+        $ExpectedRuntimeJarSha256,
+        "-ExpectedRuntimeJarSizeBytes",
+        $ExpectedRuntimeJarSizeBytes
+    )
+}
+& powershell @DeployArgs
 if ($LASTEXITCODE -ne 0) {
     throw "Materialized scenario deploy failed"
 }
@@ -101,7 +163,7 @@ Write-Host "Summarizing run $($NewRun.Name)..."
 $SummarizeArgs = @(
     "-NoProfile", "-ExecutionPolicy", "Bypass",
     "-File", (Join-Path $RepoRoot "tools\mosaic-live-maga-runtime\summarize-run.ps1"),
-    "-MosaicRoot", $MosaicRoot,
+    "-MosaicRoot", $ResolvedMosaicRoot,
     "-ScenarioName", $ScenarioName,
     "-RunName", $NewRun.Name
 )
@@ -116,7 +178,7 @@ if ($LASTEXITCODE -ne 0) {
 Write-Host "Validating literature smoke run..."
 & powershell -NoProfile -ExecutionPolicy Bypass `
     -File (Join-Path $ToolRoot "validate_literature_smoke_run.ps1") `
-    -MosaicRoot $MosaicRoot `
+    -MosaicRoot $ResolvedMosaicRoot `
     -ScenarioName $ScenarioName `
     -RunName $NewRun.Name
 if ($LASTEXITCODE -ne 0) {

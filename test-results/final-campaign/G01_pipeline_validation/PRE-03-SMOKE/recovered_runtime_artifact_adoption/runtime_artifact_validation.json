@@ -1,0 +1,35 @@
+{
+    "timestampUtc":  "2026-06-22T09:09:39Z",
+    "runtimeJarPath":  "C:\\Users\\raffa\\IdeaProjects\\maga-core\\tmp\\final-campaign-runtime-artifacts\\recovered-retry-02\\maga-live-maga-runtime.jar",
+    "filename":  "maga-live-maga-runtime.jar",
+    "expectedSizeBytes":  491454,
+    "actualSizeBytes":  491454,
+    "sizeMatch":  true,
+    "expectedSha256":  "1a0aa6d2b0441f0be38baf5df1acc2d4d889b9f356b6111f7715105cd013a9b4",
+    "actualSha256":  "1a0aa6d2b0441f0be38baf5df1acc2d4d889b9f356b6111f7715105cd013a9b4",
+    "sha256Match":  true,
+    "jarTfStatus":  "PASS",
+    "zipOpenStatus":  "PASS",
+    "entryCount":  303,
+    "expectedEntries":  [
+                            "org/eclipse/mosaic/app/maga/liveruntime/MaGaLiveRuntimeCoordinatorApp.class",
+                            "org/eclipse/mosaic/app/maga/liveruntime/MaGaLiveMosaicSnapshotBridge.class",
+                            "org/eclipse/mosaic/app/maga/liveruntime/LiveGaExecutionCoordinator.class",
+                            "org/eclipse/mosaic/app/maga/liveruntime/LiveGaExecutionState.class",
+                            "org/eclipse/mosaic/app/maga/liveruntime/LiveStrategyApplier.class",
+                            "org/eclipse/mosaic/app/maga/livestate/LiveStateLayerRuntimeFacade.class",
+                            "window/source/MosaicSystemStateSource.class",
+                            "window/core/TemporalWindowManager.class",
+                            "ga/core/MaGaOptimizer.class"
+                        ],
+    "missingExpectedEntries":  [
+
+                               ],
+    "expectedEntriesPresent":  true,
+    "freshBuildExecuted":  false,
+    "validationStatus":  "PASS",
+    "classification":  "RECOVERED_RUNTIME_ARTIFACT_VALIDATED",
+    "errors":  [
+
+               ]
+}

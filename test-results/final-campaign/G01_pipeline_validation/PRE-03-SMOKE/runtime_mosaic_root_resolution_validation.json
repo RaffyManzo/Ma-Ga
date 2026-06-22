@@ -1,0 +1,75 @@
+{
+  "campaignId": "final-test-campaign",
+  "groupId": "G01",
+  "runId": "PRE-03-SMOKE",
+  "timestampUtc": "2026-06-21T22:15:15Z",
+  "gitBranch": "testing/final-campaign",
+  "gitHead": "3e02146c9161e70caeae76c673f4068de5ecf1b7",
+  "rootCause": "RETRY-03 passed an absolute MosaicRoot through the runner, and the previous build script path resolver concatenated it with RepoRoot.",
+  "modifiedFiles": [
+    "tools/mosaic-live-maga-runtime/build.ps1",
+    "tools/intas-literature-scenario/run_literature_scenario.ps1"
+  ],
+  "relativePathTest": {
+    "input": ".\\tmp\\mosaic-25.2",
+    "resolved": "C:\\Users\\raffa\\IdeaProjects\\maga-core\\tmp\\mosaic-25.2",
+    "status": "PASS"
+  },
+  "absolutePathTest": {
+    "input": "C:\\Users\\raffa\\IdeaProjects\\maga-core\\tmp\\mosaic-25.2",
+    "resolved": "C:\\Users\\raffa\\IdeaProjects\\maga-core\\tmp\\mosaic-25.2",
+    "status": "PASS"
+  },
+  "duplicatePathDetected": false,
+  "absoluteBuildTest": {
+    "executionCount": 1,
+    "status": "FAIL",
+    "exitCode": 1,
+    "mosaicRootPrintedCorrectly": true,
+    "duplicatePathDetected": false,
+    "accessDeniedExceptionPresent": true,
+    "compilerExceptionPresent": true,
+    "runtimeBuildFailedPresent": false,
+    "stagingRoot": "C:\\Users\\raffa\\AppData\\Local\\Temp\\maga-live-maga-runtime-build-31984-20260622001356074",
+    "stagingPreserved": true
+  },
+  "sourceCount": 198,
+  "sourceCounts": {
+    "core": 151,
+    "live-state-layer": 27,
+    "live-maga-runtime": 20
+  },
+  "classCount": 252,
+  "dependencyJarCount": 11,
+  "runtimeJarPath": null,
+  "runtimeJarSizeBytes": 0,
+  "runtimeJarSha256": null,
+  "runnerPropagationChecks": {
+    "build": {
+      "targetFound": true,
+      "usesResolvedMosaicRoot": true,
+      "usesOriginalMosaicRoot": false
+    },
+    "deploy": {
+      "targetFound": true,
+      "usesResolvedMosaicRoot": true,
+      "usesOriginalMosaicRoot": false
+    },
+    "summarizer": {
+      "targetFound": true,
+      "usesResolvedMosaicRoot": true,
+      "usesOriginalMosaicRoot": false
+    },
+    "validator": {
+      "targetFound": true,
+      "usesResolvedMosaicRoot": true,
+      "usesOriginalMosaicRoot": false
+    }
+  },
+  "runnerPropagationCorrectCount": 4,
+  "runnerPropagationWrongCount": 0,
+  "classification": "ABSOLUTE_MOSAIC_ROOT_PROPAGATION_PATCHED_BUT_BUILD_VALIDATION_FAILED",
+  "limitations": [
+    "No deploy, SUMO or MOSAIC was executed. The absolute-root build validation was executed exactly once and failed with javac ZipFS AccessDeniedException in external staging; no fix was applied after that failure."
+  ]
+}

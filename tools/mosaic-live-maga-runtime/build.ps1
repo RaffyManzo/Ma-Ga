@@ -9,7 +9,28 @@ $ErrorActionPreference = "Stop"
 $ToolRoot = $PSScriptRoot
 $RepoRoot = Split-Path -Parent (Split-Path -Parent $ToolRoot)
 $SafeRepoRoot = $RepoRoot.Replace("\", "/")
-$ResolvedMosaicRoot = (Resolve-Path -LiteralPath (Join-Path $RepoRoot $MosaicRoot)).Path
+
+function Resolve-MaybeRelativeToRepo {
+    param(
+        [Parameter(Mandatory = $true)]
+        [string]$Path
+    )
+
+    if ([string]::IsNullOrWhiteSpace($Path)) {
+        throw "Path must not be blank"
+    }
+
+    $Candidate = if ([IO.Path]::IsPathRooted($Path)) {
+        $Path
+    }
+    else {
+        Join-Path $RepoRoot $Path
+    }
+
+    return (Resolve-Path -LiteralPath $Candidate).Path
+}
+
+$ResolvedMosaicRoot = Resolve-MaybeRelativeToRepo -Path $MosaicRoot
 $RuntimeSourceRoot = Join-Path $ToolRoot "src"
 $StateLayerSourceRoot = Join-Path $RepoRoot "tools\mosaic-live-state-layer\src"
 $CoreSourceRoot = Join-Path $RepoRoot "src"
@@ -148,6 +169,8 @@ foreach ($CommandName in @("javac", "jar")) {
         throw "$CommandName not found in PATH"
     }
 }
+$JavacExe = (Get-Command javac).Source
+$JarExe = (Get-Command jar).Source
 
 $Timestamp = Get-Date -Format "yyyyMMddHHmmssfff"
 if ([string]::IsNullOrWhiteSpace($ExternalBuildRoot)) {
@@ -245,8 +268,8 @@ try {
     }
 
     $Classpath = ($CopiedDependencyJars | ForEach-Object { $_.FullName }) -join [IO.Path]::PathSeparator
-    Write-Host "JDK javac: $((Get-Command javac).Source)"
-    Write-Host "JDK jar: $((Get-Command jar).Source)"
+    Write-Host "JDK javac: $JavacExe"
+    Write-Host "JDK jar: $JarExe"
     Write-Host "MOSAIC root: $ResolvedMosaicRoot"
     Write-Host "External build root: $BuildStagingRoot"
     Write-Host "Compiling core, live state layer, and live MA-GA runtime in external staging..."
@@ -256,7 +279,7 @@ try {
     Write-Host "  live-maga-runtime=$((Get-ChildItem -LiteralPath $RuntimeSourceRoot -Recurse -Filter '*.java' -File).Count)"
 
     $JavacResult = Invoke-NativeCaptured `
-        -FilePath (Get-Command javac).Source `
+        -FilePath $JavacExe `
         -Arguments @("-cp", $Classpath, "-d", $StagingClassesDir, "@$StagingSourcesFile") `
         -WorkingDirectory $StagingBuildRoot `
         -StdoutPath $JavacStdoutFile `
@@ -281,7 +304,7 @@ try {
     }
 
     $JarCreateResult = Invoke-NativeCaptured `
-        -FilePath (Get-Command jar).Source `
+        -FilePath $JarExe `
         -Arguments @("cf", $StagingJarFile, "-C", $StagingClassesDir, ".") `
         -WorkingDirectory $StagingBuildRoot `
         -StdoutPath $JarStdoutFile `
@@ -290,7 +313,7 @@ try {
         throw "jar failed with exit code $($JarCreateResult.ExitCode)"
     }
 
-    $JarEntries = & jar tf $StagingJarFile
+    $JarEntries = & $JarExe tf $StagingJarFile
     if ($LASTEXITCODE -ne 0) {
         throw "jar tf failed with exit code $LASTEXITCODE"
     }
@@ -319,7 +342,7 @@ try {
     if (-not (Test-Path -LiteralPath $PublishedJarFile -PathType Leaf)) {
         throw "Published JAR missing before out swap: $PublishedJarFile"
     }
-    $PublishedJarEntries = & jar tf $PublishedJarFile
+    $PublishedJarEntries = & $JarExe tf $PublishedJarFile
     if ($LASTEXITCODE -ne 0) {
         throw "published jar tf failed with exit code $LASTEXITCODE"
     }

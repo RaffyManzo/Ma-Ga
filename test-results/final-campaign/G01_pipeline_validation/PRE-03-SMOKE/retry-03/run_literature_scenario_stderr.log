@@ -1,0 +1,15 @@
+Resolve-Path : Impossibile trovare il percorso
+'C:\Users\raffa\IdeaProjects\maga-core\C:\Users\raffa\IdeaProjects\maga-core\tmp\mosaic-25.2' perch� non esiste.
+In C:\Users\raffa\IdeaProjects\maga-core\tools\mosaic-live-maga-runtime\build.ps1:12 car:24
++ ... saicRoot = (Resolve-Path -LiteralPath (Join-Path $RepoRoot $MosaicRoo ...
++                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : ObjectNotFound: (C:\Users\raffa\...tmp\mosaic-25.2:String) [Resolve-Path], ItemNotFoundE
+   xception
+    + FullyQualifiedErrorId : PathNotFound,Microsoft.PowerShell.Commands.ResolvePathCommand
+
+Runtime build failed
+In C:\Users\raffa\IdeaProjects\maga-core\tools\intas-literature-scenario\run_literature_scenario.ps1:60 car:5
++     throw "Runtime build failed"
++     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : OperationStopped: (Runtime build failed:String) [], RuntimeException
+    + FullyQualifiedErrorId : Runtime build failed

@@ -1,0 +1,33 @@
+{
+    "timestampUtc":  "2026-06-21T23:09:14Z",
+    "gitBranch":  "testing/final-campaign",
+    "gitHead":  "3e02146c9161e70caeae76c673f4068de5ecf1b7",
+    "searchedLocations":  [
+                              "test-results/final-campaign/G01_pipeline_validation",
+                              "test-audits/final-campaign/G01_pipeline_validation",
+                              "tmp/final-campaign-build-diagnostics"
+                          ],
+    "historicalEvidenceFiles":  [
+                                    "test-results\\final-campaign\\G01_pipeline_validation\\PRE-03-SMOKE\\runtime_jdk_workspace_isolation.json",
+                                    "C:\\Users\\raffa\\IdeaProjects\\maga-core\\test-results\\final-campaign\\G01_pipeline_validation\\PRE-03-SMOKE\\runtime_jdk_workspace_isolation\\d5_jdk-17.0.8.101-hotspot-17.0.8.1_stdout.txt",
+                                    "C:\\Users\\raffa\\IdeaProjects\\maga-core\\test-results\\final-campaign\\G01_pipeline_validation\\PRE-03-SMOKE\\runtime_jdk_workspace_isolation\\d5_jdk-17.0.8.101-hotspot-17.0.8.1_stderr.txt",
+                                    "tmp/final-campaign-build-diagnostics/G01D/g01d_console_summary.json"
+                                ],
+    "historicalVendor":  "Eclipse Adoptium",
+    "historicalJavaVersion":  "17.0.8.1",
+    "historicalJavacVersion":  "17.0.8.1",
+    "historicalBuildStatus":  "PASS",
+    "historicalSourceCount":  198,
+    "historicalClassCount":  252,
+    "discoveredJavaHome":  "C:\\Program Files\\Eclipse Adoptium\\jdk-17.0.8.101-hotspot",
+    "javaExecutable":  "C:\\Program Files\\Eclipse Adoptium\\jdk-17.0.8.101-hotspot\\bin\\java.exe",
+    "javacExecutable":  "C:\\Program Files\\Eclipse Adoptium\\jdk-17.0.8.101-hotspot\\bin\\javac.exe",
+    "jarExecutable":  "C:\\Program Files\\Eclipse Adoptium\\jdk-17.0.8.101-hotspot\\bin\\jar.exe",
+    "allExecutablesExist":  true,
+    "currentJavaVersionOutput":  "openjdk version \"17.0.8.1\" 2023-08-24\r\nOpenJDK Runtime Environment Temurin-17.0.8.1+1 (build 17.0.8.1+1)\r\nOpenJDK 64-Bit Server VM Temurin-17.0.8.1+1 (build 17.0.8.1+1, mixed mode, sharing)",
+    "currentJavacVersionOutput":  "javac 17.0.8.1",
+    "currentJarVersionOutput":  "jar 17.0.8.1",
+    "vendorMatchesHistoricalEvidence":  true,
+    "versionMatchesHistoricalEvidence":  true,
+    "classification":  "HISTORICALLY_VALIDATED_ADOPTIUM_JAVA17_TOOLCHAIN_FOUND"
+}

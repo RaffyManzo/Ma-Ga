@@ -1,0 +1,3 @@
+"candidate_id","sha256_match","jar_tf_status","zip_open_status","entry_count","expected_entries_count","expected_entries_present","validation_status","validation_error"
+"CAND-0006","True","PASS","PASS","303","9","True","PASS",""
+"CAND-0007","True","PASS","PASS","303","9","True","PASS",""

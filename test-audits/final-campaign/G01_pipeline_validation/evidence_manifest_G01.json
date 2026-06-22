@@ -1,521 +1,1053 @@
-{
-    "campaign_id": "final-test-campaign",
-    "group_id": "G01",
-    "created_at_utc": "2026-06-21T17:01:31Z",
-    "git": {
-        "branch": "testing/final-campaign",
-        "frozen_branch": "MOSAIC/SUMO-integration",
-        "frozen_commit": "5a9477735a3d707a5f000a64653cd2a6fc7f2007",
-        "campaign_head_before_g01_run": "6449978026d205c3f0949cd5532782fd447fed1d",
-        "working_tree_status_short": [
-            "G00D updated static bandwidth serialization and G01 audit evidence; no build, deploy, SUMO or MOSAIC executed."
-        ],
-        "campaign_head_before_g01_retry": "8cf83f53f3c08016edaacfc19a83fcbb767b479a",
-        "campaign_head_before_g01_retry_02": "33958c27ef7b312bf27192a79650220beabe1dd4",
-        "campaign_head_before_g00d": "33958c27ef7b312bf27192a79650220beabe1dd4"
-    },
-    "workbook": {
-        "source": "Matrice_test_MA_GA_MOSAIC_SUMO_Fase0_completa.xlsx",
-        "counts_verified": true,
-        "config_count": 30,
-        "materialization_count": 69,
-        "test_id_count": 87
-    },
-    "entries": [
-        {
-            "evidence_id": "EV-G01-0001",
-            "config_id": "CFG-SMOKE",
-            "materialization_id": "MAT-CFG-SMOKE-104729",
-            "run_id": "PRE-03-SMOKE",
-            "test_ids": [
-                "T-011",
-                "T-015",
-                "T-017",
-                "T-020",
-                "T-021"
-            ],
-            "kind": "summary",
-            "path": "test-results/final-campaign/G01_pipeline_validation/PRE-03-SMOKE/pre_execution_checks.json",
-            "sha256": "4b5ddf67cf28a4093adc1e30be4d8187154a64225eeafa162e414283132fc6c7",
-            "created_at_utc": "2026-06-21T13:35:04Z",
-            "description": "Pre-execution checks and canonical materialization id resolution."
-        },
-        {
-            "evidence_id": "EV-G01-0002",
-            "config_id": "CFG-SMOKE",
-            "materialization_id": "MAT-CFG-SMOKE-104729",
-            "run_id": "PRE-03-SMOKE",
-            "test_ids": [
-                "T-020"
-            ],
-            "kind": "summary",
-            "path": "test-results/final-campaign/G01_pipeline_validation/PRE-03-SMOKE/environment_preparation.json",
-            "sha256": "f771d9fcc4f6b2216992bb0e5f1981ef1a325c89615a8e01fb690c42194d0109",
-            "created_at_utc": "2026-06-21T13:35:04Z",
-            "description": "MOSAIC scenario archive/preparation record."
-        },
-        {
-            "evidence_id": "EV-G01-0003",
-            "config_id": "CFG-SMOKE",
-            "materialization_id": "MAT-CFG-SMOKE-104729",
-            "run_id": "PRE-03-SMOKE",
-            "test_ids": [
-                "T-011",
-                "T-015",
-                "T-017",
-                "T-020",
-                "T-021",
-                "T-002"
-            ],
-            "kind": "raw-log",
-            "path": "test-results/final-campaign/G01_pipeline_validation/PRE-03-SMOKE/run_literature_scenario_console.log",
-            "sha256": "debada51fa50a793d6ebf6c214c8d227aee365f3c42b45f762d262a936938a5d",
-            "created_at_utc": "2026-06-21T13:35:04Z",
-            "description": "Full console log from the single canonical run attempt."
-        },
-        {
-            "evidence_id": "EV-G01-0004",
-            "config_id": "CFG-SMOKE",
-            "materialization_id": "MAT-CFG-SMOKE-104729",
-            "run_id": "PRE-03-SMOKE",
-            "test_ids": [
-                "T-011",
-                "T-015",
-                "T-017",
-                "T-020",
-                "T-021"
-            ],
-            "kind": "validator",
-            "path": "test-results/final-campaign/G01_pipeline_validation/PRE-03-SMOKE/deploy_validation_failure.json",
-            "sha256": "6816ab9696d6d523b3e1bdf4bea4937cd973a418b75517b358c2b82fe44cc5ef",
-            "created_at_utc": "2026-06-21T13:35:04Z",
-            "description": "Parsed deploy validator failure summary."
-        },
-        {
-            "evidence_id": "EV-G01-0005",
-            "config_id": "CFG-SMOKE",
-            "materialization_id": "MAT-CFG-SMOKE-104729",
-            "run_id": "PRE-03-SMOKE",
-            "test_ids": [
-                "T-011",
-                "T-015",
-                "T-017",
-                "T-020",
-                "T-021"
-            ],
-            "kind": "manifest",
-            "path": "test-results/final-campaign/G01_pipeline_validation/PRE-03-SMOKE/run_evidence_index.json",
-            "sha256": "1bfb8f9de593b1f80807c888eaaecdbf4eb58d8685883c3322d684eb6eff18b8",
-            "created_at_utc": "2026-06-21T13:35:04Z",
-            "description": "Run evidence index for PRE-03-SMOKE."
-        },
-        {
-            "evidence_id": "EV-G01-0006",
-            "config_id": "CFG-SMOKE",
-            "materialization_id": "MAT-CFG-SMOKE-104729",
-            "run_id": "PRE-03-SMOKE",
-            "test_ids": [
-                "T-011",
-                "T-015",
-                "T-017",
-                "T-020",
-                "T-021"
-            ],
-            "kind": "metric",
-            "path": "test-audits/final-campaign/G01_pipeline_validation/metrics_G01.csv",
-            "sha256": "2031a878e742c30c29e5bf0df36f611fb9cbbec4dc388eba09ba7a1414e031b2",
-            "created_at_utc": "2026-06-21T13:35:04Z",
-            "description": "G01 metrics in long format."
-        },
-        {
-            "evidence_id": "EV-G01-0007",
-            "config_id": "CFG-SMOKE",
-            "materialization_id": "MAT-CFG-SMOKE-104729",
-            "run_id": "PRE-03-SMOKE",
-            "test_ids": [
-                "T-011",
-                "T-015",
-                "T-017",
-                "T-020",
-                "T-021"
-            ],
-            "kind": "summary",
-            "path": "test-audits/final-campaign/G01_pipeline_validation/anomalies_G01.csv",
-            "sha256": "a17af0300f9e307c20ed7d720ad7a128e67b73ff63ef5ce0469dc28bfa3e5cc0",
-            "created_at_utc": "2026-06-21T13:35:04Z",
-            "description": "G01 anomalies."
-        },
-        {
-            "evidence_id": "EV-G01-0008",
-            "config_id": "CFG-SMOKE",
-            "materialization_id": "MAT-CFG-SMOKE-104729",
-            "run_id": "PRE-03-SMOKE",
-            "test_ids": [
-                "T-011",
-                "T-015",
-                "T-017",
-                "T-020",
-                "T-021"
-            ],
-            "kind": "summary",
-            "path": "test-audits/final-campaign/G01_pipeline_validation/audit_G01_pipeline_validation.md",
-            "sha256": "ca634ae1d8f5f076c528170e1492d442da6a718b568bf089978c35c742b818d2",
-            "created_at_utc": "2026-06-21T13:35:04Z",
-            "description": "G01 audit markdown."
-        },
-        {
-            "evidence_id": "EV-G01-G00D-BANDWIDTH-REPAIR",
-            "config_id": "CFG-SMOKE",
-            "materialization_id": "MAT-CFG-SMOKE-104729",
-            "run_id": "PRE-03-SMOKE",
-            "test_ids": [
-                "T-020"
-            ],
-            "kind": "summary",
-            "path": "test-results/final-campaign/G00_scenario_preparation_generation/bandwidth_serialization_repair_report.json",
-            "sha256": "c01199aec86c63f33be5145dec8ffcf95d8b8faaab1a86497d8ac93813c848b4",
-            "created_at_utc": "2026-06-21T17:01:31Z",
-            "description": "G00D bandwidth serialization repair report and validator compatibility counts."
-        },
-        {
-            "evidence_id": "EV-G01-G00D-BANDWIDTH-SCAN-AFTER",
-            "config_id": "CFG-SMOKE",
-            "materialization_id": "MAT-CFG-SMOKE-104729",
-            "run_id": "PRE-03-SMOKE",
-            "test_ids": [
-                "T-020"
-            ],
-            "kind": "summary",
-            "path": "test-results/final-campaign/G00_scenario_preparation_generation/bandwidth_serialization_scan_after.csv",
-            "sha256": "c4f651cc668449c21eb651163f216a3e0944dfbded9488b81c7e430ede183380",
-            "created_at_utc": "2026-06-21T17:01:31Z",
-            "description": "G00D scan confirming MOSAIC-compatible bandwidth strings after repair."
-        },
-        {
-            "evidence_id": "EV-G01-G00D-BANDWIDTH-SCAN-BEFORE",
-            "config_id": "CFG-SMOKE",
-            "materialization_id": "MAT-CFG-SMOKE-104729",
-            "run_id": "PRE-03-SMOKE",
-            "test_ids": [
-                "T-020"
-            ],
-            "kind": "summary",
-            "path": "test-results/final-campaign/G00_scenario_preparation_generation/bandwidth_serialization_scan_before.csv",
-            "sha256": "c18924ada319b4a54d9074954b9eb6674a27834cb3cec7cfdea44da527955ecc",
-            "created_at_utc": "2026-06-21T17:01:31Z",
-            "description": "G00D scan showing bandwidth fields before serialization repair."
-        },
-        {
-            "evidence_id": "EV-G01-RETRY-01-CONSOLE-LOG",
-            "config_id": "CFG-SMOKE",
-            "materialization_id": "MAT-CFG-SMOKE-104729",
-            "run_id": "PRE-03-SMOKE",
-            "test_ids": [
-                "T-002",
-                "T-011",
-                "T-015",
-                "T-017",
-                "T-020",
-                "T-021"
-            ],
-            "kind": "raw-log",
-            "path": "test-results/final-campaign/G01_pipeline_validation/PRE-03-SMOKE/retry-01/run_literature_scenario_console.log",
-            "sha256": "1c2c06c3bdcb3fe406342080c2064cf9cbe2bd221d9407b85292f5796f0cf54f",
-            "created_at_utc": "2026-06-21T15:00:23Z",
-            "description": "Console log from the single G01R retry attempt; the command stopped before deploy/MOSAIC."
-        },
-        {
-            "evidence_id": "EV-G01-RETRY-01-EXECUTION-SUMMARY",
-            "config_id": "CFG-SMOKE",
-            "materialization_id": "MAT-CFG-SMOKE-104729",
-            "run_id": "PRE-03-SMOKE",
-            "test_ids": [
-                "T-002",
-                "T-011",
-                "T-015",
-                "T-017",
-                "T-020",
-                "T-021"
-            ],
-            "kind": "summary",
-            "path": "test-results/final-campaign/G01_pipeline_validation/PRE-03-SMOKE/retry-01/retry_execution_summary.json",
-            "sha256": "2ef4d039b11376ec526d3168792cdaf91ffee54dbfb4828f407f4b413ff74a7b",
-            "created_at_utc": "2026-06-21T15:00:23Z",
-            "description": "Structured summary of the G01R retry outcome."
-        },
-        {
-            "evidence_id": "EV-G01-RETRY-01-MOSAIC-RUNS-AFTER",
-            "config_id": "CFG-SMOKE",
-            "materialization_id": "MAT-CFG-SMOKE-104729",
-            "run_id": "PRE-03-SMOKE",
-            "test_ids": [
-                "T-020"
-            ],
-            "kind": "inventory",
-            "path": "test-results/final-campaign/G01_pipeline_validation/PRE-03-SMOKE/retry-01/mosaic_runs_after.csv",
-            "sha256": "e6f1f6ce8137cb479384c6efc4cc7ab208f5609bdc57bf605e408030ea70df39",
-            "created_at_utc": "2026-06-21T15:00:23Z",
-            "description": "Inventory of MOSAIC run directories after the G01R retry."
-        },
-        {
-            "evidence_id": "EV-G01-RETRY-01-MOSAIC-RUNS-BEFORE",
-            "config_id": "CFG-SMOKE",
-            "materialization_id": "MAT-CFG-SMOKE-104729",
-            "run_id": "PRE-03-SMOKE",
-            "test_ids": [
-                "T-020"
-            ],
-            "kind": "inventory",
-            "path": "test-results/final-campaign/G01_pipeline_validation/PRE-03-SMOKE/retry-01/mosaic_runs_before.csv",
-            "sha256": "e6f1f6ce8137cb479384c6efc4cc7ab208f5609bdc57bf605e408030ea70df39",
-            "created_at_utc": "2026-06-21T15:00:23Z",
-            "description": "Inventory of MOSAIC run directories before the G01R retry."
-        },
-        {
-            "evidence_id": "EV-G01-RETRY-01-NEW-MOSAIC-RUN",
-            "config_id": "CFG-SMOKE",
-            "materialization_id": "MAT-CFG-SMOKE-104729",
-            "run_id": "PRE-03-SMOKE",
-            "test_ids": [
-                "T-020"
-            ],
-            "kind": "metadata",
-            "path": "test-results/final-campaign/G01_pipeline_validation/PRE-03-SMOKE/retry-01/new_mosaic_run.json",
-            "sha256": "edb22a9cee6b2545be52a5b95e7d7a273747ebcdeee933aca25a471c2c455f44",
-            "created_at_utc": "2026-06-21T15:00:23Z",
-            "description": "Computed delta of MOSAIC run directories for G01R; no new run was created."
-        },
-        {
-            "evidence_id": "EV-G01-RETRY-02-CONSOLE-LOG",
-            "config_id": "CFG-SMOKE",
-            "materialization_id": "MAT-CFG-SMOKE-104729",
-            "run_id": "PRE-03-SMOKE",
-            "test_ids": [
-                "T-011",
-                "T-015",
-                "T-017",
-                "T-020",
-                "T-021"
-            ],
-            "kind": "raw-log",
-            "path": "test-results/final-campaign/G01_pipeline_validation/PRE-03-SMOKE/retry-02/run_literature_scenario_console.log",
-            "sha256": "1c49dc132134cf57ab3430f2a7862e746e7c48652fcb0cd9be19689574c751e5",
-            "created_at_utc": "2026-06-21T16:26:18Z",
-            "description": "Console log from RETRY-02; build and deploy passed, MOSAIC interrupted at 0s."
-        },
-        {
-            "evidence_id": "EV-G01-RETRY-02-EXECUTION-SUMMARY",
-            "config_id": "CFG-SMOKE",
-            "materialization_id": "MAT-CFG-SMOKE-104729",
-            "run_id": "PRE-03-SMOKE",
-            "test_ids": [
-                "T-011",
-                "T-015",
-                "T-017",
-                "T-020",
-                "T-021"
-            ],
-            "kind": "summary",
-            "path": "test-results/final-campaign/G01_pipeline_validation/PRE-03-SMOKE/retry-02/retry_execution_summary.json",
-            "sha256": "212896270a92bcd929b9645c0390327f1920edbcb5bf7e133b7c798745a56a96",
-            "created_at_utc": "2026-06-21T16:26:18Z",
-            "description": "Structured execution summary for RETRY-02."
-        },
-        {
-            "evidence_id": "EV-G01-RETRY-02-LOCAL-ARTIFACT-INVENTORY",
-            "config_id": "CFG-SMOKE",
-            "materialization_id": "MAT-CFG-SMOKE-104729",
-            "run_id": "PRE-03-SMOKE",
-            "test_ids": [
-                "T-020"
-            ],
-            "kind": "inventory",
-            "path": "test-results/final-campaign/G01_pipeline_validation/PRE-03-SMOKE/retry-02/local_run_artifact_inventory.csv",
-            "sha256": "07d26564c8950c86c052c1d283086906f82a48a32bf56162ed4f177baabea83c",
-            "created_at_utc": "2026-06-21T16:26:18Z",
-            "description": "Hash inventory of files present in the local RETRY-02 MOSAIC run directory."
-        },
-        {
-            "evidence_id": "EV-G01-RETRY-02-MOSAIC-RUN-METADATA",
-            "config_id": "CFG-SMOKE",
-            "materialization_id": "MAT-CFG-SMOKE-104729",
-            "run_id": "PRE-03-SMOKE",
-            "test_ids": [
-                "T-020"
-            ],
-            "kind": "metadata",
-            "path": "test-results/final-campaign/G01_pipeline_validation/PRE-03-SMOKE/retry-02/new_mosaic_run.json",
-            "sha256": "498758007482ca2ff13c45c222fc9d8a138efedeb5b30ce1512154de5e5bc52f",
-            "created_at_utc": "2026-06-21T16:26:18Z",
-            "description": "Metadata identifying the single new MOSAIC run created by RETRY-02."
-        },
-        {
-            "evidence_id": "EV-G01-RETRY-02-MOSAIC-RUNS-AFTER",
-            "config_id": "CFG-SMOKE",
-            "materialization_id": "MAT-CFG-SMOKE-104729",
-            "run_id": "PRE-03-SMOKE",
-            "test_ids": [
-                "T-020"
-            ],
-            "kind": "inventory",
-            "path": "test-results/final-campaign/G01_pipeline_validation/PRE-03-SMOKE/retry-02/mosaic_runs_after.csv",
-            "sha256": "c41eb92118ce9f6f8b83d2c5ad06a9a52fdfa636a330546330c9a462a7c87f5c",
-            "created_at_utc": "2026-06-21T16:26:18Z",
-            "description": "Inventory of MOSAIC run directories after RETRY-02."
-        },
-        {
-            "evidence_id": "EV-G01-RETRY-02-MOSAIC-RUNS-BEFORE",
-            "config_id": "CFG-SMOKE",
-            "materialization_id": "MAT-CFG-SMOKE-104729",
-            "run_id": "PRE-03-SMOKE",
-            "test_ids": [
-                "T-020"
-            ],
-            "kind": "inventory",
-            "path": "test-results/final-campaign/G01_pipeline_validation/PRE-03-SMOKE/retry-02/mosaic_runs_before.csv",
-            "sha256": "e6f1f6ce8137cb479384c6efc4cc7ab208f5609bdc57bf605e408030ea70df39",
-            "created_at_utc": "2026-06-21T16:26:18Z",
-            "description": "Inventory of MOSAIC run directories before RETRY-02."
-        },
-        {
-            "evidence_id": "EV-G01-RUNTIME-BUILD-ACCESS-DIAGNOSTIC",
-            "config_id": "CFG-SMOKE",
-            "materialization_id": "MAT-CFG-SMOKE-104729",
-            "run_id": "PRE-03-SMOKE",
-            "test_ids": [
-                "T-002"
-            ],
-            "kind": "diagnostic",
-            "path": "test-results/final-campaign/G01_pipeline_validation/PRE-03-SMOKE/runtime_build_access_diagnostic.json",
-            "sha256": "f568844755531b87a171e4dc1843e1a3f9069672d7a74d08bcc57de00bb7991f",
-            "created_at_utc": "2026-06-21T13:35:04Z",
-            "description": "Controlled AccessDeniedException diagnostic for the runtime build."
-        },
-        {
-            "evidence_id": "EV-G01-RUNTIME-BUILD-PREFLIGHT",
-            "config_id": "CFG-SMOKE",
-            "materialization_id": "MAT-CFG-SMOKE-104729",
-            "run_id": "PRE-03-SMOKE",
-            "test_ids": [
-                "T-002"
-            ],
-            "kind": "diagnostic",
-            "path": "test-results/final-campaign/G01_pipeline_validation/PRE-03-SMOKE/runtime_build_preflight.json",
-            "sha256": "af0f081f287a7b6a424d5d81d1209803e6ee0864fec7c5811eb115ea1a7d3f3f",
-            "created_at_utc": "2026-06-21T13:35:04Z",
-            "description": "Runtime build preflight produced during the first G01 diagnostic sequence."
-        },
-        {
-            "evidence_id": "EV-G01-RUNTIME-EXTERNAL-WORKSPACE-BUILD",
-            "config_id": "CFG-SMOKE",
-            "materialization_id": "MAT-CFG-SMOKE-104729",
-            "run_id": "PRE-03-SMOKE",
-            "test_ids": [
-                "T-002"
-            ],
-            "kind": "diagnostic",
-            "path": "test-results/final-campaign/G01_pipeline_validation/PRE-03-SMOKE/runtime_external_workspace_build_validation.json",
-            "sha256": "86db3f974bd4b4e2a5d7c96a71ea0f81bd6beeb672414a2339e7dbddc2995a18",
-            "created_at_utc": "2026-06-21T13:35:04Z",
-            "description": "Validation of external runtime build staging, safe publication, and negative publication-safety behavior."
-        },
-        {
-            "evidence_id": "EV-G01-RUNTIME-IMPLICIT-NONE-VALIDATION",
-            "config_id": "CFG-SMOKE",
-            "materialization_id": "MAT-CFG-SMOKE-104729",
-            "run_id": "PRE-03-SMOKE",
-            "test_ids": [
-                "T-002"
-            ],
-            "kind": "diagnostic",
-            "path": "test-results/final-campaign/G01_pipeline_validation/PRE-03-SMOKE/runtime_build_implicit_none_validation.json",
-            "sha256": "abe307fabb7256006354a44c1b548664964ffdf619c6a8a607ad41499c080b07",
-            "created_at_utc": "2026-06-21T13:35:04Z",
-            "description": "Validation showing that -implicit:none did not resolve the javac ZipFS close failure."
-        },
-        {
-            "evidence_id": "EV-G01-RUNTIME-JDK-WORKSPACE-ISOLATION",
-            "config_id": "CFG-SMOKE",
-            "materialization_id": "MAT-CFG-SMOKE-104729",
-            "run_id": "PRE-03-SMOKE",
-            "test_ids": [
-                "T-002"
-            ],
-            "kind": "diagnostic",
-            "path": "test-results/final-campaign/G01_pipeline_validation/PRE-03-SMOKE/runtime_jdk_workspace_isolation.json",
-            "sha256": "97c312bbe2b26f6466bc6845016d3d854183ba8d75a400272f5f08f6f31109a6",
-            "created_at_utc": "2026-06-21T13:35:04Z",
-            "description": "JDK, workspace, source-set, and external-workspace isolation diagnostic."
-        },
-        {
-            "evidence_id": "EV-G01-RUNTIME-NESTED-POWERSHELL-BUILD",
-            "config_id": "CFG-SMOKE",
-            "materialization_id": "MAT-CFG-SMOKE-104729",
-            "run_id": "PRE-03-SMOKE",
-            "test_ids": [
-                "T-002"
-            ],
-            "kind": "diagnostic",
-            "path": "test-results/final-campaign/G01_pipeline_validation/PRE-03-SMOKE/runtime_nested_powershell_build_validation.json",
-            "sha256": "cce9e8b3e01fa2b1a8666630103fb27d914526f4e1c49258d94d7f0177e1522f",
-            "created_at_utc": "2026-06-21T15:24:12Z",
-            "description": "G01F validation of nested PowerShell stderr propagation for the runtime build."
-        },
-        {
-            "evidence_id": "EV-G01-RUNTIME-NESTED-POWERSHELL-OUT-INVENTORY",
-            "config_id": "CFG-SMOKE",
-            "materialization_id": "MAT-CFG-SMOKE-104729",
-            "run_id": "PRE-03-SMOKE",
-            "test_ids": [
-                "T-002"
-            ],
-            "kind": "diagnostic",
-            "path": "test-results/final-campaign/G01_pipeline_validation/PRE-03-SMOKE/runtime_nested_powershell_build_validation/published_out_inventory.csv",
-            "sha256": "8747d92e1aaca0d8c0e8830570b90deaca2df44abf936cb6226cb7e133103f59",
-            "created_at_utc": "2026-06-21T15:24:12Z",
-            "description": "Inventory and hashes for the runtime out/ artifact published by the G01F nested build test."
-        },
-        {
-            "evidence_id": "EV-G01-RUNTIME-NESTED-POWERSHELL-STDERR",
-            "config_id": "CFG-SMOKE",
-            "materialization_id": "MAT-CFG-SMOKE-104729",
-            "run_id": "PRE-03-SMOKE",
-            "test_ids": [
-                "T-002"
-            ],
-            "kind": "diagnostic",
-            "path": "test-results/final-campaign/G01_pipeline_validation/PRE-03-SMOKE/runtime_nested_powershell_build_validation/nested_parent_stderr.txt",
-            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-            "created_at_utc": "2026-06-21T15:24:12Z",
-            "description": "Captured stderr from the parent PowerShell process during the G01F nested build test; expected to be empty."
-        },
-        {
-            "evidence_id": "EV-G01-RUNTIME-NESTED-POWERSHELL-STDOUT",
-            "config_id": "CFG-SMOKE",
-            "materialization_id": "MAT-CFG-SMOKE-104729",
-            "run_id": "PRE-03-SMOKE",
-            "test_ids": [
-                "T-002"
-            ],
-            "kind": "diagnostic",
-            "path": "test-results/final-campaign/G01_pipeline_validation/PRE-03-SMOKE/runtime_nested_powershell_build_validation/nested_parent_stdout.txt",
-            "sha256": "198d1fde42be9b74b3b25b08e7db9ad53c2f72818b1ae66c3a1e087193c76e71",
-            "created_at_utc": "2026-06-21T15:24:12Z",
-            "description": "Captured stdout from the parent PowerShell process during the G01F nested build test."
-        },
-        {
-            "evidence_id": "EV-G01-RUNTIME-OUT-CONSUMER-INVENTORY",
-            "config_id": "CFG-SMOKE",
-            "materialization_id": "MAT-CFG-SMOKE-104729",
-            "run_id": "PRE-03-SMOKE",
-            "test_ids": [
-                "T-002"
-            ],
-            "kind": "diagnostic",
-            "path": "test-results/final-campaign/G01_pipeline_validation/PRE-03-SMOKE/runtime_out_consumer_inventory.json",
-            "sha256": "a166f8bb9409c8d3476f32a32bcc6de87affa703e8af385900acaf1c8bfb36d2",
-            "created_at_utc": "2026-06-21T13:35:04Z",
-            "description": "Inventory of versioned consumers that rely on the runtime out/ structure."
-        }
-    ]
+﻿{
+    "campaign_id":  "final-test-campaign",
+    "group_id":  "G01",
+    "created_at_utc":  "2026-06-22T09:36:27Z",
+    "git":  {
+                "branch":  "testing/final-campaign",
+                "frozen_branch":  "MOSAIC/SUMO-integration",
+                "frozen_commit":  "5a9477735a3d707a5f000a64653cd2a6fc7f2007",
+                "campaign_head_before_g01_run":  "6449978026d205c3f0949cd5532782fd447fed1d",
+                "working_tree_status_short":  [
+                                                  "G01L recovered validated runtime artifact workflow pending commit; no Java/core changes, no build/deploy/SUMO/MOSAIC/RETRY-04."
+                                              ],
+                "campaign_head_before_g01_retry":  "8cf83f53f3c08016edaacfc19a83fcbb767b479a",
+                "campaign_head_before_g01_retry_02":  "33958c27ef7b312bf27192a79650220beabe1dd4",
+                "campaign_head_before_g00d":  "33958c27ef7b312bf27192a79650220beabe1dd4",
+                "campaign_head_before_g01_retry_03":  "3e02146c9161e70caeae76c673f4068de5ecf1b7",
+                "campaign_head_before_g01g":  "3e02146c9161e70caeae76c673f4068de5ecf1b7",
+                "campaign_head_before_g01h":  "3e02146c9161e70caeae76c673f4068de5ecf1b7",
+                "campaign_head_before_g01i":  "3e02146c9161e70caeae76c673f4068de5ecf1b7",
+                "campaign_head_before_g01j":  "3e02146c9161e70caeae76c673f4068de5ecf1b7",
+                "campaign_head_before_g01l":  "3e02146c9161e70caeae76c673f4068de5ecf1b7"
+            },
+    "workbook":  {
+                     "source":  "Matrice_test_MA_GA_MOSAIC_SUMO_Fase0_completa.xlsx",
+                     "counts_verified":  true,
+                     "config_count":  30,
+                     "materialization_count":  69,
+                     "test_id_count":  87
+                 },
+    "entries":  [
+                    {
+                        "evidence_id":  "EV-G01-0001",
+                        "config_id":  "CFG-SMOKE",
+                        "materialization_id":  "MAT-CFG-SMOKE-104729",
+                        "run_id":  "PRE-03-SMOKE",
+                        "test_ids":  [
+                                         "T-011",
+                                         "T-015",
+                                         "T-017",
+                                         "T-020",
+                                         "T-021"
+                                     ],
+                        "kind":  "summary",
+                        "path":  "test-results/final-campaign/G01_pipeline_validation/PRE-03-SMOKE/pre_execution_checks.json",
+                        "sha256":  "4b5ddf67cf28a4093adc1e30be4d8187154a64225eeafa162e414283132fc6c7",
+                        "created_at_utc":  "2026-06-21T13:35:04Z",
+                        "description":  "Pre-execution checks and canonical materialization id resolution."
+                    },
+                    {
+                        "evidence_id":  "EV-G01-0002",
+                        "config_id":  "CFG-SMOKE",
+                        "materialization_id":  "MAT-CFG-SMOKE-104729",
+                        "run_id":  "PRE-03-SMOKE",
+                        "test_ids":  [
+                                         "T-020"
+                                     ],
+                        "kind":  "summary",
+                        "path":  "test-results/final-campaign/G01_pipeline_validation/PRE-03-SMOKE/environment_preparation.json",
+                        "sha256":  "f771d9fcc4f6b2216992bb0e5f1981ef1a325c89615a8e01fb690c42194d0109",
+                        "created_at_utc":  "2026-06-21T13:35:04Z",
+                        "description":  "MOSAIC scenario archive/preparation record."
+                    },
+                    {
+                        "evidence_id":  "EV-G01-0003",
+                        "config_id":  "CFG-SMOKE",
+                        "materialization_id":  "MAT-CFG-SMOKE-104729",
+                        "run_id":  "PRE-03-SMOKE",
+                        "test_ids":  [
+                                         "T-011",
+                                         "T-015",
+                                         "T-017",
+                                         "T-020",
+                                         "T-021",
+                                         "T-002"
+                                     ],
+                        "kind":  "raw-log",
+                        "path":  "test-results/final-campaign/G01_pipeline_validation/PRE-03-SMOKE/run_literature_scenario_console.log",
+                        "sha256":  "debada51fa50a793d6ebf6c214c8d227aee365f3c42b45f762d262a936938a5d",
+                        "created_at_utc":  "2026-06-21T13:35:04Z",
+                        "description":  "Full console log from the single canonical run attempt."
+                    },
+                    {
+                        "evidence_id":  "EV-G01-0004",
+                        "config_id":  "CFG-SMOKE",
+                        "materialization_id":  "MAT-CFG-SMOKE-104729",
+                        "run_id":  "PRE-03-SMOKE",
+                        "test_ids":  [
+                                         "T-011",
+                                         "T-015",
+                                         "T-017",
+                                         "T-020",
+                                         "T-021"
+                                     ],
+                        "kind":  "validator",
+                        "path":  "test-results/final-campaign/G01_pipeline_validation/PRE-03-SMOKE/deploy_validation_failure.json",
+                        "sha256":  "6816ab9696d6d523b3e1bdf4bea4937cd973a418b75517b358c2b82fe44cc5ef",
+                        "created_at_utc":  "2026-06-21T13:35:04Z",
+                        "description":  "Parsed deploy validator failure summary."
+                    },
+                    {
+                        "evidence_id":  "EV-G01-0005",
+                        "config_id":  "CFG-SMOKE",
+                        "materialization_id":  "MAT-CFG-SMOKE-104729",
+                        "run_id":  "PRE-03-SMOKE",
+                        "test_ids":  [
+                                         "T-011",
+                                         "T-015",
+                                         "T-017",
+                                         "T-020",
+                                         "T-021"
+                                     ],
+                        "kind":  "manifest",
+                        "path":  "test-results/final-campaign/G01_pipeline_validation/PRE-03-SMOKE/run_evidence_index.json",
+                        "sha256":  "1bfb8f9de593b1f80807c888eaaecdbf4eb58d8685883c3322d684eb6eff18b8",
+                        "created_at_utc":  "2026-06-21T13:35:04Z",
+                        "description":  "Run evidence index for PRE-03-SMOKE."
+                    },
+                    {
+                        "evidence_id":  "EV-G01-0006",
+                        "config_id":  "CFG-SMOKE",
+                        "materialization_id":  "MAT-CFG-SMOKE-104729",
+                        "run_id":  "PRE-03-SMOKE",
+                        "test_ids":  [
+                                         "T-011",
+                                         "T-015",
+                                         "T-017",
+                                         "T-020",
+                                         "T-021"
+                                     ],
+                        "kind":  "metric",
+                        "path":  "test-audits/final-campaign/G01_pipeline_validation/metrics_G01.csv",
+                        "sha256":  "2031a878e742c30c29e5bf0df36f611fb9cbbec4dc388eba09ba7a1414e031b2",
+                        "created_at_utc":  "2026-06-21T13:35:04Z",
+                        "description":  "G01 metrics in long format."
+                    },
+                    {
+                        "evidence_id":  "EV-G01-0007",
+                        "config_id":  "CFG-SMOKE",
+                        "materialization_id":  "MAT-CFG-SMOKE-104729",
+                        "run_id":  "PRE-03-SMOKE",
+                        "test_ids":  [
+                                         "T-011",
+                                         "T-015",
+                                         "T-017",
+                                         "T-020",
+                                         "T-021"
+                                     ],
+                        "kind":  "summary",
+                        "path":  "test-audits/final-campaign/G01_pipeline_validation/anomalies_G01.csv",
+                        "sha256":  "b8565ae49716d705443ab2990fdd93852f716ea942ac01e254d45826f15ffb72",
+                        "created_at_utc":  "2026-06-21T13:35:04Z",
+                        "description":  "G01 anomalies."
+                    },
+                    {
+                        "evidence_id":  "EV-G01-0008",
+                        "config_id":  "CFG-SMOKE",
+                        "materialization_id":  "MAT-CFG-SMOKE-104729",
+                        "run_id":  "PRE-03-SMOKE",
+                        "test_ids":  [
+                                         "T-011",
+                                         "T-015",
+                                         "T-017",
+                                         "T-020",
+                                         "T-021"
+                                     ],
+                        "kind":  "summary",
+                        "path":  "test-audits/final-campaign/G01_pipeline_validation/audit_G01_pipeline_validation.md",
+                        "sha256":  "f8357078ccf818bb4e5a5a97dbfa23719d7583d48feb601289430212bd8dceb0",
+                        "created_at_utc":  "2026-06-21T13:35:04Z",
+                        "description":  "G01 audit markdown."
+                    },
+                    {
+                        "evidence_id":  "EV-G01-G00D-BANDWIDTH-REPAIR",
+                        "config_id":  "CFG-SMOKE",
+                        "materialization_id":  "MAT-CFG-SMOKE-104729",
+                        "run_id":  "PRE-03-SMOKE",
+                        "test_ids":  [
+                                         "T-020"
+                                     ],
+                        "kind":  "summary",
+                        "path":  "test-results/final-campaign/G00_scenario_preparation_generation/bandwidth_serialization_repair_report.json",
+                        "sha256":  "c01199aec86c63f33be5145dec8ffcf95d8b8faaab1a86497d8ac93813c848b4",
+                        "created_at_utc":  "2026-06-21T17:01:31Z",
+                        "description":  "G00D bandwidth serialization repair report and validator compatibility counts."
+                    },
+                    {
+                        "evidence_id":  "EV-G01-G00D-BANDWIDTH-SCAN-AFTER",
+                        "config_id":  "CFG-SMOKE",
+                        "materialization_id":  "MAT-CFG-SMOKE-104729",
+                        "run_id":  "PRE-03-SMOKE",
+                        "test_ids":  [
+                                         "T-020"
+                                     ],
+                        "kind":  "summary",
+                        "path":  "test-results/final-campaign/G00_scenario_preparation_generation/bandwidth_serialization_scan_after.csv",
+                        "sha256":  "c4f651cc668449c21eb651163f216a3e0944dfbded9488b81c7e430ede183380",
+                        "created_at_utc":  "2026-06-21T17:01:31Z",
+                        "description":  "G00D scan confirming MOSAIC-compatible bandwidth strings after repair."
+                    },
+                    {
+                        "evidence_id":  "EV-G01-G00D-BANDWIDTH-SCAN-BEFORE",
+                        "config_id":  "CFG-SMOKE",
+                        "materialization_id":  "MAT-CFG-SMOKE-104729",
+                        "run_id":  "PRE-03-SMOKE",
+                        "test_ids":  [
+                                         "T-020"
+                                     ],
+                        "kind":  "summary",
+                        "path":  "test-results/final-campaign/G00_scenario_preparation_generation/bandwidth_serialization_scan_before.csv",
+                        "sha256":  "c18924ada319b4a54d9074954b9eb6674a27834cb3cec7cfdea44da527955ecc",
+                        "created_at_utc":  "2026-06-21T17:01:31Z",
+                        "description":  "G00D scan showing bandwidth fields before serialization repair."
+                    },
+                    {
+                        "evidence_id":  "EV-G01-RETRY-01-CONSOLE-LOG",
+                        "config_id":  "CFG-SMOKE",
+                        "materialization_id":  "MAT-CFG-SMOKE-104729",
+                        "run_id":  "PRE-03-SMOKE",
+                        "test_ids":  [
+                                         "T-002",
+                                         "T-011",
+                                         "T-015",
+                                         "T-017",
+                                         "T-020",
+                                         "T-021"
+                                     ],
+                        "kind":  "raw-log",
+                        "path":  "test-results/final-campaign/G01_pipeline_validation/PRE-03-SMOKE/retry-01/run_literature_scenario_console.log",
+                        "sha256":  "1c2c06c3bdcb3fe406342080c2064cf9cbe2bd221d9407b85292f5796f0cf54f",
+                        "created_at_utc":  "2026-06-21T15:00:23Z",
+                        "description":  "Console log from the single G01R retry attempt; the command stopped before deploy/MOSAIC."
+                    },
+                    {
+                        "evidence_id":  "EV-G01-RETRY-01-EXECUTION-SUMMARY",
+                        "config_id":  "CFG-SMOKE",
+                        "materialization_id":  "MAT-CFG-SMOKE-104729",
+                        "run_id":  "PRE-03-SMOKE",
+                        "test_ids":  [
+                                         "T-002",
+                                         "T-011",
+                                         "T-015",
+                                         "T-017",
+                                         "T-020",
+                                         "T-021"
+                                     ],
+                        "kind":  "summary",
+                        "path":  "test-results/final-campaign/G01_pipeline_validation/PRE-03-SMOKE/retry-01/retry_execution_summary.json",
+                        "sha256":  "2ef4d039b11376ec526d3168792cdaf91ffee54dbfb4828f407f4b413ff74a7b",
+                        "created_at_utc":  "2026-06-21T15:00:23Z",
+                        "description":  "Structured summary of the G01R retry outcome."
+                    },
+                    {
+                        "evidence_id":  "EV-G01-RETRY-01-MOSAIC-RUNS-AFTER",
+                        "config_id":  "CFG-SMOKE",
+                        "materialization_id":  "MAT-CFG-SMOKE-104729",
+                        "run_id":  "PRE-03-SMOKE",
+                        "test_ids":  [
+                                         "T-020"
+                                     ],
+                        "kind":  "inventory",
+                        "path":  "test-results/final-campaign/G01_pipeline_validation/PRE-03-SMOKE/retry-01/mosaic_runs_after.csv",
+                        "sha256":  "e6f1f6ce8137cb479384c6efc4cc7ab208f5609bdc57bf605e408030ea70df39",
+                        "created_at_utc":  "2026-06-21T15:00:23Z",
+                        "description":  "Inventory of MOSAIC run directories after the G01R retry."
+                    },
+                    {
+                        "evidence_id":  "EV-G01-RETRY-01-MOSAIC-RUNS-BEFORE",
+                        "config_id":  "CFG-SMOKE",
+                        "materialization_id":  "MAT-CFG-SMOKE-104729",
+                        "run_id":  "PRE-03-SMOKE",
+                        "test_ids":  [
+                                         "T-020"
+                                     ],
+                        "kind":  "inventory",
+                        "path":  "test-results/final-campaign/G01_pipeline_validation/PRE-03-SMOKE/retry-01/mosaic_runs_before.csv",
+                        "sha256":  "e6f1f6ce8137cb479384c6efc4cc7ab208f5609bdc57bf605e408030ea70df39",
+                        "created_at_utc":  "2026-06-21T15:00:23Z",
+                        "description":  "Inventory of MOSAIC run directories before the G01R retry."
+                    },
+                    {
+                        "evidence_id":  "EV-G01-RETRY-01-NEW-MOSAIC-RUN",
+                        "config_id":  "CFG-SMOKE",
+                        "materialization_id":  "MAT-CFG-SMOKE-104729",
+                        "run_id":  "PRE-03-SMOKE",
+                        "test_ids":  [
+                                         "T-020"
+                                     ],
+                        "kind":  "metadata",
+                        "path":  "test-results/final-campaign/G01_pipeline_validation/PRE-03-SMOKE/retry-01/new_mosaic_run.json",
+                        "sha256":  "edb22a9cee6b2545be52a5b95e7d7a273747ebcdeee933aca25a471c2c455f44",
+                        "created_at_utc":  "2026-06-21T15:00:23Z",
+                        "description":  "Computed delta of MOSAIC run directories for G01R; no new run was created."
+                    },
+                    {
+                        "evidence_id":  "EV-G01-RETRY-02-CONSOLE-LOG",
+                        "config_id":  "CFG-SMOKE",
+                        "materialization_id":  "MAT-CFG-SMOKE-104729",
+                        "run_id":  "PRE-03-SMOKE",
+                        "test_ids":  [
+                                         "T-011",
+                                         "T-015",
+                                         "T-017",
+                                         "T-020",
+                                         "T-021"
+                                     ],
+                        "kind":  "raw-log",
+                        "path":  "test-results/final-campaign/G01_pipeline_validation/PRE-03-SMOKE/retry-02/run_literature_scenario_console.log",
+                        "sha256":  "1c49dc132134cf57ab3430f2a7862e746e7c48652fcb0cd9be19689574c751e5",
+                        "created_at_utc":  "2026-06-21T16:26:18Z",
+                        "description":  "Console log from RETRY-02; build and deploy passed, MOSAIC interrupted at 0s."
+                    },
+                    {
+                        "evidence_id":  "EV-G01-RETRY-02-EXECUTION-SUMMARY",
+                        "config_id":  "CFG-SMOKE",
+                        "materialization_id":  "MAT-CFG-SMOKE-104729",
+                        "run_id":  "PRE-03-SMOKE",
+                        "test_ids":  [
+                                         "T-011",
+                                         "T-015",
+                                         "T-017",
+                                         "T-020",
+                                         "T-021"
+                                     ],
+                        "kind":  "summary",
+                        "path":  "test-results/final-campaign/G01_pipeline_validation/PRE-03-SMOKE/retry-02/retry_execution_summary.json",
+                        "sha256":  "212896270a92bcd929b9645c0390327f1920edbcb5bf7e133b7c798745a56a96",
+                        "created_at_utc":  "2026-06-21T16:26:18Z",
+                        "description":  "Structured execution summary for RETRY-02."
+                    },
+                    {
+                        "evidence_id":  "EV-G01-RETRY-02-LOCAL-ARTIFACT-INVENTORY",
+                        "config_id":  "CFG-SMOKE",
+                        "materialization_id":  "MAT-CFG-SMOKE-104729",
+                        "run_id":  "PRE-03-SMOKE",
+                        "test_ids":  [
+                                         "T-020"
+                                     ],
+                        "kind":  "inventory",
+                        "path":  "test-results/final-campaign/G01_pipeline_validation/PRE-03-SMOKE/retry-02/local_run_artifact_inventory.csv",
+                        "sha256":  "07d26564c8950c86c052c1d283086906f82a48a32bf56162ed4f177baabea83c",
+                        "created_at_utc":  "2026-06-21T16:26:18Z",
+                        "description":  "Hash inventory of files present in the local RETRY-02 MOSAIC run directory."
+                    },
+                    {
+                        "evidence_id":  "EV-G01-RETRY-02-MOSAIC-RUN-METADATA",
+                        "config_id":  "CFG-SMOKE",
+                        "materialization_id":  "MAT-CFG-SMOKE-104729",
+                        "run_id":  "PRE-03-SMOKE",
+                        "test_ids":  [
+                                         "T-020"
+                                     ],
+                        "kind":  "metadata",
+                        "path":  "test-results/final-campaign/G01_pipeline_validation/PRE-03-SMOKE/retry-02/new_mosaic_run.json",
+                        "sha256":  "498758007482ca2ff13c45c222fc9d8a138efedeb5b30ce1512154de5e5bc52f",
+                        "created_at_utc":  "2026-06-21T16:26:18Z",
+                        "description":  "Metadata identifying the single new MOSAIC run created by RETRY-02."
+                    },
+                    {
+                        "evidence_id":  "EV-G01-RETRY-02-MOSAIC-RUNS-AFTER",
+                        "config_id":  "CFG-SMOKE",
+                        "materialization_id":  "MAT-CFG-SMOKE-104729",
+                        "run_id":  "PRE-03-SMOKE",
+                        "test_ids":  [
+                                         "T-020"
+                                     ],
+                        "kind":  "inventory",
+                        "path":  "test-results/final-campaign/G01_pipeline_validation/PRE-03-SMOKE/retry-02/mosaic_runs_after.csv",
+                        "sha256":  "c41eb92118ce9f6f8b83d2c5ad06a9a52fdfa636a330546330c9a462a7c87f5c",
+                        "created_at_utc":  "2026-06-21T16:26:18Z",
+                        "description":  "Inventory of MOSAIC run directories after RETRY-02."
+                    },
+                    {
+                        "evidence_id":  "EV-G01-RETRY-02-MOSAIC-RUNS-BEFORE",
+                        "config_id":  "CFG-SMOKE",
+                        "materialization_id":  "MAT-CFG-SMOKE-104729",
+                        "run_id":  "PRE-03-SMOKE",
+                        "test_ids":  [
+                                         "T-020"
+                                     ],
+                        "kind":  "inventory",
+                        "path":  "test-results/final-campaign/G01_pipeline_validation/PRE-03-SMOKE/retry-02/mosaic_runs_before.csv",
+                        "sha256":  "e6f1f6ce8137cb479384c6efc4cc7ab208f5609bdc57bf605e408030ea70df39",
+                        "created_at_utc":  "2026-06-21T16:26:18Z",
+                        "description":  "Inventory of MOSAIC run directories before RETRY-02."
+                    },
+                    {
+                        "evidence_id":  "EV-G01-RETRY-03-ATTEMPT-GUARD",
+                        "config_id":  "CFG-SMOKE",
+                        "materialization_id":  "MAT-CFG-SMOKE-104729",
+                        "run_id":  "PRE-03-SMOKE",
+                        "test_ids":  [
+                                         "T-020"
+                                     ],
+                        "kind":  "summary",
+                        "path":  "test-results/final-campaign/G01_pipeline_validation/PRE-03-SMOKE/retry-03/attempt_guard.json",
+                        "sha256":  "53beb2bda3b8a3f2043188d9ec752f5fa3bc6333fc2608c4a177c38fcc61deb2",
+                        "created_at_utc":  "2026-06-21T22:04:06Z",
+                        "description":  "RETRY-03 attempt guard proving commandExecutionCount=1."
+                    },
+                    {
+                        "evidence_id":  "EV-G01-RETRY-03-CONSOLE",
+                        "config_id":  "CFG-SMOKE",
+                        "materialization_id":  "MAT-CFG-SMOKE-104729",
+                        "run_id":  "PRE-03-SMOKE",
+                        "test_ids":  [
+                                         "T-020"
+                                     ],
+                        "kind":  "raw-log",
+                        "path":  "test-results/final-campaign/G01_pipeline_validation/PRE-03-SMOKE/retry-03/run_literature_scenario_console.log",
+                        "sha256":  "188eee6a021139397e21140a960e75c42a0acb83c19e7936ceb1be894e097a32",
+                        "created_at_utc":  "2026-06-21T22:04:06Z",
+                        "description":  "RETRY-03 combined console log preserving separated stream contents."
+                    },
+                    {
+                        "evidence_id":  "EV-G01-RETRY-03-EXECUTION-SUMMARY",
+                        "config_id":  "CFG-SMOKE",
+                        "materialization_id":  "MAT-CFG-SMOKE-104729",
+                        "run_id":  "PRE-03-SMOKE",
+                        "test_ids":  [
+                                         "T-020"
+                                     ],
+                        "kind":  "summary",
+                        "path":  "test-results/final-campaign/G01_pipeline_validation/PRE-03-SMOKE/retry-03/retry_execution_summary.json",
+                        "sha256":  "ed307557fe0581001fb272359e7fc34631a9e87d82acb40caa9ab8100e5caf74",
+                        "created_at_utc":  "2026-06-21T22:04:06Z",
+                        "description":  "RETRY-03 execution summary and failure classification."
+                    },
+                    {
+                        "evidence_id":  "EV-G01-RETRY-03-NEW-MOSAIC-RUN",
+                        "config_id":  "CFG-SMOKE",
+                        "materialization_id":  "MAT-CFG-SMOKE-104729",
+                        "run_id":  "PRE-03-SMOKE",
+                        "test_ids":  [
+                                         "T-020"
+                                     ],
+                        "kind":  "summary",
+                        "path":  "test-results/final-campaign/G01_pipeline_validation/PRE-03-SMOKE/retry-03/new_mosaic_run.json",
+                        "sha256":  "52a4b372eea443cf276cafca5cd3aa044e9382995734a7aedb2e4b5ec5c75a99",
+                        "created_at_utc":  "2026-06-21T22:04:06Z",
+                        "description":  "RETRY-03 new MOSAIC run detection metadata showing zero new runs."
+                    },
+                    {
+                        "evidence_id":  "EV-G01-RETRY-03-RUNS-AFTER",
+                        "config_id":  "CFG-SMOKE",
+                        "materialization_id":  "MAT-CFG-SMOKE-104729",
+                        "run_id":  "PRE-03-SMOKE",
+                        "test_ids":  [
+                                         "T-020"
+                                     ],
+                        "kind":  "summary",
+                        "path":  "test-results/final-campaign/G01_pipeline_validation/PRE-03-SMOKE/retry-03/mosaic_runs_after.csv",
+                        "sha256":  "dfcbec5f3b5dd7d65d14daec182268d403b26f4b4e0f1973463750789155b53e",
+                        "created_at_utc":  "2026-06-21T22:04:06Z",
+                        "description":  "MOSAIC run inventory after RETRY-03."
+                    },
+                    {
+                        "evidence_id":  "EV-G01-RETRY-03-RUNS-BEFORE",
+                        "config_id":  "CFG-SMOKE",
+                        "materialization_id":  "MAT-CFG-SMOKE-104729",
+                        "run_id":  "PRE-03-SMOKE",
+                        "test_ids":  [
+                                         "T-020"
+                                     ],
+                        "kind":  "summary",
+                        "path":  "test-results/final-campaign/G01_pipeline_validation/PRE-03-SMOKE/retry-03/mosaic_runs_before.csv",
+                        "sha256":  "dfcbec5f3b5dd7d65d14daec182268d403b26f4b4e0f1973463750789155b53e",
+                        "created_at_utc":  "2026-06-21T22:04:06Z",
+                        "description":  "MOSAIC run inventory before RETRY-03."
+                    },
+                    {
+                        "evidence_id":  "EV-G01-RETRY-03-STDERR",
+                        "config_id":  "CFG-SMOKE",
+                        "materialization_id":  "MAT-CFG-SMOKE-104729",
+                        "run_id":  "PRE-03-SMOKE",
+                        "test_ids":  [
+                                         "T-020"
+                                     ],
+                        "kind":  "raw-log",
+                        "path":  "test-results/final-campaign/G01_pipeline_validation/PRE-03-SMOKE/retry-03/run_literature_scenario_stderr.log",
+                        "sha256":  "c5c0bb132e071cd4a0f611347401706e359ec8b50f11b9401a8bb8b1f1484828",
+                        "created_at_utc":  "2026-06-21T22:04:06Z",
+                        "description":  "RETRY-03 runner stderr with path-resolution failure."
+                    },
+                    {
+                        "evidence_id":  "EV-G01-RETRY-03-STDOUT",
+                        "config_id":  "CFG-SMOKE",
+                        "materialization_id":  "MAT-CFG-SMOKE-104729",
+                        "run_id":  "PRE-03-SMOKE",
+                        "test_ids":  [
+                                         "T-020"
+                                     ],
+                        "kind":  "raw-log",
+                        "path":  "test-results/final-campaign/G01_pipeline_validation/PRE-03-SMOKE/retry-03/run_literature_scenario_stdout.log",
+                        "sha256":  "a375c36d5fb5fb126536712122fb6d94b438ac3e1b469f5a86b03a697530fad4",
+                        "created_at_utc":  "2026-06-21T22:04:06Z",
+                        "description":  "RETRY-03 runner stdout."
+                    },
+                    {
+                        "evidence_id":  "EV-G01-RUNTIME-BUILD-ACCESS-DIAGNOSTIC",
+                        "config_id":  "CFG-SMOKE",
+                        "materialization_id":  "MAT-CFG-SMOKE-104729",
+                        "run_id":  "PRE-03-SMOKE",
+                        "test_ids":  [
+                                         "T-002"
+                                     ],
+                        "kind":  "diagnostic",
+                        "path":  "test-results/final-campaign/G01_pipeline_validation/PRE-03-SMOKE/runtime_build_access_diagnostic.json",
+                        "sha256":  "f568844755531b87a171e4dc1843e1a3f9069672d7a74d08bcc57de00bb7991f",
+                        "created_at_utc":  "2026-06-21T13:35:04Z",
+                        "description":  "Controlled AccessDeniedException diagnostic for the runtime build."
+                    },
+                    {
+                        "evidence_id":  "EV-G01-RUNTIME-BUILD-PREFLIGHT",
+                        "config_id":  "CFG-SMOKE",
+                        "materialization_id":  "MAT-CFG-SMOKE-104729",
+                        "run_id":  "PRE-03-SMOKE",
+                        "test_ids":  [
+                                         "T-002"
+                                     ],
+                        "kind":  "diagnostic",
+                        "path":  "test-results/final-campaign/G01_pipeline_validation/PRE-03-SMOKE/runtime_build_preflight.json",
+                        "sha256":  "af0f081f287a7b6a424d5d81d1209803e6ee0864fec7c5811eb115ea1a7d3f3f",
+                        "created_at_utc":  "2026-06-21T13:35:04Z",
+                        "description":  "Runtime build preflight produced during the first G01 diagnostic sequence."
+                    },
+                    {
+                        "evidence_id":  "EV-G01-RUNTIME-EXTERNAL-WORKSPACE-BUILD",
+                        "config_id":  "CFG-SMOKE",
+                        "materialization_id":  "MAT-CFG-SMOKE-104729",
+                        "run_id":  "PRE-03-SMOKE",
+                        "test_ids":  [
+                                         "T-002"
+                                     ],
+                        "kind":  "diagnostic",
+                        "path":  "test-results/final-campaign/G01_pipeline_validation/PRE-03-SMOKE/runtime_external_workspace_build_validation.json",
+                        "sha256":  "86db3f974bd4b4e2a5d7c96a71ea0f81bd6beeb672414a2339e7dbddc2995a18",
+                        "created_at_utc":  "2026-06-21T13:35:04Z",
+                        "description":  "Validation of external runtime build staging, safe publication, and negative publication-safety behavior."
+                    },
+                    {
+                        "evidence_id":  "EV-G01-RUNTIME-IMPLICIT-NONE-VALIDATION",
+                        "config_id":  "CFG-SMOKE",
+                        "materialization_id":  "MAT-CFG-SMOKE-104729",
+                        "run_id":  "PRE-03-SMOKE",
+                        "test_ids":  [
+                                         "T-002"
+                                     ],
+                        "kind":  "diagnostic",
+                        "path":  "test-results/final-campaign/G01_pipeline_validation/PRE-03-SMOKE/runtime_build_implicit_none_validation.json",
+                        "sha256":  "abe307fabb7256006354a44c1b548664964ffdf619c6a8a607ad41499c080b07",
+                        "created_at_utc":  "2026-06-21T13:35:04Z",
+                        "description":  "Validation showing that -implicit:none did not resolve the javac ZipFS close failure."
+                    },
+                    {
+                        "evidence_id":  "EV-G01-RUNTIME-JDK-WORKSPACE-ISOLATION",
+                        "config_id":  "CFG-SMOKE",
+                        "materialization_id":  "MAT-CFG-SMOKE-104729",
+                        "run_id":  "PRE-03-SMOKE",
+                        "test_ids":  [
+                                         "T-002"
+                                     ],
+                        "kind":  "diagnostic",
+                        "path":  "test-results/final-campaign/G01_pipeline_validation/PRE-03-SMOKE/runtime_jdk_workspace_isolation.json",
+                        "sha256":  "97c312bbe2b26f6466bc6845016d3d854183ba8d75a400272f5f08f6f31109a6",
+                        "created_at_utc":  "2026-06-21T13:35:04Z",
+                        "description":  "JDK, workspace, source-set, and external-workspace isolation diagnostic."
+                    },
+                    {
+                        "evidence_id":  "EV-G01-RUNTIME-MOSAIC-ROOT-ABSOLUTE-BUILD-STDERR",
+                        "config_id":  "CFG-SMOKE",
+                        "materialization_id":  "MAT-CFG-SMOKE-104729",
+                        "run_id":  "PRE-03-SMOKE",
+                        "test_ids":  [
+                                         "T-020"
+                                     ],
+                        "kind":  "raw-log",
+                        "path":  "test-results/final-campaign/G01_pipeline_validation/PRE-03-SMOKE/runtime_mosaic_root_resolution_validation/absolute_build_stderr.txt",
+                        "sha256":  "8896f0d5a34545a5f79e0e7c63c77a890061f5ff093b0c717bf45a0bccfb8369",
+                        "created_at_utc":  "2026-06-21T22:16:07Z",
+                        "description":  "G01G absolute-root runtime build stderr."
+                    },
+                    {
+                        "evidence_id":  "EV-G01-RUNTIME-MOSAIC-ROOT-ABSOLUTE-BUILD-STDOUT",
+                        "config_id":  "CFG-SMOKE",
+                        "materialization_id":  "MAT-CFG-SMOKE-104729",
+                        "run_id":  "PRE-03-SMOKE",
+                        "test_ids":  [
+                                         "T-020"
+                                     ],
+                        "kind":  "raw-log",
+                        "path":  "test-results/final-campaign/G01_pipeline_validation/PRE-03-SMOKE/runtime_mosaic_root_resolution_validation/absolute_build_stdout.txt",
+                        "sha256":  "46f3c3f2e670ec212e4a9ce98c90e169edb3184ece390e323e9994f25a677ae6",
+                        "created_at_utc":  "2026-06-21T22:16:07Z",
+                        "description":  "G01G absolute-root runtime build stdout."
+                    },
+                    {
+                        "evidence_id":  "EV-G01-RUNTIME-MOSAIC-ROOT-OUT-INVENTORY",
+                        "config_id":  "CFG-SMOKE",
+                        "materialization_id":  "MAT-CFG-SMOKE-104729",
+                        "run_id":  "PRE-03-SMOKE",
+                        "test_ids":  [
+                                         "T-020"
+                                     ],
+                        "kind":  "summary",
+                        "path":  "test-results/final-campaign/G01_pipeline_validation/PRE-03-SMOKE/runtime_mosaic_root_resolution_validation/published_out_inventory.csv",
+                        "sha256":  "25e69ef7a50b74338f22401cbd2994cd6c8f29485a82ae69a16e5e21835ce650",
+                        "created_at_utc":  "2026-06-21T22:16:07Z",
+                        "description":  "G01G published out inventory after failed absolute-root build validation."
+                    },
+                    {
+                        "evidence_id":  "EV-G01-RUNTIME-MOSAIC-ROOT-PATH-TESTS",
+                        "config_id":  "CFG-SMOKE",
+                        "materialization_id":  "MAT-CFG-SMOKE-104729",
+                        "run_id":  "PRE-03-SMOKE",
+                        "test_ids":  [
+                                         "T-020"
+                                     ],
+                        "kind":  "summary",
+                        "path":  "test-results/final-campaign/G01_pipeline_validation/PRE-03-SMOKE/runtime_mosaic_root_resolution_validation/path_resolution_tests.json",
+                        "sha256":  "02fca52d0d360781091c76f9cfcca39fed6025813ba5731934af6b9b5277cef0",
+                        "created_at_utc":  "2026-06-21T22:16:07Z",
+                        "description":  "G01G relative/absolute MOSAIC root path resolution tests."
+                    },
+                    {
+                        "evidence_id":  "EV-G01-RUNTIME-MOSAIC-ROOT-RESOLUTION",
+                        "config_id":  "CFG-SMOKE",
+                        "materialization_id":  "MAT-CFG-SMOKE-104729",
+                        "run_id":  "PRE-03-SMOKE",
+                        "test_ids":  [
+                                         "T-020"
+                                     ],
+                        "kind":  "summary",
+                        "path":  "test-results/final-campaign/G01_pipeline_validation/PRE-03-SMOKE/runtime_mosaic_root_resolution_validation.json",
+                        "sha256":  "1bb2cbd7cab3b11a64d16e7d22871ed3e479a17b35fe1b2e4d1250b42386ae7f",
+                        "created_at_utc":  "2026-06-21T22:16:07Z",
+                        "description":  "G01G MOSAIC root path normalization and absolute build validation report."
+                    },
+                    {
+                        "evidence_id":  "EV-G01-RUNTIME-NESTED-POWERSHELL-BUILD",
+                        "config_id":  "CFG-SMOKE",
+                        "materialization_id":  "MAT-CFG-SMOKE-104729",
+                        "run_id":  "PRE-03-SMOKE",
+                        "test_ids":  [
+                                         "T-002"
+                                     ],
+                        "kind":  "diagnostic",
+                        "path":  "test-results/final-campaign/G01_pipeline_validation/PRE-03-SMOKE/runtime_nested_powershell_build_validation.json",
+                        "sha256":  "cce9e8b3e01fa2b1a8666630103fb27d914526f4e1c49258d94d7f0177e1522f",
+                        "created_at_utc":  "2026-06-21T15:24:12Z",
+                        "description":  "G01F validation of nested PowerShell stderr propagation for the runtime build."
+                    },
+                    {
+                        "evidence_id":  "EV-G01-RUNTIME-NESTED-POWERSHELL-OUT-INVENTORY",
+                        "config_id":  "CFG-SMOKE",
+                        "materialization_id":  "MAT-CFG-SMOKE-104729",
+                        "run_id":  "PRE-03-SMOKE",
+                        "test_ids":  [
+                                         "T-002"
+                                     ],
+                        "kind":  "diagnostic",
+                        "path":  "test-results/final-campaign/G01_pipeline_validation/PRE-03-SMOKE/runtime_nested_powershell_build_validation/published_out_inventory.csv",
+                        "sha256":  "8747d92e1aaca0d8c0e8830570b90deaca2df44abf936cb6226cb7e133103f59",
+                        "created_at_utc":  "2026-06-21T15:24:12Z",
+                        "description":  "Inventory and hashes for the runtime out/ artifact published by the G01F nested build test."
+                    },
+                    {
+                        "evidence_id":  "EV-G01-RUNTIME-NESTED-POWERSHELL-STDERR",
+                        "config_id":  "CFG-SMOKE",
+                        "materialization_id":  "MAT-CFG-SMOKE-104729",
+                        "run_id":  "PRE-03-SMOKE",
+                        "test_ids":  [
+                                         "T-002"
+                                     ],
+                        "kind":  "diagnostic",
+                        "path":  "test-results/final-campaign/G01_pipeline_validation/PRE-03-SMOKE/runtime_nested_powershell_build_validation/nested_parent_stderr.txt",
+                        "sha256":  "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+                        "created_at_utc":  "2026-06-21T15:24:12Z",
+                        "description":  "Captured stderr from the parent PowerShell process during the G01F nested build test; expected to be empty."
+                    },
+                    {
+                        "evidence_id":  "EV-G01-RUNTIME-NESTED-POWERSHELL-STDOUT",
+                        "config_id":  "CFG-SMOKE",
+                        "materialization_id":  "MAT-CFG-SMOKE-104729",
+                        "run_id":  "PRE-03-SMOKE",
+                        "test_ids":  [
+                                         "T-002"
+                                     ],
+                        "kind":  "diagnostic",
+                        "path":  "test-results/final-campaign/G01_pipeline_validation/PRE-03-SMOKE/runtime_nested_powershell_build_validation/nested_parent_stdout.txt",
+                        "sha256":  "198d1fde42be9b74b3b25b08e7db9ad53c2f72818b1ae66c3a1e087193c76e71",
+                        "created_at_utc":  "2026-06-21T15:24:12Z",
+                        "description":  "Captured stdout from the parent PowerShell process during the G01F nested build test."
+                    },
+                    {
+                        "evidence_id":  "EV-G01-RUNTIME-OUT-CONSUMER-INVENTORY",
+                        "config_id":  "CFG-SMOKE",
+                        "materialization_id":  "MAT-CFG-SMOKE-104729",
+                        "run_id":  "PRE-03-SMOKE",
+                        "test_ids":  [
+                                         "T-002"
+                                     ],
+                        "kind":  "diagnostic",
+                        "path":  "test-results/final-campaign/G01_pipeline_validation/PRE-03-SMOKE/runtime_out_consumer_inventory.json",
+                        "sha256":  "a166f8bb9409c8d3476f32a32bcc6de87affa703e8af385900acaf1c8bfb36d2",
+                        "created_at_utc":  "2026-06-21T13:35:04Z",
+                        "description":  "Inventory of versioned consumers that rely on the runtime out/ structure."
+                    },
+                    {
+                        "evidence_id":  "EV-G01-RUNTIME-STABLE-ORIGINAL-CLASSPATH",
+                        "config_id":  "CFG-SMOKE",
+                        "materialization_id":  "MAT-CFG-SMOKE-104729",
+                        "run_id":  "PRE-03-SMOKE",
+                        "test_ids":  [
+                                         "T-002"
+                                     ],
+                        "kind":  "diagnostic",
+                        "path":  "test-results/final-campaign/G01_pipeline_validation/PRE-03-SMOKE/runtime_stable_original_classpath_validation.json",
+                        "sha256":  "95110344c038d1ad74a37524b32ffa79af2f8a38a2202e06192add31168e9381",
+                        "created_at_utc":  "2026-06-21T22:39:34Z",
+                        "description":  "G01H stable original MOSAIC classpath build validation report."
+                    },
+                    {
+                        "evidence_id":  "EV-G01-RUNTIME-STABLE-ORIGINAL-CLASSPATH-STDOUT",
+                        "config_id":  "CFG-SMOKE",
+                        "materialization_id":  "MAT-CFG-SMOKE-104729",
+                        "run_id":  "PRE-03-SMOKE",
+                        "test_ids":  [
+                                         "T-002"
+                                     ],
+                        "kind":  "diagnostic",
+                        "path":  "test-results/final-campaign/G01_pipeline_validation/PRE-03-SMOKE/runtime_stable_original_classpath_validation/stable_classpath_build_stdout.txt",
+                        "sha256":  "a82ae309644a813d1aac6316fee625944419d97795383e9e52fa74f866ed9bae",
+                        "created_at_utc":  "2026-06-21T22:39:34Z",
+                        "description":  "Stdout from the single G01H validation build using original MOSAIC classpath JARs."
+                    },
+                    {
+                        "evidence_id":  "EV-G01-RUNTIME-STABLE-ORIGINAL-CLASSPATH-STDERR",
+                        "config_id":  "CFG-SMOKE",
+                        "materialization_id":  "MAT-CFG-SMOKE-104729",
+                        "run_id":  "PRE-03-SMOKE",
+                        "test_ids":  [
+                                         "T-002"
+                                     ],
+                        "kind":  "diagnostic",
+                        "path":  "test-results/final-campaign/G01_pipeline_validation/PRE-03-SMOKE/runtime_stable_original_classpath_validation/stable_classpath_build_stderr.txt",
+                        "sha256":  "8896f0d5a34545a5f79e0e7c63c77a890061f5ff093b0c717bf45a0bccfb8369",
+                        "created_at_utc":  "2026-06-21T22:39:34Z",
+                        "description":  "Stderr from the single G01H validation build."
+                    },
+                    {
+                        "evidence_id":  "EV-G01-RUNTIME-STABLE-ORIGINAL-CLASSPATH-CONSOLE",
+                        "config_id":  "CFG-SMOKE",
+                        "materialization_id":  "MAT-CFG-SMOKE-104729",
+                        "run_id":  "PRE-03-SMOKE",
+                        "test_ids":  [
+                                         "T-002"
+                                     ],
+                        "kind":  "diagnostic",
+                        "path":  "test-results/final-campaign/G01_pipeline_validation/PRE-03-SMOKE/runtime_stable_original_classpath_validation/stable_classpath_build_console.txt",
+                        "sha256":  "ce4d075df560c07cad5e1c62d98349394c4f20b18d3de89e934d726e7a3cb7d0",
+                        "created_at_utc":  "2026-06-21T22:39:34Z",
+                        "description":  "Combined stdout/stderr log from G01H validation build."
+                    },
+                    {
+                        "evidence_id":  "EV-G01-RUNTIME-STABLE-ORIGINAL-CLASSPATH-INVENTORY",
+                        "config_id":  "CFG-SMOKE",
+                        "materialization_id":  "MAT-CFG-SMOKE-104729",
+                        "run_id":  "PRE-03-SMOKE",
+                        "test_ids":  [
+                                         "T-002"
+                                     ],
+                        "kind":  "diagnostic",
+                        "path":  "test-results/final-campaign/G01_pipeline_validation/PRE-03-SMOKE/runtime_stable_original_classpath_validation/original_classpath_inventory.csv",
+                        "sha256":  "45e4e83220f055f337cfc07245392554cc2324e95a5469c8d714584b157f40b5",
+                        "created_at_utc":  "2026-06-21T22:39:34Z",
+                        "description":  "Inventory of the 11 original MOSAIC classpath JARs used by javac in G01H."
+                    },
+                    {
+                        "evidence_id":  "EV-G01-RUNTIME-STABLE-PUBLISHED-CLASSPATH-MANIFEST",
+                        "config_id":  "CFG-SMOKE",
+                        "materialization_id":  "MAT-CFG-SMOKE-104729",
+                        "run_id":  "PRE-03-SMOKE",
+                        "test_ids":  [
+                                         "T-002"
+                                     ],
+                        "kind":  "diagnostic",
+                        "path":  "test-results/final-campaign/G01_pipeline_validation/PRE-03-SMOKE/runtime_stable_original_classpath_validation/published_classpath_manifest.csv",
+                        "sha256":  "903b4b0a16a7c4c951ad3c4643c0f387e6f532baa9b723b3474166c31242794b",
+                        "created_at_utc":  "2026-06-21T22:39:34Z",
+                        "description":  "Published classpath manifest placeholder; build failed before out publication."
+                    },
+                    {
+                        "evidence_id":  "EV-G01-PREVALIDATED-RUNTIME-VALIDATION",
+                        "config_id":  "CFG-SMOKE",
+                        "materialization_id":  "MAT-CFG-SMOKE-104729",
+                        "run_id":  "PRE-03-SMOKE",
+                        "test_ids":  [
+                                         "T-002"
+                                     ],
+                        "kind":  "diagnostic",
+                        "path":  "test-results/final-campaign/G01_pipeline_validation/PRE-03-SMOKE/prevalidated_runtime_artifact_validation.json",
+                        "sha256":  "7a2aea61a6a9d848e6bdce3232714b64959636ad041be428034749820a1ef483",
+                        "created_at_utc":  "2026-06-21T23:00:25Z",
+                        "description":  "G01I prevalidated frozen runtime artifact validation report."
+                    },
+                    {
+                        "evidence_id":  "EV-G01-PREVALIDATED-RUNTIME-VALIDATOR-STDOUT",
+                        "config_id":  "CFG-SMOKE",
+                        "materialization_id":  "MAT-CFG-SMOKE-104729",
+                        "run_id":  "PRE-03-SMOKE",
+                        "test_ids":  [
+                                         "T-002"
+                                     ],
+                        "kind":  "diagnostic",
+                        "path":  "test-results/final-campaign/G01_pipeline_validation/PRE-03-SMOKE/prevalidated_runtime_artifact_validation/validator_stdout.txt",
+                        "sha256":  "de13b93be250938e73a40efbe8733cbb1e9eb2a8dfc4a96d2beb19b37523d9cc",
+                        "created_at_utc":  "2026-06-21T23:00:25Z",
+                        "description":  "Stdout from the single G01I prevalidated artifact validator execution."
+                    },
+                    {
+                        "evidence_id":  "EV-G01-PREVALIDATED-RUNTIME-VALIDATOR-STDERR",
+                        "config_id":  "CFG-SMOKE",
+                        "materialization_id":  "MAT-CFG-SMOKE-104729",
+                        "run_id":  "PRE-03-SMOKE",
+                        "test_ids":  [
+                                         "T-002"
+                                     ],
+                        "kind":  "diagnostic",
+                        "path":  "test-results/final-campaign/G01_pipeline_validation/PRE-03-SMOKE/prevalidated_runtime_artifact_validation/validator_stderr.txt",
+                        "sha256":  "cd63f47a3d743d1937c1dba93730122871e2d4ef8c9a07da73aaa1a6755a6e51",
+                        "created_at_utc":  "2026-06-21T23:00:25Z",
+                        "description":  "Stderr from the single G01I prevalidated artifact validator execution."
+                    },
+                    {
+                        "evidence_id":  "EV-G01-PREVALIDATED-RUNTIME-VALIDATOR-CONSOLE",
+                        "config_id":  "CFG-SMOKE",
+                        "materialization_id":  "MAT-CFG-SMOKE-104729",
+                        "run_id":  "PRE-03-SMOKE",
+                        "test_ids":  [
+                                         "T-002"
+                                     ],
+                        "kind":  "diagnostic",
+                        "path":  "test-results/final-campaign/G01_pipeline_validation/PRE-03-SMOKE/prevalidated_runtime_artifact_validation/validator_console.txt",
+                        "sha256":  "bc20095eb338d1d19e80b15aebd01bc7925fdf86d55bcda8bd9893febe70f540",
+                        "created_at_utc":  "2026-06-21T23:00:25Z",
+                        "description":  "Combined validator stdout/stderr log for G01I."
+                    },
+                    {
+                        "evidence_id":  "EV-G01-PREVALIDATED-RUNTIME-INVENTORY",
+                        "config_id":  "CFG-SMOKE",
+                        "materialization_id":  "MAT-CFG-SMOKE-104729",
+                        "run_id":  "PRE-03-SMOKE",
+                        "test_ids":  [
+                                         "T-002"
+                                     ],
+                        "kind":  "diagnostic",
+                        "path":  "test-results/final-campaign/G01_pipeline_validation/PRE-03-SMOKE/prevalidated_runtime_artifact_validation/prevalidated_runtime_artifact_inventory.csv",
+                        "sha256":  "b5e7d3e0aeacdf371473a9f900be06955adc15dc0001b9673aed0d635f9fbac6",
+                        "created_at_utc":  "2026-06-21T23:00:25Z",
+                        "description":  "Inventory comparing runtime classpath JARs to original MOSAIC JARs; empty/mismatch because out/ is absent."
+                    },
+                    {
+                        "evidence_id":  "EV-G01-VALIDATED-JAVA-TOOLCHAIN-DISCOVERY",
+                        "config_id":  "CFG-SMOKE",
+                        "materialization_id":  "MAT-CFG-SMOKE-104729",
+                        "run_id":  "PRE-03-SMOKE",
+                        "test_ids":  [
+                                         "T-002"
+                                     ],
+                        "kind":  "diagnostic",
+                        "path":  "test-results/final-campaign/G01_pipeline_validation/PRE-03-SMOKE/validated_java_toolchain_discovery.json",
+                        "sha256":  "2ae59b663746f154f9129f9317f9941128281a9382d289192e3e4d9f16d986da",
+                        "created_at_utc":  "2026-06-21T23:17:26Z",
+                        "description":  "G01J discovery of the historically validated Adoptium/Temurin Java 17 toolchain from G01D evidence."
+                    },
+                    {
+                        "evidence_id":  "EV-G01-EXPLICIT-JAVA17-VALIDATION",
+                        "config_id":  "CFG-SMOKE",
+                        "materialization_id":  "MAT-CFG-SMOKE-104729",
+                        "run_id":  "PRE-03-SMOKE",
+                        "test_ids":  [
+                                         "T-002"
+                                     ],
+                        "kind":  "diagnostic",
+                        "path":  "test-results/final-campaign/G01_pipeline_validation/PRE-03-SMOKE/explicit_java17_toolchain_validation.json",
+                        "sha256":  "84b2bc3ace47cd2346233ca74fc3142769e64339ca683a7ccb232581692b5321",
+                        "created_at_utc":  "2026-06-21T23:17:26Z",
+                        "description":  "G01J single validation build report using explicit Adoptium/Temurin Java 17.0.8.1 JavaHome."
+                    },
+                    {
+                        "evidence_id":  "EV-G01-EXPLICIT-JAVA17-BUILD-STDOUT",
+                        "config_id":  "CFG-SMOKE",
+                        "materialization_id":  "MAT-CFG-SMOKE-104729",
+                        "run_id":  "PRE-03-SMOKE",
+                        "test_ids":  [
+                                         "T-002"
+                                     ],
+                        "kind":  "raw-log",
+                        "path":  "test-results/final-campaign/G01_pipeline_validation/PRE-03-SMOKE/explicit_java17_toolchain_validation/build_stdout.txt",
+                        "sha256":  "9d4734fd93573db297c874de9bda7f6eec00052206eed612decfbc59de2f7627",
+                        "created_at_utc":  "2026-06-21T23:17:26Z",
+                        "description":  "Stdout from the single G01J explicit JavaHome validation build."
+                    },
+                    {
+                        "evidence_id":  "EV-G01-EXPLICIT-JAVA17-BUILD-STDERR",
+                        "config_id":  "CFG-SMOKE",
+                        "materialization_id":  "MAT-CFG-SMOKE-104729",
+                        "run_id":  "PRE-03-SMOKE",
+                        "test_ids":  [
+                                         "T-002"
+                                     ],
+                        "kind":  "raw-log",
+                        "path":  "test-results/final-campaign/G01_pipeline_validation/PRE-03-SMOKE/explicit_java17_toolchain_validation/build_stderr.txt",
+                        "sha256":  "7436574a860829d1971ae99faf9240d22069dd1d7cd6a121d0c87f7d50820857",
+                        "created_at_utc":  "2026-06-21T23:17:26Z",
+                        "description":  "Stderr from the single G01J explicit JavaHome validation build."
+                    },
+                    {
+                        "evidence_id":  "EV-G01-EXPLICIT-JAVA17-BUILD-CONSOLE",
+                        "config_id":  "CFG-SMOKE",
+                        "materialization_id":  "MAT-CFG-SMOKE-104729",
+                        "run_id":  "PRE-03-SMOKE",
+                        "test_ids":  [
+                                         "T-002"
+                                     ],
+                        "kind":  "raw-log",
+                        "path":  "test-results/final-campaign/G01_pipeline_validation/PRE-03-SMOKE/explicit_java17_toolchain_validation/build_console.txt",
+                        "sha256":  "8bcf4f6c81b3d2cd197e0454550e1157ea3a5eae0b4aa2fce907dd7f9120da36",
+                        "created_at_utc":  "2026-06-21T23:17:26Z",
+                        "description":  "Combined stdout/stderr log for the G01J explicit JavaHome validation build."
+                    },
+                    {
+                        "evidence_id":  "EV-G01-VALIDATED-JAVA-TOOLCHAIN-ENVIRONMENT",
+                        "config_id":  "CFG-SMOKE",
+                        "materialization_id":  "MAT-CFG-SMOKE-104729",
+                        "run_id":  "PRE-03-SMOKE",
+                        "test_ids":  [
+                                         "T-002"
+                                     ],
+                        "kind":  "diagnostic",
+                        "path":  "test-results/final-campaign/G01_pipeline_validation/PRE-03-SMOKE/explicit_java17_toolchain_validation/validated_java_toolchain_environment.txt",
+                        "sha256":  "7538d91fde3ab2c418b704772ee6f68e286dfa5df026f95ffba9df3dd7e556c6",
+                        "created_at_utc":  "2026-06-21T23:17:26Z",
+                        "description":  "Captured java, javac, and jar version output for the historically validated JavaHome used in G01J."
+                    },
+                    {
+                        "evidence_id":  "EV-G01-EXPLICIT-JAVA17-PUBLISHED-OUT-INVENTORY",
+                        "config_id":  "CFG-SMOKE",
+                        "materialization_id":  "MAT-CFG-SMOKE-104729",
+                        "run_id":  "PRE-03-SMOKE",
+                        "test_ids":  [
+                                         "T-002"
+                                     ],
+                        "kind":  "inventory",
+                        "path":  "test-results/final-campaign/G01_pipeline_validation/PRE-03-SMOKE/explicit_java17_toolchain_validation/published_out_inventory.csv",
+                        "sha256":  "346d7743742386a7dd9099451bf5f63babf261c80012e1b0ef6df0fc598d5951",
+                        "created_at_utc":  "2026-06-21T23:17:26Z",
+                        "description":  "Published out inventory for G01J; header only because the failed build did not publish out/."
+                    },
+                    {
+                        "evidence_id":  "EV-G01-RECOVERED-RUNTIME-ADOPTION",
+                        "config_id":  "CFG-SMOKE",
+                        "materialization_id":  "MAT-CFG-SMOKE-104729",
+                        "run_id":  "PRE-03-SMOKE",
+                        "test_ids":  [
+                                         "T-002"
+                                     ],
+                        "kind":  "diagnostic",
+                        "path":  "test-results/final-campaign/G01_pipeline_validation/PRE-03-SMOKE/recovered_runtime_artifact_adoption.json",
+                        "sha256":  "ad5dda6850714620879ffdcb4611423659bf713fa77e28a87a578859a7177268",
+                        "created_at_utc":  "2026-06-22T09:13:58Z",
+                        "description":  "G01L recovered runtime artifact adoption report and workflow readiness classification."
+                    },
+                    {
+                        "evidence_id":  "EV-G01-RECOVERED-RUNTIME-VALIDATOR-STDOUT",
+                        "config_id":  "CFG-SMOKE",
+                        "materialization_id":  "MAT-CFG-SMOKE-104729",
+                        "run_id":  "PRE-03-SMOKE",
+                        "test_ids":  [
+                                         "T-002"
+                                     ],
+                        "kind":  "raw-log",
+                        "path":  "test-results/final-campaign/G01_pipeline_validation/PRE-03-SMOKE/recovered_runtime_artifact_adoption/validator_stdout.txt",
+                        "sha256":  "99304a1474f0506ff3938e2e2997c39c81bd93445b68d7b799f7b36f695b80e9",
+                        "created_at_utc":  "2026-06-22T09:13:58Z",
+                        "description":  "Stdout from the single G01L runtime artifact validator execution."
+                    },
+                    {
+                        "evidence_id":  "EV-G01-RECOVERED-RUNTIME-VALIDATOR-STDERR",
+                        "config_id":  "CFG-SMOKE",
+                        "materialization_id":  "MAT-CFG-SMOKE-104729",
+                        "run_id":  "PRE-03-SMOKE",
+                        "test_ids":  [
+                                         "T-002"
+                                     ],
+                        "kind":  "raw-log",
+                        "path":  "test-results/final-campaign/G01_pipeline_validation/PRE-03-SMOKE/recovered_runtime_artifact_adoption/validator_stderr.txt",
+                        "sha256":  "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+                        "created_at_utc":  "2026-06-22T09:13:58Z",
+                        "description":  "Stderr from the single G01L runtime artifact validator execution."
+                    },
+                    {
+                        "evidence_id":  "EV-G01-RECOVERED-RUNTIME-VALIDATOR-CONSOLE",
+                        "config_id":  "CFG-SMOKE",
+                        "materialization_id":  "MAT-CFG-SMOKE-104729",
+                        "run_id":  "PRE-03-SMOKE",
+                        "test_ids":  [
+                                         "T-002"
+                                     ],
+                        "kind":  "raw-log",
+                        "path":  "test-results/final-campaign/G01_pipeline_validation/PRE-03-SMOKE/recovered_runtime_artifact_adoption/validator_console.txt",
+                        "sha256":  "27b9d61217548e9964ded40618c2bdc4ebc5c1217363556236ca084006435efe",
+                        "created_at_utc":  "2026-06-22T09:13:58Z",
+                        "description":  "Combined stdout/stderr log from G01L runtime artifact validation."
+                    },
+                    {
+                        "evidence_id":  "EV-G01-RECOVERED-RUNTIME-VALIDATION-JSON",
+                        "config_id":  "CFG-SMOKE",
+                        "materialization_id":  "MAT-CFG-SMOKE-104729",
+                        "run_id":  "PRE-03-SMOKE",
+                        "test_ids":  [
+                                         "T-002"
+                                     ],
+                        "kind":  "diagnostic",
+                        "path":  "test-results/final-campaign/G01_pipeline_validation/PRE-03-SMOKE/recovered_runtime_artifact_adoption/runtime_artifact_validation.json",
+                        "sha256":  "f09de8bfef219267e76f7a08cab13648fac3809376dac7598456a01d33210638",
+                        "created_at_utc":  "2026-06-22T09:13:58Z",
+                        "description":  "Read-only validation JSON for the recovered runtime artifact: size, SHA-256, jar tf, ZipArchive, and expected entries."
+                    },
+                    {
+                        "evidence_id":  "EV-G01-RECOVERED-RUNTIME-SCRIPT-STATIC-VALIDATION",
+                        "config_id":  "CFG-SMOKE",
+                        "materialization_id":  "MAT-CFG-SMOKE-104729",
+                        "run_id":  "PRE-03-SMOKE",
+                        "test_ids":  [
+                                         "T-002"
+                                     ],
+                        "kind":  "diagnostic",
+                        "path":  "test-results/final-campaign/G01_pipeline_validation/PRE-03-SMOKE/recovered_runtime_artifact_adoption/script_static_validation.json",
+                        "sha256":  "e5a4fd7903cb1bdec290315af873a453e6a95dfbc9d0538176224335af26da10",
+                        "created_at_utc":  "2026-06-22T09:13:58Z",
+                        "description":  "Static validation that runner and deploy expose BUILD and RECOVERED_VALIDATED_ARTIFACT workflow without invoking build.ps1 in recovered mode."
+                    }
+                ],
+    "recovered_runtime_artifact":  {
+                                       "artifactId":  "RUNTIME-JAR-RETRY02-1A0AA6D2",
+                                       "policy":  "RECOVERED_VALIDATED_ARTIFACT",
+                                       "stableLocalPath":  "tmp/final-campaign-runtime-artifacts/recovered-retry-02/maga-live-maga-runtime.jar",
+                                       "sizeBytes":  491454,
+                                       "sha256":  "1a0aa6d2b0441f0be38baf5df1acc2d4d889b9f356b6111f7715105cd013a9b4",
+                                       "evidencePath":  "test-results/final-campaign/G01_pipeline_validation/PRE-03-SMOKE/recovered_runtime_artifact_adoption.json"
+                                   }
 }

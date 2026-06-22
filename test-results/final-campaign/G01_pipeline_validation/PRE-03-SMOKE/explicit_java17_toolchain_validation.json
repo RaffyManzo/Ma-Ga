@@ -1,0 +1,50 @@
+{
+    "campaignId":  "final-test-campaign",
+    "groupId":  "G01",
+    "phase":  "G01J",
+    "timestampUtc":  "2026-06-21T23:15:31Z",
+    "gitBranch":  "testing/final-campaign",
+    "gitHead":  "3e02146c9161e70caeae76c673f4068de5ecf1b7",
+    "historicallyValidatedToolchain":  {
+                                           "vendor":  "Eclipse Adoptium",
+                                           "javaVersion":  "17.0.8.1",
+                                           "javacVersion":  "17.0.8.1",
+                                           "historicalBuildStatus":  "PASS",
+                                           "historicalSourceCount":  198,
+                                           "historicalClassCount":  252,
+                                           "evidenceFiles":  [
+                                                                 "test-results\\final-campaign\\G01_pipeline_validation\\PRE-03-SMOKE\\runtime_jdk_workspace_isolation.json",
+                                                                 "C:\\Users\\raffa\\IdeaProjects\\maga-core\\test-results\\final-campaign\\G01_pipeline_validation\\PRE-03-SMOKE\\runtime_jdk_workspace_isolation\\d5_jdk-17.0.8.101-hotspot-17.0.8.1_stdout.txt",
+                                                                 "C:\\Users\\raffa\\IdeaProjects\\maga-core\\test-results\\final-campaign\\G01_pipeline_validation\\PRE-03-SMOKE\\runtime_jdk_workspace_isolation\\d5_jdk-17.0.8.101-hotspot-17.0.8.1_stderr.txt",
+                                                                 "tmp/final-campaign-build-diagnostics/G01D/g01d_console_summary.json"
+                                                             ]
+                                       },
+    "javaHome":  "C:\\Program Files\\Eclipse Adoptium\\jdk-17.0.8.101-hotspot",
+    "javaVendor":  "Eclipse Adoptium",
+    "javaVersion":  "openjdk version \"17.0.8.1\" 2023-08-24\r\nOpenJDK Runtime Environment Temurin-17.0.8.1+1 (build 17.0.8.1+1)\r\nOpenJDK 64-Bit Server VM Temurin-17.0.8.1+1 (build 17.0.8.1+1, mixed mode, sharing)",
+    "javacVersion":  "javac 17.0.8.1",
+    "jarVersion":  "jar 17.0.8.1",
+    "buildExecutionCount":  1,
+    "buildExitCode":  1,
+    "mosaicRoot":  "C:\\Users\\raffa\\IdeaProjects\\maga-core\\tmp\\mosaic-25.2",
+    "duplicatePathDetected":  false,
+    "sourceCount":  198,
+    "classCount":  252,
+    "dependencyJarCount":  11,
+    "accessDeniedExceptionPresent":  true,
+    "compilerExceptionPresent":  true,
+    "runtimeJarPath":  null,
+    "runtimeJarSizeBytes":  null,
+    "runtimeJarSha256":  "",
+    "runtimeJarTfStatus":  "NOT_RUN_JAR_MISSING",
+    "outPublished":  false,
+    "stagingRoot":  "C:\\Users\\raffa\\AppData\\Local\\Temp\\maga-live-maga-runtime-build-14128-20260622011413322",
+    "stagingRemoved":  false,
+    "classification":  "EXPLICIT_VALIDATED_JAVA17_BUILD_FAILED",
+    "limitations":  [
+                        "Exactly one validation build was executed.",
+                        "No deploy, SUMO, MOSAIC, RETRY-04, commit, or push was executed.",
+                        "The historically validated Adoptium/Temurin Java 17 toolchain was selected explicitly, but javac still emitted a ZipFS AccessDeniedException after producing classes in this environment.",
+                        "No runtime out artifact was published."
+                    ]
+}

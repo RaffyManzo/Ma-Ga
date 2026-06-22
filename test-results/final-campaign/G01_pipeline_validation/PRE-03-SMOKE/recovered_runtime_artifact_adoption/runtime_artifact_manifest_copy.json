@@ -1,0 +1,25 @@
+{
+    "artifactId":  "RUNTIME-JAR-RETRY02-1A0AA6D2",
+    "artifactRole":  "MOSAIC_LIVE_MAGA_RUNTIME",
+    "sourceAttempt":  "G01-RETRY-02",
+    "sourcePath":  "tmp/archive/final-test-campaign-pre-G01-retry-03-20260621-220103/MaGaLiteratureBasedUrbanStudy/application/maga-live-maga-runtime.jar",
+    "stableLocalPath":  "tmp/final-campaign-runtime-artifacts/recovered-retry-02/maga-live-maga-runtime.jar",
+    "filename":  "maga-live-maga-runtime.jar",
+    "sizeBytes":  491454,
+    "sha256":  "1a0aa6d2b0441f0be38baf5df1acc2d4d889b9f356b6111f7715105cd013a9b4",
+    "sourceClassification":  "ARCHIVED_DEPLOYED_SCENARIO",
+    "sourceJarTfStatus":  "PASS",
+    "sourceZipOpenStatus":  "PASS",
+    "sourceExpectedEntriesPresent":  true,
+    "copiedAtUtc":  "2026-06-22T09:08:46Z",
+    "copyCount":  1,
+    "sourceDestinationHashMatch":  true,
+    "freshBuildExecuted":  false,
+    "compilerExitCode":  null,
+    "campaignUsePolicy":  "RECOVERED_VALIDATED_ARTIFACT",
+    "limitations":  [
+                        "The artifact was produced by a previously successful build and was already deployed during RETRY-02.",
+                        "It is not the result of a new build performed during G01L.",
+                        "Fresh javac builds remain non-reproducible in the current Windows environment because of an intermittent JavacFileManager/ZipFS AccessDeniedException after class generation."
+                    ]
+}

@@ -1,0 +1,10 @@
+{
+    "attemptId":  "RETRY-03",
+    "commandExecutionCount":  1,
+    "status":  "PROCESS_COMPLETED",
+    "gitHead":  "3e02146c9161e70caeae76c673f4068de5ecf1b7",
+    "startedAtUtc":  "2026-06-21T22:01:27Z",
+    "completedAtUtc":  "2026-06-21T22:01:29Z",
+    "durationSeconds":  1.0608075,
+    "exitCode":  1
+}
