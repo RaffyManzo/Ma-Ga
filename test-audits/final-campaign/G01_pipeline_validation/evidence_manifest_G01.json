@@ -1,4 +1,4 @@
-﻿{
+{
     "campaign_id":  "final-test-campaign",
     "group_id":  "G01",
     "created_at_utc":  "2026-06-22T10:03:26Z",
@@ -167,7 +167,7 @@
                                      ],
                         "kind":  "summary",
                         "path":  "test-audits/final-campaign/G01_pipeline_validation/audit_G01_pipeline_validation.md",
-                        "sha256":  "f681402f585066568cb8fca51e5af60c126c9f9adb0930c7e3eec26d821d8341",
+                        "sha256":  "5fb62eba68796b4b615096bf21fdb27074bfde0d5df2e773216cf9ee89820146",
                         "created_at_utc":  "2026-06-22T14:32:20.8988219Z",
                         "description":  "Audit finale G01."
                     },
@@ -1348,7 +1348,7 @@
                              "sourceAttempt":  "G01-RETRY-02",
                              "versionedEvidence":  false
                          },
-    "updated_at_utc":  "2026-06-22T14:32:21.2498122Z",
+    "updated_at_utc":  "2026-06-22T15:53:16.3753711Z",
     "final_status":  {
                          "audit_status":  "COMPLETED - RETRY-04 SIMULATION PASSED WITH OFFLINE POST-PROCESSING RECOVERY",
                          "retry04_execution_count":  1,
