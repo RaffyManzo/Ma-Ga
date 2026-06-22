@@ -1,14 +1,14 @@
 ﻿{
     "campaign_id":  "final-test-campaign",
     "group_id":  "G01",
-    "created_at_utc":  "2026-06-22T09:36:27Z",
+    "created_at_utc":  "2026-06-22T10:03:26Z",
     "git":  {
                 "branch":  "testing/final-campaign",
                 "frozen_branch":  "MOSAIC/SUMO-integration",
                 "frozen_commit":  "5a9477735a3d707a5f000a64653cd2a6fc7f2007",
                 "campaign_head_before_g01_run":  "6449978026d205c3f0949cd5532782fd447fed1d",
                 "working_tree_status_short":  [
-                                                  "G01L recovered validated runtime artifact workflow pending commit; no Java/core changes, no build/deploy/SUMO/MOSAIC/RETRY-04."
+                                                  "RETRY-04 executed exactly once; failed after MOSAIC during summarize-run.ps1; final audit/results pending commit."
                                               ],
                 "campaign_head_before_g01_retry":  "8cf83f53f3c08016edaacfc19a83fcbb767b479a",
                 "campaign_head_before_g01_retry_02":  "33958c27ef7b312bf27192a79650220beabe1dd4",
@@ -18,7 +18,9 @@
                 "campaign_head_before_g01h":  "3e02146c9161e70caeae76c673f4068de5ecf1b7",
                 "campaign_head_before_g01i":  "3e02146c9161e70caeae76c673f4068de5ecf1b7",
                 "campaign_head_before_g01j":  "3e02146c9161e70caeae76c673f4068de5ecf1b7",
-                "campaign_head_before_g01l":  "3e02146c9161e70caeae76c673f4068de5ecf1b7"
+                "campaign_head_before_g01l":  "3e02146c9161e70caeae76c673f4068de5ecf1b7",
+                "campaign_head_before_g01_retry_04":  "7b3f6359aae81388d009d35da3adb527fc8f11b8",
+                "campaign_head_before_g01_finalization":  "7b3f6359aae81388d009d35da3adb527fc8f11b8"
             },
     "workbook":  {
                      "source":  "Matrice_test_MA_GA_MOSAIC_SUMO_Fase0_completa.xlsx",
@@ -129,9 +131,9 @@
                                      ],
                         "kind":  "metric",
                         "path":  "test-audits/final-campaign/G01_pipeline_validation/metrics_G01.csv",
-                        "sha256":  "2031a878e742c30c29e5bf0df36f611fb9cbbec4dc388eba09ba7a1414e031b2",
-                        "created_at_utc":  "2026-06-21T13:35:04Z",
-                        "description":  "G01 metrics in long format."
+                        "sha256":  "d9c93fc444bfe2314824017652cde849bcdf77897441fcc00495045713fab107",
+                        "created_at_utc":  "2026-06-22T14:32:20.9084074Z",
+                        "description":  "Metriche finali G01."
                     },
                     {
                         "evidence_id":  "EV-G01-0007",
@@ -147,9 +149,9 @@
                                      ],
                         "kind":  "summary",
                         "path":  "test-audits/final-campaign/G01_pipeline_validation/anomalies_G01.csv",
-                        "sha256":  "b8565ae49716d705443ab2990fdd93852f716ea942ac01e254d45826f15ffb72",
-                        "created_at_utc":  "2026-06-21T13:35:04Z",
-                        "description":  "G01 anomalies."
+                        "sha256":  "ad9855dde48411a6570540797007207322d7d647ab8cf5360c789c9d0e57793a",
+                        "created_at_utc":  "2026-06-22T14:32:20.8873124Z",
+                        "description":  "Anomalie finali G01."
                     },
                     {
                         "evidence_id":  "EV-G01-0008",
@@ -165,9 +167,9 @@
                                      ],
                         "kind":  "summary",
                         "path":  "test-audits/final-campaign/G01_pipeline_validation/audit_G01_pipeline_validation.md",
-                        "sha256":  "f8357078ccf818bb4e5a5a97dbfa23719d7583d48feb601289430212bd8dceb0",
-                        "created_at_utc":  "2026-06-21T13:35:04Z",
-                        "description":  "G01 audit markdown."
+                        "sha256":  "f681402f585066568cb8fca51e5af60c126c9f9adb0930c7e3eec26d821d8341",
+                        "created_at_utc":  "2026-06-22T14:32:20.8988219Z",
+                        "description":  "Audit finale G01."
                     },
                     {
                         "evidence_id":  "EV-G01-G00D-BANDWIDTH-REPAIR",
@@ -1040,6 +1042,294 @@
                         "sha256":  "e5a4fd7903cb1bdec290315af873a453e6a95dfbc9d0538176224335af26da10",
                         "created_at_utc":  "2026-06-22T09:13:58Z",
                         "description":  "Static validation that runner and deploy expose BUILD and RECOVERED_VALIDATED_ARTIFACT workflow without invoking build.ps1 in recovered mode."
+                    },
+                    {
+                        "evidence_id":  "EV-G01-RETRY-04-ATTEMPT-GUARD",
+                        "config_id":  "CFG-SMOKE",
+                        "materialization_id":  "MAT-CFG-SMOKE-104729",
+                        "run_id":  "PRE-03-SMOKE",
+                        "test_ids":  [
+                                         "T-011",
+                                         "T-015",
+                                         "T-017",
+                                         "T-020",
+                                         "T-021"
+                                     ],
+                        "kind":  "run-metadata",
+                        "path":  "test-results/final-campaign/G01_pipeline_validation/PRE-03-SMOKE/retry-04/attempt_guard.json",
+                        "sha256":  "ddd8e04ba0231a113729973937e4042cc89e04c5672a33895d951e7e533b16dc",
+                        "created_at_utc":  "2026-06-22T09:50:24.8993447Z",
+                        "description":  "Attempt guard di RETRY-04."
+                    },
+                    {
+                        "evidence_id":  "EV-G01-RETRY-04-RUNNER-COMMAND",
+                        "config_id":  "CFG-SMOKE",
+                        "materialization_id":  "MAT-CFG-SMOKE-104729",
+                        "run_id":  "PRE-03-SMOKE",
+                        "test_ids":  [
+                                         "T-011",
+                                         "T-015",
+                                         "T-017",
+                                         "T-020",
+                                         "T-021"
+                                     ],
+                        "kind":  "command",
+                        "path":  "test-results/final-campaign/G01_pipeline_validation/PRE-03-SMOKE/retry-04/runner_command.txt",
+                        "sha256":  "679972fb05f9342002ce25ae19e93177eab2d51416e82db30a32b182a0f294c4",
+                        "created_at_utc":  "2026-06-22T10:03:26Z",
+                        "description":  "Exact RETRY-04 runner command with recovered artifact parameters."
+                    },
+                    {
+                        "evidence_id":  "EV-G01-RETRY-04-RUNNER-STDOUT",
+                        "config_id":  "CFG-SMOKE",
+                        "materialization_id":  "MAT-CFG-SMOKE-104729",
+                        "run_id":  "PRE-03-SMOKE",
+                        "test_ids":  [
+                                         "T-011",
+                                         "T-015",
+                                         "T-017",
+                                         "T-020",
+                                         "T-021"
+                                     ],
+                        "kind":  "raw-log",
+                        "path":  "test-results/final-campaign/G01_pipeline_validation/PRE-03-SMOKE/retry-04/runner_stdout.txt",
+                        "sha256":  "c164de9dbdd9dcdf2ab3e7ae393e9928b03a4d5c96a3aec8dd4dabd24f6de358",
+                        "created_at_utc":  "2026-06-22T10:03:26Z",
+                        "description":  "RETRY-04 runner stdout."
+                    },
+                    {
+                        "evidence_id":  "EV-G01-RETRY-04-RUNNER-STDERR",
+                        "config_id":  "CFG-SMOKE",
+                        "materialization_id":  "MAT-CFG-SMOKE-104729",
+                        "run_id":  "PRE-03-SMOKE",
+                        "test_ids":  [
+                                         "T-011",
+                                         "T-015",
+                                         "T-017",
+                                         "T-020",
+                                         "T-021"
+                                     ],
+                        "kind":  "raw-log",
+                        "path":  "test-results/final-campaign/G01_pipeline_validation/PRE-03-SMOKE/retry-04/runner_stderr.txt",
+                        "sha256":  "df9ebf254a66b91b7e0b3b1e32976afeb350139e5dfb5d53f72ef1be2746f0fc",
+                        "created_at_utc":  "2026-06-22T10:03:26Z",
+                        "description":  "RETRY-04 runner stderr containing summarizer failure."
+                    },
+                    {
+                        "evidence_id":  "EV-G01-RETRY-04-RUNNER-CONSOLE",
+                        "config_id":  "CFG-SMOKE",
+                        "materialization_id":  "MAT-CFG-SMOKE-104729",
+                        "run_id":  "PRE-03-SMOKE",
+                        "test_ids":  [
+                                         "T-011",
+                                         "T-015",
+                                         "T-017",
+                                         "T-020",
+                                         "T-021"
+                                     ],
+                        "kind":  "raw-log",
+                        "path":  "test-results/final-campaign/G01_pipeline_validation/PRE-03-SMOKE/retry-04/runner_console.txt",
+                        "sha256":  "be97282fa470bf1c198d67d45a5a3ea550d318bbaab5d7b491e3b44c26611d45",
+                        "created_at_utc":  "2026-06-22T10:03:26Z",
+                        "description":  "Combined RETRY-04 runner stdout/stderr."
+                    },
+                    {
+                        "evidence_id":  "EV-G01-RETRY-04-RUNNER-EXIT-CODE",
+                        "config_id":  "CFG-SMOKE",
+                        "materialization_id":  "MAT-CFG-SMOKE-104729",
+                        "run_id":  "PRE-03-SMOKE",
+                        "test_ids":  [
+                                         "T-011",
+                                         "T-015",
+                                         "T-017",
+                                         "T-020",
+                                         "T-021"
+                                     ],
+                        "kind":  "run-metadata",
+                        "path":  "test-results/final-campaign/G01_pipeline_validation/PRE-03-SMOKE/retry-04/runner_exit_code.txt",
+                        "sha256":  "07846b783c23904a75834c1932bc2fad41e388e18bc32ffd73ed87bfa3844d87",
+                        "created_at_utc":  "2026-06-22T10:03:26Z",
+                        "description":  "RETRY-04 process exit code."
+                    },
+                    {
+                        "evidence_id":  "EV-G01-RETRY-04-SUMMARY",
+                        "config_id":  "CFG-SMOKE",
+                        "materialization_id":  "MAT-CFG-SMOKE-104729",
+                        "run_id":  "PRE-03-SMOKE",
+                        "test_ids":  [
+                                         "T-011",
+                                         "T-015",
+                                         "T-017",
+                                         "T-020",
+                                         "T-021"
+                                     ],
+                        "kind":  "summary",
+                        "path":  "test-results/final-campaign/G01_pipeline_validation/PRE-03-SMOKE/retry-04/retry-04_summary.json",
+                        "sha256":  "f0fc1466597136b2c233cde0abc4b5d1ca1f4145ec912b69e24efe4e42f2ed62",
+                        "created_at_utc":  "2026-06-22T14:32:20.8794712Z",
+                        "description":  "Riepilogo finale RETRY-04."
+                    },
+                    {
+                        "evidence_id":  "EV-G01-RETRY-04-MOSAIC-RUN-METADATA",
+                        "config_id":  "CFG-SMOKE",
+                        "materialization_id":  "MAT-CFG-SMOKE-104729",
+                        "run_id":  "PRE-03-SMOKE",
+                        "test_ids":  [
+                                         "T-011",
+                                         "T-015",
+                                         "T-017",
+                                         "T-020",
+                                         "T-021"
+                                     ],
+                        "kind":  "run-metadata",
+                        "path":  "test-results/final-campaign/G01_pipeline_validation/PRE-03-SMOKE/retry-04/new_mosaic_run.json",
+                        "sha256":  "400e67ee663bbc902990c07d61e35fc7c9f18d771f4eb9448c2ec95c929455c7",
+                        "created_at_utc":  "2026-06-22T10:03:26Z",
+                        "description":  "Metadata for the single MOSAIC run created by RETRY-04."
+                    },
+                    {
+                        "evidence_id":  "EV-G01-RETRY-04-RUNTIME-REPORT-JSON",
+                        "config_id":  "CFG-SMOKE",
+                        "materialization_id":  "MAT-CFG-SMOKE-104729",
+                        "run_id":  "PRE-03-SMOKE",
+                        "test_ids":  [
+                                         "T-011",
+                                         "T-015",
+                                         "T-017",
+                                         "T-020",
+                                         "T-021"
+                                     ],
+                        "kind":  "runtime-report",
+                        "path":  "test-results/final-campaign/G01_pipeline_validation/PRE-03-SMOKE/retry-04/live_detailed_execution_report.json",
+                        "sha256":  "848dd01f104ef5fe1b7f72c41bdf6dc89d81a3a8e0a8b315030a76dca0275d74",
+                        "created_at_utc":  "2026-06-22T10:03:26Z",
+                        "description":  "Detailed runtime execution report JSON produced before summarizer failure."
+                    },
+                    {
+                        "evidence_id":  "EV-G01-RETRY-04-RUNTIME-REPORT-MD",
+                        "config_id":  "CFG-SMOKE",
+                        "materialization_id":  "MAT-CFG-SMOKE-104729",
+                        "run_id":  "PRE-03-SMOKE",
+                        "test_ids":  [
+                                         "T-011",
+                                         "T-015",
+                                         "T-017",
+                                         "T-020",
+                                         "T-021"
+                                     ],
+                        "kind":  "runtime-report",
+                        "path":  "test-results/final-campaign/G01_pipeline_validation/PRE-03-SMOKE/retry-04/live_detailed_execution_report.md",
+                        "sha256":  "338dd795a29426721c3612b8774700c78e39516ab715553ce8e4fe27a1454ec3",
+                        "created_at_utc":  "2026-06-22T10:03:26Z",
+                        "description":  "Detailed runtime execution report Markdown."
+                    },
+                    {
+                        "evidence_id":  "EV-G01-RETRY-04-RUNTIME-TRACE-INVENTORY",
+                        "config_id":  "CFG-SMOKE",
+                        "materialization_id":  "MAT-CFG-SMOKE-104729",
+                        "run_id":  "PRE-03-SMOKE",
+                        "test_ids":  [
+                                         "T-011",
+                                         "T-015",
+                                         "T-017",
+                                         "T-020",
+                                         "T-021"
+                                     ],
+                        "kind":  "inventory",
+                        "path":  "test-results/final-campaign/G01_pipeline_validation/PRE-03-SMOKE/retry-04/local_run_artifact_inventory.csv",
+                        "sha256":  "696a67b943292352b189ec1ab325fbc4c5e2c0cd3dcf3437137bac76ba4e0138",
+                        "created_at_utc":  "2026-06-22T10:03:26Z",
+                        "description":  "Inventory and hashes for local MOSAIC run artifacts."
+                    },
+                    {
+                        "evidence_id":  "EV-G01-OFFLINE-RECOVERY",
+                        "config_id":  "CFG-SMOKE",
+                        "materialization_id":  "MAT-CFG-SMOKE-104729",
+                        "run_id":  "PRE-03-SMOKE",
+                        "test_ids":  [
+                                         "T-011",
+                                         "T-015",
+                                         "T-017",
+                                         "T-020",
+                                         "T-021"
+                                     ],
+                        "kind":  "summary",
+                        "path":  "test-results/final-campaign/G01_pipeline_validation/PRE-03-SMOKE/retry-04/offline-post-processing-recovery/offline_post_processing_recovery.json",
+                        "sha256":  "d20a492c75c7452712dfdb0633f2eb81fca435edcd3a4e0b835463dfc0df7aff",
+                        "created_at_utc":  "2026-06-22T10:23:39.3918851Z",
+                        "description":  "Recupero offline di summarizer e validator."
+                    },
+                    {
+                        "evidence_id":  "EV-G01-LIVE-SUMMARY",
+                        "config_id":  "CFG-SMOKE",
+                        "materialization_id":  "MAT-CFG-SMOKE-104729",
+                        "run_id":  "PRE-03-SMOKE",
+                        "test_ids":  [
+                                         "T-011",
+                                         "T-015",
+                                         "T-017",
+                                         "T-020",
+                                         "T-021"
+                                     ],
+                        "kind":  "report",
+                        "path":  "test-results/final-campaign/G01_pipeline_validation/PRE-03-SMOKE/retry-04/offline-post-processing-recovery/live_run_summary.json",
+                        "sha256":  "7b0c5f71504555e3c0937c370e200670eb76b24a0dce6fafa97c9a0a8b23bf06",
+                        "created_at_utc":  "2026-06-22T10:19:48.2971588Z",
+                        "description":  "Riepilogo strutturato del run live."
+                    },
+                    {
+                        "evidence_id":  "EV-G01-RETRY04-VALIDATION",
+                        "config_id":  "CFG-SMOKE",
+                        "materialization_id":  "MAT-CFG-SMOKE-104729",
+                        "run_id":  "PRE-03-SMOKE",
+                        "test_ids":  [
+                                         "T-011",
+                                         "T-015",
+                                         "T-017",
+                                         "T-020",
+                                         "T-021"
+                                     ],
+                        "kind":  "validation",
+                        "path":  "test-results/final-campaign/G01_pipeline_validation/PRE-03-SMOKE/retry-04/offline-post-processing-recovery/literature_smoke_validation.json",
+                        "sha256":  "17c26e59d8353df3ce16ce581b8f91d6813bf9bfd952e493686ff7573644e2ba",
+                        "created_at_utc":  "2026-06-22T10:19:51.2131688Z",
+                        "description":  "Validator finale LITERATURE_SMOKE_TEST_PASSED."
+                    },
+                    {
+                        "evidence_id":  "EV-G01-TRACKING-REPORT",
+                        "config_id":  "CFG-SMOKE",
+                        "materialization_id":  "MAT-CFG-SMOKE-104729",
+                        "run_id":  "PRE-03-SMOKE",
+                        "test_ids":  [
+                                         "T-011",
+                                         "T-015",
+                                         "T-017",
+                                         "T-020",
+                                         "T-021"
+                                     ],
+                        "kind":  "report",
+                        "path":  "test-audits/final-campaign/Report_tracciamento_G00_G01.md",
+                        "sha256":  "8543cf9cc481236aded2b1642e4057d5a7f1e9a9ca417e4d6a1278f5188abb46",
+                        "created_at_utc":  "2026-06-22T14:32:20.9119193Z",
+                        "description":  "Report definitivo G00-G01."
+                    },
+                    {
+                        "evidence_id":  "EV-G01-SUMMARIZER-PATH-FIX",
+                        "config_id":  "CFG-SMOKE",
+                        "materialization_id":  "MAT-CFG-SMOKE-104729",
+                        "run_id":  "PRE-03-SMOKE",
+                        "test_ids":  [
+                                         "T-011",
+                                         "T-015",
+                                         "T-017",
+                                         "T-020",
+                                         "T-021"
+                                     ],
+                        "kind":  "tooling",
+                        "path":  "tools/mosaic-live-maga-runtime/summarize-run.ps1",
+                        "sha256":  "c7fbca8891235895afb76d97e1e7b4cd3e4b4fcadc73acaea12399d888f97656",
+                        "created_at_utc":  "2026-06-22T10:15:06.9597914Z",
+                        "description":  "Fix MosaicRoot assoluto o relativo nel summarizer."
                     }
                 ],
     "recovered_runtime_artifact":  {
@@ -1049,5 +1339,22 @@
                                        "sizeBytes":  491454,
                                        "sha256":  "1a0aa6d2b0441f0be38baf5df1acc2d4d889b9f356b6111f7715105cd013a9b4",
                                        "evidencePath":  "test-results/final-campaign/G01_pipeline_validation/PRE-03-SMOKE/recovered_runtime_artifact_adoption.json"
-                                   }
+                                   },
+    "runtime_artifact":  {
+                             "filename":  "maga-live-maga-runtime.jar",
+                             "sizeBytes":  491454,
+                             "sha256":  "1a0aa6d2b0441f0be38baf5df1acc2d4d889b9f356b6111f7715105cd013a9b4",
+                             "localCampaignRole":  "RECOVERED_VALIDATED_ARTIFACT",
+                             "sourceAttempt":  "G01-RETRY-02",
+                             "versionedEvidence":  false
+                         },
+    "updated_at_utc":  "2026-06-22T14:32:21.2498122Z",
+    "final_status":  {
+                         "audit_status":  "COMPLETED - RETRY-04 SIMULATION PASSED WITH OFFLINE POST-PROCESSING RECOVERY",
+                         "retry04_execution_count":  1,
+                         "validator_status":  "LITERATURE_SMOKE_TEST_PASSED",
+                         "validator_errors":  0,
+                         "task_completion_model":  "NOT_IMPLEMENTED",
+                         "g02_started":  false
+                     }
 }

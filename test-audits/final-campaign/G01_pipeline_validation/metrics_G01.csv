@@ -1,32 +1,30 @@
-campaign_id,group_id,config_id,materialization_id,run_id,test_id,metric_name,metric_value,metric_unit,source_file,validator_status,notes
-final-test-campaign,G01,CFG-SMOKE,MAT-CFG-SMOKE-104729,PRE-03-SMOKE,T-011;T-015;T-017;T-020;T-021,simulation_completed,false,boolean,test-results/final-campaign/G01_pipeline_validation/PRE-03-SMOKE/deploy_validation_failure.json,FAIL,MOSAIC was not launched because deploy validation failed.
-final-test-campaign,G01,CFG-SMOKE,MAT-CFG-SMOKE-104729,PRE-03-SMOKE,T-011;T-015;T-017;T-020;T-021,tasks_generated_cumulative,NOT_AVAILABLE,count,test-results/final-campaign/G01_pipeline_validation/PRE-03-SMOKE/deploy_validation_failure.json,FAIL,Metric not produced because the run stopped before MOSAIC execution.
-final-test-campaign,G01,CFG-SMOKE,MAT-CFG-SMOKE-104729,PRE-03-SMOKE,T-011;T-015;T-017;T-020;T-021,tasks_activated_cumulative,NOT_AVAILABLE,count,test-results/final-campaign/G01_pipeline_validation/PRE-03-SMOKE/deploy_validation_failure.json,FAIL,Metric not produced because the run stopped before MOSAIC execution.
-final-test-campaign,G01,CFG-SMOKE,MAT-CFG-SMOKE-104729,PRE-03-SMOKE,T-011;T-015;T-017;T-020;T-021,tasks_removed_at_deadline_cumulative,NOT_AVAILABLE,count,test-results/final-campaign/G01_pipeline_validation/PRE-03-SMOKE/deploy_validation_failure.json,FAIL,Metric not produced because the run stopped before MOSAIC execution.
-final-test-campaign,G01,CFG-SMOKE,MAT-CFG-SMOKE-104729,PRE-03-SMOKE,T-011;T-015;T-017;T-020;T-021,tasks_pending_at_end,NOT_AVAILABLE,count,test-results/final-campaign/G01_pipeline_validation/PRE-03-SMOKE/deploy_validation_failure.json,FAIL,Metric not produced because the run stopped before MOSAIC execution.
-final-test-campaign,G01,CFG-SMOKE,MAT-CFG-SMOKE-104729,PRE-03-SMOKE,T-011;T-015;T-017;T-020;T-021,tasks_pending_peak,NOT_AVAILABLE,count,test-results/final-campaign/G01_pipeline_validation/PRE-03-SMOKE/deploy_validation_failure.json,FAIL,Metric not produced because the run stopped before MOSAIC execution.
-final-test-campaign,G01,CFG-SMOKE,MAT-CFG-SMOKE-104729,PRE-03-SMOKE,T-011;T-015;T-017;T-020;T-021,snapshot_requests,NOT_AVAILABLE,count,test-results/final-campaign/G01_pipeline_validation/PRE-03-SMOKE/deploy_validation_failure.json,FAIL,Metric not produced because the run stopped before MOSAIC execution.
-final-test-campaign,G01,CFG-SMOKE,MAT-CFG-SMOKE-104729,PRE-03-SMOKE,T-011;T-015;T-017;T-020;T-021,snapshot_resolved,NOT_AVAILABLE,count,test-results/final-campaign/G01_pipeline_validation/PRE-03-SMOKE/deploy_validation_failure.json,FAIL,Metric not produced because the run stopped before MOSAIC execution.
-final-test-campaign,G01,CFG-SMOKE,MAT-CFG-SMOKE-104729,PRE-03-SMOKE,T-011;T-015;T-017;T-020;T-021,ga_jobs_submitted,NOT_AVAILABLE,count,test-results/final-campaign/G01_pipeline_validation/PRE-03-SMOKE/deploy_validation_failure.json,FAIL,Metric not produced because the run stopped before MOSAIC execution.
-final-test-campaign,G01,CFG-SMOKE,MAT-CFG-SMOKE-104729,PRE-03-SMOKE,T-011;T-015;T-017;T-020;T-021,ga_jobs_completed,NOT_AVAILABLE,count,test-results/final-campaign/G01_pipeline_validation/PRE-03-SMOKE/deploy_validation_failure.json,FAIL,Metric not produced because the run stopped before MOSAIC execution.
-final-test-campaign,G01,CFG-SMOKE,MAT-CFG-SMOKE-104729,PRE-03-SMOKE,T-011;T-015;T-017;T-020;T-021,strategy_applications,NOT_AVAILABLE,count,test-results/final-campaign/G01_pipeline_validation/PRE-03-SMOKE/deploy_validation_failure.json,FAIL,Metric not produced because the run stopped before MOSAIC execution.
-final-test-campaign,G01,CFG-SMOKE,MAT-CFG-SMOKE-104729,PRE-03-SMOKE,T-011;T-015;T-017;T-020;T-021,local_assignments,NOT_AVAILABLE,count,test-results/final-campaign/G01_pipeline_validation/PRE-03-SMOKE/deploy_validation_failure.json,FAIL,Metric not produced because the run stopped before MOSAIC execution.
-final-test-campaign,G01,CFG-SMOKE,MAT-CFG-SMOKE-104729,PRE-03-SMOKE,T-011;T-015;T-017;T-020;T-021,vehicle_assignments,NOT_AVAILABLE,count,test-results/final-campaign/G01_pipeline_validation/PRE-03-SMOKE/deploy_validation_failure.json,FAIL,Metric not produced because the run stopped before MOSAIC execution.
-final-test-campaign,G01,CFG-SMOKE,MAT-CFG-SMOKE-104729,PRE-03-SMOKE,T-011;T-015;T-017;T-020;T-021,edge_assignments,NOT_AVAILABLE,count,test-results/final-campaign/G01_pipeline_validation/PRE-03-SMOKE/deploy_validation_failure.json,FAIL,Metric not produced because the run stopped before MOSAIC execution.
-final-test-campaign,G01,CFG-SMOKE,MAT-CFG-SMOKE-104729,PRE-03-SMOKE,T-011;T-015;T-017;T-020;T-021,cloud_assignments,NOT_AVAILABLE,count,test-results/final-campaign/G01_pipeline_validation/PRE-03-SMOKE/deploy_validation_failure.json,FAIL,Metric not produced because the run stopped before MOSAIC execution.
-final-test-campaign,G01,CFG-SMOKE,MAT-CFG-SMOKE-104729,PRE-03-SMOKE,T-011;T-015;T-017;T-020;T-021,ga_runtime_mean_seconds,NOT_AVAILABLE,s,test-results/final-campaign/G01_pipeline_validation/PRE-03-SMOKE/deploy_validation_failure.json,FAIL,Metric not produced because the run stopped before MOSAIC execution.
-final-test-campaign,G01,CFG-SMOKE,MAT-CFG-SMOKE-104729,PRE-03-SMOKE,T-011;T-015;T-017;T-020;T-021,ga_runtime_median_seconds,NOT_AVAILABLE,s,test-results/final-campaign/G01_pipeline_validation/PRE-03-SMOKE/deploy_validation_failure.json,FAIL,Metric not produced because the run stopped before MOSAIC execution.
-final-test-campaign,G01,CFG-SMOKE,MAT-CFG-SMOKE-104729,PRE-03-SMOKE,T-011;T-015;T-017;T-020;T-021,ga_runtime_p95_seconds,NOT_AVAILABLE,s,test-results/final-campaign/G01_pipeline_validation/PRE-03-SMOKE/deploy_validation_failure.json,FAIL,Metric not produced because the run stopped before MOSAIC execution.
-final-test-campaign,G01,CFG-SMOKE,MAT-CFG-SMOKE-104729,PRE-03-SMOKE,T-011;T-015;T-017;T-020;T-021,ga_runtime_max_seconds,NOT_AVAILABLE,s,test-results/final-campaign/G01_pipeline_validation/PRE-03-SMOKE/deploy_validation_failure.json,FAIL,Metric not produced because the run stopped before MOSAIC execution.
-final-test-campaign,G01,CFG-SMOKE,MAT-CFG-SMOKE-104729,PRE-03-SMOKE,T-011;T-015;T-017;T-020;T-021,stale_ratio_percent,NOT_AVAILABLE,percent,test-results/final-campaign/G01_pipeline_validation/PRE-03-SMOKE/deploy_validation_failure.json,FAIL,Metric not produced because the run stopped before MOSAIC execution.
-final-test-campaign,G01,CFG-SMOKE,MAT-CFG-SMOKE-104729,PRE-03-SMOKE,T-011;T-015;T-017;T-020;T-021,stale_sequence_count,NOT_AVAILABLE,count,test-results/final-campaign/G01_pipeline_validation/PRE-03-SMOKE/deploy_validation_failure.json,FAIL,Metric not produced because the run stopped before MOSAIC execution.
-final-test-campaign,G01,CFG-SMOKE,MAT-CFG-SMOKE-104729,PRE-03-SMOKE,T-011;T-015;T-017;T-020;T-021,longest_consecutive_stale_sequence,NOT_AVAILABLE,count,test-results/final-campaign/G01_pipeline_validation/PRE-03-SMOKE/deploy_validation_failure.json,FAIL,Metric not produced because the run stopped before MOSAIC execution.
-final-test-campaign,G01,CFG-SMOKE,MAT-CFG-SMOKE-104729,PRE-03-SMOKE,T-011;T-015;T-017;T-020;T-021,maximum_absolute_snapshot_lag_seconds,NOT_AVAILABLE,s,test-results/final-campaign/G01_pipeline_validation/PRE-03-SMOKE/deploy_validation_failure.json,FAIL,Metric not produced because the run stopped before MOSAIC execution.
-final-test-campaign,G01,CFG-SMOKE,MAT-CFG-SMOKE-104729,PRE-03-SMOKE,T-011;T-015;T-017;T-020;T-021,non_zero_lag_window_count,NOT_AVAILABLE,count,test-results/final-campaign/G01_pipeline_validation/PRE-03-SMOKE/deploy_validation_failure.json,FAIL,Metric not produced because the run stopped before MOSAIC execution.
-final-test-campaign,G01,CFG-SMOKE,MAT-CFG-SMOKE-104729,PRE-03-SMOKE,T-011;T-015;T-017;T-020;T-021,last_applied_strategy_simulation_time_seconds,NOT_AVAILABLE,s,test-results/final-campaign/G01_pipeline_validation/PRE-03-SMOKE/deploy_validation_failure.json,FAIL,Metric not produced because the run stopped before MOSAIC execution.
-final-test-campaign,G01,CFG-SMOKE,MAT-CFG-SMOKE-104729,PRE-03-SMOKE,T-011;T-015;T-017;T-020;T-021,seconds_without_applied_strategy_at_end,NOT_AVAILABLE,count,test-results/final-campaign/G01_pipeline_validation/PRE-03-SMOKE/deploy_validation_failure.json,FAIL,Metric not produced because the run stopped before MOSAIC execution.
-final-test-campaign,G01,CFG-SMOKE,MAT-CFG-SMOKE-104729,PRE-03-SMOKE,T-011;T-015;T-017;T-020;T-021,parallel_ga_violations,NOT_AVAILABLE,count,test-results/final-campaign/G01_pipeline_validation/PRE-03-SMOKE/deploy_validation_failure.json,FAIL,Metric not produced because the run stopped before MOSAIC execution.
-final-test-campaign,G01,CFG-SMOKE,MAT-CFG-SMOKE-104729,PRE-03-SMOKE,T-011;T-015;T-017;T-020;T-021,future_snapshot_violations,NOT_AVAILABLE,count,test-results/final-campaign/G01_pipeline_validation/PRE-03-SMOKE/deploy_validation_failure.json,FAIL,Metric not produced because the run stopped before MOSAIC execution.
-final-test-campaign,G01,CFG-SMOKE,MAT-CFG-SMOKE-104729,PRE-03-SMOKE,T-011;T-015;T-017;T-020;T-021,future_pool_violations,NOT_AVAILABLE,count,test-results/final-campaign/G01_pipeline_validation/PRE-03-SMOKE/deploy_validation_failure.json,FAIL,Metric not produced because the run stopped before MOSAIC execution.
-final-test-campaign,G01,CFG-SMOKE,MAT-CFG-SMOKE-104729,PRE-03-SMOKE,T-011;T-015;T-017;T-020;T-021,invalid_pool_bandwidth_violations,NOT_AVAILABLE,count,test-results/final-campaign/G01_pipeline_validation/PRE-03-SMOKE/deploy_validation_failure.json,FAIL,Metric not produced because the run stopped before MOSAIC execution.
-final-test-campaign,G01,CFG-SMOKE,MAT-CFG-SMOKE-104729,PRE-03-SMOKE,T-011;T-015;T-017;T-020;T-021,delta_t_max_mismatch_violations,NOT_AVAILABLE,count,test-results/final-campaign/G01_pipeline_validation/PRE-03-SMOKE/deploy_validation_failure.json,FAIL,Metric not produced because the run stopped before MOSAIC execution.
+﻿"metric","value","unit","source","availability","notes"
+"retry04_execution_count","1","count","attempt_guard.json","AVAILABLE",""
+"original_runner_exit_code","1","code","offline_post_processing_recovery.json","AVAILABLE","La simulazione era conclusa; il fallimento era nel summarizer post-MOSAIC."
+"simulation_duration","180","s","retry-04_summary.json","AVAILABLE",""
+"validator_status","LITERATURE_SMOKE_TEST_PASSED","status","literature_smoke_validation.json","AVAILABLE",""
+"validator_errors","0","count","literature_smoke_validation.json","AVAILABLE",""
+"tasks_generated","101","tasks","live_run_summary.json","AVAILABLE",""
+"tasks_activated","101","tasks","live_run_summary.json","AVAILABLE",""
+"tasks_removed_at_deadline","101","tasks","live_run_summary.json","AVAILABLE",""
+"tasks_pending_at_end","0","tasks","live_run_summary.json","AVAILABLE",""
+"tasks_pending_peak","5","tasks","live_run_summary.json","AVAILABLE",""
+"ga_jobs_submitted","243","jobs","live_run_summary.json","AVAILABLE",""
+"ga_jobs_completed","243","jobs","live_run_summary.json","AVAILABLE",""
+"ga_jobs_applied","233","jobs","live_run_summary.json","AVAILABLE",""
+"stale_results","10","results","live_run_summary.json","AVAILABLE",""
+"stale_ratio","4.115226","percent","live_run_summary.json","AVAILABLE",""
+"longest_consecutive_stale_sequence","2","results","live_run_summary.json","AVAILABLE",""
+"ga_runtime_mean","0.036802903","s","live_run_summary.json","AVAILABLE",""
+"ga_runtime_median","0.004650299","s","live_run_summary.json","AVAILABLE",""
+"ga_runtime_p95","0.1787343","s","live_run_summary.json","AVAILABLE",""
+"ga_runtime_max","0.5146541","s","live_run_summary.json","AVAILABLE",""
+"maximum_absolute_snapshot_lag","0","s","live_run_summary.json","AVAILABLE",""
+"non_zero_lag_window_count","0","windows","live_run_summary.json","AVAILABLE",""
+"last_applied_strategy_simulation_time","180","s","live_run_summary.json","AVAILABLE",""
+"seconds_without_applied_strategy_at_end","0","s","live_run_summary.json","AVAILABLE",""
+"runtime_violations","0","count","live_run_summary.json","AVAILABLE",""
+"task_completion_rate","N/A","percent","not implemented","NOT_IMPLEMENTED","taskCompletionModel=NOT_IMPLEMENTED."
+"sumo_errors","N/A","count","not explicitly reported","NOT_AVAILABLE","Valore non inventato perchÃ© non disponibile nei report finali."
+"teleports","N/A","count","not explicitly reported","NOT_AVAILABLE","Valore non inventato perchÃ© non disponibile nei report finali."
+"emergency_braking","N/A","count","not explicitly reported","NOT_AVAILABLE","Valore non inventato perchÃ© non disponibile nei report finali."

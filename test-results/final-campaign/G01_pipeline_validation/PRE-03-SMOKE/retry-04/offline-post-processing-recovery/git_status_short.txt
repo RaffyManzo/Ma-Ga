@@ -1,0 +1,7 @@
+ M test-audits/final-campaign/G01_pipeline_validation/anomalies_G01.csv
+ M test-audits/final-campaign/G01_pipeline_validation/audit_G01_pipeline_validation.md
+ M test-audits/final-campaign/G01_pipeline_validation/evidence_manifest_G01.json
+ M test-audits/final-campaign/G01_pipeline_validation/metrics_G01.csv
+ M tools/mosaic-live-maga-runtime/summarize-run.ps1
+?? test-audits/final-campaign/Report_tracciamento_G00_G01_incompleto.md
+?? test-results/final-campaign/G01_pipeline_validation/PRE-03-SMOKE/retry-04/

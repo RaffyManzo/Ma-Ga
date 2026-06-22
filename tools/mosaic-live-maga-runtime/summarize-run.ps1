@@ -25,6 +25,25 @@ function Assert-SafeScenarioName {
     }
 }
 
+function Resolve-MaybeRelativeToRepo {
+    param(
+        [Parameter(Mandatory = $true)]
+        [string]$Path
+    )
+
+    if ([string]::IsNullOrWhiteSpace($Path)) {
+        throw "Path must not be blank"
+    }
+
+    $Candidate = if ([IO.Path]::IsPathRooted($Path)) {
+        $Path
+    } else {
+        Join-Path $RepoRoot $Path
+    }
+
+    return (Resolve-Path -LiteralPath $Candidate).Path
+}
+
 function Import-RuntimeCsv {
     param([string]$RuntimeDir, [string]$FileName)
     $Path = Join-Path $RuntimeDir $FileName
@@ -144,7 +163,7 @@ function Get-StaleSequenceStats {
 }
 
 Assert-SafeScenarioName -Name $ScenarioName
-$ResolvedMosaicRoot = (Resolve-Path -LiteralPath (Join-Path $RepoRoot $MosaicRoot)).Path
+$ResolvedMosaicRoot = Resolve-MaybeRelativeToRepo -Path $MosaicRoot
 $LogsRoot = Join-Path $ResolvedMosaicRoot "logs"
 if (-not (Test-Path -LiteralPath $LogsRoot -PathType Container)) {
     throw "MOSAIC logs root not found: $LogsRoot"

@@ -1,0 +1,124 @@
+Runtime artifact mode:
+RECOVERED_VALIDATED_ARTIFACT
+Runtime build executed:
+false
+Runtime artifact path:
+C:\Users\raffa\IdeaProjects\maga-core\tmp\final-campaign-runtime-artifacts\recovered-retry-02\maga-live-maga-runtime.jar
+Runtime artifact expected SHA-256:
+1a0aa6d2b0441f0be38baf5df1acc2d4d889b9f356b6111f7715105cd013a9b4
+Runtime artifact validation status: PASS
+Runtime artifact SHA-256: 1a0aa6d2b0441f0be38baf5df1acc2d4d889b9f356b6111f7715105cd013a9b4
+Runtime artifact size bytes: 491454
+Runtime artifact fresh build executed: false
+Deploying materialized literature scenario...
+Runtime artifact validation status: PASS
+Runtime artifact SHA-256: 1a0aa6d2b0441f0be38baf5df1acc2d4d889b9f356b6111f7715105cd013a9b4
+Runtime artifact size bytes: 491454
+Runtime artifact fresh build executed: false
+{
+  "configuredDatabaseFile": "intas_literature_urban.db",
+  "database": {
+    "exists": true,
+    "matchingDiagnosticDbs": [],
+    "path": "C:/Users/raffa/IdeaProjects/maga-core/tmp/materialized-literature-scenarios/final-test-campaign/G01_pipeline_validation/CFG-SMOKE/104729/application/intas_literature_urban.db",
+    "readable": true,
+    "sha256": "b05b5c708751b1fa1732728a6db8b7cfd497d326986ce709aa6be3bf53a009ac",
+    "sizeBytes": 176128,
+    "tableCounts": {
+      "Building": 0,
+      "BuildingConsistsOf": 0,
+      "Connection": 155,
+      "ConnectionConsistsOf": 695,
+      "ConnectionDetails": 0,
+      "Node": 314,
+      "Properties": 2,
+      "Restriction": 125,
+      "Roundabout": 0,
+      "RoundaboutConsistsOf": 0,
+      "Route": 295,
+      "TrafficSignals": 0,
+      "Way": 155,
+      "WayConsistsOf": 695
+    },
+    "tables": [
+      "Building",
+      "BuildingConsistsOf",
+      "Connection",
+      "ConnectionConsistsOf",
+      "ConnectionDetails",
+      "Node",
+      "Properties",
+      "Restriction",
+      "Roundabout",
+      "RoundaboutConsistsOf",
+      "Route",
+      "TrafficSignals",
+      "Way",
+      "WayConsistsOf"
+    ]
+  },
+  "errors": [],
+  "gaParameterScalingMode": "STATIC",
+  "generatedAtUtc": "2026-06-22T09:49:53.333040+00:00",
+  "missingFiles": [],
+  "mobilityMode": "SYNTHETIC_CALIBRATED_ON_INTAS_SUBNETWORK",
+  "projection": {
+    "cartesianOffset": {
+      "x": -464198.88,
+      "y": -4952821.58
+    },
+    "centerCoordinates": {
+      "latitude": 48.75619812000397,
+      "longitude": 11.425493114727528
+    }
+  },
+  "reducedNetworkCounts": {
+    "externalEdges": 155,
+    "externalJunctions": 88,
+    "trafficLights": 8
+  },
+  "routeFiles": [
+    "C:/Users/raffa/IdeaProjects/maga-core/tmp/materialized-literature-scenarios/final-test-campaign/G01_pipeline_validation/CFG-SMOKE/104729/sumo/intas_literature_urban_nominal.rou.xml"
+  ],
+  "routeVehicleCounts": {
+    "intas_literature_urban_nominal.rou.xml": 50
+  },
+  "scenarioRoot": "C:/Users/raffa/IdeaProjects/maga-core/tmp/materialized-literature-scenarios/final-test-campaign/G01_pipeline_validation/CFG-SMOKE/104729",
+  "status": "VALID_MATERIALIZED_SCENARIO",
+  "sumocfgReferences": [
+    "intas_literature_urban.net.xml",
+    "intas_literature_urban_nominal.rou.xml"
+  ],
+  "tokenFiles": [],
+  "warnings": []
+}
+Runtime artifact source: C:\Users\raffa\IdeaProjects\maga-core\tmp\final-campaign-runtime-artifacts\recovered-retry-02\maga-live-maga-runtime.jar
+Runtime artifact mode: EXPLICIT_RUNTIME_JAR
+Runtime artifact SHA-256: 1a0aa6d2b0441f0be38baf5df1acc2d4d889b9f356b6111f7715105cd013a9b4
+Runtime artifact fresh build: false
+DEPLOYED_MATERIALIZED_LITERATURE_SCENARIO
+ScenarioName: MaGaLiteratureBasedUrbanStudy
+Source: C:\Users\raffa\IdeaProjects\maga-core\tmp\materialized-literature-scenarios\final-test-campaign\G01_pipeline_validation\CFG-SMOKE\104729
+Target: C:\Users\raffa\IdeaProjects\maga-core\tmp\mosaic-25.2\scenarios\MaGaLiteratureBasedUrbanStudy
+Database: C:\Users\raffa\IdeaProjects\maga-core\tmp\mosaic-25.2\scenarios\MaGaLiteratureBasedUrbanStudy\application\intas_literature_urban.db
+Injected runtime JAR: C:\Users\raffa\IdeaProjects\maga-core\tmp\final-campaign-runtime-artifacts\recovered-retry-02\maga-live-maga-runtime.jar
+Injected ad-hoc radio diagnostic JAR: C:\Users\raffa\IdeaProjects\maga-core\tools\mosaic-adhoc-radio-diagnostic\out\maga-adhoc-radio-diagnostic.jar
+Running: .\mosaic.bat -s MaGaLiteratureBasedUrbanStudy
+2026-06-22 11:49:56,336 INFO  ROOT - Running Eclipse MOSAIC 25.2 on Java JRE v17.0.12 (Oracle Corporation)
+2026-06-22 11:49:56,379 INFO  FederationManagement - Start federation with id 'MaGaLiteratureBasedUrbanStudy'
+2026-06-22 11:49:56,571 INFO  FederationManagement - Add ambassador/federate with id 'application'
+2026-06-22 11:49:56,571 INFO  FederationManagement - Add ambassador/federate with id 'mapping'
+2026-06-22 11:49:56,587 INFO  FederationManagement - Add ambassador/federate with id 'cell'
+2026-06-22 11:49:56,587 INFO  FederationManagement - Add ambassador/federate with id 'sns'
+2026-06-22 11:49:56,587 INFO  FederationManagement - Add ambassador/federate with id 'sumo'
+2026-06-22 11:49:56,587 INFO  FederationManagement - Deploying federate 'sumo' locally in .\tmp\sumo
+2026-06-22 11:49:56,606 INFO  FederationManagement - Starting federate 'sumo' locally in .\tmp\sumo
+2026-06-22 11:49:56,606 INFO  FederationManagement - Add ambassador/federate with id 'output'
+11:50:00 - Simulating: 0ns (0.0s / 180.0s) - 0.0% (RTF:0.00, ETC:unknown)                        11:50:00 - Simulating: 2400000000ns (2.4s / 180.0s) - 1.3% (RTF:0.00, ETC:unknown)                        11:50:01 - Simulating: 7800000000ns (7.8s / 180.0s) - 4.3% (RTF:0.00, ETC:unknown)                        11:50:01 - Simulating: 14000000000ns (14.0s / 180.0s) - 7.8% (RTF:0.00, ETC:unknown)                        11:50:02 - Simulating: 19700000000ns (19.7s / 180.0s) - 10.9% (RTF:0.00, ETC:unknown)                        11:50:02 - Simulating: 24800000000ns (24.8s / 180.0s) - 13.8% (RTF:0.00, ETC:unknown)                        11:50:03 - Simulating: 29800000000ns (29.8s / 180.0s) - 16.6% (RTF:0.00, ETC:unknown)                        11:50:03 - Simulating: 34600000000ns (34.6s / 180.0s) - 19.2% (RTF:0.00, ETC:unknown)                        11:50:04 - Simulating: 39800000000ns (39.8s / 180.0s) - 22.1% (RTF:0.00, ETC:unknown)                        11:50:04 - Simulating: 44700000000ns (44.7s / 180.0s) - 24.8% (RTF:0.00, ETC:unknown)                        11:50:05 - Simulating: 49700000000ns (49.7s / 180.0s) - 27.6% (RTF:9.90, ETC:13.2s)                        11:50:06 - Simulating: 54200000000ns (54.2s / 180.0s) - 30.1% (RTF:9.90, ETC:13.2s)                        11:50:06 - Simulating: 59200000000ns (59.2s / 180.0s) - 32.9% (RTF:9.90, ETC:13.2s)                        11:50:07 - Simulating: 64100000000ns (64.1s / 180.0s) - 35.6% (RTF:9.90, ETC:13.2s)                        11:50:07 - Simulating: 68700000000ns (68.7s / 180.0s) - 38.2% (RTF:9.90, ETC:13.2s)                        11:50:08 - Simulating: 73700000000ns (73.7s / 180.0s) - 40.9% (RTF:9.90, ETC:13.2s)                        11:50:08 - Simulating: 78600000000ns (78.6s / 180.0s) - 43.7% (RTF:9.90, ETC:13.2s)                        11:50:09 - Simulating: 81800000000ns (81.8s / 180.0s) - 45.4% (RTF:9.90, ETC:13.2s)                        11:50:09 - Simulating: 85500000000ns (85.5s / 180.0s) - 47.5% (RTF:9.90, ETC:13.2s)                        11:50:10 - Simulating: 90000000000ns (90.0s / 180.0s) - 50.0% (RTF:9.90, ETC:13.2s)                        11:50:10 - Simulating: 94500000000ns (94.5s / 180.0s) - 52.5% (RTF:8.72, ETC:10.0s)                        11:50:11 - Simulating: 98000000000ns (98.0s / 180.0s) - 54.4% (RTF:8.72, ETC:10.0s)                        11:50:11 - Simulating: 101600000000ns (101.6s / 180.0s) - 56.4% (RTF:8.72, ETC:10.0s)                        11:50:12 - Simulating: 105600000000ns (105.6s / 180.0s) - 58.7% (RTF:8.72, ETC:10.0s)                        11:50:12 - Simulating: 110000000000ns (110.0s / 180.0s) - 61.1% (RTF:8.72, ETC:10.0s)                        11:50:13 - Simulating: 114400000000ns (114.4s / 180.0s) - 63.6% (RTF:8.72, ETC:10.0s)                        11:50:13 - Simulating: 118300000000ns (118.3s / 180.0s) - 65.7% (RTF:8.72, ETC:10.0s)                        11:50:14 - Simulating: 123200000000ns (123.2s / 180.0s) - 68.4% (RTF:8.72, ETC:10.0s)                        11:50:14 - Simulating: 127600000000ns (127.6s / 180.0s) - 70.9% (RTF:8.72, ETC:10.0s)                        11:50:15 - Simulating: 132600000000ns (132.6s / 180.0s) - 73.7% (RTF:8.72, ETC:10.0s)                        11:50:15 - Simulating: 137200000000ns (137.2s / 180.0s) - 76.2% (RTF:8.36, ETC:5.4s)                        11:50:16 - Simulating: 142500000000ns (142.5s / 180.0s) - 79.2% (RTF:8.36, ETC:5.4s)                        11:50:16 - Simulating: 147400000000ns (147.4s / 180.0s) - 81.9% (RTF:8.36, ETC:5.4s)                        11:50:17 - Simulating: 152400000000ns (152.4s / 180.0s) - 84.7% (RTF:8.36, ETC:5.4s)                        11:50:17 - Simulating: 157600000000ns (157.6s / 180.0s) - 87.6% (RTF:8.36, ETC:5.4s)                        11:50:18 - Simulating: 163900000000ns (163.9s / 180.0s) - 91.1% (RTF:8.36, ETC:5.4s)                        11:50:18 - Simulating: 170000000000ns (170.0s / 180.0s) - 94.4% (RTF:8.36, ETC:5.4s)                        11:50:19 - Simulating: 177000000000ns (177.0s / 180.0s) - 98.3% (RTF:8.36, ETC:5.4s)                        11:50:21 - Simulating: 180000000000ns (180.0s / 180.0s) - 100.0% (RTF:7.81, ETC:0.0s)                        11:50:21 - Simulating: 180000000000ns (180.0s) - 100.0%                                         11:50:21 - 
+2026-06-22 11:50:21,362 INFO  SequentialTimeManagement - Simulation ended after 180s of 180s (100%)
+2026-06-22 11:50:21,362 INFO  SequentialTimeManagement - Started: 2026-06-22 11:49:59
+2026-06-22 11:50:21,362 INFO  SequentialTimeManagement - Ended: 2026-06-22 11:50:21
+2026-06-22 11:50:21,362 INFO  SequentialTimeManagement - Duration: 00h 00m 21.951s (RTF: 8.00)
+2026-06-22 11:50:21,371 INFO  SequentialTimeManagement - 
+2026-06-22 11:50:21,371 INFO  SequentialTimeManagement - Simulation finished: 101
+Summarizing run log-20260622-114955-MaGaLiteratureBasedUrbanStudy...

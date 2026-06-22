@@ -1,0 +1,14 @@
+LITERATURE_SMOKE_TEST_PASSED
+Run: log-20260622-114955-MaGaLiteratureBasedUrbanStudy
+Tasks generated cumulative: 101
+Tasks activated cumulative: 101
+Tasks removed at deadline cumulative: 101
+Tasks pending at end: 0
+Tasks pending peak: 5
+Task completion model: NOT_IMPLEMENTED
+GA parameter scaling mode: STATIC
+GA stale ratio percent: 4.115226
+GA runtime mean/median/P95/max seconds: 0.036802903 / 0.004650299 / 0.1787343 / 0.5146541
+Maximum absolute snapshot lag seconds: 0
+Validation JSON: C:\Users\raffa\IdeaProjects\maga-core\tmp\mosaic-25.2\logs\log-20260622-114955-MaGaLiteratureBasedUrbanStudy\live-maga-runtime\literature_smoke_validation.json
+Validation Markdown: C:\Users\raffa\IdeaProjects\maga-core\tmp\mosaic-25.2\logs\log-20260622-114955-MaGaLiteratureBasedUrbanStudy\live-maga-runtime\literature_smoke_validation.md

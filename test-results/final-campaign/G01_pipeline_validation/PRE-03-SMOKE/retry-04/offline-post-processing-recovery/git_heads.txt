@@ -1,0 +1,5 @@
+﻿branch=testing/final-campaign
+localHead=7b3f6359aae81388d009d35da3adb527fc8f11b8
+remoteHead=7b3f6359aae81388d009d35da3adb527fc8f11b8
+gitStatusExitCode=0
+gitDiffCheckExitCode=0

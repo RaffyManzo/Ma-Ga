@@ -1,0 +1,2 @@
+warning: in the working copy of 'test-audits/final-campaign/G01_pipeline_validation/audit_G01_pipeline_validation.md', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'tools/mosaic-live-maga-runtime/summarize-run.ps1', LF will be replaced by CRLF the next time Git touches it
