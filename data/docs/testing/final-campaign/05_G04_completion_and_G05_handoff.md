@@ -1,6 +1,6 @@
 # Chiusura G04 e passaggio a G05
 
-La chiusura formale di G04 è predisposta con stato `PASS_WITH_OBSERVABILITY_LIMITS`; commit e push vengono eseguiti dallo script di chiusura.
+La chiusura formale di G04 è completata e pubblicata con stato `PASS_WITH_OBSERVABILITY_LIMITS`. Il commit di chiusura è `4ab01845f772640398c25ba7f565ec857d284052` sul branch `testing/final-campaign`.
 
 ## Stato campagna
 
@@ -8,7 +8,7 @@ La chiusura formale di G04 è predisposta con stato `PASS_WITH_OBSERVABILITY_LIM
 - G01: chiusa;
 - G02: chiusa, 45/45 PASS;
 - G03: chiusa, `PASS_WITH_OPTIONAL_STRESS_LIMIT`;
-- G04: 5/5 run tecnicamente PASS, audit T-090–T-099 completato; chiusura Git da registrare;
+- G04: formalmente chiusa e pubblicata; 5/5 run tecnicamente PASS, audit T-090–T-099 completato, 0 FAIL;
 - G05: prossimo gruppo, non ancora avviato;
 - G06: non avviato;
 - G02B: `DEFERRED_AFTER_G06`;

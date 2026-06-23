@@ -46,3 +46,10 @@ Sono stati renderizzati e controllati:
 6. foglio `06_Risultati_G04`.
 
 Le immagini di controllo sono conservate in `_quality_control/previews/` nel pacchetto di chiusura e non vengono installate nella repository.
+## Verifica post-chiusura Git
+
+- commit di chiusura verificato: `4ab01845f772640398c25ba7f565ec857d284052`;
+- branch remoto verificato: `testing/final-campaign`;
+- working tree attestato pulito e diff Java dal freeze vuoto;
+- rimossi dalle matrici i riferimenti operativi ormai superati a commit/push ancora da eseguire;
+- prossimo passo operativo: preflight G05, senza avviare automaticamente simulazioni.
