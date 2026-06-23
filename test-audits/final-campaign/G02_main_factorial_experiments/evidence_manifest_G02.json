@@ -1,0 +1,620 @@
+﻿{
+    "schemaVersion":  "1.0",
+    "generatedAtUtc":  "2026-06-23T00:33:45.0597361Z",
+    "campaignId":  "final-test-campaign",
+    "groupId":  "G02",
+    "classification":  "MAIN_FACTORIAL",
+    "branch":  "testing/final-campaign",
+    "head":  "95e51e186f5e846b41a8ece7db416f67e60312ef",
+    "frozenCoreCommit":  "5a9477735a3d707a5f000a64653cd2a6fc7f2007",
+    "javaDiffFromFreeze":  [
+
+                           ],
+    "expectedConfigurations":  [
+                                   "CFG-L-E",
+                                   "CFG-L-I",
+                                   "CFG-L-S",
+                                   "CFG-N-E",
+                                   "CFG-N-I",
+                                   "CFG-N-S",
+                                   "CFG-H-E",
+                                   "CFG-H-I",
+                                   "CFG-H-S"
+                               ],
+    "expectedSeeds":  [
+                          104729,
+                          130363,
+                          155921,
+                          181081,
+                          207547
+                      ],
+    "runCount":  45,
+    "passRunCount":  45,
+    "validatorErrorCount":  0,
+    "validatorWarningCount":  0,
+    "maximumSnapshotLagSeconds":  0,
+    "runtimeViolationCount":  0,
+    "taskCompletionModel":  "NOT_IMPLEMENTED",
+    "artifacts":  [
+                      {
+                          "Type":  "RUN_RESULT",
+                          "ConfigId":  "CFG-L-E",
+                          "Seed":  104729,
+                          "RunId":  "L-E-01",
+                          "Path":  "test-results\\final-campaign\\G02_main_factorial_experiments\\run-summaries\\CFG-L-E\\L-E-01-104729.json",
+                          "SizeBytes":  2163,
+                          "SHA256":  "f24d4fddb038d1781513ea03221405a86a8d389bc122850ccab2353cc283c446",
+                          "SourceSHA256":  "1245f87ad99af98189678fe04767e2bce843367820ba3570bb67ed2a456cc4fe"
+                      },
+                      {
+                          "Type":  "RUN_RESULT",
+                          "ConfigId":  "CFG-L-E",
+                          "Seed":  130363,
+                          "RunId":  "L-E-02",
+                          "Path":  "test-results\\final-campaign\\G02_main_factorial_experiments\\run-summaries\\CFG-L-E\\L-E-02-130363.json",
+                          "SizeBytes":  2125,
+                          "SHA256":  "c7365f993e9749cdccc8876f26b718cdb34eebb7bfb806f2ed332f90a013f564",
+                          "SourceSHA256":  "64a8f45f0f8a9c4b423304cbbd96ea2cd9ccf2876ad7137e321bda033a2edda0"
+                      },
+                      {
+                          "Type":  "RUN_RESULT",
+                          "ConfigId":  "CFG-L-E",
+                          "Seed":  155921,
+                          "RunId":  "L-E-03",
+                          "Path":  "test-results\\final-campaign\\G02_main_factorial_experiments\\run-summaries\\CFG-L-E\\L-E-03-155921.json",
+                          "SizeBytes":  2125,
+                          "SHA256":  "aaa31a66e6a53963b6058dba3d096fbc6762ffa6a6c70eae8a9199b2a18a766a",
+                          "SourceSHA256":  "bad702386ea91d1062e72c70313b2730b33f59071484e56e80149f7c0c13cf01"
+                      },
+                      {
+                          "Type":  "RUN_RESULT",
+                          "ConfigId":  "CFG-L-E",
+                          "Seed":  181081,
+                          "RunId":  "L-E-04",
+                          "Path":  "test-results\\final-campaign\\G02_main_factorial_experiments\\run-summaries\\CFG-L-E\\L-E-04-181081.json",
+                          "SizeBytes":  2117,
+                          "SHA256":  "8f0ad2e4207a1abdc0bac489b43ff1da6adc5873b44c2cd75ed4811a2cd6b7af",
+                          "SourceSHA256":  "f43f49db10d0dcc6fec5c9b9d867b2592dd7378c54873441d9f475154d3364fb"
+                      },
+                      {
+                          "Type":  "RUN_RESULT",
+                          "ConfigId":  "CFG-L-E",
+                          "Seed":  207547,
+                          "RunId":  "L-E-05",
+                          "Path":  "test-results\\final-campaign\\G02_main_factorial_experiments\\run-summaries\\CFG-L-E\\L-E-05-207547.json",
+                          "SizeBytes":  2119,
+                          "SHA256":  "ff04a38fc0fcab2ecfc7938f28da8a753662ae206683f930c408b2ec3b9d0f7c",
+                          "SourceSHA256":  "0304b3c8835b681a23c96f1ff1ab3af2ee238db0da94b713ccc3f138d9d13536"
+                      },
+                      {
+                          "Type":  "BATCH_ZIP_REFERENCE",
+                          "ConfigId":  "CFG-L-E",
+                          "Seed":  "",
+                          "RunId":  "",
+                          "Path":  "C:\\Users\\raffa\\IdeaProjects\\maga-core\\tmp\\archive\\G02_CFG-L-E_five_seeds_PASS_20260623-002644.zip",
+                          "SizeBytes":  823734,
+                          "SHA256":  "8eccc214b61c0a7756029b57d32b64c396850122d2e60af3cb04d33d2572d0c7",
+                          "SourceSHA256":  ""
+                      },
+                      {
+                          "Type":  "RUN_RESULT",
+                          "ConfigId":  "CFG-L-I",
+                          "Seed":  104729,
+                          "RunId":  "L-I-01",
+                          "Path":  "test-results\\final-campaign\\G02_main_factorial_experiments\\run-summaries\\CFG-L-I\\L-I-01-104729.json",
+                          "SizeBytes":  2124,
+                          "SHA256":  "3cac50d4d51d778f1b80ffcb04ee165054f0132e2b75dd64688e6f402ba8eabb",
+                          "SourceSHA256":  "f596d8cd8b418c0ad8ce1f3c2da5a75a84fb63e0133d06ec688a6bcc6080ffeb"
+                      },
+                      {
+                          "Type":  "RUN_RESULT",
+                          "ConfigId":  "CFG-L-I",
+                          "Seed":  130363,
+                          "RunId":  "L-I-02",
+                          "Path":  "test-results\\final-campaign\\G02_main_factorial_experiments\\run-summaries\\CFG-L-I\\L-I-02-130363.json",
+                          "SizeBytes":  2122,
+                          "SHA256":  "0451686835b8bcc426cd031ef7d81b019b60030805493ace7ad3097bbc802bea",
+                          "SourceSHA256":  "85fab0cd2cc272af6a686f7c5bd3e6a7bb3381776b4d3b618aad044617212514"
+                      },
+                      {
+                          "Type":  "RUN_RESULT",
+                          "ConfigId":  "CFG-L-I",
+                          "Seed":  155921,
+                          "RunId":  "L-I-03",
+                          "Path":  "test-results\\final-campaign\\G02_main_factorial_experiments\\run-summaries\\CFG-L-I\\L-I-03-155921.json",
+                          "SizeBytes":  2118,
+                          "SHA256":  "4b3e0c456bc61ea71bc0f106016925e425b7d6192359da12bb83833a21de56db",
+                          "SourceSHA256":  "ae8478a9253963db40008e2fe3774fe7a463bdfd90324a7fbbf122ddff4dc780"
+                      },
+                      {
+                          "Type":  "RUN_RESULT",
+                          "ConfigId":  "CFG-L-I",
+                          "Seed":  181081,
+                          "RunId":  "L-I-04",
+                          "Path":  "test-results\\final-campaign\\G02_main_factorial_experiments\\run-summaries\\CFG-L-I\\L-I-04-181081.json",
+                          "SizeBytes":  2122,
+                          "SHA256":  "46a7663be34ed718e95c058a01dabae76e5753a6b9c3576b2411ca802bb01880",
+                          "SourceSHA256":  "fca584ddf892ba8f098b1bc66a626e2ba81002903e211ea5d483b3dcb10decb7"
+                      },
+                      {
+                          "Type":  "RUN_RESULT",
+                          "ConfigId":  "CFG-L-I",
+                          "Seed":  207547,
+                          "RunId":  "L-I-05",
+                          "Path":  "test-results\\final-campaign\\G02_main_factorial_experiments\\run-summaries\\CFG-L-I\\L-I-05-207547.json",
+                          "SizeBytes":  2124,
+                          "SHA256":  "84428324a8df3ab113e1cba0c46209f49c27c1eb8544027764e528d7db3e5634",
+                          "SourceSHA256":  "f588e801db2949c965776d44414e3ac01100e400df6efcef1e81bd470b3e2f25"
+                      },
+                      {
+                          "Type":  "BATCH_ZIP_REFERENCE",
+                          "ConfigId":  "CFG-L-I",
+                          "Seed":  "",
+                          "RunId":  "",
+                          "Path":  "C:\\Users\\raffa\\IdeaProjects\\maga-core\\tmp\\archive\\G02_CFG-L-I_five_seeds_PASS_20260623-010140.zip",
+                          "SizeBytes":  875621,
+                          "SHA256":  "98e8e69aa1bb9b949642f3291695a18bbe48a9957651f4ab84dfefd9ded64cc4",
+                          "SourceSHA256":  ""
+                      },
+                      {
+                          "Type":  "RUN_RESULT",
+                          "ConfigId":  "CFG-L-S",
+                          "Seed":  104729,
+                          "RunId":  "L-S-01",
+                          "Path":  "test-results\\final-campaign\\G02_main_factorial_experiments\\run-summaries\\CFG-L-S\\L-S-01-104729.json",
+                          "SizeBytes":  2124,
+                          "SHA256":  "8579df4a2f28fc61802f6f167d583d18d14cd42d5b88c09640c6cdae9c4adac5",
+                          "SourceSHA256":  "f0b81e5e5fb532fff66666b96f3eac48510c33e4e8d818b023744f76f63eabdc"
+                      },
+                      {
+                          "Type":  "RUN_RESULT",
+                          "ConfigId":  "CFG-L-S",
+                          "Seed":  130363,
+                          "RunId":  "L-S-02",
+                          "Path":  "test-results\\final-campaign\\G02_main_factorial_experiments\\run-summaries\\CFG-L-S\\L-S-02-130363.json",
+                          "SizeBytes":  2116,
+                          "SHA256":  "fe99455f58c9e673d26f8e707c155b8468218dc6b2c73bc40a7a2165f5dbca2f",
+                          "SourceSHA256":  "f2c4efdc73460ae6e74baa59b85af4fcd009e86cd4d48a97282219558335afed"
+                      },
+                      {
+                          "Type":  "RUN_RESULT",
+                          "ConfigId":  "CFG-L-S",
+                          "Seed":  155921,
+                          "RunId":  "L-S-03",
+                          "Path":  "test-results\\final-campaign\\G02_main_factorial_experiments\\run-summaries\\CFG-L-S\\L-S-03-155921.json",
+                          "SizeBytes":  2117,
+                          "SHA256":  "282c29bf94c0391447ef500d31ad68d1d0f719bdd6454e33e950f2cdbc903fac",
+                          "SourceSHA256":  "f1bd4c8d4f0592487b3094ad602cae9441ef93ee5e02d34e5cf76d8e5b5cd7ea"
+                      },
+                      {
+                          "Type":  "RUN_RESULT",
+                          "ConfigId":  "CFG-L-S",
+                          "Seed":  181081,
+                          "RunId":  "L-S-04",
+                          "Path":  "test-results\\final-campaign\\G02_main_factorial_experiments\\run-summaries\\CFG-L-S\\L-S-04-181081.json",
+                          "SizeBytes":  2117,
+                          "SHA256":  "40bb9191192257104ebeaad002d429475c30b845b2e26da5af7c0cfdfd80bcbf",
+                          "SourceSHA256":  "a931bdbfc4f9fe60619d713e6233ddb49d2893ee5dbebb3add3127d77185d9bd"
+                      },
+                      {
+                          "Type":  "RUN_RESULT",
+                          "ConfigId":  "CFG-L-S",
+                          "Seed":  207547,
+                          "RunId":  "L-S-05",
+                          "Path":  "test-results\\final-campaign\\G02_main_factorial_experiments\\run-summaries\\CFG-L-S\\L-S-05-207547.json",
+                          "SizeBytes":  2116,
+                          "SHA256":  "9c753e46d2397f3dce34bc160db14611dcbdc5edf867fa0f393a951189aa6952",
+                          "SourceSHA256":  "88f7137a9af3e8c6162db479fe5051de750e8f1c39453227a37febda57368b3c"
+                      },
+                      {
+                          "Type":  "BATCH_ZIP_REFERENCE",
+                          "ConfigId":  "CFG-L-S",
+                          "Seed":  "",
+                          "RunId":  "",
+                          "Path":  "C:\\Users\\raffa\\IdeaProjects\\maga-core\\tmp\\archive\\G02_CFG-L-S_five_seeds_PASS_20260623-010928.zip",
+                          "SizeBytes":  773813,
+                          "SHA256":  "f80508a5aa73271fd0c7cf00fd15681df7e512aec39ab2040ef9b88c62925e07",
+                          "SourceSHA256":  ""
+                      },
+                      {
+                          "Type":  "RUN_RESULT",
+                          "ConfigId":  "CFG-N-E",
+                          "Seed":  104729,
+                          "RunId":  "N-E-01",
+                          "Path":  "test-results\\final-campaign\\G02_main_factorial_experiments\\run-summaries\\CFG-N-E\\N-E-01-104729.json",
+                          "SizeBytes":  2125,
+                          "SHA256":  "3536550a1495a7ed1a04cbceb9104f40a10525febae8ef1a702d8412925ecfe3",
+                          "SourceSHA256":  "35bd965d3d27557ea90ca679464c5adb4be330dad9b3af6412e67f6b59362631"
+                      },
+                      {
+                          "Type":  "RUN_RESULT",
+                          "ConfigId":  "CFG-N-E",
+                          "Seed":  130363,
+                          "RunId":  "N-E-02",
+                          "Path":  "test-results\\final-campaign\\G02_main_factorial_experiments\\run-summaries\\CFG-N-E\\N-E-02-130363.json",
+                          "SizeBytes":  2126,
+                          "SHA256":  "a1bdcc94615d62a5e1d6867efdf3eb034f1e993d23fb08fcf0d52aefe4dc7911",
+                          "SourceSHA256":  "c97c1646f8c3618437fd782ced7ba8796908c7bb448597cd73f0c638228c3b4d"
+                      },
+                      {
+                          "Type":  "RUN_RESULT",
+                          "ConfigId":  "CFG-N-E",
+                          "Seed":  155921,
+                          "RunId":  "N-E-03",
+                          "Path":  "test-results\\final-campaign\\G02_main_factorial_experiments\\run-summaries\\CFG-N-E\\N-E-03-155921.json",
+                          "SizeBytes":  2124,
+                          "SHA256":  "415507e80e2b3a04030014d975fc911979d619c0b3e3ad234a004cdc66e9dc5c",
+                          "SourceSHA256":  "45d3950909eb157be7e7c6b5dd639d1ea8e6601524322aaffe02e8f2dfe7a59d"
+                      },
+                      {
+                          "Type":  "RUN_RESULT",
+                          "ConfigId":  "CFG-N-E",
+                          "Seed":  181081,
+                          "RunId":  "N-E-04",
+                          "Path":  "test-results\\final-campaign\\G02_main_factorial_experiments\\run-summaries\\CFG-N-E\\N-E-04-181081.json",
+                          "SizeBytes":  2117,
+                          "SHA256":  "419da9c8be8236fdc84f2111b9eaa59aa20fe587d58e465c8b6a0c165575d962",
+                          "SourceSHA256":  "70d712605cf72a9529637b9fc7a4db4bde5a717a37f0808d6f0fe3b3411d483b"
+                      },
+                      {
+                          "Type":  "RUN_RESULT",
+                          "ConfigId":  "CFG-N-E",
+                          "Seed":  207547,
+                          "RunId":  "N-E-05",
+                          "Path":  "test-results\\final-campaign\\G02_main_factorial_experiments\\run-summaries\\CFG-N-E\\N-E-05-207547.json",
+                          "SizeBytes":  2124,
+                          "SHA256":  "dfeeec57f775315330182d8f6beaa2054f67d94ed9b99bf252f77cd1d97a1eb8",
+                          "SourceSHA256":  "16a6189212ecee5a4a6ae72a90a3b20a73cf609a8b97612f81c23e8a3b9c5bb8"
+                      },
+                      {
+                          "Type":  "BATCH_ZIP_REFERENCE",
+                          "ConfigId":  "CFG-N-E",
+                          "Seed":  "",
+                          "RunId":  "",
+                          "Path":  "C:\\Users\\raffa\\IdeaProjects\\maga-core\\tmp\\archive\\G02_CFG-N-E_five_seeds_PASS_20260623-011643.zip",
+                          "SizeBytes":  781026,
+                          "SHA256":  "d9454b759f42e1aa9bfbc8d7402bf300fe1b79d0d23201feba8b3fd5311c35ca",
+                          "SourceSHA256":  ""
+                      },
+                      {
+                          "Type":  "RUN_RESULT",
+                          "ConfigId":  "CFG-N-I",
+                          "Seed":  104729,
+                          "RunId":  "N-I-01",
+                          "Path":  "test-results\\final-campaign\\G02_main_factorial_experiments\\run-summaries\\CFG-N-I\\N-I-01-104729.json",
+                          "SizeBytes":  2124,
+                          "SHA256":  "46581c1377c331e6b424f383a3e941e253b76c8ab9656aaff4afefca72f9ef8c",
+                          "SourceSHA256":  "5da99c6c946268dd213fb43361a3a206d95b5da0c27bbe9adb6e06b615f70472"
+                      },
+                      {
+                          "Type":  "RUN_RESULT",
+                          "ConfigId":  "CFG-N-I",
+                          "Seed":  130363,
+                          "RunId":  "N-I-02",
+                          "Path":  "test-results\\final-campaign\\G02_main_factorial_experiments\\run-summaries\\CFG-N-I\\N-I-02-130363.json",
+                          "SizeBytes":  2123,
+                          "SHA256":  "8efd94906236048546d56a82a1b012885767ea9ac89a0acb9c720767bc463ab5",
+                          "SourceSHA256":  "21f1c208a43f9ab368876cc2ef39923cfa8f7377922fc9713fb0c8fad60f4468"
+                      },
+                      {
+                          "Type":  "RUN_RESULT",
+                          "ConfigId":  "CFG-N-I",
+                          "Seed":  155921,
+                          "RunId":  "N-I-03",
+                          "Path":  "test-results\\final-campaign\\G02_main_factorial_experiments\\run-summaries\\CFG-N-I\\N-I-03-155921.json",
+                          "SizeBytes":  2124,
+                          "SHA256":  "aa03702b93c1454eb514a39abbb95d61a060619a5b99ca1f16a5bc93fb272d17",
+                          "SourceSHA256":  "59efa7f809b23a61d110b37a9630c2a05bc655cab8efe4bccac0ee985b41021d"
+                      },
+                      {
+                          "Type":  "RUN_RESULT",
+                          "ConfigId":  "CFG-N-I",
+                          "Seed":  181081,
+                          "RunId":  "N-I-04",
+                          "Path":  "test-results\\final-campaign\\G02_main_factorial_experiments\\run-summaries\\CFG-N-I\\N-I-04-181081.json",
+                          "SizeBytes":  2115,
+                          "SHA256":  "c596584b9b9b036bdf688073233847a7427fe90cb89228e090feb5818c8e7704",
+                          "SourceSHA256":  "192c53955c5018ae1dd0b3259cd3d16356025bff530baf5a6b9c25f08b45a5b5"
+                      },
+                      {
+                          "Type":  "RUN_RESULT",
+                          "ConfigId":  "CFG-N-I",
+                          "Seed":  207547,
+                          "RunId":  "N-I-05",
+                          "Path":  "test-results\\final-campaign\\G02_main_factorial_experiments\\run-summaries\\CFG-N-I\\N-I-05-207547.json",
+                          "SizeBytes":  2124,
+                          "SHA256":  "cc7fa3560373ee9f658395e4385547aa86d5fd20c2c2b6e96620e30219c17253",
+                          "SourceSHA256":  "1fe7d94080214ea3f7353880f6f4ea23b744dce6f89761de5d803a38aeae3b42"
+                      },
+                      {
+                          "Type":  "BATCH_ZIP_REFERENCE",
+                          "ConfigId":  "CFG-N-I",
+                          "Seed":  "",
+                          "RunId":  "",
+                          "Path":  "C:\\Users\\raffa\\IdeaProjects\\maga-core\\tmp\\archive\\G02_CFG-N-I_five_seeds_PASS_20260623-013346.zip",
+                          "SizeBytes":  747619,
+                          "SHA256":  "e70bb016a8442ed41fe6b7c6ec779b05c34a68cb7be677b9a9b6d0b16ece6f16",
+                          "SourceSHA256":  ""
+                      },
+                      {
+                          "Type":  "RUN_RESULT",
+                          "ConfigId":  "CFG-N-S",
+                          "Seed":  104729,
+                          "RunId":  "N-S-01",
+                          "Path":  "test-results\\final-campaign\\G02_main_factorial_experiments\\run-summaries\\CFG-N-S\\N-S-01-104729.json",
+                          "SizeBytes":  2127,
+                          "SHA256":  "91e0d81c05f668875911171330da104946e06f106c8bc1d1de113af10c12ac7a",
+                          "SourceSHA256":  "488a82cc8ef280f6b356ec32d7055c493cc15a1faa9936ebe8791389f9370d99"
+                      },
+                      {
+                          "Type":  "RUN_RESULT",
+                          "ConfigId":  "CFG-N-S",
+                          "Seed":  130363,
+                          "RunId":  "N-S-02",
+                          "Path":  "test-results\\final-campaign\\G02_main_factorial_experiments\\run-summaries\\CFG-N-S\\N-S-02-130363.json",
+                          "SizeBytes":  2125,
+                          "SHA256":  "d2361faea6c18258027c24b0f8864e1c02fd6628dd1bebc634e214cc10dcca4f",
+                          "SourceSHA256":  "b8f1c2ed16b2881637007239e65dd5a6bdb49e9d7e94989ce1dfd53e4df42f4e"
+                      },
+                      {
+                          "Type":  "RUN_RESULT",
+                          "ConfigId":  "CFG-N-S",
+                          "Seed":  155921,
+                          "RunId":  "N-S-03",
+                          "Path":  "test-results\\final-campaign\\G02_main_factorial_experiments\\run-summaries\\CFG-N-S\\N-S-03-155921.json",
+                          "SizeBytes":  2128,
+                          "SHA256":  "60e9a3240635e7718b691f7a876c94bdb4988ccf02e6f8d83710ad63d3408aaa",
+                          "SourceSHA256":  "7699482ca92e4bf6d68823fbd50374a754f2e56bc33f6e3815ce1c77426c1d05"
+                      },
+                      {
+                          "Type":  "RUN_RESULT",
+                          "ConfigId":  "CFG-N-S",
+                          "Seed":  181081,
+                          "RunId":  "N-S-04",
+                          "Path":  "test-results\\final-campaign\\G02_main_factorial_experiments\\run-summaries\\CFG-N-S\\N-S-04-181081.json",
+                          "SizeBytes":  2127,
+                          "SHA256":  "6aed19dfd1749cd4ca8cd44b1c211f152e24b99abf77add9be66a251d87b43fd",
+                          "SourceSHA256":  "c7e884233893ddc09e17124abd921875bcd54ff48d8d6abcac1f87333718b581"
+                      },
+                      {
+                          "Type":  "RUN_RESULT",
+                          "ConfigId":  "CFG-N-S",
+                          "Seed":  207547,
+                          "RunId":  "N-S-05",
+                          "Path":  "test-results\\final-campaign\\G02_main_factorial_experiments\\run-summaries\\CFG-N-S\\N-S-05-207547.json",
+                          "SizeBytes":  2126,
+                          "SHA256":  "881018a301bc333309f2d0b95c7e9920774a497da4b7e4c87f6dc641a7f06cb8",
+                          "SourceSHA256":  "514186e732302424a18abd090cde0651f5d3db797550725f15fc65eb4b20f74b"
+                      },
+                      {
+                          "Type":  "BATCH_ZIP_REFERENCE",
+                          "ConfigId":  "CFG-N-S",
+                          "Seed":  "",
+                          "RunId":  "",
+                          "Path":  "C:\\Users\\raffa\\IdeaProjects\\maga-core\\tmp\\archive\\G02_CFG-N-S_five_seeds_PASS_20260623-014130.zip",
+                          "SizeBytes":  634009,
+                          "SHA256":  "4fc4d70a81aa62227b5a72f4c818c74906220dfc684f0a0edeb1926362ec673b",
+                          "SourceSHA256":  ""
+                      },
+                      {
+                          "Type":  "RUN_RESULT",
+                          "ConfigId":  "CFG-H-E",
+                          "Seed":  104729,
+                          "RunId":  "H-E-01",
+                          "Path":  "test-results\\final-campaign\\G02_main_factorial_experiments\\run-summaries\\CFG-H-E\\H-E-01-104729.json",
+                          "SizeBytes":  2128,
+                          "SHA256":  "146164595abaf615705aeb36e93f92951a187ac5a493d7a7e23bbacf5cd8907c",
+                          "SourceSHA256":  "49b8812abdb6cb6bc0def1e33b6034a14f37a5c82c4cda8631d1e3312546685c"
+                      },
+                      {
+                          "Type":  "RUN_RESULT",
+                          "ConfigId":  "CFG-H-E",
+                          "Seed":  130363,
+                          "RunId":  "H-E-02",
+                          "Path":  "test-results\\final-campaign\\G02_main_factorial_experiments\\run-summaries\\CFG-H-E\\H-E-02-130363.json",
+                          "SizeBytes":  2129,
+                          "SHA256":  "675178ff183adf12e5a02c55a00bf3340574d0df2ec0ae54726aa862257e9e30",
+                          "SourceSHA256":  "0b38c95dbb22b66d83eaf8a5aee0f9b9e76f5e4af15cf802b463e2284e0ced31"
+                      },
+                      {
+                          "Type":  "RUN_RESULT",
+                          "ConfigId":  "CFG-H-E",
+                          "Seed":  155921,
+                          "RunId":  "H-E-03",
+                          "Path":  "test-results\\final-campaign\\G02_main_factorial_experiments\\run-summaries\\CFG-H-E\\H-E-03-155921.json",
+                          "SizeBytes":  2129,
+                          "SHA256":  "1d3fa85d1030acdf39d2f5552cec918179e54aa4693672c851dda0c1b4ceb0df",
+                          "SourceSHA256":  "00536334942230167544c1f42b94e4c91300a5d9d647abfa3b779637514fe11d"
+                      },
+                      {
+                          "Type":  "RUN_RESULT",
+                          "ConfigId":  "CFG-H-E",
+                          "Seed":  181081,
+                          "RunId":  "H-E-04",
+                          "Path":  "test-results\\final-campaign\\G02_main_factorial_experiments\\run-summaries\\CFG-H-E\\H-E-04-181081.json",
+                          "SizeBytes":  2130,
+                          "SHA256":  "81047b9cb958f9f31705ae12f8b01b791a4ddbca0e0e5011d5907c2bea87ca90",
+                          "SourceSHA256":  "0f7d7df8aa1e0cd62e247944ac7f7bb339aca8b498d039686d23d3bdf10d8808"
+                      },
+                      {
+                          "Type":  "RUN_RESULT",
+                          "ConfigId":  "CFG-H-E",
+                          "Seed":  207547,
+                          "RunId":  "H-E-05",
+                          "Path":  "test-results\\final-campaign\\G02_main_factorial_experiments\\run-summaries\\CFG-H-E\\H-E-05-207547.json",
+                          "SizeBytes":  2129,
+                          "SHA256":  "8254cd07523f33cb2e0ecbb544fed86452e8ce230153b358830a1eba439a3547",
+                          "SourceSHA256":  "c5fec89943d8d4497a4408256791a9ad1a6c65638bc6fd648040dafc5179aadf"
+                      },
+                      {
+                          "Type":  "BATCH_ZIP_REFERENCE",
+                          "ConfigId":  "CFG-H-E",
+                          "Seed":  "",
+                          "RunId":  "",
+                          "Path":  "C:\\Users\\raffa\\IdeaProjects\\maga-core\\tmp\\archive\\G02_CFG-H-E_five_seeds_PASS_20260623-015044.zip",
+                          "SizeBytes":  711901,
+                          "SHA256":  "47449aa8b0df8b0783cc8c93f3584f5006e16b4b9097c866cc577474190b8e29",
+                          "SourceSHA256":  ""
+                      },
+                      {
+                          "Type":  "RUN_RESULT",
+                          "ConfigId":  "CFG-H-I",
+                          "Seed":  104729,
+                          "RunId":  "H-I-01",
+                          "Path":  "test-results\\final-campaign\\G02_main_factorial_experiments\\run-summaries\\CFG-H-I\\H-I-01-104729.json",
+                          "SizeBytes":  2130,
+                          "SHA256":  "5f499c57dedb4b39d04af8623b4c236a481948b0d3f8c1a6860ba50817cd1894",
+                          "SourceSHA256":  "66d38f769aa8154fbe4169a568928a1698bf2175d5f04b8c4012e76e77a6a5ca"
+                      },
+                      {
+                          "Type":  "RUN_RESULT",
+                          "ConfigId":  "CFG-H-I",
+                          "Seed":  130363,
+                          "RunId":  "H-I-02",
+                          "Path":  "test-results\\final-campaign\\G02_main_factorial_experiments\\run-summaries\\CFG-H-I\\H-I-02-130363.json",
+                          "SizeBytes":  2130,
+                          "SHA256":  "94b132fab102aaa1869e2f4b13e304394a99b79e3d99584bb26bcfb73d14f69c",
+                          "SourceSHA256":  "35c96447e863581bf4a4111a44447d0e3a23c9fc1e6ed65eed6321b988df9be8"
+                      },
+                      {
+                          "Type":  "RUN_RESULT",
+                          "ConfigId":  "CFG-H-I",
+                          "Seed":  155921,
+                          "RunId":  "H-I-03",
+                          "Path":  "test-results\\final-campaign\\G02_main_factorial_experiments\\run-summaries\\CFG-H-I\\H-I-03-155921.json",
+                          "SizeBytes":  2130,
+                          "SHA256":  "e92d29f5caba539b5a20f7f41f548b4959380bdb9b8166f5bf6d2cf8c22fc93a",
+                          "SourceSHA256":  "b09a29141052bb3028cea6008891419ce0ea39873251c50805519faa25e17afa"
+                      },
+                      {
+                          "Type":  "RUN_RESULT",
+                          "ConfigId":  "CFG-H-I",
+                          "Seed":  181081,
+                          "RunId":  "H-I-04",
+                          "Path":  "test-results\\final-campaign\\G02_main_factorial_experiments\\run-summaries\\CFG-H-I\\H-I-04-181081.json",
+                          "SizeBytes":  2131,
+                          "SHA256":  "314ff40a8cbfe447f45212a36f212eb8ddb3b26f1dfb9bd9ff47c00d59a95e04",
+                          "SourceSHA256":  "7fd1b0219f46767c81af3289e2f958bb8c49387a18202f8807768ca46b38bbcb"
+                      },
+                      {
+                          "Type":  "RUN_RESULT",
+                          "ConfigId":  "CFG-H-I",
+                          "Seed":  207547,
+                          "RunId":  "H-I-05",
+                          "Path":  "test-results\\final-campaign\\G02_main_factorial_experiments\\run-summaries\\CFG-H-I\\H-I-05-207547.json",
+                          "SizeBytes":  2131,
+                          "SHA256":  "56f3e84c2904915844b06c6524dbad1050e402ff139622dc9564a2bea2700fb1",
+                          "SourceSHA256":  "bd335ee41567d02ef212d016593261e555655a78118dbadd982df1608ddad2d8"
+                      },
+                      {
+                          "Type":  "BATCH_ZIP_REFERENCE",
+                          "ConfigId":  "CFG-H-I",
+                          "Seed":  "",
+                          "RunId":  "",
+                          "Path":  "C:\\Users\\raffa\\IdeaProjects\\maga-core\\tmp\\archive\\G02_CFG-H-I_five_seeds_PASS_20260623-015748.zip",
+                          "SizeBytes":  647938,
+                          "SHA256":  "8c080fc44754c12bf8e789a1951586dbc600282361ecb84d989a9310bea06329",
+                          "SourceSHA256":  ""
+                      },
+                      {
+                          "Type":  "RUN_RESULT",
+                          "ConfigId":  "CFG-H-S",
+                          "Seed":  104729,
+                          "RunId":  "H-S-01",
+                          "Path":  "test-results\\final-campaign\\G02_main_factorial_experiments\\run-summaries\\CFG-H-S\\H-S-01-104729.json",
+                          "SizeBytes":  2131,
+                          "SHA256":  "99a8f72376f859f9d77221133f72efe5c8a828afb15116bc60d708d3de0d015a",
+                          "SourceSHA256":  "5c0b0972120c57df2c9524390ad8f10d345df3e65d98e9d4a9031f7fa4804401"
+                      },
+                      {
+                          "Type":  "RUN_RESULT",
+                          "ConfigId":  "CFG-H-S",
+                          "Seed":  130363,
+                          "RunId":  "H-S-02",
+                          "Path":  "test-results\\final-campaign\\G02_main_factorial_experiments\\run-summaries\\CFG-H-S\\H-S-02-130363.json",
+                          "SizeBytes":  2129,
+                          "SHA256":  "abe1ae3f0a705436cedc16e5578807a396aa301b1c14ae261fa54706c9f6d87a",
+                          "SourceSHA256":  "0785aa7eb6fcd57d109345568dfc9d65ede6872834bb88ff5942f92e7568098a"
+                      },
+                      {
+                          "Type":  "RUN_RESULT",
+                          "ConfigId":  "CFG-H-S",
+                          "Seed":  155921,
+                          "RunId":  "H-S-03",
+                          "Path":  "test-results\\final-campaign\\G02_main_factorial_experiments\\run-summaries\\CFG-H-S\\H-S-03-155921.json",
+                          "SizeBytes":  2131,
+                          "SHA256":  "d175f782a77df95435cbdc9d8ce3a1d12469cb4dac004ceb8ae90d09017e3038",
+                          "SourceSHA256":  "48f4e42bb789dd7a2b535b33ecfd9a20597ff7382da9dd617813e5fa93066ed2"
+                      },
+                      {
+                          "Type":  "RUN_RESULT",
+                          "ConfigId":  "CFG-H-S",
+                          "Seed":  181081,
+                          "RunId":  "H-S-04",
+                          "Path":  "test-results\\final-campaign\\G02_main_factorial_experiments\\run-summaries\\CFG-H-S\\H-S-04-181081.json",
+                          "SizeBytes":  2130,
+                          "SHA256":  "2acd4411205f22575e450fcce87d6b03c2ec0620392250ae23a4c750849b879e",
+                          "SourceSHA256":  "f5fc0df2280e73ce66fdfc9473504320b920c6c4a4969cc27810e4b2e529a9f6"
+                      },
+                      {
+                          "Type":  "RUN_RESULT",
+                          "ConfigId":  "CFG-H-S",
+                          "Seed":  207547,
+                          "RunId":  "H-S-05",
+                          "Path":  "test-results\\final-campaign\\G02_main_factorial_experiments\\run-summaries\\CFG-H-S\\H-S-05-207547.json",
+                          "SizeBytes":  2131,
+                          "SHA256":  "d4f932fa48ed34814295e807161a3039fda6a7998ad298e1378bbb786d79c00a",
+                          "SourceSHA256":  "85657f208de55847490810832e3e898ec84fcc59f9a7fc6f03596fc6fc5705dc"
+                      },
+                      {
+                          "Type":  "BATCH_ZIP_REFERENCE",
+                          "ConfigId":  "CFG-H-S",
+                          "Seed":  "",
+                          "RunId":  "",
+                          "Path":  "C:\\Users\\raffa\\IdeaProjects\\maga-core\\tmp\\archive\\G02_CFG-H-S_five_seeds_PASS_20260623-020447.zip",
+                          "SizeBytes":  563946,
+                          "SHA256":  "fa5ba7bc0612f554537594c53a18685aa460c8eb1f07026714531abe0e99bfcb",
+                          "SourceSHA256":  ""
+                      },
+                      {
+                          "Type":  "CONSOLIDATED_ARTIFACT",
+                          "ConfigId":  "",
+                          "Seed":  "",
+                          "RunId":  "",
+                          "Path":  "Matrice_test_MA_GA_MOSAIC_SUMO_G02_45_run_completate.xlsx",
+                          "SizeBytes":  435790,
+                          "SHA256":  "25974139a882d44dba2eebab059b642f648e6e34abf91419565445fb9cba0ee0",
+                          "SourceSHA256":  ""
+                      },
+                      {
+                          "Type":  "CONSOLIDATED_ARTIFACT",
+                          "ConfigId":  "",
+                          "Seed":  "",
+                          "RunId":  "",
+                          "Path":  "Matrice_semplificata_G02_45_run_completate.xlsx",
+                          "SizeBytes":  26805,
+                          "SHA256":  "b58a59f9cee5f41e6c1e9c1147214794fdfd6445f7a897c7e992302eba9a196b",
+                          "SourceSHA256":  ""
+                      },
+                      {
+                          "Type":  "CONSOLIDATED_ARTIFACT",
+                          "ConfigId":  "",
+                          "Seed":  "",
+                          "RunId":  "",
+                          "Path":  "test-results\\final-campaign\\G02_main_factorial_experiments\\metrics_G02_runs.csv",
+                          "SizeBytes":  22206,
+                          "SHA256":  "899b3535fff59d53171e4046201a25d07f04444899c73e5187b9431aca06d721",
+                          "SourceSHA256":  ""
+                      },
+                      {
+                          "Type":  "CONSOLIDATED_ARTIFACT",
+                          "ConfigId":  "",
+                          "Seed":  "",
+                          "RunId":  "",
+                          "Path":  "test-results\\final-campaign\\G02_main_factorial_experiments\\metrics_G02_by_configuration.csv",
+                          "SizeBytes":  1766,
+                          "SHA256":  "1b6f500d932574304175206ae58f7767e3eb9d1d97a9b83c052f98b9b4d93a96",
+                          "SourceSHA256":  ""
+                      }
+                  ]
+}

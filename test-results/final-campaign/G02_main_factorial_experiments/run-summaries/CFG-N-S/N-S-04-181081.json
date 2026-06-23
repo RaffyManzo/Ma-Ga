@@ -1,0 +1,48 @@
+﻿{
+    "schemaVersion":  "1.0",
+    "campaignId":  "final-test-campaign",
+    "groupId":  "G02",
+    "classification":  "MAIN_FACTORIAL",
+    "runId":  "N-S-04",
+    "configId":  "CFG-N-S",
+    "seed":  181081,
+    "replica":  4,
+    "status":  "PASS",
+    "runName":  "log-20260623-014612-MaGaLiteratureBasedUrbanStudy",
+    "validator":  {
+                      "status":  "LITERATURE_SMOKE_TEST_PASSED",
+                      "errorCount":  0,
+                      "warningCount":  0
+                  },
+    "metrics":  {
+                    "tasksGenerated":  9413,
+                    "tasksActivated":  9413,
+                    "tasksRemovedAtDeadline":  9299,
+                    "tasksPendingAtEnd":  114,
+                    "tasksPendingPeak":  130,
+                    "gaJobsSubmitted":  422,
+                    "gaJobsCompleted":  422,
+                    "gaJobsApplied":  378,
+                    "staleResults":  44,
+                    "staleRatioPercent":  10.42654,
+                    "gaRuntimeMeanSeconds":  0.098336382,
+                    "gaRuntimeMedianSeconds":  0.0734988,
+                    "gaRuntimeP95Seconds":  0.2975268,
+                    "gaRuntimeMaxSeconds":  0.4811488,
+                    "snapshotLagMaxSeconds":  0,
+                    "runtimeViolations":  0,
+                    "assignments":  {
+                                        "local":  20495,
+                                        "vehicle":  0,
+                                        "edge":  0,
+                                        "cloud":  1
+                                    },
+                    "taskCompletionModel":  "NOT_IMPLEMENTED"
+                },
+    "evidence":  {
+                     "resultJsonSha256":  "c7e884233893ddc09e17124abd921875bcd54ff48d8d6abcac1f87333718b581",
+                     "batchZip":  "G02_CFG-N-S_five_seeds_PASS_20260623-014130.zip",
+                     "batchZipSha256":  "4fc4d70a81aa62227b5a72f4c818c74906220dfc684f0a0edeb1926362ec673b",
+                     "recoveryClassification":  ""
+                 }
+}

@@ -1,0 +1,54 @@
+{
+  "schemaVersion": "2.0",
+  "status": "BLOCKED_PENDING_DECISION",
+  "approved": false,
+  "coreChangesRequired": true,
+  "comparativeRunsAuthorized": false,
+  "baselineVariant": {
+    "id": "FULL_MA_GA",
+    "action": "REUSE_G02_RESULTS",
+    "rerun": false
+  },
+  "configurations": [
+    "CFG-N-I",
+    "CFG-N-S",
+    "CFG-H-I"
+  ],
+  "optionalConfigurations": [
+    "CFG-H-S"
+  ],
+  "seeds": [
+    104729,
+    130363,
+    155921,
+    181081,
+    207547
+  ],
+  "variants": [
+    {
+      "id": "LOCAL_ONLY",
+      "supportClassification": "NOT_EXPOSED",
+      "approved": false,
+      "exactMutations": []
+    },
+    {
+      "id": "NO_MOBILITY_PENALTY",
+      "supportClassification": "CORE_PRESENT_CONFIG_NOT_EXPOSED",
+      "approved": false,
+      "exactMutations": []
+    },
+    {
+      "id": "COLD_START_NO_REUSE",
+      "supportClassification": "CORE_PRESENT_CONFIG_NOT_EXPOSED",
+      "approved": false,
+      "exactMutations": []
+    }
+  ],
+  "safetyRules": [
+    "Do not modify Java before an explicit design decision.",
+    "Do not start comparative runs with inferred or post-processed variants.",
+    "Do not repeat the FULL_MA_GA baseline runs already completed in G02.",
+    "Use the five official seeds for every approved comparison.",
+    "Re-run smoke validation after any future core change before starting G02B."
+  ]
+}

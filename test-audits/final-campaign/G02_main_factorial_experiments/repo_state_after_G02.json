@@ -1,0 +1,25 @@
+﻿{
+    "generatedAtUtc":  "2026-06-23T00:33:52.5603388Z",
+    "branch":  "testing/final-campaign",
+    "head":  "95e51e186f5e846b41a8ece7db416f67e60312ef",
+    "remoteHead":  "95e51e186f5e846b41a8ece7db416f67e60312ef",
+    "frozenCoreCommit":  "5a9477735a3d707a5f000a64653cd2a6fc7f2007",
+    "committedJavaDiff":  [
+
+                          ],
+    "workingJavaDiff":  [
+
+                        ],
+    "workingTreeChanges":  [
+                               "?? Matrice_semplificata_G02_45_run_completate.xlsx",
+                               "?? Matrice_test_MA_GA_MOSAIC_SUMO_G02_45_run_completate.xlsx",
+                               "?? data/docs/testing/final-campaign/03_G02_completion_and_G02B_handoff.md",
+                               "?? test-audits/final-campaign/G02B_comparative_analysis/",
+                               "?? test-audits/final-campaign/G02_main_factorial_experiments/",
+                               "?? test-results/final-campaign/G02_main_factorial_experiments/"
+                           ],
+    "g02MainRuns":  45,
+    "g02MainPass":  45,
+    "g02bRunsStarted":  0,
+    "g02bAuditStatus":  "G02B_DECISION_REQUIRED"
+}

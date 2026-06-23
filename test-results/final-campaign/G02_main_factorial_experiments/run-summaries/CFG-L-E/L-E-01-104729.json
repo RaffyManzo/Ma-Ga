@@ -1,0 +1,48 @@
+﻿{
+    "schemaVersion":  "1.0",
+    "campaignId":  "final-test-campaign",
+    "groupId":  "G02",
+    "classification":  "MAIN_FACTORIAL",
+    "runId":  "L-E-01",
+    "configId":  "CFG-L-E",
+    "seed":  104729,
+    "replica":  1,
+    "status":  "PASS",
+    "runName":  "log-20260623-001953-MaGaLiteratureBasedUrbanStudy",
+    "validator":  {
+                      "status":  "LITERATURE_SMOKE_TEST_PASSED",
+                      "errorCount":  0,
+                      "warningCount":  0
+                  },
+    "metrics":  {
+                    "tasksGenerated":  5667,
+                    "tasksActivated":  5667,
+                    "tasksRemovedAtDeadline":  5650,
+                    "tasksPendingAtEnd":  17,
+                    "tasksPendingPeak":  43,
+                    "gaJobsSubmitted":  720,
+                    "gaJobsCompleted":  720,
+                    "gaJobsApplied":  717,
+                    "staleResults":  3,
+                    "staleRatioPercent":  0.416667,
+                    "gaRuntimeMeanSeconds":  0.028436988,
+                    "gaRuntimeMedianSeconds":  0.0246536,
+                    "gaRuntimeP95Seconds":  0.0626592,
+                    "gaRuntimeMaxSeconds":  0.2303412,
+                    "snapshotLagMaxSeconds":  0,
+                    "runtimeViolations":  0,
+                    "assignments":  {
+                                        "local":  9367,
+                                        "vehicle":  27,
+                                        "edge":  0,
+                                        "cloud":  14
+                                    },
+                    "taskCompletionModel":  "NOT_IMPLEMENTED"
+                },
+    "evidence":  {
+                     "resultJsonSha256":  "1245f87ad99af98189678fe04767e2bce843367820ba3570bb67ed2a456cc4fe",
+                     "batchZip":  "G02_CFG-L-E_five_seeds_PASS_20260623-002644.zip",
+                     "batchZipSha256":  "8eccc214b61c0a7756029b57d32b64c396850122d2e60af3cb04d33d2572d0c7",
+                     "recoveryClassification":  "WRAPPER_FAILURE_EXISTING_RUN_RECOVERED"
+                 }
+}

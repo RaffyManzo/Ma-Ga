@@ -1,0 +1,48 @@
+﻿{
+    "schemaVersion":  "1.0",
+    "campaignId":  "final-test-campaign",
+    "groupId":  "G02",
+    "classification":  "MAIN_FACTORIAL",
+    "runId":  "L-S-02",
+    "configId":  "CFG-L-S",
+    "seed":  130363,
+    "replica":  2,
+    "status":  "PASS",
+    "runName":  "log-20260623-011038-MaGaLiteratureBasedUrbanStudy",
+    "validator":  {
+                      "status":  "LITERATURE_SMOKE_TEST_PASSED",
+                      "errorCount":  0,
+                      "warningCount":  0
+                  },
+    "metrics":  {
+                    "tasksGenerated":  5344,
+                    "tasksActivated":  5344,
+                    "tasksRemovedAtDeadline":  5293,
+                    "tasksPendingAtEnd":  51,
+                    "tasksPendingPeak":  78,
+                    "gaJobsSubmitted":  620,
+                    "gaJobsCompleted":  620,
+                    "gaJobsApplied":  620,
+                    "staleResults":  0,
+                    "staleRatioPercent":  0,
+                    "gaRuntimeMeanSeconds":  0.03912211,
+                    "gaRuntimeMedianSeconds":  0.0348675,
+                    "gaRuntimeP95Seconds":  0.0815374,
+                    "gaRuntimeMaxSeconds":  0.1412085,
+                    "snapshotLagMaxSeconds":  0,
+                    "runtimeViolations":  0,
+                    "assignments":  {
+                                        "local":  21850,
+                                        "vehicle":  0,
+                                        "edge":  0,
+                                        "cloud":  0
+                                    },
+                    "taskCompletionModel":  "NOT_IMPLEMENTED"
+                },
+    "evidence":  {
+                     "resultJsonSha256":  "f2c4efdc73460ae6e74baa59b85af4fcd009e86cd4d48a97282219558335afed",
+                     "batchZip":  "G02_CFG-L-S_five_seeds_PASS_20260623-010928.zip",
+                     "batchZipSha256":  "f80508a5aa73271fd0c7cf00fd15681df7e512aec39ab2040ef9b88c62925e07",
+                     "recoveryClassification":  ""
+                 }
+}

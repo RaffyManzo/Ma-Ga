@@ -1,0 +1,48 @@
+﻿{
+    "schemaVersion":  "1.0",
+    "campaignId":  "final-test-campaign",
+    "groupId":  "G02",
+    "classification":  "MAIN_FACTORIAL",
+    "runId":  "H-S-02",
+    "configId":  "CFG-H-S",
+    "seed":  130363,
+    "replica":  2,
+    "status":  "PASS",
+    "runName":  "log-20260623-020607-MaGaLiteratureBasedUrbanStudy",
+    "validator":  {
+                      "status":  "LITERATURE_SMOKE_TEST_PASSED",
+                      "errorCount":  0,
+                      "warningCount":  0
+                  },
+    "metrics":  {
+                    "tasksGenerated":  15387,
+                    "tasksActivated":  15387,
+                    "tasksRemovedAtDeadline":  15210,
+                    "tasksPendingAtEnd":  177,
+                    "tasksPendingPeak":  220,
+                    "gaJobsSubmitted":  320,
+                    "gaJobsCompleted":  320,
+                    "gaJobsApplied":  243,
+                    "staleResults":  77,
+                    "staleRatioPercent":  24.0625,
+                    "gaRuntimeMeanSeconds":  0.144420979,
+                    "gaRuntimeMedianSeconds":  0.0812235,
+                    "gaRuntimeP95Seconds":  0.4735152,
+                    "gaRuntimeMaxSeconds":  0.6401189,
+                    "snapshotLagMaxSeconds":  0,
+                    "runtimeViolations":  0,
+                    "assignments":  {
+                                        "local":  17103,
+                                        "vehicle":  0,
+                                        "edge":  0,
+                                        "cloud":  0
+                                    },
+                    "taskCompletionModel":  "NOT_IMPLEMENTED"
+                },
+    "evidence":  {
+                     "resultJsonSha256":  "0785aa7eb6fcd57d109345568dfc9d65ede6872834bb88ff5942f92e7568098a",
+                     "batchZip":  "G02_CFG-H-S_five_seeds_PASS_20260623-020447.zip",
+                     "batchZipSha256":  "fa5ba7bc0612f554537594c53a18685aa460c8eb1f07026714531abe0e99bfcb",
+                     "recoveryClassification":  ""
+                 }
+}

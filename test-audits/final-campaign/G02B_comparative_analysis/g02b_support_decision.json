@@ -1,0 +1,97 @@
+{
+  "schemaVersion": "2.0",
+  "generatedAtUtc": "2026-06-23T00:42:34.343846+00:00",
+  "campaignId": "final-test-campaign",
+  "groupId": "G02B",
+  "status": "G02B_DECISION_REQUIRED",
+  "sourceAuditBundle": {
+    "filename": "G02_closure_and_G02B_audit_20260623-023328.zip",
+    "sha256": "44933aca8c752476a5a3a5a052fa178d7b6bbe651bf4565af02a52007f63f45a"
+  },
+  "repositoryState": {
+    "branch": "testing/final-campaign",
+    "headBeforeClosure": "95e51e186f5e846b41a8ece7db416f67e60312ef",
+    "frozenCoreCommit": "5a9477735a3d707a5f000a64653cd2a6fc7f2007",
+    "javaDiffFromFreeze": []
+  },
+  "g02Main": {
+    "runCount": 45,
+    "passCount": 45,
+    "validatorErrors": 0,
+    "validatorWarnings": 0,
+    "maximumSnapshotLagSeconds": 0,
+    "runtimeViolationCount": 0,
+    "taskCompletionModel": "NOT_IMPLEMENTED"
+  },
+  "g02b": {
+    "comparativeRunsStarted": 0,
+    "javaChangesPerformed": false,
+    "baselinePolicy": "REUSE_EXISTING_FULL_MA_GA_G02_RESULTS",
+    "minimumConfigurations": [
+      "CFG-N-I",
+      "CFG-N-S",
+      "CFG-H-I"
+    ],
+    "optionalConfigurations": [
+      "CFG-H-S"
+    ],
+    "seeds": [
+      104729,
+      130363,
+      155921,
+      181081,
+      207547
+    ],
+    "capabilities": [
+      {
+        "id": "LOCAL_ONLY",
+        "classification": "NOT_EXPOSED",
+        "configurationSupport": false,
+        "toolingSupport": false,
+        "coreSupportProven": false,
+        "review": "The two tooling matches were false positives: target_length in route selection and a generic metadata target.",
+        "automaticExecutionAllowed": false
+      },
+      {
+        "id": "NO_MOBILITY_PENALTY",
+        "classification": "CORE_PRESENT_CONFIG_NOT_EXPOSED",
+        "configurationSupport": false,
+        "toolingSupport": false,
+        "coreSupportProven": true,
+        "review": "Mobility penalty and FitnessWeights exist in the core, but no runtime JSON key or external switch exposes a zero-weight variant.",
+        "automaticExecutionAllowed": false
+      },
+      {
+        "id": "COLD_START_NO_REUSE",
+        "classification": "CORE_PRESENT_CONFIG_NOT_EXPOSED",
+        "configurationSupport": false,
+        "toolingSupport": false,
+        "coreSupportProven": true,
+        "review": "Population reuse and cold-start logic exist in the core, but no runtime JSON key forces cold start for every window.",
+        "automaticExecutionAllowed": false
+      },
+      {
+        "id": "RANDOM_OR_GREEDY_OPTIONAL",
+        "classification": "NO_EVIDENCE",
+        "configurationSupport": false,
+        "toolingSupport": false,
+        "coreSupportProven": false,
+        "review": "No existing configurable random-feasible or greedy baseline was identified.",
+        "automaticExecutionAllowed": false
+      }
+    ]
+  },
+  "decisionOptions": [
+    {
+      "id": "PRESERVE_FREEZE",
+      "description": "Close G02B as not executable under the frozen-core constraint, document the limitation, and continue with G03.",
+      "requiresJavaChanges": false
+    },
+    {
+      "id": "CONTROLLED_EXPERIMENTAL_BRANCH",
+      "description": "Create a dedicated experimental branch and expose minimal, explicit switches for the mandatory ablations. This requires design review before implementation.",
+      "requiresJavaChanges": true
+    }
+  ],
+  "selectedDecision": null
+}

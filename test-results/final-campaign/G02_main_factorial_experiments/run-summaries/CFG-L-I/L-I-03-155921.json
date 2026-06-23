@@ -1,0 +1,48 @@
+﻿{
+    "schemaVersion":  "1.0",
+    "campaignId":  "final-test-campaign",
+    "groupId":  "G02",
+    "classification":  "MAIN_FACTORIAL",
+    "runId":  "L-I-03",
+    "configId":  "CFG-L-I",
+    "seed":  155921,
+    "replica":  3,
+    "status":  "PASS",
+    "runName":  "log-20260623-010350-MaGaLiteratureBasedUrbanStudy",
+    "validator":  {
+                      "status":  "LITERATURE_SMOKE_TEST_PASSED",
+                      "errorCount":  0,
+                      "warningCount":  0
+                  },
+    "metrics":  {
+                    "tasksGenerated":  5483,
+                    "tasksActivated":  5483,
+                    "tasksRemovedAtDeadline":  5442,
+                    "tasksPendingAtEnd":  41,
+                    "tasksPendingPeak":  55,
+                    "gaJobsSubmitted":  718,
+                    "gaJobsCompleted":  718,
+                    "gaJobsApplied":  718,
+                    "staleResults":  0,
+                    "staleRatioPercent":  0,
+                    "gaRuntimeMeanSeconds":  0.028172077,
+                    "gaRuntimeMedianSeconds":  0.0263762,
+                    "gaRuntimeP95Seconds":  0.0581785,
+                    "gaRuntimeMaxSeconds":  0.1368229,
+                    "snapshotLagMaxSeconds":  0,
+                    "runtimeViolations":  0,
+                    "assignments":  {
+                                        "local":  14539,
+                                        "vehicle":  10,
+                                        "edge":  0,
+                                        "cloud":  1
+                                    },
+                    "taskCompletionModel":  "NOT_IMPLEMENTED"
+                },
+    "evidence":  {
+                     "resultJsonSha256":  "ae8478a9253963db40008e2fe3774fe7a463bdfd90324a7fbbf122ddff4dc780",
+                     "batchZip":  "G02_CFG-L-I_five_seeds_PASS_20260623-010140.zip",
+                     "batchZipSha256":  "98e8e69aa1bb9b949642f3291695a18bbe48a9957651f4ab84dfefd9ded64cc4",
+                     "recoveryClassification":  ""
+                 }
+}
