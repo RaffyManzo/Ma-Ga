@@ -1,0 +1,81 @@
+﻿{
+    "schemaVersion":  "1.0",
+    "generatedAtUtc":  "2026-06-23T20:28:25.5210304Z",
+    "campaignId":  "final-test-campaign",
+    "groupId":  "G04",
+    "classification":  "MOBILITY_CONNECTIVITY",
+    "batchId":  "G04-MOBILITY-CONNECTIVITY-20260623-222722",
+    "actionId":  "M-RSU1-01",
+    "configId":  "CFG-M-RSU1",
+    "materializationId":  "MAT-CFG-M-RSU1-104729",
+    "seed":  104729,
+    "durationSeconds":  180,
+    "density":  "nominal",
+    "workloadProfile":  "WL-I",
+    "purpose":  "RSU1_EDGE_AND_CLOUD_GATEWAY",
+    "plannedTestIds":  [
+                           "T-091",
+                           "T-095",
+                           "T-097",
+                           "T-099"
+                       ],
+    "status":  "PASS",
+    "execution":  {
+                      "startedAtUtc":  "2026-06-23T20:27:24.8828490Z",
+                      "completedAtUtc":  "2026-06-23T20:28:25.0977835Z",
+                      "elapsedSeconds":  60.215,
+                      "runnerExitCode":  0,
+                      "runName":  "log-20260623-222730-MaGaLiteratureBasedUrbanStudy",
+                      "runDirectory":  "C:\\Users\\raffa\\IdeaProjects\\maga-core\\tmp\\mosaic-25.2\\logs\\log-20260623-222730-MaGaLiteratureBasedUrbanStudy"
+                  },
+    "validator":  {
+                      "status":  "LITERATURE_SMOKE_TEST_PASSED",
+                      "errorCount":  0,
+                      "warningCount":  0,
+                      "errors":  [
+
+                                 ],
+                      "warnings":  [
+
+                                   ]
+                  },
+    "metrics":  {
+                    "taskCompletionModel":  "NOT_IMPLEMENTED",
+                    "tasksGenerated":  2887,
+                    "tasksPendingAtEnd":  12,
+                    "gaJobsSubmitted":  427,
+                    "gaJobsCompleted":  427,
+                    "gaJobsApplied":  427,
+                    "staleResults":  0,
+                    "staleRatioPercent":  0,
+                    "gaRuntimeMeanSeconds":  0.028549481,
+                    "gaRuntimeP95Seconds":  0.065512,
+                    "gaRuntimeMaxSeconds":  0.124636,
+                    "maximumAbsoluteSnapshotLagSeconds":  0,
+                    "runtimeViolationCount":  0,
+                    "localAssignments":  7079,
+                    "vehicleAssignments":  0,
+                    "edgeAssignments":  0,
+                    "cloudAssignments":  2,
+                    "sumoErrors":  null,
+                    "teleports":  null,
+                    "emergencyBraking":  null
+                },
+    "evidence":  {
+                     "evidenceDirectory":  "C:\\Users\\raffa\\IdeaProjects\\maga-core\\tmp\\final-campaign-execution\\G04_mobility_connectivity\\CFG-M-RSU1\\104729\\evidence",
+                     "materializationDirectory":  "C:\\Users\\raffa\\IdeaProjects\\maga-core\\tmp\\final-campaign-execution\\G04_mobility_connectivity\\CFG-M-RSU1\\104729\\materialization",
+                     "publishedSnapshotCopyLimit":  32
+                 },
+    "runtimeArtifact":  {
+                            "mode":  "RECOVERED_VALIDATED_ARTIFACT",
+                            "path":  "C:\\Users\\raffa\\IdeaProjects\\maga-core\\tmp\\final-campaign-runtime-artifacts\\recovered-retry-02\\maga-live-maga-runtime.jar",
+                            "sizeBytes":  491454,
+                            "sha256":  "1a0aa6d2b0441f0be38baf5df1acc2d4d889b9f356b6111f7715105cd013a9b4"
+                        },
+    "limitations":  [
+                        "G04 test verdicts require offline inspection of compact raw evidence",
+                        "taskCompletionModel is NOT_IMPLEMENTED",
+                        "SUMO errors, teleports and emergency braking are not inferred",
+                        "high_density is a stress profile"
+                    ]
+}

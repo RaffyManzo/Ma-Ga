@@ -1,0 +1,11 @@
+Test_ID,Livello,Funzionalita,Situazione,Configurazioni,Output,Oracolo
+T-090,Mobilita,LOCAL_CONVENTIONAL,Scelta locale,CFG-M-BACKGROUND,mobility model,phiCov/phiLink/phiHo locali coerenti
+T-091,Mobilita,EDGE_GEOMETRIC,Distanza/raggio RSU,CFG-M-RSU0|CFG-M-RSU1,mobility breakdown,phiLink cresce verso bordo
+T-092,Mobilita,CLOUD_GATEWAY_GEOMETRIC,Cloud via gateway,CFG-M-RSU0|CFG-M-SWITCH,cloud gateway/mobility,Placeholder cloud assente
+T-093,Mobilita,V2V_SCALAR_RELATIVE_SPEED,Distanza e velocita relativa scalare,CFG-M-V2V,V2V mobility,Metriche finite e limite modello dichiarato
+T-094,Mobilita,Coverage insufficiente,completion > coverage,CFG-M-SWITCH|CFG-R-RTT|CFG-R-CELLBW,phiCov/coverage insufficient,Penalita o prefilter coerenti
+T-095,Mobilita,Link instability,phiLink,MOB,avg/max phiLink,Valori in range e coerenti con distanza
+T-096,Mobilita,Handover risk,phiHo,CFG-M-SWITCH,phiHo/transitions,Rischio maggiore vicino allo switch
+T-097,Mobilita,Pmob,Somma pesata,MOB|MAIN,mobility penalty,Coerente con componenti
+T-098,Mobilita,Gateway switch,rsu_0 -> rsu_1 o viceversa,CFG-M-SWITCH,access link transitions,Almeno una transizione
+T-099,Mobilita,Legacy cloud placeholder,CLOUD_STABLE_PLACEHOLDER,tutte run,placeholderCloud,0 in STRICT_GATEWAY

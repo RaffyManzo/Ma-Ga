@@ -1,0 +1,24 @@
+{
+  "schemaVersion": "1.0",
+  "generatedAtUtc": "2026-06-23T20:42:26.502674+00:00",
+  "status": "G04_FULL_OFFLINE_AUDIT_EVIDENCE_READY",
+  "simulationsStarted": 0,
+  "versionedFilesModified": 0,
+  "repository": {
+    "branch": "testing/final-campaign",
+    "head": "06eb415e720d08aba82f5aacc1501c86de2c0841",
+    "remoteHead": "06eb415e720d08aba82f5aacc1501c86de2c0841",
+    "frozenCoreCommit": "5a9477735a3d707a5f000a64653cd2a6fc7f2007",
+    "workingTreeClean": true,
+    "javaDiffFromFreeze": [],
+    "deployScriptSha256": "6034409e0228a1a2da0cf840e7283f1eb9396ccb0c0d50628e65191f472fe122",
+    "deployScriptRestored": true
+  },
+  "runsVerified": 5,
+  "snapshotRowsExtracted": 160,
+  "gatewayTransitionRowsExtracted": 0,
+  "observabilityStatisticRows": 2991,
+  "observabilitySampleRows": 10000,
+  "javaSourceFilesCopied": 19,
+  "sourceBundleIssueCorrected": true
+}

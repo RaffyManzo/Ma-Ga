@@ -1,0 +1,169 @@
+{
+  "schemaVersion": "2.0",
+  "groupId": "G04",
+  "classification": "MOBILITY_CONNECTIVITY",
+  "closureStatus": "PASS_WITH_OBSERVABILITY_LIMITS",
+  "generatedAtUtc": "2026-06-23T21:55:34Z",
+  "frozenCoreCommit": "5a9477735a3d707a5f000a64653cd2a6fc7f2007",
+  "preClosureHead": "06eb415e720d08aba82f5aacc1501c86de2c0841",
+  "branch": "testing/final-campaign",
+  "technicalRunsPass": 5,
+  "testsEvaluated": 10,
+  "testVerdictCounts": {
+    "PASS": 2,
+    "PASS_CON_LIMITAZIONE": 4,
+    "EVIDENZA_PARZIALE": 2,
+    "NON_OSSERVATO": 2,
+    "FAIL": 0
+  },
+  "taskCompletionModel": "NOT_IMPLEMENTED",
+  "sumoMetricPolicy": "NULL_NOT_ZERO",
+  "nextGroup": "G05",
+  "g02bState": "DEFERRED_AFTER_G06",
+  "sourceBundleSha256": {
+    "G04_evidence_collection_PASS_20260623-222722.zip": "b175f52879ba55ca55729e6c77e63231be2f10b315fa96f0386a3d599264f4d5",
+    "G04_full_offline_audit_evidence_20260623-224200.zip": "3c4de2c7851bc86878b67daebeffe07fdf608ec63799356131d950f455c16d75"
+  },
+  "files": [
+    {
+      "relativePath": "Matrice_semplificata_G04_allineata.xlsx",
+      "sizeBytes": 33663,
+      "sha256": "8347dab408a37cf87d3e856b84b5974468fb33ad45a606905ff8668cf4b8142b"
+    },
+    {
+      "relativePath": "Matrice_test_MA_GA_MOSAIC_SUMO_G04_allineata.xlsx",
+      "sizeBytes": 456594,
+      "sha256": "93b026eb2f4dc5f5a2cf2d18731f2e177a6ada384dfb62357eb3ff31b138f9ba"
+    },
+    {
+      "relativePath": "data/docs/testing/final-campaign/05_G04_completion_and_G05_handoff.md",
+      "sizeBytes": 1240,
+      "sha256": "2608f4479d86f256d3a32656516ea59679ea414c1dccdc3d610b6583ea9ed0ca"
+    },
+    {
+      "relativePath": "data/docs/testing/final-campaign/G05_CONFIGURAZIONI_PREVISTE.csv",
+      "sizeBytes": 500,
+      "sha256": "ad0743ad39841cec11139d4b9e4d445ad7937956bb9d8ab5189b37749195f425"
+    },
+    {
+      "relativePath": "test-audits/final-campaign/G04_mobility_connectivity/G04_matrix_alignment_audit.md",
+      "sizeBytes": 1489,
+      "sha256": "3551ccfe111c7ecb83289bfd49e7ae4fbde7749bab403589be910eae6f94ddf2"
+    },
+    {
+      "relativePath": "test-audits/final-campaign/G04_mobility_connectivity/T090_T099_results.csv",
+      "sizeBytes": 5857,
+      "sha256": "3c255cbb6bde1b9138848c36910e87415350991a7bd0343fd5b3cde945ebd05b"
+    },
+    {
+      "relativePath": "test-audits/final-campaign/G04_mobility_connectivity/audit_G04_mobility_connectivity.md",
+      "sizeBytes": 10374,
+      "sha256": "9fd3035f86beac2b2a963c0887187b86d71c40d3bef60e490db0edcbbbf7f7c2"
+    },
+    {
+      "relativePath": "test-audits/final-campaign/G04_mobility_connectivity/references/T090_T099_DEFINIZIONI.csv",
+      "sizeBytes": 1249,
+      "sha256": "365dc3093752f25b24e5a178472994162a7925c4bc82ed7c611f6e0ac0c5ef1f"
+    },
+    {
+      "relativePath": "test-audits/final-campaign/G04_mobility_connectivity/report_G04_human.md",
+      "sizeBytes": 2518,
+      "sha256": "9f2320650adbd86b96fba3e84803799f2340ec0542c9cd3720245b7bf9d77f59"
+    },
+    {
+      "relativePath": "test-results/final-campaign/G04_mobility_connectivity/G04_batch_summary_corrected.json",
+      "sizeBytes": 16631,
+      "sha256": "0db634f89e4ba04392ff2f0e419895cbedc780f448c41505060a21ace6f34bb8"
+    },
+    {
+      "relativePath": "test-results/final-campaign/G04_mobility_connectivity/G04_full_snapshot_mobility_trace.csv",
+      "sizeBytes": 26032,
+      "sha256": "b99bbb75df7b17da9e84d23ec7a8903221791d99ed24e32ff8f646450a03f565"
+    },
+    {
+      "relativePath": "test-results/final-campaign/G04_mobility_connectivity/G04_full_snapshot_summary.json",
+      "sizeBytes": 4829,
+      "sha256": "ee1fdd0ded1d02b9434c31fd9674e681ed3dad16f7f17a80890f16f4d8b79ec8"
+    },
+    {
+      "relativePath": "test-results/final-campaign/G04_mobility_connectivity/G04_gateway_transitions.csv",
+      "sizeBytes": 111,
+      "sha256": "0305550d7ca5fd983f83799cc27d54386656d7e95c349a689b2bd3af8b155bb1"
+    },
+    {
+      "relativePath": "test-results/final-campaign/G04_mobility_connectivity/G04_java_source_match_inventory.csv",
+      "sizeBytes": 2919,
+      "sha256": "586aeec428a58b40cf5475124e5e6ca067c3700669c3589ffff4b7d9a1068640"
+    },
+    {
+      "relativePath": "test-results/final-campaign/G04_mobility_connectivity/G04_observability_key_statistics.csv",
+      "sizeBytes": 334776,
+      "sha256": "a73d4d576e46bc145518473b93c3b735e0808c557b9bc80ff0d30d44f447adc2"
+    },
+    {
+      "relativePath": "test-results/final-campaign/G04_mobility_connectivity/G04_observability_samples.csv",
+      "sizeBytes": 1043197,
+      "sha256": "0f1a1bae99323cd5d95df1b6e4cebd1a122bb296137d843e46dadcb5c4285f77"
+    },
+    {
+      "relativePath": "test-results/final-campaign/G04_mobility_connectivity/G04_observability_source_inventory.json",
+      "sizeBytes": 6563,
+      "sha256": "2a89e1ecf3a84b150d6ad61b166a445d89240b0731b38f60bd1ba20bb2c9c111"
+    },
+    {
+      "relativePath": "test-results/final-campaign/G04_mobility_connectivity/G04_offline_collection_report.json",
+      "sizeBytes": 867,
+      "sha256": "f6992bdc9743bce213cddda880917f6da0505300e99b70d2ba3f4a04cc025d26"
+    },
+    {
+      "relativePath": "test-results/final-campaign/G04_mobility_connectivity/G04_run_metrics_corrected.csv",
+      "sizeBytes": 1145,
+      "sha256": "36e42871ccbc57268b8bda5556f7ace059d7e924c039a0e395a5b34aa2a74c8f"
+    },
+    {
+      "relativePath": "test-results/final-campaign/G04_mobility_connectivity/G04_source_file_inventory.csv",
+      "sizeBytes": 12259,
+      "sha256": "31d0c6fe64347628a479985d6631bb70552e836ebc959f88f4d68c7933a7e663"
+    },
+    {
+      "relativePath": "test-results/final-campaign/G04_mobility_connectivity/Matrice_semplificata_G04_allineata.xlsx",
+      "sizeBytes": 33663,
+      "sha256": "8347dab408a37cf87d3e856b84b5974468fb33ad45a606905ff8668cf4b8142b"
+    },
+    {
+      "relativePath": "test-results/final-campaign/G04_mobility_connectivity/Matrice_test_MA_GA_MOSAIC_SUMO_G04_allineata.xlsx",
+      "sizeBytes": 456594,
+      "sha256": "93b026eb2f4dc5f5a2cf2d18731f2e177a6ada384dfb62357eb3ff31b138f9ba"
+    },
+    {
+      "relativePath": "test-results/final-campaign/G04_mobility_connectivity/bundle_inventory_sha256.csv",
+      "sizeBytes": 18101,
+      "sha256": "f59ed638f9b0c03475b5b31f5cbda29d2e41e17688b26b5238c1482012b43f0c"
+    },
+    {
+      "relativePath": "test-results/final-campaign/G04_mobility_connectivity/run-summaries/G04_M-BACKGROUND-01_result.json",
+      "sizeBytes": 3983,
+      "sha256": "8319874f5c5f8e38c4d9b71cedb21858383ac715c073aab599fc64647b0519bb"
+    },
+    {
+      "relativePath": "test-results/final-campaign/G04_mobility_connectivity/run-summaries/G04_M-RSU0-01_result.json",
+      "sizeBytes": 3988,
+      "sha256": "0e734f2cad02e860da19a441488f600b7fa8522f6429cb157bb89445f0f1a1c9"
+    },
+    {
+      "relativePath": "test-results/final-campaign/G04_mobility_connectivity/run-summaries/G04_M-RSU1-01_result.json",
+      "sizeBytes": 3942,
+      "sha256": "29c48982e106e014ef0a84b15e34680461b8a6124f7ac36578c47f9f1680b57a"
+    },
+    {
+      "relativePath": "test-results/final-campaign/G04_mobility_connectivity/run-summaries/G04_M-SWITCH-01_result.json",
+      "sizeBytes": 4073,
+      "sha256": "e334adc0b406a0d05183be7ab26674ce61a68cd8fadbd741e7a309f70de8aa61"
+    },
+    {
+      "relativePath": "test-results/final-campaign/G04_mobility_connectivity/run-summaries/G04_M-V2V-01_result.json",
+      "sizeBytes": 3960,
+      "sha256": "43ebdb2aeb7f46848c1c63b2d7a0604856154c10eea6603434671c528f191abe"
+    }
+  ]
+}

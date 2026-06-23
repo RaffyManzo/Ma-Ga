@@ -1,0 +1,7 @@
+Run_ID,Config_ID,Densita,Durata,Seed,Workload,Obiettivo
+R-LOCALCPU-01,CFG-R-LOCALCPU,nominal,180 s,104729,WL-S,Pressione CPU locale
+R-EDGECPU-01,CFG-R-EDGECPU,nominal,180 s,104729,WL-S,Pressione CPU edge e repair
+R-CLOUDCPU-01,CFG-R-CLOUDCPU,nominal,180 s,104729,WL-S,Pressione CPU cloud
+R-CELLBW-01,CFG-R-CELLBW,nominal,180 s,104729,WL-S,Pressione banda CELL
+R-V2VBW-01,CFG-R-V2VBW,high_density,180 s,104729,WL-S,Pressione banda V2V
+R-RTT-01,CFG-R-RTT,nominal,180 s,104729,WL-I,Latenza base elevata

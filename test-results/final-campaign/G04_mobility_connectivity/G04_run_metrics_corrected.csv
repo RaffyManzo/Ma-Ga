@@ -1,0 +1,6 @@
+﻿actionId,configId,seed,status,runName,validatorStatus,validatorErrors,validatorWarnings,tasksGenerated,tasksPendingAtEnd,gaJobsSubmitted,gaJobsCompleted,gaJobsApplied,staleResults,staleRatioPercent,localAssignments,vehicleAssignments,edgeAssignments,cloudAssignments,maximumSnapshotLagSeconds,runtimeViolationCount
+M-BACKGROUND-01,CFG-M-BACKGROUND,104729,PASS,log-20260623-191234-MaGaLiteratureBasedUrbanStudy,LITERATURE_SMOKE_TEST_PASSED,0,0,5901,20,416,416,411,5,1.201923,13894,0,0,0,0,0
+M-RSU0-01,CFG-M-RSU0,104729,PASS,log-20260623-191349-MaGaLiteratureBasedUrbanStudy,LITERATURE_SMOKE_TEST_PASSED,0,0,5299,11,370,370,369,1,0.27027,11234,0,0,0,0,0
+M-RSU1-01,CFG-M-RSU1,104729,PASS,log-20260623-222730-MaGaLiteratureBasedUrbanStudy,LITERATURE_SMOKE_TEST_PASSED,0,0,2887,12,427,427,427,0,0,7079,0,0,2,0,0
+M-SWITCH-01,CFG-M-SWITCH,104729,PASS,log-20260623-222831-MaGaLiteratureBasedUrbanStudy,LITERATURE_SMOKE_TEST_PASSED,0,0,6141,42,309,309,294,15,4.854369,9418,0,0,0,0,0
+M-V2V-01,CFG-M-V2V,104729,PASS,log-20260623-222946-MaGaLiteratureBasedUrbanStudy,LITERATURE_SMOKE_TEST_PASSED,0,0,9396,58,193,193,100,93,48.186528,2096,0,0,0,0,0

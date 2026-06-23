@@ -1,0 +1,210 @@
+[
+  {
+    "actionId": "M-BACKGROUND-01",
+    "configId": "CFG-M-BACKGROUND",
+    "snapshotCount": 32,
+    "snapshotTimeMinSeconds": 2.0,
+    "snapshotTimeMaxSeconds": 5.1,
+    "candidateOccurrences": {
+      "LOCAL": 78,
+      "VEHICLE": 82
+    },
+    "snapshotsWithCandidateType": {
+      "LOCAL": 32,
+      "VEHICLE": 32
+    },
+    "activeGatewayOccurrences": {},
+    "availableGatewayOccurrences": {},
+    "gatewayTransitionCount": 0,
+    "gatewaySwitchCount": 0,
+    "coverageEnterCount": 0,
+    "coverageExitCount": 0,
+    "v2vRelativeSpeed": {
+      "count": 82,
+      "min": 0.3248675180989784,
+      "mean": 5.559459686292039,
+      "max": 13.074753477598566,
+      "allFinite": true
+    },
+    "activeLinkDistanceMeters": {
+      "count": 0,
+      "min": null,
+      "mean": null,
+      "max": null
+    },
+    "activeLinkCoverageRatio": {
+      "count": 0,
+      "min": null,
+      "mean": null,
+      "max": null
+    }
+  },
+  {
+    "actionId": "M-RSU0-01",
+    "configId": "CFG-M-RSU0",
+    "snapshotCount": 32,
+    "snapshotTimeMinSeconds": 2.0,
+    "snapshotTimeMaxSeconds": 5.1,
+    "candidateOccurrences": {
+      "LOCAL": 78,
+      "VEHICLE": 64,
+      "CLOUD": 14,
+      "EDGE": 14
+    },
+    "snapshotsWithCandidateType": {
+      "LOCAL": 32,
+      "VEHICLE": 32,
+      "CLOUD": 14,
+      "EDGE": 14
+    },
+    "activeGatewayOccurrences": {
+      "rsu_0": 14
+    },
+    "availableGatewayOccurrences": {
+      "rsu_0": 14
+    },
+    "gatewayTransitionCount": 0,
+    "gatewaySwitchCount": 0,
+    "coverageEnterCount": 0,
+    "coverageExitCount": 0,
+    "v2vRelativeSpeed": {
+      "count": 64,
+      "min": 0.5754573248577906,
+      "mean": 0.7089874973700455,
+      "max": 0.804406951639768,
+      "allFinite": true
+    },
+    "activeLinkDistanceMeters": {
+      "count": 14,
+      "min": 101.98140026339222,
+      "mean": 110.96025175802158,
+      "max": 119.91373307974912
+    },
+    "activeLinkCoverageRatio": {
+      "count": 14,
+      "min": 0.40792560105356884,
+      "mean": 0.44384100703208634,
+      "max": 0.4796549323189965
+    }
+  },
+  {
+    "actionId": "M-RSU1-01",
+    "configId": "CFG-M-RSU1",
+    "snapshotCount": 32,
+    "snapshotTimeMinSeconds": 2.0,
+    "snapshotTimeMaxSeconds": 5.1,
+    "candidateOccurrences": {
+      "LOCAL": 78,
+      "VEHICLE": 28
+    },
+    "snapshotsWithCandidateType": {
+      "LOCAL": 32,
+      "VEHICLE": 14
+    },
+    "activeGatewayOccurrences": {},
+    "availableGatewayOccurrences": {},
+    "gatewayTransitionCount": 0,
+    "gatewaySwitchCount": 0,
+    "coverageEnterCount": 0,
+    "coverageExitCount": 0,
+    "v2vRelativeSpeed": {
+      "count": 28,
+      "min": 0.02705399972694522,
+      "mean": 0.10551968268010992,
+      "max": 0.2322785749782863,
+      "allFinite": true
+    },
+    "activeLinkDistanceMeters": {
+      "count": 0,
+      "min": null,
+      "mean": null,
+      "max": null
+    },
+    "activeLinkCoverageRatio": {
+      "count": 0,
+      "min": null,
+      "mean": null,
+      "max": null
+    }
+  },
+  {
+    "actionId": "M-SWITCH-01",
+    "configId": "CFG-M-SWITCH",
+    "snapshotCount": 32,
+    "snapshotTimeMinSeconds": 2.0,
+    "snapshotTimeMaxSeconds": 5.1,
+    "candidateOccurrences": {
+      "LOCAL": 78,
+      "VEHICLE": 28
+    },
+    "snapshotsWithCandidateType": {
+      "LOCAL": 32,
+      "VEHICLE": 14
+    },
+    "activeGatewayOccurrences": {},
+    "availableGatewayOccurrences": {},
+    "gatewayTransitionCount": 0,
+    "gatewaySwitchCount": 0,
+    "coverageEnterCount": 0,
+    "coverageExitCount": 0,
+    "v2vRelativeSpeed": {
+      "count": 28,
+      "min": 6.036758178686521,
+      "mean": 9.01227454446902,
+      "max": 11.904095426381964,
+      "allFinite": true
+    },
+    "activeLinkDistanceMeters": {
+      "count": 0,
+      "min": null,
+      "mean": null,
+      "max": null
+    },
+    "activeLinkCoverageRatio": {
+      "count": 0,
+      "min": null,
+      "mean": null,
+      "max": null
+    }
+  },
+  {
+    "actionId": "M-V2V-01",
+    "configId": "CFG-M-V2V",
+    "snapshotCount": 32,
+    "snapshotTimeMinSeconds": 2.0,
+    "snapshotTimeMaxSeconds": 5.1,
+    "candidateOccurrences": {
+      "LOCAL": 115,
+      "VEHICLE": 46
+    },
+    "snapshotsWithCandidateType": {
+      "LOCAL": 32,
+      "VEHICLE": 17
+    },
+    "activeGatewayOccurrences": {},
+    "availableGatewayOccurrences": {},
+    "gatewayTransitionCount": 0,
+    "gatewaySwitchCount": 0,
+    "coverageEnterCount": 0,
+    "coverageExitCount": 0,
+    "v2vRelativeSpeed": {
+      "count": 46,
+      "min": 0.21027988956760701,
+      "mean": 0.9117770917358486,
+      "max": 1.1057190921999744,
+      "allFinite": true
+    },
+    "activeLinkDistanceMeters": {
+      "count": 0,
+      "min": null,
+      "mean": null,
+      "max": null
+    },
+    "activeLinkCoverageRatio": {
+      "count": 0,
+      "min": null,
+      "mean": null,
+      "max": null
+    }
+  }
+]

@@ -1,0 +1,202 @@
+[
+  {
+    "sourceFile": "M-BACKGROUND-01/live-reporting/live_ga_job_events.jsonl",
+    "lineCount": 1253,
+    "matchedScalarCount": 0,
+    "parseErrorCount": 0,
+    "sizeBytes": 717163,
+    "sha256": "1780d8b375f0b70cfffec89cbe521a2f56e224817b6b1826c03c34304143a9c5"
+  },
+  {
+    "sourceFile": "M-BACKGROUND-01/live-reporting/live_temporal_step_records.jsonl",
+    "lineCount": 416,
+    "matchedScalarCount": 100879,
+    "parseErrorCount": 0,
+    "sizeBytes": 12232892,
+    "sha256": "8644f19c72fbb5f6f1ce5a7a7d37ec55e89ba347af53a32fa158280697d0470d"
+  },
+  {
+    "sourceFile": "M-BACKGROUND-01/live-reporting/live_detailed_execution_report.json",
+    "lineCount": 1,
+    "matchedScalarCount": 0,
+    "parseErrorCount": 0,
+    "sizeBytes": 522954,
+    "sha256": "f7cd0adaf18d27d3c1b2161862648f2ecedcd336dce292659fa098e321acd7e8"
+  },
+  {
+    "sourceFile": "M-BACKGROUND-01/live_run_summary.json",
+    "lineCount": 1,
+    "matchedScalarCount": 0,
+    "parseErrorCount": 0,
+    "sizeBytes": 4472,
+    "sha256": "70459defffa8986a7f569fbc76ba13bd10991e25d377b1faef0f4f4bd698e513"
+  },
+  {
+    "sourceFile": "M-BACKGROUND-01/literature_smoke_validation.json",
+    "lineCount": 1,
+    "matchedScalarCount": 0,
+    "parseErrorCount": 0,
+    "sizeBytes": 4228,
+    "sha256": "c8345b993fa5976fcbcb8968cca81f127a9c6549926b0156d4b208e4820774a0"
+  },
+  {
+    "sourceFile": "M-RSU0-01/live-reporting/live_ga_job_events.jsonl",
+    "lineCount": 1111,
+    "matchedScalarCount": 0,
+    "parseErrorCount": 0,
+    "sizeBytes": 635572,
+    "sha256": "40ab440dffe4acf59f66711c10181f439560e68e263cce6977634e6759850f04"
+  },
+  {
+    "sourceFile": "M-RSU0-01/live-reporting/live_temporal_step_records.jsonl",
+    "lineCount": 370,
+    "matchedScalarCount": 80259,
+    "parseErrorCount": 0,
+    "sizeBytes": 9816260,
+    "sha256": "8dc7b6df006752c6d759b7099e577e271ba16b4fab070e5cafc492606821f47d"
+  },
+  {
+    "sourceFile": "M-RSU0-01/live-reporting/live_detailed_execution_report.json",
+    "lineCount": 1,
+    "matchedScalarCount": 0,
+    "parseErrorCount": 0,
+    "sizeBytes": 465336,
+    "sha256": "061305ff8390ef8da8ed8d8c2901afd0f7661631aea67a94e590f949def2cf23"
+  },
+  {
+    "sourceFile": "M-RSU0-01/live_run_summary.json",
+    "lineCount": 1,
+    "matchedScalarCount": 0,
+    "parseErrorCount": 0,
+    "sizeBytes": 4472,
+    "sha256": "c74466bcb26c675fff4f8b30794557637c04262e521d9d9913ac47708b44446a"
+  },
+  {
+    "sourceFile": "M-RSU0-01/literature_smoke_validation.json",
+    "lineCount": 1,
+    "matchedScalarCount": 0,
+    "parseErrorCount": 0,
+    "sizeBytes": 4228,
+    "sha256": "253704a7981a89b0b3803f4b56d624542194af4d0243a1140371261127186f67"
+  },
+  {
+    "sourceFile": "M-RSU1-01/live-reporting/live_ga_job_events.jsonl",
+    "lineCount": 1281,
+    "matchedScalarCount": 0,
+    "parseErrorCount": 0,
+    "sizeBytes": 733138,
+    "sha256": "e6a7a8a82de86c7394bf3f4268d7c26dff31115c792f8a0312dfa7cb3453d16a"
+  },
+  {
+    "sourceFile": "M-RSU1-01/live-reporting/live_temporal_step_records.jsonl",
+    "lineCount": 427,
+    "matchedScalarCount": 50850,
+    "parseErrorCount": 0,
+    "sizeBytes": 6615620,
+    "sha256": "b130b62fb1fe5f65494905d89b04474eeacf012c71b287bf4f3940cc6cc0786d"
+  },
+  {
+    "sourceFile": "M-RSU1-01/live-reporting/live_detailed_execution_report.json",
+    "lineCount": 1,
+    "matchedScalarCount": 0,
+    "parseErrorCount": 0,
+    "sizeBytes": 536761,
+    "sha256": "994f609282b2fee9449aa83b08e3f52bf377de8243c281ac5dd026b513d30d87"
+  },
+  {
+    "sourceFile": "M-RSU1-01/live_run_summary.json",
+    "lineCount": 1,
+    "matchedScalarCount": 0,
+    "parseErrorCount": 0,
+    "sizeBytes": 4484,
+    "sha256": "e166f4e5a3c92d8dce685adb326ac9a072b75946e88b8cddbdeedcfc55136eee"
+  },
+  {
+    "sourceFile": "M-RSU1-01/literature_smoke_validation.json",
+    "lineCount": 1,
+    "matchedScalarCount": 0,
+    "parseErrorCount": 0,
+    "sizeBytes": 4240,
+    "sha256": "fbfcf698ef6f621f50515a9117d7522d44adda8c30fb2c0dce2e48263a252517"
+  },
+  {
+    "sourceFile": "M-SWITCH-01/live-reporting/live_ga_job_events.jsonl",
+    "lineCount": 942,
+    "matchedScalarCount": 0,
+    "parseErrorCount": 0,
+    "sizeBytes": 540076,
+    "sha256": "ec08547e2e7dd3270df19fcf70110c69e9636b4143810bde4fd548bcda081879"
+  },
+  {
+    "sourceFile": "M-SWITCH-01/live-reporting/live_temporal_step_records.jsonl",
+    "lineCount": 309,
+    "matchedScalarCount": 73391,
+    "parseErrorCount": 0,
+    "sizeBytes": 8914230,
+    "sha256": "3a649c2b525b3d1ea0b90e8ce724338f02dff775189ddaa4a19d9e687338101e"
+  },
+  {
+    "sourceFile": "M-SWITCH-01/live-reporting/live_detailed_execution_report.json",
+    "lineCount": 1,
+    "matchedScalarCount": 0,
+    "parseErrorCount": 0,
+    "sizeBytes": 389184,
+    "sha256": "ff3f80fef65cc170d3d7f20dc5a3faaab54e58c6fe18c926251be5ffa420b24c"
+  },
+  {
+    "sourceFile": "M-SWITCH-01/live_run_summary.json",
+    "lineCount": 1,
+    "matchedScalarCount": 0,
+    "parseErrorCount": 0,
+    "sizeBytes": 4474,
+    "sha256": "e91fb40f55e0dd9848f184da86390cd1c60a493ab368a5b3a73f6ccc644701cb"
+  },
+  {
+    "sourceFile": "M-SWITCH-01/literature_smoke_validation.json",
+    "lineCount": 1,
+    "matchedScalarCount": 0,
+    "parseErrorCount": 0,
+    "sizeBytes": 4229,
+    "sha256": "d389f162a58fb629a672e6c296355b5ca44aa9d676e9dde8f083d6091a9fde84"
+  },
+  {
+    "sourceFile": "M-V2V-01/live-reporting/live_ga_job_events.jsonl",
+    "lineCount": 672,
+    "matchedScalarCount": 0,
+    "parseErrorCount": 0,
+    "sizeBytes": 393703,
+    "sha256": "e64bf7d1e8aefa2b0c9c10ec462b045568ee8ddd344424afd97ba0ce81dd13f4"
+  },
+  {
+    "sourceFile": "M-V2V-01/live-reporting/live_temporal_step_records.jsonl",
+    "lineCount": 193,
+    "matchedScalarCount": 61549,
+    "parseErrorCount": 0,
+    "sizeBytes": 7349996,
+    "sha256": "6f1162fa89bccf47c6cef927b95122efd9f35ea2c128a4f4ced4e27171e25eba"
+  },
+  {
+    "sourceFile": "M-V2V-01/live-reporting/live_detailed_execution_report.json",
+    "lineCount": 1,
+    "matchedScalarCount": 0,
+    "parseErrorCount": 0,
+    "sizeBytes": 246325,
+    "sha256": "8f316499f414b14761f1c1aa0bd7fc34df6e1c80bb813301a0981dfdc8f42c77"
+  },
+  {
+    "sourceFile": "M-V2V-01/live_run_summary.json",
+    "lineCount": 1,
+    "matchedScalarCount": 0,
+    "parseErrorCount": 0,
+    "sizeBytes": 4476,
+    "sha256": "477c692431e2e316cc72bba4f0b3378c25abf80c13600f666fde6d3abb94b348"
+  },
+  {
+    "sourceFile": "M-V2V-01/literature_smoke_validation.json",
+    "lineCount": 1,
+    "matchedScalarCount": 0,
+    "parseErrorCount": 0,
+    "sizeBytes": 4231,
+    "sha256": "838e1e7cc3d26047af85f5f5a7dc64c7f91b14bb5764e981d8831830f0cd41f9"
+  }
+]
