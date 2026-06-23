@@ -1,0 +1,28 @@
+
+--------------------------------------------------------------------------------
+ ERROR: One or more federates did not respond for 30 seconds.
+        This could be caused by an error in a federate.
+        You can increase the timeout using the -w parameter.
+        Using "-w 0" disables the watchdog.
+--------------------------------------------------------------------------------
+ MOSAIC will now shut down.
+--------------------------------------------------------------------------------
+
+
+--------------------------------------------------------------------------------
+ Stopping simulation due to a critical error:
+	- InternalFederateException: Error during executing TraCI command VehicleGetTaxiFleet
+	- Root Cause: SocketException: Connessione interrotta dal software del computer host
+ Please see the log files for details.
+	- Log-Directory: logs\log-20260623-181139-MaGaLiteratureBasedUrbanStudy
+--------------------------------------------------------------------------------
+ MOSAIC will now shut down.
+--------------------------------------------------------------------------------
+
+MOSAIC run failed with exit code 333
+In C:\Users\raffa\IdeaProjects\maga-core\tools\intas-literature-scenario\run_literature_scenario.ps1:145 car:9
++         throw "MOSAIC run failed with exit code $LASTEXITCODE"
++         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : OperationStopped: (MOSAIC run failed with exit code 333:String) [], RuntimeException
+    + FullyQualifiedErrorId : MOSAIC run failed with exit code 333
+ 

@@ -1,0 +1,105 @@
+{
+  "schemaVersion": "1.0",
+  "files": [
+    {
+      "path": "04_G03_completion_and_G04_handoff.md",
+      "sizeBytes": 682,
+      "sha256": "07bc62813d3f09e4db3b717f5142957889c2354943fd18c58a7e81479c60dca9"
+    },
+    {
+      "path": "G03_batch_summary.json",
+      "sizeBytes": 1422,
+      "sha256": "b47c23ccd7dc124ebb64d28a57f9960b93a33e8ed79e1d555cf1c2493631e805"
+    },
+    {
+      "path": "G03_extended_duration_analysis.json",
+      "sizeBytes": 8959,
+      "sha256": "749358e5d192b37199ee271067e1d29bb4f9a30a438c203eb9d0afcce2fe846c"
+    },
+    {
+      "path": "G03_matrix_alignment_audit.md",
+      "sizeBytes": 2657,
+      "sha256": "eb24d1aedc8b10b8a97c8a25c91d57ae1a961663422cc89f88c2f67556fa42dc"
+    },
+    {
+      "path": "G03_reproducibility_evidence.json",
+      "sizeBytes": 1630,
+      "sha256": "f6978e5faa31fc0cac5818baa57699a3838df3fd5655569b8af7e7dc3508ba30"
+    },
+    {
+      "path": "G03_runtime_repeat_analysis.json",
+      "sizeBytes": 5297,
+      "sha256": "84409c456e1952d959459210319cb59ef20b61ec8633a9c563057c43ae9419ac"
+    },
+    {
+      "path": "G03_stress_limit_evidence.json",
+      "sizeBytes": 1400,
+      "sha256": "d462923e1dffe463e3a5908aaf312a4010d02287f1e9e5b1d7af8d3a98e9a6cb"
+    },
+    {
+      "path": "audit_G03_reproducibility_duration.md",
+      "sizeBytes": 2364,
+      "sha256": "11094fedd163ad06170b350ed8d375a2b88b90e41b510f3f179817187ff77924"
+    },
+    {
+      "path": "metrics_G03_runs.csv",
+      "sizeBytes": 3337,
+      "sha256": "f3ddfbae3265a79ccfd5becb856cb935867a4971cfcec6e5056b586c278b1685"
+    },
+    {
+      "path": "run-summaries/N-I-EXT-01.json",
+      "sizeBytes": 1197,
+      "sha256": "174a8f633b0cd190943ed9b93c04cc0bd9a408ef97eb9d7a13843f4ed13a5ae8"
+    },
+    {
+      "path": "run-summaries/N-I-EXT-02.json",
+      "sizeBytes": 1191,
+      "sha256": "2c76e01383ad2fba5297d39e192e228fcb6c6491ad3f94501bb0ecf80ba7a5e8"
+    },
+    {
+      "path": "run-summaries/N-I-EXT-03.json",
+      "sizeBytes": 1218,
+      "sha256": "5ed74b6b070f704e4a036b2025f81cdad74bff7e3133c47119a86e01b4d4f4a6"
+    },
+    {
+      "path": "run-summaries/N-I-EXT-04.json",
+      "sizeBytes": 1219,
+      "sha256": "b8ccdb4bf299abe64d5c3036bbe112a4445f590dd938c7cbbd39ed4b18d773ce"
+    },
+    {
+      "path": "run-summaries/N-I-EXT-05.json",
+      "sizeBytes": 1219,
+      "sha256": "b44ef78f9822f4a79f8a47f190b0311310ac308c93f51a31a86da6637af6ffd6"
+    },
+    {
+      "path": "run-summaries/VAR-N-01.json",
+      "sizeBytes": 1189,
+      "sha256": "fd4c3a879cfeaba7815de481bd65506e6f106be6a494bfa1aa40b65a81a37fd2"
+    },
+    {
+      "path": "run-summaries/VAR-N-02.json",
+      "sizeBytes": 1216,
+      "sha256": "eeb2d333b95bf6dc0da3612b2b41f8b24ab98d59da04dd2a52f5b2cab54d8053"
+    },
+    {
+      "path": "run-summaries/VAR-N-03.json",
+      "sizeBytes": 1194,
+      "sha256": "58c78753d1cc2c1533ed7cd298d4e1507397aa8930b9fbc15aef83a4eba06f2a"
+    },
+    {
+      "path": "stress-evidence/H-S-EXT-01_result.json",
+      "sizeBytes": 2550,
+      "sha256": "3b7c9e78386805c85715b9f5dbf011cb7ec40c86257c4613a3dfdead49a035f3"
+    },
+    {
+      "path": "stress-evidence/H-S-EXT-01_runner_stderr.txt",
+      "sizeBytes": 1590,
+      "sha256": "94f33095c3ddff4a5d24331bee4e60f90cedae0582395a865cabb03e08047af4"
+    },
+    {
+      "path": "stress-evidence/H-S-EXT-01_runner_stdout.txt",
+      "sizeBytes": 41673,
+      "sha256": "8f1d77842c558fbb69e9e1988c8034e4c23f415bdf624b948ee0eb6a4a17607b"
+    }
+  ]
+}

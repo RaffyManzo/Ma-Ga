@@ -1,0 +1,52 @@
+{
+  "schemaVersion": "1.0",
+  "campaignId": "final-test-campaign",
+  "groupId": "G03",
+  "status": "PASS_WITH_OPTIONAL_STRESS_LIMIT",
+  "repository": {
+    "branch": "testing/final-campaign",
+    "headBeforeClosure": "0d9fa715bb00f2acac533fc061b6bf0879445333",
+    "frozenCoreCommit": "5a9477735a3d707a5f000a64653cd2a6fc7f2007",
+    "javaDiffFromFreeze": []
+  },
+  "actions": {
+    "planned": 11,
+    "pass": 10,
+    "mandatoryAndRecommendedPass": 10,
+    "optionalStressLimit": 1,
+    "materializationPass": 2,
+    "mosaicRunPass": 8,
+    "mosaicRunOptionalStressInterrupted": 1
+  },
+  "tests": {
+    "T-010": "PASS",
+    "T-014": "PASS",
+    "T-018": "PASS_WITH_OPTIONAL_STRESS_LIMIT"
+  },
+  "aggregatePassRuns": {
+    "runCount": 8,
+    "validatorErrors": 0,
+    "validatorWarnings": 0,
+    "tasksGenerated": 124255,
+    "gaJobsSubmitted": 7661,
+    "gaJobsCompleted": 7661,
+    "gaJobsApplied": 7606,
+    "staleResults": 55,
+    "maximumSnapshotLagSeconds": 0,
+    "runtimeViolationCount": 0,
+    "maximumGaRuntimeSeconds": 0.5132551
+  },
+  "nextSequence": [
+    "G04",
+    "G05",
+    "G06",
+    "G02B",
+    "G07"
+  ],
+  "g02bStatus": "DEFERRED_UNTIL_AFTER_G06",
+  "limitations": [
+    "taskCompletionModel is NOT_IMPLEMENTED",
+    "SUMO errors, teleports and emergency braking are not assigned numeric values without explicit reports",
+    "high_density remains a stress profile, not a stable operating profile"
+  ]
+}

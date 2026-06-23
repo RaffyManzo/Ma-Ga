@@ -1,0 +1,33 @@
+{
+  "schemaVersion": "1.0",
+  "generatedAtUtc": "2026-06-23T15:59:09.0371597Z",
+  "campaignId": "final-test-campaign",
+  "groupId": "G03",
+  "testIds": [
+    "T-010",
+    "T-014"
+  ],
+  "status": "PASS",
+  "comparisonSource": "C:\\Users\\raffa\\IdeaProjects\\maga-core\\test-results\\final-campaign\\G03_reproducibility_duration\\repro_materialization_comparison.json",
+  "comparisonSourceSha256": "16d771bd8a33f401334bfbab311a292ad49b1b01e4bd7c12e3afe031f670f437",
+  "rawComparisonStatus": "DIFFERENT",
+  "logicalComparisonStatus": "LOGICALLY_IDENTICAL",
+  "logicalDifferenceCount": 0,
+  "manifestEvidence": [
+    {
+      "actionId": "REP-01-A",
+      "root": "C:\\Users\\raffa\\IdeaProjects\\maga-core\\tmp\\materialized-literature-scenarios\\final-test-campaign\\G03_reproducibility_duration\\CFG-REPRO\\104729\\A",
+      "materializationId": "MAT-CFG-REPRO-104729-A",
+      "manifestSha256": "c6eb721bf872476de3f034b450ea73a6af7e07060f186fb18368e41eb3569e55",
+      "validationStatus": "MATERIALIZED_VALIDATED"
+    },
+    {
+      "actionId": "REP-01-B",
+      "root": "C:\\Users\\raffa\\IdeaProjects\\maga-core\\tmp\\materialized-literature-scenarios\\final-test-campaign\\G03_reproducibility_duration\\CFG-REPRO\\104729\\B",
+      "materializationId": "MAT-CFG-REPRO-104729-B",
+      "manifestSha256": "4410709ed78e72a2a459f238ae32d81c469222e0411d93a19008d70b57e520bc",
+      "validationStatus": "MATERIALIZED_VALIDATED"
+    }
+  ],
+  "interpretation": "The two independent materializations are logically identical after the documented normalization of timestamps, paths, materialization identifiers and documentary fields."
+}

@@ -1,0 +1,35 @@
+{
+  "schemaVersion": "1.0",
+  "campaignId": "final-test-campaign",
+  "groupId": "G03",
+  "actionId": "H-S-EXT-01",
+  "status": "OPTIONAL_STRESS_LIMIT_OBSERVED",
+  "mandatory": false,
+  "seed": 104729,
+  "plannedDurationSeconds": 600,
+  "reachedSimulationTimeSeconds": 464.0,
+  "reachedPercent": 77.3,
+  "runName": "log-20260623-181139-MaGaLiteratureBasedUrbanStudy",
+  "runnerDiagnostic": {
+    "mosaicFailureExitCode": 333,
+    "watchdogSeconds": 30,
+    "exception": "InternalFederateException",
+    "traciCommand": "VehicleGetTaxiFleet",
+    "rootCause": "SocketException: Connessione interrotta dal software del computer host",
+    "reportsMissing": [
+      "live_run_summary.json",
+      "literature_smoke_validation.json",
+      "live-reporting/live_detailed_execution_report.json"
+    ]
+  },
+  "sourceDiagnosticBundle": {
+    "filename": "G03_failure_diagnostic_20260623-175907.zip",
+    "sha256": "a53001930a5b312b14957bbecd36c2774e5994c1c1de37d2b2c545faa8635114"
+  },
+  "evidenceFiles": {
+    "failureResultSha256": "3b7c9e78386805c85715b9f5dbf011cb7ec40c86257c4613a3dfdead49a035f3",
+    "runnerStdoutSha256": "8f1d77842c558fbb69e9e1988c8034e4c23f415bdf624b948ee0eb6a4a17607b",
+    "runnerStderrSha256": "94f33095c3ddff4a5d24331bee4e60f90cedae0582395a865cabb03e08047af4"
+  },
+  "decision": "Do not rerun. Record as the observed endurance limit of the optional high-density stress profile."
+}

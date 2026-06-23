@@ -1,0 +1,36 @@
+﻿{
+    "schemaVersion":  "1.0",
+    "generatedAtUtc":  "2026-06-23T16:17:15.3184055Z",
+    "campaignId":  "final-test-campaign",
+    "groupId":  "G03",
+    "classification":  "REPRODUCIBILITY_DURATION",
+    "batchId":  "G03-COMPLETE-20260623-175907",
+    "actionId":  "H-S-EXT-01",
+    "configId":  "CFG-H-S-EXT",
+    "replica":  1,
+    "seed":  104729,
+    "status":  "FAILED",
+    "failureReason":  "Report JSON mancanti: C:\\Users\\raffa\\IdeaProjects\\maga-core\\tmp\\mosaic-25.2\\logs\\log-20260623-181139-MaGaLiteratureBasedUrbanStudy\\live-maga-runtime\\live_run_summary.json | C:\\Users\\raffa\\IdeaProjects\\maga-core\\tmp\\mosaic-25.2\\logs\\log-20260623-181139-MaGaLiteratureBasedUrbanStudy\\live-maga-runtime\\literature_smoke_validation.json | C:\\Users\\raffa\\IdeaProjects\\maga-core\\tmp\\mosaic-25.2\\logs\\log-20260623-181139-MaGaLiteratureBasedUrbanStudy\\live-maga-runtime\\live-reporting\\live_detailed_execution_report.json",
+    "materializationId":  "MAT-CFG-H-S-EXT-104729",
+    "materializedScenarioRoot":  "C:\\Users\\raffa\\IdeaProjects\\maga-core\\tmp\\materialized-literature-scenarios\\final-test-campaign\\G03_reproducibility_duration\\CFG-H-S-EXT\\104729",
+    "execution":  {
+                      "startedAtUtc":  "2026-06-23T16:11:33.9731850Z",
+                      "completedAtUtc":  "2026-06-23T16:17:15.3018682Z",
+                      "runnerExitCode":  0,
+                      "newRunDirectories":  [
+                                                "log-20260623-181139-MaGaLiteratureBasedUrbanStudy"
+                                            ],
+                      "runnerStdout":  "C:\\Users\\raffa\\IdeaProjects\\maga-core\\tmp\\final-campaign-execution\\G03_reproducibility_duration\\CFG-H-S-EXT\\104729\\replica-01\\runner_stdout.txt",
+                      "runnerStderr":  "C:\\Users\\raffa\\IdeaProjects\\maga-core\\tmp\\final-campaign-execution\\G03_reproducibility_duration\\CFG-H-S-EXT\\104729\\replica-01\\runner_stderr.txt"
+                  },
+    "sourceReports":  {
+                          "liveRunSummary":  null,
+                          "literatureValidation":  null,
+                          "detailedExecutionReport":  null
+                      },
+    "limitations":  [
+                        "Do not rerun automatically if a MOSAIC directory was created",
+                        "taskCompletionModel remains NOT_IMPLEMENTED",
+                        "sumoErrors, teleports and emergencyBraking are not inferred"
+                    ]
+}
