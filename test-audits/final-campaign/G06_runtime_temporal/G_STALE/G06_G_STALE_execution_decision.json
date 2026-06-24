@@ -1,0 +1,91 @@
+{
+    "schemaVersion":  "1.0",
+    "status":  "G06_G_STALE_EXECUTION_COMPLETE_CAUSAL_AUDIT_REQUIRED",
+    "technicalStatus":  "PASS_WITH_EXPECTED_CANONICAL_VALIDATOR_REJECTION",
+    "controlledStaleStatus":  "CONTROLLED_STALE_EVIDENCE_PRESENT_ALL_RESULTS_DISCARDED",
+    "sourceCommit":  "e5730ae149e72c6f0510f293471e9ed466c8332d",
+    "runId":  "G-STALE-01",
+    "runName":  "log-20260624-173047-MaGaLiteratureBasedUrbanStudy",
+    "preliminaryTests":  [
+                             {
+                                 "Test_ID":  "T-110",
+                                 "Status":  "PASS_PRELIMINARY",
+                                 "Evidence":  "temporalRecords=33; invalidDynamicity=0",
+                                 "Finality":  "PRELIMINARY"
+                             },
+                             {
+                                 "Test_ID":  "T-111",
+                                 "Status":  "PASS_PRELIMINARY",
+                                 "Evidence":  "UNKNOWN=33",
+                                 "Finality":  "PRELIMINARY"
+                             },
+                             {
+                                 "Test_ID":  "T-112",
+                                 "Status":  "REVIEW_REQUIRED",
+                                 "Evidence":  "FIRST_RUN=33",
+                                 "Finality":  "PRELIMINARY"
+                             },
+                             {
+                                 "Test_ID":  "T-113",
+                                 "Status":  "SCHEMA_VALID_CORRECTION_NOT_TRIGGERED",
+                                 "Evidence":  "corrected=0; correctedWithoutReason=0",
+                                 "Finality":  "PRELIMINARY"
+                             },
+                             {
+                                 "Test_ID":  "T-114",
+                                 "Status":  "PASS_PRELIMINARY",
+                                 "Evidence":  "FIRST_RUN=33",
+                                 "Finality":  "PRELIMINARY"
+                             },
+                             {
+                                 "Test_ID":  "T-115",
+                                 "Status":  "PASS_PRELIMINARY",
+                                 "Evidence":  "summaryMismatch=0; recordBoundViolations=0",
+                                 "Finality":  "PRELIMINARY"
+                             },
+                             {
+                                 "Test_ID":  "T-116",
+                                 "Status":  "PASS_PRELIMINARY_CAUSAL_AUDIT_REQUIRED",
+                                 "Evidence":  "staleRecords=33; summaryStale=33; exceedsRows=0",
+                                 "Finality":  "REQUIRES_G06_C"
+                             },
+                             {
+                                 "Test_ID":  "T-117",
+                                 "Status":  "REVIEW_REQUIRED",
+                                 "Evidence":  "FIRST_RUN=33",
+                                 "Finality":  "PRELIMINARY"
+                             },
+                             {
+                                 "Test_ID":  "T-118",
+                                 "Status":  "NOT_APPLICABLE_OR_NOT_EXPOSED",
+                                 "Evidence":  "CRITICAL_EVENT non forzato",
+                                 "Finality":  "DOCUMENTED_LIMIT"
+                             },
+                             {
+                                 "Test_ID":  "T-119",
+                                 "Status":  "PASS_PREEXISTING_CONFIRMED",
+                                 "Evidence":  "MOSAIC run completed; configuredCellProfileLoaded=true; sourceMode field absent from summary",
+                                 "Finality":  "CONFIRMED_WITH_FIELD_LOCATION_LIMIT"
+                             },
+                             {
+                                 "Test_ID":  "T-120",
+                                 "Status":  "PASS_PREEXISTING_CONFIRMED",
+                                 "Evidence":  "gaParameterScalingMode=STATIC",
+                                 "Finality":  "CONFIRMED"
+                             },
+                             {
+                                 "Test_ID":  "T-121",
+                                 "Status":  "DEFERRED_OPTIONAL",
+                                 "Evidence":  "G-ADAPTIVE-01 non eseguita",
+                                 "Finality":  "DEFERRED"
+                             }
+                         ],
+    "optionalRuns":  {
+                         "G_SPARSE_01":  "DEFERRED_UNTIL_AFTER_G06_C",
+                         "G_ADAPTIVE_01":  "DEFERRED_UNTIL_AFTER_G06_C_AND_CONFIG_REVIEW"
+                     },
+    "simulationStarted":  true,
+    "matricesUpdated":  false,
+    "javaModified":  false,
+    "nextAction":  "G06_C_CAUSAL_TEMPORAL_AUDIT"
+}

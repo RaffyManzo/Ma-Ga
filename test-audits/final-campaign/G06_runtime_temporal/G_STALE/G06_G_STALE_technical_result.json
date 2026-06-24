@@ -1,0 +1,130 @@
+{
+    "schemaVersion":  "1.0",
+    "executionId":  "G06-G-STALE-20260624-180604",
+    "groupId":  "G06",
+    "runId":  "G-STALE-01",
+    "configId":  "CFG-G-STALE",
+    "materializationId":  "MAT-CFG-G-STALE-104729",
+    "status":  "PASS_WITH_EXPECTED_CANONICAL_VALIDATOR_REJECTION_TEMPORAL_AUDIT_REQUIRED",
+    "execution":  {
+                      "startedAtUtc":  "2026-06-24T15:30:47.7473660Z",
+                      "completedAtUtc":  "2026-06-24T16:06:06.2703959Z",
+                      "elapsedSeconds":  2118.523,
+                      "runnerExitCode":  0,
+                      "runName":  "log-20260624-173047-MaGaLiteratureBasedUrbanStudy",
+                      "runDirectory":  "C:\\Users\\raffa\\IdeaProjects\\maga-core\\tmp\\mosaic-25.2\\logs\\log-20260624-173047-MaGaLiteratureBasedUrbanStudy",
+                      "originalWrapperExitCode":  1,
+                      "postProcessingRecovered":  true,
+                      "simulationRerun":  false
+                  },
+    "toolingFix":  {
+                       "file":  "tools/mosaic-live-maga-runtime/summarize-run.ps1",
+                       "correctedSha256":  "7df0ad0e0f50cc2a46e75ea290bdf4111e7b277b644ee80f23bbe6e9e87c3a4f",
+                       "scalarCsvImportsConvertedToArrays":  6
+                   },
+    "materialization":  {
+                            "root":  "C:\\Users\\raffa\\IdeaProjects\\maga-core\\tmp\\materialized-literature-scenarios\\final-test-campaign\\G06_runtime_temporal_policies\\CFG-G-STALE\\104729",
+                            "density":  "nominal",
+                            "workloadProfile":  "WL-I",
+                            "durationSeconds":  180,
+                            "seed":  104729,
+                            "gaParameterScalingMode":  "STATIC",
+                            "diagnosticArtificialGaDelayMs":  300,
+                            "validationStatus":  "MATERIALIZED_VALIDATED"
+                        },
+    "runtimeArtifact":  {
+                            "path":  "C:\\Users\\raffa\\IdeaProjects\\maga-core\\tmp\\final-campaign-execution\\G05_resource_policies_repair\\G05-RESOURCE-REPAIR-20260624-120030\\runtime\\maga-live-maga-runtime.jar",
+                            "sizeBytes":  491454,
+                            "sha256":  "3a5ae6111f251b97e3940fc57f5df5ab960adcb0af1bd985a9a0a7f680893575"
+                        },
+    "validator":  {
+                      "canonicalStatus":  "LITERATURE_SMOKE_TEST_FAILED",
+                      "errorCount":  1,
+                      "errors":  [
+                                     "strategyApplications \u003c= 0"
+                                 ],
+                      "warningCount":  0,
+                      "compatibilityClassification":  "EXPECTED_REJECTION_STRATEGY_APPLICATIONS_ZERO",
+                      "expectedExceptionVerified":  true,
+                      "canonicalValidatorModified":  false
+                  },
+    "hardOracles":  {
+                        "simulationCompleted":  true,
+                        "maximumAbsoluteSnapshotLagSeconds":  0,
+                        "nonZeroLagWindowCount":  0,
+                        "runtimeViolationCount":  0,
+                        "deltaTMaxMismatchViolations":  0
+                    },
+    "summaryMetrics":  {
+                           "tasksGenerated":  5640,
+                           "tasksActivated":  5640,
+                           "tasksRemovedAtDeadline":  5606,
+                           "tasksPendingAtEnd":  34,
+                           "tasksPendingPeak":  79,
+                           "gaJobsSubmitted":  33,
+                           "gaJobsCompleted":  33,
+                           "gaJobsApplied":  0,
+                           "staleDiscarded":  33,
+                           "staleRatioPercent":  100,
+                           "longestConsecutiveStaleSequence":  33,
+                           "gaRuntimeMeanSeconds":  0.393554818,
+                           "gaRuntimeMedianSeconds":  0.385921,
+                           "gaRuntimeP95Seconds":  0.4663392,
+                           "gaRuntimeMaxSeconds":  0.4870797,
+                           "lastAppliedStrategySimulationTimeSeconds":  0,
+                           "secondsWithoutAppliedStrategyAtEnd":  0,
+                           "taskCompletionModel":  "NOT_IMPLEMENTED"
+                       },
+    "temporalExtraction":  {
+                               "recordCount":  33,
+                               "appliedCount":  0,
+                               "staleDiscardedCount":  33,
+                               "triggers":  {
+                                                "FIRST_RUN":  33
+                                            },
+                               "dynamicityLevels":  {
+                                                        "UNKNOWN":  33
+                                                    },
+                               "suggestedReuseModes":  {
+                                                           "FIRST_RUN":  33
+                                                       },
+                               "appliedReuseModes":  {
+                                                         "FIRST_RUN":  33
+                                                     },
+                               "windowActions":  {
+                                                     "FIRST_RUN":  33
+                                                 },
+                               "correctedReuseCount":  0,
+                               "correctedWithoutReason":  0,
+                               "invalidDynamicityValues":  0,
+                               "invalidLevels":  0,
+                               "invalidReuseModes":  0,
+                               "invalidActions":  0,
+                               "boundViolations":  0
+                           },
+    "overrunExtraction":  {
+                              "filePresent":  true,
+                              "rowCount":  66,
+                              "headers":  [
+                                              "profile",
+                                              "simulationTimeNs",
+                                              "windowIndex",
+                                              "runtimeState",
+                                              "snapshotId",
+                                              "gaRuntimeWallClockSeconds",
+                                              "deltaTMaxSeconds",
+                                              "resultDiscardedAsStale",
+                                              "deltaTMaxAtSubmissionSeconds",
+                                              "deltaTMaxFromCompletedStepSeconds",
+                                              "deltaTMaxMismatchSeconds",
+                                              "wallClockDeadlineNs",
+                                              "timeoutDetectedBeforeCompletion",
+                                              "waitCapDetectedWallClockNs",
+                                              "waitCapDetectedSimulationTimeNs"
+                                          ],
+                              "exceedsCurrentAndNextCount":  0,
+                              "staleTokenCount":  33
+                          },
+    "controlledStaleStatus":  "CONTROLLED_STALE_EVIDENCE_PRESENT_ALL_RESULTS_DISCARDED",
+    "causalAuditRequired":  true
+}

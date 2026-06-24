@@ -189,12 +189,12 @@ if (-not (Test-Path -LiteralPath $RuntimeDir -PathType Container)) {
     throw "Runtime trace directory not found: $RuntimeDir"
 }
 
-$RuntimeRows = Import-RuntimeCsv -RuntimeDir $RuntimeDir -FileName "live_ga_runtime_trace.csv"
-$StrategyRows = Import-RuntimeCsv -RuntimeDir $RuntimeDir -FileName "live_strategy_application_trace.csv"
-$BridgeRows = Import-RuntimeCsv -RuntimeDir $RuntimeDir -FileName "live_bridge_snapshot_trace.csv"
-$OverrunRows = Import-RuntimeCsv -RuntimeDir $RuntimeDir -FileName "live_overrun_trace.csv"
-$AppliedWindowRows = Import-RuntimeCsv -RuntimeDir $RuntimeDir -FileName "live-reporting\live_applied_window_records.csv"
-$DiscardedWindowRows = Import-RuntimeCsv -RuntimeDir $RuntimeDir -FileName "live-reporting\live_discarded_window_records.csv"
+$RuntimeRows = @(Import-RuntimeCsv -RuntimeDir $RuntimeDir -FileName "live_ga_runtime_trace.csv")
+$StrategyRows = @(Import-RuntimeCsv -RuntimeDir $RuntimeDir -FileName "live_strategy_application_trace.csv")
+$BridgeRows = @(Import-RuntimeCsv -RuntimeDir $RuntimeDir -FileName "live_bridge_snapshot_trace.csv")
+$OverrunRows = @(Import-RuntimeCsv -RuntimeDir $RuntimeDir -FileName "live_overrun_trace.csv")
+$AppliedWindowRows = @(Import-RuntimeCsv -RuntimeDir $RuntimeDir -FileName "live-reporting\live_applied_window_records.csv")
+$DiscardedWindowRows = @(Import-RuntimeCsv -RuntimeDir $RuntimeDir -FileName "live-reporting\live_discarded_window_records.csv")
 
 $MosaicLog = Join-Path $Run.FullName "MOSAIC.log"
 $SimulationCompleted = $false
