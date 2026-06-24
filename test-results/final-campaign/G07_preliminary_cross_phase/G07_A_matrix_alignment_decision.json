@@ -1,0 +1,21 @@
+{
+  "schemaVersion": 1,
+  "phase": "G07-A-MATRIX-ALIGNMENT",
+  "status": "PASS_READY_FOR_FIRST_CHAPTER_DRAFT",
+  "sourceCommit": "19e8bb3332e5522ed38c1328409f0be5d009fbcf",
+  "simulationsStarted": false,
+  "javaChanges": 0,
+  "g02bExecuted": false,
+  "g02bIncludedInFirstDraft": false,
+  "fullMatrix": {
+    "file": "Matrice_test_MA_GA_MOSAIC_SUMO_G07A_allineata.xlsx",
+    "sheetCount": 19,
+    "sha256": "30b83d95b3533c272363f540353a0e1fc5a967904dd389d16d001ba5cc313cc6"
+  },
+  "simpleMatrix": {
+    "file": "Matrice_semplificata_G07A_allineata.xlsx",
+    "sheetCount": 11,
+    "sha256": "8e9fb708467f677096e674f5fb9d1f3a4cc1d380be4e3dae0decd335ba154de1"
+  },
+  "nextAction": "WRITE_FIRST_CHAPTER_DRAFT_WITHOUT_G02B"
+}
