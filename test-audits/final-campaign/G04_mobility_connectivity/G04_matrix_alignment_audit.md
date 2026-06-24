@@ -3,10 +3,7 @@
 Data verifica: 23 giugno 2026
 Stato: **PASS**
 
-## Matrice completa
-
-- File: `Matrice_test_MA_GA_MOSAIC_SUMO_G04_allineata.xlsx`
-- SHA-256: `93b026eb2f4dc5f5a2cf2d18731f2e177a6ada384dfb62357eb3ff31b138f9ba`
+$178859928b85e272d067c5f3c346a0d8702a613c45ac4d15071de09142710d568`
 - Fogli: **15**
 - Nuovo foglio: `14_Risultati_G04`
 - Configurazioni `CFG-M-*`: riallineate agli esiti delle cinque run.
@@ -16,10 +13,7 @@ Stato: **PASS**
 - Prossimo gruppo: `G05`.
 - G02B: `DEFERRED_AFTER_G06`.
 
-## Matrice semplificata
-
-- File: `Matrice_semplificata_G04_allineata.xlsx`
-- SHA-256: `8347dab408a37cf87d3e856b84b5974468fb33ad45a606905ff8668cf4b8142b`
+$19a4956053372833f2d1a7e222e159686a7947d80f4fd20fe74d5dddf8488c11e`
 - Fogli: **7**
 - Nuovo foglio: `06_Risultati_G04`
 - Dashboard, riepilogo configurazioni, storico e legenda: riallineati a G04.
