@@ -1,0 +1,63 @@
+﻿{
+    "schemaVersion":  "1.0",
+    "status":  "G04_R_BLOCK2_RECOVERY_EXECUTED_ANALYZED",
+    "runId":  "G04-R-01-RECOVERY-01",
+    "runName":  "log-20260624-233717-MaGaLiteratureBasedUrbanStudy",
+    "sourceCommit":  "9f7a87273379daaa4a13c1deff8cfcff504766c8",
+    "route":  {
+                  "vehicleId":  "veh_2",
+                  "sourceRouteVehicleId":  "synthetic_005",
+                  "routeId":  "route_dual_rsu_switch_04",
+                  "selectionBasis":  "GEOMETRY_CONFIRMED_OR_REJECTED_AT_RUNTIME",
+                  "expectedTransitionSeconds":  64.547419259851353
+              },
+    "configuration":  {
+                          "durationSeconds":  180,
+                          "density":  "low_density",
+                          "seed":  104729,
+                          "localCpuMultiplier":  0.5,
+                          "gaParameterScalingMode":  "STATIC",
+                          "diagnosticArtificialGaDelayMs":  0,
+                          "workloadMode":  "DEDICATED_STATIC_PROBE_TASKS_FROM_EXISTING_HEAVY_PROFILE"
+                      },
+    "implementation":  {
+                           "javaModified":  false,
+                           "coreModified":  false,
+                           "materializedOverlayOnly":  true,
+                           "reportingExtensionAdded":  false,
+                           "postProcessingOnly":  true
+                       },
+    "resultStatus":  "PASS",
+    "tests":  {
+                  "T-091":  {
+                                "primary":  false,
+                                "status":  "EVIDENZA_PARZIALE"
+                            },
+                  "T-093":  {
+                                "excluded":  true,
+                                "status":  "NOT_REPEATED_ALREADY_PASS_RECOVERED"
+                            },
+                  "T-094":  {
+                                "primary":  false,
+                                "status":  "NON_OSSERVATO"
+                            },
+                  "T-096":  {
+                                "primary":  true,
+                                "status":  "PASS"
+                            },
+                  "T-098":  {
+                                "primary":  true,
+                                "remoteAfterCount":  13,
+                                "remoteBeforeCount":  38,
+                                "remoteNearCount":  51,
+                                "status":  "PASS",
+                                "taskNearSnapshotCount":  162
+                            }
+              },
+    "recoverySimulationCount":  1,
+    "priorInvalidHarnessRunCount":  1,
+    "totalMosaicAttemptsForG04R":  2,
+    "validTargetedRunCount":  1,
+    "matricesUpdated":  false,
+    "nextAction":  "REVIEW_RESULT_THEN_FORMALLY_CLOSE_G04_R_AND_ALIGN_MATRICES"
+}

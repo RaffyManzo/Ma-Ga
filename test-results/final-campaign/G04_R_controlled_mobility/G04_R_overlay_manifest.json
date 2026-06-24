@@ -1,0 +1,88 @@
+{
+  "baseMaterialization": "C:\\Users\\raffa\\IdeaProjects\\maga-core\\tmp\\materialized-literature-scenarios\\final-test-campaign\\G04_R_controlled_mobility\\CFG-G04-R-HANDOVER-R1\\104729",
+  "classification": "TARGETED_CONTROLLED_MOBILITY_RECOVERY_AFTER_RUNTIME_ID_MISMATCH",
+  "configId": "CFG-G04-R-HANDOVER",
+  "density": "low_density",
+  "departSeconds": 5.5,
+  "durationSeconds": 180,
+  "expectedGeometricTransitionSeconds": 64.54741925985135,
+  "files": {
+    "database": {
+      "path": "C:\\Users\\raffa\\IdeaProjects\\maga-core\\tmp\\materialized-literature-scenarios\\final-test-campaign\\G04_R_controlled_mobility\\CFG-G04-R-HANDOVER-R1\\104729\\application\\intas_literature_urban.db",
+      "sha256": "cbd14630737b22f5cb3fedc07d8be24c9994a505a3fb34a485cf8e981e07cd97"
+    },
+    "liveStateConfig": {
+      "path": "C:\\Users\\raffa\\IdeaProjects\\maga-core\\tmp\\materialized-literature-scenarios\\final-test-campaign\\G04_R_controlled_mobility\\CFG-G04-R-HANDOVER-R1\\104729\\application\\ma_ga_live_state_config.json",
+      "sha256": "af5208fb198c28a3f23701e7e46a61b421cd86820b6152ba9517326e7020168e"
+    },
+    "route": {
+      "path": "C:\\Users\\raffa\\IdeaProjects\\maga-core\\tmp\\materialized-literature-scenarios\\final-test-campaign\\G04_R_controlled_mobility\\CFG-G04-R-HANDOVER-R1\\104729\\sumo\\intas_literature_urban_low_density.rou.xml",
+      "sha256": "4e0c120e95a37d331db09dae1b905803b72169deabb886407a5853822d74e8d4"
+    },
+    "runtimeConfig": {
+      "path": "C:\\Users\\raffa\\IdeaProjects\\maga-core\\tmp\\materialized-literature-scenarios\\final-test-campaign\\G04_R_controlled_mobility\\CFG-G04-R-HANDOVER-R1\\104729\\application\\ma_ga_live_runtime_config.json",
+      "sha256": "ca1bd239116ce01cac1b3bebb555e958b71846311595acd7b8dbb014c24101a0"
+    }
+  },
+  "javaModified": false,
+  "localCpuMultiplier": 0.5,
+  "nearbyRuntimeMapping": [
+    {
+      "departSeconds": 0.0,
+      "runtimeVehicleId": "veh_0",
+      "sourceVehicleId": "synthetic_000"
+    },
+    {
+      "departSeconds": 2.8,
+      "runtimeVehicleId": "veh_1",
+      "sourceVehicleId": "synthetic_001"
+    },
+    {
+      "departSeconds": 5.5,
+      "runtimeVehicleId": "veh_2",
+      "sourceVehicleId": "synthetic_005"
+    },
+    {
+      "departSeconds": 5.6,
+      "runtimeVehicleId": "veh_3",
+      "sourceVehicleId": "synthetic_002"
+    },
+    {
+      "departSeconds": 8.4,
+      "runtimeVehicleId": "veh_4",
+      "sourceVehicleId": "synthetic_003"
+    }
+  ],
+  "poissonArrivalRate": 0.0,
+  "recoveryReason": "Static tasks in the first attempt targeted the SUMO source id instead of the MOSAIC runtime veh_N id.",
+  "routeId": "route_dual_rsu_switch_04",
+  "runId": "G04-R-01-RECOVERY-01",
+  "runtimeMappingBasis": "SORTED_SUMO_DEPARTURE_ORDER_TO_MOSAIC_VEH_SEQUENCE",
+  "runtimeProbeIndex": 2,
+  "runtimeProbeVehicleId": "veh_2",
+  "schemaVersion": "1.0",
+  "seed": 104729,
+  "sourceRouteVehicleId": "synthetic_005",
+  "staticProbeActivationTimesMs": [
+    48000,
+    50000,
+    52000,
+    54000,
+    56000,
+    58000,
+    60000,
+    62000,
+    64000,
+    66000,
+    68000,
+    70000,
+    72000,
+    74000,
+    76000,
+    78000,
+    80000,
+    82000,
+    84000
+  ],
+  "staticProbeTaskCount": 19
+}
