@@ -1,0 +1,6 @@
+﻿"Test_ID","Status","Residual","Role_In_G04_R","Reason"
+"T-091","EVIDENZA_PARZIALE","True","SECONDARY_OBJECTIVE","EDGE applicato e stato osservato, ma manca una dimostrazione causale nella transizione mobility controllata."
+"T-093","PASS_RECOVERED","False","DO_NOT_REPEAT","VEHICLE applicato con modello V2V gia osservato in G05."
+"T-094","NON_OSSERVATO","True","SECONDARY_OBJECTIVE","coverageSufficient=false non e stato osservato in una strategia applicata."
+"T-096","EVIDENZA_PARZIALE","True","PRIMARY_OBJECTIVE","Manca una traiettoria controllata rsu_0 -> rsu_1 con timeline verificabile."
+"T-098","NON_OSSERVATO","True","PRIMARY_OBJECTIVE","Manca una decisione remota applicata durante la transizione gateway."

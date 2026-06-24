@@ -1,0 +1,74 @@
+{
+    "schemaVersion":  "1.0",
+    "auditId":  "RESIDUAL-AUDIT-20260624-183636",
+    "status":  "RESIDUAL_EVIDENCE_AUDIT_COMPLETE",
+    "sourceCommit":  "06e3815f1d3d6db8e6315e3d0c0d5f9dd908ea54",
+    "tests":  [
+                  {
+                      "Test_ID":  "T-091",
+                      "Status":  "EVIDENZA_PARZIALE",
+                      "Residual":  true,
+                      "Role_In_G04_R":  "SECONDARY_OBJECTIVE",
+                      "Reason":  "EDGE applicato e stato osservato, ma manca una dimostrazione causale nella transizione mobility controllata."
+                  },
+                  {
+                      "Test_ID":  "T-093",
+                      "Status":  "PASS_RECOVERED",
+                      "Residual":  false,
+                      "Role_In_G04_R":  "DO_NOT_REPEAT",
+                      "Reason":  "VEHICLE applicato con modello V2V gia osservato in G05."
+                  },
+                  {
+                      "Test_ID":  "T-094",
+                      "Status":  "NON_OSSERVATO",
+                      "Residual":  true,
+                      "Role_In_G04_R":  "SECONDARY_OBJECTIVE",
+                      "Reason":  "coverageSufficient=false non e stato osservato in una strategia applicata."
+                  },
+                  {
+                      "Test_ID":  "T-096",
+                      "Status":  "EVIDENZA_PARZIALE",
+                      "Residual":  true,
+                      "Role_In_G04_R":  "PRIMARY_OBJECTIVE",
+                      "Reason":  "Manca una traiettoria controllata rsu_0 -\u003e rsu_1 con timeline verificabile."
+                  },
+                  {
+                      "Test_ID":  "T-098",
+                      "Status":  "NON_OSSERVATO",
+                      "Residual":  true,
+                      "Role_In_G04_R":  "PRIMARY_OBJECTIVE",
+                      "Reason":  "Manca una decisione remota applicata durante la transizione gateway."
+                  }
+              ],
+    "g04R":  {
+                 "decision":  "REQUIRED_SINGLE_TARGETED_CONTROLLED_MOBILITY_RUN",
+                 "primaryTests":  [
+                                      "T-096",
+                                      "T-098"
+                                  ],
+                 "secondaryTests":  [
+                                        "T-091",
+                                        "T-094"
+                                    ],
+                 "excludedTests":  [
+                                       "T-093"
+                                   ],
+                 "runCountTarget":  1,
+                 "implementationAuthorized":  false,
+                 "requiresDiscussion":  true
+             },
+    "campaignConstraints":  {
+                                "repeatG02Baselines":  false,
+                                "repeatG03HighDensityExtended":  false,
+                                "javaChangesAuthorized":  false,
+                                "matricesUpdated":  false,
+                                "simulationStarted":  false
+                            },
+    "sequence":  [
+                     "G04_R_TARGETED_RUN",
+                     "G04_R_RESULT_AUDIT",
+                     "G02B_EXPERIMENTAL_BRANCH",
+                     "G07_FINAL_CROSS_AUDIT"
+                 ],
+    "nextAction":  "DISCUSS_AND_PREPARE_G04_R_CONTROLLED_MOBILITY_RUN"
+}
