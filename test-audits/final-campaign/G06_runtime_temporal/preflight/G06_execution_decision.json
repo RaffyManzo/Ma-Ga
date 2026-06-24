@@ -1,0 +1,185 @@
+{
+    "schemaVersion":  "1.0",
+    "preflightId":  "G06-PREFLIGHT-20260624-172152",
+    "status":  "G06_PREFLIGHT_COMPLETE_MANDATORY_STALE_READY",
+    "sourceCommit":  "7890881e86891d992a1397a0d246c3680c8dce3b",
+    "frozenCoreCommit":  "5a9477735a3d707a5f000a64653cd2a6fc7f2007",
+    "matrices":  {
+                     "fullSha256":  "916d62801d135b50b1760da7d86ed648a11b9d6176189958f9f5d274d7aabdd2",
+                     "simpleSha256":  "f4cead82aa57f3443f13ff618b4df0273039d4f1b99e404a804554412e1a257f"
+                 },
+    "g05ClosureBundleSha256":  "b22384a2ae8f6d08aea886427b609256c3c26634b798423158ca0c70d56b7b27",
+    "sourceInventory":  {
+                            "totalMatches":  2788,
+                            "operationalMatches":  462
+                        },
+    "outputInventory":  {
+                            "representativeFiles":  40,
+                            "relevantFieldRows":  612
+                        },
+    "configurations":  [
+                           {
+                               "Config_ID":  "CFG-G-SPARSE",
+                               "Run_ID":  "G-SPARSE-01",
+                               "Mandatory":  "No",
+                               "Exposure_Status":  "EXACT_VARIANT_EXPOSURE_PROVEN",
+                               "Existing_Materialization":  true,
+                               "Existing_Materialization_Paths":  "C:\\Users\\raffa\\IdeaProjects\\maga-core\\tmp\\materialized-literature-scenarios\\final-test-campaign\\G06_runtime_temporal_policies\\CFG-G-SPARSE | C:\\Users\\raffa\\IdeaProjects\\maga-core\\tmp\\materialized-literature-scenarios\\final-test-campaign\\G06_runtime_temporal_policies\\CFG-G-SPARSE\\104729 | C:\\Users\\raffa\\IdeaProjects\\maga-core\\tmp\\materialized-literature-scenarios\\final-test-campaign\\G06_runtime_temporal_policies\\CFG-G-SPARSE\\104729\\application | C:\\Users\\raffa\\IdeaProjects\\maga-core\\tmp\\materialized-literature-scenarios\\final-test-campaign\\G06_runtime_temporal_policies\\CFG-G-SPARSE\\104729\\cell | C:\\Users\\raffa\\IdeaProjects\\maga-core\\tmp\\materialized-literature-scenarios\\final-test-campaign\\G06_runtime_temporal_policies\\CFG-G-SPARSE\\104729\\mapping | C:\\Users\\raffa\\IdeaProjects\\maga-core\\tmp\\materialized-literature-scenarios\\final-test-campaign\\G06_runtime_temporal_policies\\CFG-G-SPARSE\\104729\\output | C:\\Users\\raffa\\IdeaProjects\\maga-core\\tmp\\materialized-literature-scenarios\\final-test-campaign\\G06_runtime_temporal_policies\\CFG-G-SPARSE\\104729\\reports | C:\\Users\\raffa\\IdeaProjects\\maga-core\\tmp\\materialized-literature-scenarios\\final-test-campaign\\G06_runtime_temporal_policies\\CFG-G-SPARSE\\104729\\sns | C:\\Users\\raffa\\IdeaProjects\\maga-core\\tmp\\materialized-literature-scenarios\\final-test-campaign\\G06_runtime_temporal_policies\\CFG-G-SPARSE\\104729\\sumo | C:\\Users\\raffa\\IdeaProjects\\maga-core\\tmp\\materialized-literature-scenarios\\final-test-campaign\\G06_runtime_temporal_policies\\CFG-G-SPARSE\\104729\\_campaign_logs",
+                               "Readiness":  "OPTIONAL_READY_AFTER_MANDATORY_STALE",
+                               "Reason":  "WL-SPARSE presente in un artefatto operativo.",
+                               "Planned_Action":  "DEFER_DECISION_UNTIL_AFTER_G_STALE"
+                           },
+                           {
+                               "Config_ID":  "CFG-G-ADAPTIVE",
+                               "Run_ID":  "G-ADAPTIVE-01",
+                               "Mandatory":  "No",
+                               "Exposure_Status":  "EXPOSURE_NOT_PROVEN",
+                               "Existing_Materialization":  true,
+                               "Existing_Materialization_Paths":  "C:\\Users\\raffa\\IdeaProjects\\maga-core\\tmp\\materialized-literature-scenarios\\final-test-campaign\\G06_runtime_temporal_policies\\CFG-G-ADAPTIVE | C:\\Users\\raffa\\IdeaProjects\\maga-core\\tmp\\materialized-literature-scenarios\\final-test-campaign\\G06_runtime_temporal_policies\\CFG-G-ADAPTIVE\\104729 | C:\\Users\\raffa\\IdeaProjects\\maga-core\\tmp\\materialized-literature-scenarios\\final-test-campaign\\G06_runtime_temporal_policies\\CFG-G-ADAPTIVE\\104729\\application | C:\\Users\\raffa\\IdeaProjects\\maga-core\\tmp\\materialized-literature-scenarios\\final-test-campaign\\G06_runtime_temporal_policies\\CFG-G-ADAPTIVE\\104729\\cell | C:\\Users\\raffa\\IdeaProjects\\maga-core\\tmp\\materialized-literature-scenarios\\final-test-campaign\\G06_runtime_temporal_policies\\CFG-G-ADAPTIVE\\104729\\mapping | C:\\Users\\raffa\\IdeaProjects\\maga-core\\tmp\\materialized-literature-scenarios\\final-test-campaign\\G06_runtime_temporal_policies\\CFG-G-ADAPTIVE\\104729\\output | C:\\Users\\raffa\\IdeaProjects\\maga-core\\tmp\\materialized-literature-scenarios\\final-test-campaign\\G06_runtime_temporal_policies\\CFG-G-ADAPTIVE\\104729\\reports | C:\\Users\\raffa\\IdeaProjects\\maga-core\\tmp\\materialized-literature-scenarios\\final-test-campaign\\G06_runtime_temporal_policies\\CFG-G-ADAPTIVE\\104729\\sns | C:\\Users\\raffa\\IdeaProjects\\maga-core\\tmp\\materialized-literature-scenarios\\final-test-campaign\\G06_runtime_temporal_policies\\CFG-G-ADAPTIVE\\104729\\sumo | C:\\Users\\raffa\\IdeaProjects\\maga-core\\tmp\\materialized-literature-scenarios\\final-test-campaign\\G06_runtime_temporal_policies\\CFG-G-ADAPTIVE\\104729\\_campaign_logs",
+                               "Readiness":  "OPTIONAL_MANUAL_REVIEW",
+                               "Reason":  "Scaling ADAPTIVE non dimostrato in entrambi i livelli.",
+                               "Planned_Action":  "DEFER_DECISION_UNTIL_AFTER_G_STALE"
+                           },
+                           {
+                               "Config_ID":  "CFG-G-STALE",
+                               "Run_ID":  "G-STALE-01",
+                               "Mandatory":  "Si",
+                               "Exposure_Status":  "RUNTIME_AND_MATERIALIZER_EXPOSURE_PROVEN",
+                               "Existing_Materialization":  true,
+                               "Existing_Materialization_Paths":  "C:\\Users\\raffa\\IdeaProjects\\maga-core\\tmp\\materialized-literature-scenarios\\final-test-campaign\\G06_runtime_temporal_policies\\CFG-G-STALE | C:\\Users\\raffa\\IdeaProjects\\maga-core\\tmp\\materialized-literature-scenarios\\final-test-campaign\\G06_runtime_temporal_policies\\CFG-G-STALE\\104729 | C:\\Users\\raffa\\IdeaProjects\\maga-core\\tmp\\materialized-literature-scenarios\\final-test-campaign\\G06_runtime_temporal_policies\\CFG-G-STALE\\104729\\application | C:\\Users\\raffa\\IdeaProjects\\maga-core\\tmp\\materialized-literature-scenarios\\final-test-campaign\\G06_runtime_temporal_policies\\CFG-G-STALE\\104729\\cell | C:\\Users\\raffa\\IdeaProjects\\maga-core\\tmp\\materialized-literature-scenarios\\final-test-campaign\\G06_runtime_temporal_policies\\CFG-G-STALE\\104729\\mapping | C:\\Users\\raffa\\IdeaProjects\\maga-core\\tmp\\materialized-literature-scenarios\\final-test-campaign\\G06_runtime_temporal_policies\\CFG-G-STALE\\104729\\output | C:\\Users\\raffa\\IdeaProjects\\maga-core\\tmp\\materialized-literature-scenarios\\final-test-campaign\\G06_runtime_temporal_policies\\CFG-G-STALE\\104729\\reports | C:\\Users\\raffa\\IdeaProjects\\maga-core\\tmp\\materialized-literature-scenarios\\final-test-campaign\\G06_runtime_temporal_policies\\CFG-G-STALE\\104729\\sns | C:\\Users\\raffa\\IdeaProjects\\maga-core\\tmp\\materialized-literature-scenarios\\final-test-campaign\\G06_runtime_temporal_policies\\CFG-G-STALE\\104729\\sumo | C:\\Users\\raffa\\IdeaProjects\\maga-core\\tmp\\materialized-literature-scenarios\\final-test-campaign\\G06_runtime_temporal_policies\\CFG-G-STALE\\104729\\_campaign_logs",
+                               "Readiness":  "READY_FOR_EXECUTION_PREPARATION",
+                               "Reason":  "Artificial GA delay presente nel runtime e nel tool di materializzazione.",
+                               "Planned_Action":  "MANDATORY_NEXT_RUN_IF_EXPOSURE_PROVEN"
+                           }
+                       ],
+    "tests":  [
+                  {
+                      "Test_ID":  "T-110",
+                      "Feature":  "Componenti della dinamicita",
+                      "Mandatory":  "Si",
+                      "Source_Exposure":  true,
+                      "Existing_Output_Exposure":  true,
+                      "Required_Run":  "ANY_G06_OR_EXISTING_OUTPUTS",
+                      "Readiness":  "READY_FROM_EXISTING_OUTPUTS",
+                      "Oracle":  "Componenti finite e in range"
+                  },
+                  {
+                      "Test_ID":  "T-111",
+                      "Feature":  "Livello UNKNOWN/STABLE/MODERATE/HIGH",
+                      "Mandatory":  "Si",
+                      "Source_Exposure":  true,
+                      "Existing_Output_Exposure":  true,
+                      "Required_Run":  "ANY_G06_OR_EXISTING_OUTPUTS",
+                      "Readiness":  "READY_FROM_EXISTING_OUTPUTS",
+                      "Oracle":  "UNKNOWN solo nella prima finestra o caso previsto"
+                  },
+                  {
+                      "Test_ID":  "T-112",
+                      "Feature":  "Modalita di riuso popolazione",
+                      "Mandatory":  "Si",
+                      "Source_Exposure":  true,
+                      "Existing_Output_Exposure":  true,
+                      "Required_Run":  "ANY_G06_OR_EXISTING_OUTPUTS",
+                      "Readiness":  "READY_FROM_EXISTING_OUTPUTS",
+                      "Oracle":  "Modalita coerente con dinamicita e policy"
+                  },
+                  {
+                      "Test_ID":  "T-113",
+                      "Feature":  "Correzione suggested/applied e reason",
+                      "Mandatory":  "Si",
+                      "Source_Exposure":  true,
+                      "Existing_Output_Exposure":  true,
+                      "Required_Run":  "G-STALE-01_OR_STRESS",
+                      "Readiness":  "READY_FROM_EXISTING_OUTPUTS",
+                      "Oracle":  "Motivazione presente quando suggested != applied"
+                  },
+                  {
+                      "Test_ID":  "T-114",
+                      "Feature":  "Azioni sulla finestra",
+                      "Mandatory":  "Si",
+                      "Source_Exposure":  true,
+                      "Existing_Output_Exposure":  false,
+                      "Required_Run":  "ANY_G06_OR_EXISTING_OUTPUTS",
+                      "Readiness":  "READY_AFTER_ANY_G06_RUN",
+                      "Oracle":  "Azione coerente con bounds e dinamicita"
+                  },
+                  {
+                      "Test_ID":  "T-115",
+                      "Feature":  "deltaTMin, deltaTMax e mismatch",
+                      "Mandatory":  "Si",
+                      "Source_Exposure":  false,
+                      "Existing_Output_Exposure":  true,
+                      "Required_Run":  "ANY_G06_OR_EXISTING_OUTPUTS",
+                      "Readiness":  "READY_FROM_EXISTING_OUTPUTS",
+                      "Oracle":  "deltaTMaxMismatchViolations = 0"
+                  },
+                  {
+                      "Test_ID":  "T-116",
+                      "Feature":  "Runtime budget EXCEEDS_CURRENT_AND_NEXT",
+                      "Mandatory":  "Si",
+                      "Source_Exposure":  true,
+                      "Existing_Output_Exposure":  true,
+                      "Required_Run":  "G-STALE-01",
+                      "Readiness":  "READY_AFTER_G_STALE_RUN",
+                      "Oracle":  "Segnalazione, scarto stale e nuova ottimizzazione"
+                  },
+                  {
+                      "Test_ID":  "T-117",
+                      "Feature":  "Trigger FIRST_RUN e SCHEDULED_WINDOW_EXPIRATION",
+                      "Mandatory":  "Si",
+                      "Source_Exposure":  true,
+                      "Existing_Output_Exposure":  true,
+                      "Required_Run":  "ANY_G06_OR_EXISTING_OUTPUTS",
+                      "Readiness":  "READY_FROM_EXISTING_OUTPUTS",
+                      "Oracle":  "Entrambi osservabili"
+                  },
+                  {
+                      "Test_ID":  "T-118",
+                      "Feature":  "Trigger CRITICAL_EVENT",
+                      "Mandatory":  "No",
+                      "Source_Exposure":  true,
+                      "Existing_Output_Exposure":  false,
+                      "Required_Run":  "NONE_IN_CANONICAL_LIVE_FREEZE",
+                      "Readiness":  "NOT_APPLICABLE_OR_NOT_EXPOSED",
+                      "Oracle":  "Non forzare nella campagna live congelata"
+                  },
+                  {
+                      "Test_ID":  "T-119",
+                      "Feature":  "Sorgente MOSAIC_LIVE",
+                      "Mandatory":  "Si",
+                      "Source_Exposure":  true,
+                      "Existing_Output_Exposure":  true,
+                      "Required_Run":  "ALREADY_VERIFIED",
+                      "Readiness":  "PASS_PREEXISTING",
+                      "Oracle":  "sourceMode = MOSAIC_LIVE"
+                  },
+                  {
+                      "Test_ID":  "T-120",
+                      "Feature":  "Scaling canonico STATIC",
+                      "Mandatory":  "Si",
+                      "Source_Exposure":  true,
+                      "Existing_Output_Exposure":  true,
+                      "Required_Run":  "ALREADY_VERIFIED",
+                      "Readiness":  "PASS_PREEXISTING",
+                      "Oracle":  "STATIC nelle run canoniche"
+                  },
+                  {
+                      "Test_ID":  "T-121",
+                      "Feature":  "Scaling opzionale ADAPTIVE",
+                      "Mandatory":  "No",
+                      "Source_Exposure":  false,
+                      "Existing_Output_Exposure":  true,
+                      "Required_Run":  "G-ADAPTIVE-01",
+                      "Readiness":  "OPTIONAL_CONFIG_REVIEW",
+                      "Oracle":  "Risultati mantenuti separati dalla baseline canonica"
+                  }
+              ],
+    "mandatoryTestsRequiringReview":  [
+
+                                      ],
+    "nextAction":  "PREPARE_AND_EXECUTE_G_STALE_01",
+    "optionalRunDecision":  "DEFER_G_SPARSE_AND_G_ADAPTIVE_UNTIL_AFTER_G_STALE_AUDIT",
+    "simulationStarted":  false,
+    "matricesUpdated":  false,
+    "javaModified":  false
+}

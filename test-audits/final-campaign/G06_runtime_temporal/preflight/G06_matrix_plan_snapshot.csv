@@ -1,0 +1,4 @@
+﻿"Run_ID","Config_ID","Mandatory","Density","Duration_s","Seed","Workload","Arrival_Rate_Per_Vehicle_s","GA_Scaling","Artificial_GA_Delay_ms","Primary_Objective","Planned_Action"
+"G-SPARSE-01","CFG-G-SPARSE","No","low_density","180","104729","WL-SPARSE","0,05","STATIC","0","Finestre sparse, FIRST_RUN, possibili empty o near-empty task set","DEFER_DECISION_UNTIL_AFTER_G_STALE"
+"G-ADAPTIVE-01","CFG-G-ADAPTIVE","No","high_density","300","104729","WL-S","1","ADAPTIVE","0","Scaling non canonico di popolazione e generazioni","DEFER_DECISION_UNTIL_AFTER_G_STALE"
+"G-STALE-01","CFG-G-STALE","Si","nominal","180","104729","WL-I","1","STATIC","300","Stale controllato, discard, mantenimento ultima strategia e nuova ottimizzazione","MANDATORY_NEXT_RUN_IF_EXPOSURE_PROVEN"
