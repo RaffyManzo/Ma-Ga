@@ -1,0 +1,84 @@
+{
+    "schemaVersion":  "1.0",
+    "status":  "G05_THESIS_SYNTHESIS_COMPLETE_F4_REQUIRED",
+    "sourceCommit":  "3a78132cba4d1acf0afd9b557179b51fb5a1d85d",
+    "sourceBundles":  {
+                          "executionBatchSha256":  "afec92048b843caa6678173684b0419208516427f5facc5149daf327cdd7a790",
+                          "localCpuRecoverySha256":  "654aa34d8f9a13d5a525885835ea1daa8633144801ecc3aab8475586daa0200f"
+                      },
+    "baseline":  {
+                     "sourceGroup":  "G02",
+                     "configs":  [
+                                     "CFG-N-S",
+                                     "CFG-N-I",
+                                     "CFG-H-S"
+                                 ],
+                     "seeds":  [
+                                   104729,
+                                   130363,
+                                   155921,
+                                   181081,
+                                   207547
+                               ],
+                     "observationCount":  15,
+                     "durationSeconds":  300,
+                     "runtimeJarSha256":  "1a0aa6d2b0441f0be38baf5df1acc2d4d889b9f356b6111f7715105cd013a9b4"
+                 },
+    "g05":  {
+                "runCount":  6,
+                "durationSeconds":  180,
+                "runtimeJarSha256":  "3a5ae6111f251b97e3940fc57f5df5ab960adcb0af1bd985a9a0a7f680893575",
+                "localCpuObservationCount":  3,
+                "localCpuFinalVerdict":  "PASS_WITH_REPRODUCIBLE_TEMPORAL_LIMIT"
+            },
+    "comparability":  {
+                          "sameFrozenJavaSource":  true,
+                          "sameMatchedSeed":  true,
+                          "sameMatchedDensityAndWorkload":  true,
+                          "sameDuration":  false,
+                          "byteIdenticalRuntimeJar":  false,
+                          "allowedComparison":  "NORMALIZED_METRICS_AND_RATIOS_ONLY"
+                      },
+    "finalRunVerdicts":  [
+                             {
+                                 "runId":  "R-LOCALCPU-01",
+                                 "verdict":  "PASS_WITH_REPRODUCIBLE_TEMPORAL_LIMIT",
+                                 "targetExercised":  true
+                             },
+                             {
+                                 "runId":  "R-EDGECPU-01",
+                                 "verdict":  "PASS_TECHNICAL_TARGET_RESOURCE_NOT_EXERCISED",
+                                 "targetExercised":  false
+                             },
+                             {
+                                 "runId":  "R-CLOUDCPU-01",
+                                 "verdict":  "PASS_TECHNICAL_TARGET_RESOURCE_NOT_EXERCISED",
+                                 "targetExercised":  false
+                             },
+                             {
+                                 "runId":  "R-CELLBW-01",
+                                 "verdict":  "PASS_TECHNICAL_TARGET_LINK_NOT_EXERCISED",
+                                 "targetExercised":  false
+                             },
+                             {
+                                 "runId":  "R-RTT-01",
+                                 "verdict":  "PASS_STABLE_TARGET_LINK_NOT_EXERCISED",
+                                 "targetExercised":  false
+                             },
+                             {
+                                 "runId":  "R-V2VBW-01",
+                                 "verdict":  "PASS_WITH_STRESS_LIMIT_TARGET_NOT_EXERCISED",
+                                 "targetExercised":  false
+                             }
+                         ],
+    "residualEvidence":  {
+                             "T091":  "SUPPORTED_BY_LOCALCPU_RECOVERY_NOT_VALIDATED_BY_EDGECPU",
+                             "T093":  "PASS_RECOVERED",
+                             "T094":  "NOT_OBSERVED_IN_APPLIED_STRATEGIES",
+                             "repairFallbackObservability":  "NOT_EXPOSED"
+                         },
+    "simulationStarted":  false,
+    "matricesUpdated":  false,
+    "javaModified":  false,
+    "nextAction":  "G05_F4_MATRIX_ALIGNMENT_AND_FORMAL_CLOSURE"
+}
