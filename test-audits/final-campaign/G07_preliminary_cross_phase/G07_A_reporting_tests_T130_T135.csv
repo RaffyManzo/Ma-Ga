@@ -1,0 +1,7 @@
+"test_id","objective","status","evidence","scope_limit"
+"T-130","Presenza dei file e delle evidenze obbligatorie","PASS","Documenti autorevoli, matrici e sette bundle finali verificati","Audit preliminare prima di G02B"
+"T-131","Parsing CSV, JSON e JSONL","PASS_SCOPED_AUTHORITATIVE_CORPUS","303 file strutturati analizzati; errori parsing 0","Corpus versionato final-campaign; output locali rigenerabili esclusi"
+"T-132","Coerenza aritmetica dei contatori","PASS","81 insiemi verificati; errori hard 0","Gli scostamenti non impossibili sono registrati come warning interpretativi"
+"T-133","Dichiarazione del completion model","PASS","86 occorrenze NOT_IMPLEMENTED; valori contrari 0","Non esiste una metrica di completamento applicativo"
+"T-134","Provenienza configurata, osservata, derivata e ottimizzata","PASS_PRELIMINARY_PROVENANCE_LEDGER","Mappa delle evidenze e regole di interpretazione prodotte","Il controllo definitivo verrÃ  ripetuto dopo G02B"
+"T-135","IntegritÃ  numerica","PASS_SCOPED_AUTHORITATIVE_CORPUS","NaN e Infinity non rilevati nel corpus strutturato","Non equivale a validazione semantica di ogni valore"

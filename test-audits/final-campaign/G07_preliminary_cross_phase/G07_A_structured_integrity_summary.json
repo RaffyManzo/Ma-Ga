@@ -1,0 +1,32 @@
+{
+  "status": "PASS",
+  "roots": [
+    "C:\\Users\\raffa\\IdeaProjects\\maga-core\\test-audits\\final-campaign",
+    "C:\\Users\\raffa\\IdeaProjects\\maga-core\\test-results\\final-campaign",
+    "C:\\Users\\raffa\\IdeaProjects\\maga-core\\data\\docs\\testing\\final-campaign"
+  ],
+  "scanned_files": 303,
+  "unique_content_hashes": 299,
+  "files_by_extension": {
+    ".csv": 91,
+    ".json": 210,
+    ".jsonl": 2
+  },
+  "bytes_by_extension": {
+    ".csv": 7464574,
+    ".json": 2490822,
+    ".jsonl": 1093831
+  },
+  "csv_rows": 33283,
+  "json_documents": 210,
+  "jsonl_records": 982,
+  "parse_errors": [],
+  "nonfinite_values": [],
+  "counter_sets_checked": 81,
+  "counter_hard_errors": [],
+  "counter_warnings": [],
+  "task_completion_model_occurrences": 86,
+  "task_completion_model_not_implemented": 86,
+  "task_completion_model_null": 0,
+  "task_completion_model_other": []
+}

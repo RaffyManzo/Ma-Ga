@@ -1,0 +1,66 @@
+{
+    "schemaVersion":  1,
+    "campaign":  "final-test-campaign",
+    "group":  "G07-A",
+    "status":  "PRELIMINARY_PASS_READY_FOR_FIRST_CHAPTER_DRAFT",
+    "scope":  [
+                  "G00",
+                  "G01",
+                  "G02",
+                  "G03",
+                  "G04",
+                  "G05",
+                  "G06",
+                  "G04-R"
+              ],
+    "excluded":  [
+                     "G02B"
+                 ],
+    "finalG07DeferredUntil":  "POST_G02B",
+    "simulationsStarted":  false,
+    "javaChanges":  0,
+    "matricesUpdated":  false,
+    "repository":  {
+                       "branch":  "testing/final-campaign",
+                       "head":  "479cb309eae629d7905683ec48f98e323b226ac2",
+                       "remoteHead":  "479cb309eae629d7905683ec48f98e323b226ac2",
+                       "frozenCoreCommit":  "5a9477735a3d707a5f000a64653cd2a6fc7f2007",
+                       "javaDiffFromFreezeEmpty":  true
+                   },
+    "matrices":  {
+                     "full":  {
+                                  "path":  "Matrice_test_MA_GA_MOSAIC_SUMO_G04R_allineata.xlsx",
+                                  "sheetCount":  18,
+                                  "sha256":  "273691cc24606dd0523d8d82d18a3d3d9a1685ebc9c8c1482b414a8ce3203dc7"
+                              },
+                     "simple":  {
+                                    "path":  "Matrice_semplificata_G04R_allineata.xlsx",
+                                    "sheetCount":  10,
+                                    "sha256":  "0e1875353e762d1241bd5a91649f157eea51ef5f734270e7d445058778f45a96"
+                                }
+                 },
+    "bundlesVerified":  7,
+    "structuredIntegrity":  {
+                                "status":  "PASS",
+                                "scannedFiles":  303,
+                                "uniqueContentHashes":  299,
+                                "jsonDocuments":  210,
+                                "jsonlRecords":  982,
+                                "csvRows":  33283,
+                                "counterSetsChecked":  81,
+                                "parseErrors":  0,
+                                "nonfiniteValues":  0,
+                                "counterHardErrors":  0,
+                                "completionModelNotImplemented":  86
+                            },
+    "reportingVerdicts":  {
+                              "T130":  "PASS",
+                              "T131":  "PASS_SCOPED_AUTHORITATIVE_CORPUS",
+                              "T132":  "PASS",
+                              "T133":  "PASS",
+                              "T134":  "PASS_PRELIMINARY_PROVENANCE_LEDGER",
+                              "T135":  "PASS_SCOPED_AUTHORITATIVE_CORPUS"
+                          },
+    "chapterDecision":  "READY_FOR_FIRST_DRAFT_WITHOUT_G02B",
+    "nextAction":  "REVIEW_G07_A_THEN_ALIGN_MATRICES_AND_WRITE_FIRST_CHAPTER_DRAFT"
+}
