@@ -1,0 +1,65 @@
+{
+    "schemaVersion":  "1.0",
+    "auditId":  "G06-CAUSAL-AUDIT-20260624-181047",
+    "runName":  "log-20260624-173047-MaGaLiteratureBasedUrbanStudy",
+    "verdict":  "PASS_WITH_FORCED_STALE_AND_NO_PRIOR_STRATEGY_LIMIT",
+    "configuration":  {
+                          "diagnosticArtificialGaDelayMs":  300,
+                          "gaParameterScalingMode":  "STATIC",
+                          "durationSeconds":  180,
+                          "seed":  104729
+                      },
+    "jobs":  {
+                 "submitted":  33,
+                 "completed":  33,
+                 "staleDiscarded":  33,
+                 "applied":  0,
+                 "strategyApplications":  0,
+                 "staleRatioPercent":  100
+             },
+    "temporalRecords":  {
+                            "total":  33,
+                            "applied":  0,
+                            "staleDiscarded":  33,
+                            "firstRunTriggers":  33,
+                            "firstRunReuse":  33,
+                            "firstRunWindowActions":  33
+                        },
+    "gaEventTokenCounts":  {
+                               "SUBMITTED":  33,
+                               "COMPLETED":  132,
+                               "APPLIED":  0,
+                               "STALE_DISCARDED":  99,
+                               "STALE":  99
+                           },
+    "overrun":  {
+                    "rows":  66,
+                    "exceedsCurrentAndNextRows":  0
+                },
+    "hardOracles":  {
+                        "pass":  true,
+                        "maximumAbsoluteSnapshotLagSeconds":  0,
+                        "nonZeroLagWindowCount":  0,
+                        "parallelGaViolations":  0,
+                        "futureSnapshotViolations":  0,
+                        "futurePoolViolations":  0,
+                        "invalidPoolBandwidthViolations":  0,
+                        "deltaTMaxMismatchViolations":  0
+                    },
+    "canonicalValidator":  {
+                               "status":  "LITERATURE_SMOKE_TEST_FAILED",
+                               "errors":  [
+                                              "strategyApplications \u003c= 0"
+                                          ],
+                               "expectedExceptionConfirmed":  true,
+                               "modified":  false
+                           },
+    "observabilityLimits":  {
+                                "priorStrategyAvailable":  false,
+                                "keepLastAppliedStrategyObservable":  false,
+                                "scheduledProgressionObservableInStaleRun":  false,
+                                "nonFirstReuseObservableInStaleRun":  false,
+                                "adaptiveWindowObservableInStaleRun":  false,
+                                "exceedsCurrentAndNextObserved":  false
+                            }
+}

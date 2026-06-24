@@ -1,0 +1,19 @@
+{
+    "schemaVersion":  "1.0",
+    "status":  "G06_CAUSAL_AUDIT_COMPLETE",
+    "sourceCommit":  "f43e512ccd3e54cc6cec624f7c9a34080fc66686",
+    "staleRunVerdict":  "PASS_WITH_FORCED_STALE_AND_NO_PRIOR_STRATEGY_LIMIT",
+    "mandatoryTestsRequiringAdditionalRun":  [
+
+                                             ],
+    "G_SPARSE_01":  "SKIP_NOT_REQUIRED_FOR_MANDATORY_G06",
+    "G_ADAPTIVE_01":  "SKIP_OPTIONAL_NON_CANONICAL_T121",
+    "rationale":  {
+                      "G_SPARSE_01":  "Usare solo se un test obbligatorio resta senza evidenza sufficiente dopo l audit cross-run.",
+                      "G_ADAPTIVE_01":  "T-121 e opzionale e non appartiene alla campagna canonica STATIC."
+                  },
+    "matricesUpdated":  false,
+    "simulationStarted":  false,
+    "javaModified":  false,
+    "nextAction":  "G06_D_PREPARE_FORMAL_CLOSURE"
+}
