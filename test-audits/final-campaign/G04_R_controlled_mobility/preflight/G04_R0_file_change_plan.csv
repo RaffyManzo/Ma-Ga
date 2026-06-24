@@ -1,0 +1,6 @@
+﻿"Order","Area","Path_or_Class","Proposed_Action","Required","Java","Effect"
+"1","Campaign overlay","tools/intas-literature-scenario/final_campaign/final_campaign_spec.json or dedicated G04-R overlay","ADD_DEDICATED_CFG_G04_R_HANDOVER","True","False","Define seed, duration, density, resource multipliers and route/probe overlay without changing canonical profiles."
+"2","Mobility route","C:\Users\raffa\IdeaProjects\maga-core\tmp\materialized-literature-scenarios\final-test-campaign\G02_main_factorial_experiments\CFG-H-E\155921\sumo\intas_literature_urban_high_density.rou.xml","REUSE_OR_COPY_SELECTED_RSU0_TO_RSU1_ROUTE_IN_MATERIALIZED_OVERLAY","True","False","Guarantee deterministic rsu_0 to rsu_1 movement for the probe vehicle."
+"3","Workload","MaGaLiveStateConfig.java; LiveSeededPoissonWorkloadGenerator.java","CONFIGURE_EXISTING_TARGET_FILTER","False","False","Select probe vehicle through existing configuration."
+"4","Reporting","LiveAppliedStrategy; LiveStrategyApplier; LiveRuntimeTraceWriter; reporting package","DISCUSS_MINIMAL_DIAGNOSTIC_FIELDS","True","True","Expose vehicle, gateway, coverage and applied target in the same timestamped record; no decision logic change."
+"5","Core MA-GA","src/","NO_CHANGE","False","False","Frozen core remains unchanged."

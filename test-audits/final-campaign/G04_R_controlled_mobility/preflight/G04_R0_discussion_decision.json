@@ -1,0 +1,20 @@
+{
+    "schemaVersion":  "1.0",
+    "status":  "G04_R0_PREFLIGHT_COMPLETE_DISCUSSION_REQUIRED",
+    "routeCandidateAvailable":  true,
+    "routeSelectionBasis":  "GEOMETRY",
+    "workloadTargetability":  "CONFIG_EXPOSED",
+    "reportingReadiness":  "MINIMAL_DIAGNOSTIC_EXTENSION_REQUIRED",
+    "implementationRecommendation":  "MINIMAL_DIAGNOSTIC_REPORTING_EXTENSION_REQUIRED",
+    "javaChangesAuthorized":  false,
+    "simulationAuthorized":  false,
+    "matricesUpdated":  false,
+    "nextAction":  "DISCUSS_G04_R0_PROPOSAL_THEN_PREPARE_SINGLE_BLOCK2_RUN",
+    "discussionRequired":  true,
+    "discussionItems":  [
+                            "The selected route is geometry-based and must be confirmed at runtime.",
+                            "Some critical fields are not confirmed in existing outputs; decide whether a minimal diagnostic extension is needed.",
+                            "Confirm whether localCpuMultiplier=0.5 is acceptable as a fixed enabling condition rather than the variable under test.",
+                            "Confirm the single-run acceptance criteria and the treatment of T-094 as a secondary opportunity, not a forced outcome."
+                        ]
+}

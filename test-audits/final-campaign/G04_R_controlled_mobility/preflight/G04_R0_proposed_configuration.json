@@ -1,0 +1,78 @@
+{
+    "schemaVersion":  "1.0",
+    "preflightId":  "G04-R0-PREFLIGHT-20260624-225957",
+    "status":  "G04_R0_PREFLIGHT_COMPLETE_DISCUSSION_REQUIRED",
+    "sourceCommit":  "8199c49dd6b27d4a641df90eaf4e3b758fc25378",
+    "proposedRun":  {
+                        "runId":  "G04-R-01",
+                        "configId":  "CFG-G04-R-HANDOVER",
+                        "description":  "Controlled rsu_0 to rsu_1 transition with active remote task",
+                        "seed":  104729,
+                        "durationSeconds":  180,
+                        "density":  "low_density",
+                        "workloadProfile":  "WL-I_OR_DEDICATED_PROBE_VARIANT",
+                        "localCpuMultiplier":  0.5,
+                        "edgeCpuMultiplier":  1,
+                        "cloudCpuMultiplier":  1,
+                        "cellBandwidthMultiplier":  1,
+                        "v2vBandwidthMultiplier":  1,
+                        "gaParameterScalingMode":  "STATIC",
+                        "diagnosticArtificialGaDelayMs":  0,
+                        "runCount":  1
+                    },
+    "probe":  {
+                  "vehicleId":  "synthetic_005",
+                  "selectedVehicleFromEvidence":  "synthetic_005",
+                  "routeId":  "route_dual_rsu_switch_04",
+                  "selectionBasis":  "GEOMETRY",
+                  "routeReadiness":  "GEOMETRY_ROUTE_REQUIRES_RUNTIME_CONFIRMATION",
+                  "transitionTimeSeconds":  64.547419259851353,
+                  "routeFile":  "C:\\Users\\raffa\\IdeaProjects\\maga-core\\tmp\\materialized-literature-scenarios\\final-test-campaign\\G02_main_factorial_experiments\\CFG-H-E\\155921\\sumo\\intas_literature_urban_high_density.rou.xml",
+                  "evidenceFile":  "C:\\Users\\raffa\\IdeaProjects\\maga-core\\tmp\\materialized-literature-scenarios\\final-test-campaign\\G02_main_factorial_experiments\\CFG-H-E\\155921\\sumo\\intas_literature_urban_high_density.rou.xml"
+              },
+    "rsus":  {
+                 "rsu_0":  {
+                               "x":  213980.44,
+                               "y":  450429.42,
+                               "radiusMeters":  250
+                           },
+                 "rsu_1":  {
+                               "x":  213897.79,
+                               "y":  450744.66,
+                               "radiusMeters":  250
+                           }
+             },
+    "readiness":  {
+                      "route":  "GEOMETRY_ROUTE_REQUIRES_RUNTIME_CONFIRMATION",
+                      "workloadTargetability":  "CONFIG_EXPOSED",
+                      "reporting":  "MINIMAL_DIAGNOSTIC_EXTENSION_REQUIRED",
+                      "recommendation":  "MINIMAL_DIAGNOSTIC_REPORTING_EXTENSION_REQUIRED"
+                  },
+    "objectives":  {
+                       "primary":  [
+                                       "T-096",
+                                       "T-098"
+                                   ],
+                       "secondary":  [
+                                         "T-091",
+                                         "T-094"
+                                     ],
+                       "excluded":  [
+                                        "T-093"
+                                    ]
+                   },
+    "constraints":  {
+                        "repeatG02Baselines":  false,
+                        "repeatG03HighDensityExtended":  false,
+                        "modifyCore":  false,
+                        "runMosaicInBlock1":  false,
+                        "updateMatricesInBlock1":  false,
+                        "implementationAuthorized":  false
+                    },
+    "discussionItems":  [
+                            "The selected route is geometry-based and must be confirmed at runtime.",
+                            "Some critical fields are not confirmed in existing outputs; decide whether a minimal diagnostic extension is needed.",
+                            "Confirm whether localCpuMultiplier=0.5 is acceptable as a fixed enabling condition rather than the variable under test.",
+                            "Confirm the single-run acceptance criteria and the treatment of T-094 as a secondary opportunity, not a forced outcome."
+                        ]
+}
