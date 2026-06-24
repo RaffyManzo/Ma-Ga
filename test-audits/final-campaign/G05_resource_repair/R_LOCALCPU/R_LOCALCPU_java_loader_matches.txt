@@ -1,0 +1,9 @@
+# Occorrenze Java di localCpuCyclesPerSecond
+
+Commit analizzato: 81ddfd8e97ec8aaf0098cc15a6ef461e76180157
+
+tools/mosaic-live-state-layer/harness/LiveSeededPoissonWorkloadGeneratorHarness.java:225:        cfg.localCpuCyclesPerSecond = localCpu;
+tools/mosaic-live-state-layer/src/org/eclipse/mosaic/app/maga/livestate/MaGaLiveStateConfig.java:21:    long localCpuCyclesPerSecond;
+tools/mosaic-live-state-layer/src/org/eclipse/mosaic/app/maga/livestate/MaGaLiveStateConfig.java:67:        return localCpuCyclesPerSecond;
+tools/mosaic-live-state-layer/src/org/eclipse/mosaic/app/maga/livestate/MaGaLiveStateConfig.java:139:        requirePositive(localCpuCyclesPerSecond, "localCpuCyclesPerSecond", source);
+tools/mosaic-live-state-layer/src/org/eclipse/mosaic/app/maga/livestate/MaGaLiveStateConfig.java:142:            remoteVehicleCpuCyclesPerSecond = localCpuCyclesPerSecond;

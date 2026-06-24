@@ -1,0 +1,59 @@
+{
+    "status":  "READY_FOR_EXECUTION_PREPARATION",
+    "simulationStarted":  false,
+    "javaModified":  false,
+    "branch":  "testing/final-campaign",
+    "sourceCommit":  "81ddfd8e97ec8aaf0098cc15a6ef461e76180157",
+    "frozenCoreCommit":  "5a9477735a3d707a5f000a64653cd2a6fc7f2007",
+    "runId":  "R-LOCALCPU-01",
+    "configId":  "CFG-R-LOCALCPU",
+    "materializationId":  "MAT-CFG-R-LOCALCPU-104729",
+    "materializationDirectory":  "tmp/materialized-literature-scenarios/final-test-campaign/G05_resource_policies_repair/CFG-R-LOCALCPU/104729",
+    "mapping":  {
+                    "materializable":  "yes",
+                    "classification":  "READY_CONFIG_ONLY",
+                    "decisionRequired":  "no",
+                    "notes":  "lambda=1; weights=0.25/0.3/0.45; multipliers cpu=0.5/1/1/1, cell=1, v2v=1, range=1, rtt=1; ga=STATIC, delayMs=0"
+                },
+    "expectedResources":  {
+                              "localCpuCyclesPerSecond":  500000000,
+                              "remoteVehicleCpuCyclesPerSecond":  1000000000,
+                              "edgeCpuCyclesPerSecond":  5000000000,
+                              "cloudCpuCyclesPerSecond":  100000000000,
+                              "cellCapacityBitsPerSecond":  49200000,
+                              "cellRttSeconds":  0.0522,
+                              "v2vNominalBandwidthBitsPerSecond":  4700000,
+                              "v2vSinglehopRadiusMeters":  250
+                          },
+    "observed":  {
+                     "localCpuCyclesPerSecond":  500000000,
+                     "remoteVehicleCpuCyclesPerSecond":  1000000000,
+                     "cellCapacityBitsPerSecond":  49200000,
+                     "cellRttSeconds":  0.0522,
+                     "v2vNominalBandwidthBitsPerSecond":  4700000,
+                     "v2vSinglehopRadiusMeters":  250,
+                     "gaParameterScalingMode":  "STATIC",
+                     "diagnosticArtificialGaDelayMs":  0,
+                     "validationStatus":  "MATERIALIZED_VALIDATED",
+                     "validationErrorCount":  0,
+                     "javaLoaderMatchCount":  5
+                 },
+    "theoreticalLocalExecutionSeconds":  {
+                                             "baseline":  {
+                                                              "light":  0.2,
+                                                              "medium":  0.6,
+                                                              "heavy":  3.2
+                                                          },
+                                             "test":  {
+                                                          "light":  0.4,
+                                                          "medium":  1.2,
+                                                          "heavy":  6.4
+                                                      }
+                                         },
+    "fileHashes":  {
+                       "finalCampaignManifest":  "e9fd1e8c1f81199451e2c88e59bed7d5df044d25fa233ce749d224c543d3faa7",
+                       "liveStateConfig":  "f80d7a8f973bcfe1433267e8abc95f65b079aad4fc6e7d0a5ecc00c57a482391",
+                       "runtimeConfig":  "64ceec5dd062c9786b82818582e284fa117ec3c095b5a0c941b7e7becd93052b",
+                       "validationReport":  "0339f53a240920c76e413cb5d96116f6ae9189fd624f6655c6a34cc72ae0803c"
+                   }
+}
