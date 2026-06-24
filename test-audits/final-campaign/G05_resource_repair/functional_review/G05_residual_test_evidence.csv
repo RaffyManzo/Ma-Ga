@@ -1,0 +1,4 @@
+﻿"Test_ID","Evidence_Required","Applied_Evidence_Count","Stale_Context_Count","Status","Interpretation","Next_Action"
+"T-091","Almeno un gene EDGE in una strategia APPLIED","0","","NOT_OBSERVED","EDGE applicato resta assente se il conteggio e zero.","Non ripetere ora; rivalutare dopo G06 e prima di G02B."
+"T-093","Gene VEHICLE APPLIED con V2V_SCALAR_RELATIVE_SPEED","3","","PASS_RECOVERED","Le decisioni VEHICLE applicate costituiscono evidenza valida del modello V2V.","Nessun rerun dedicato se PASS_RECOVERED."
+"T-094","coverageSufficient=false in una strategia APPLIED","0","4","NOT_OBSERVED_IN_APPLIED_STRATEGIES","I casi presenti solo in risultati stale non costituiscono prova applicata.","Non ripetere ora; rivalutare dopo G06 e prima di G02B."
