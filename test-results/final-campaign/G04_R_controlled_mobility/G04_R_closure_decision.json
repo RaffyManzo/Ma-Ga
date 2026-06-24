@@ -1,0 +1,51 @@
+{
+  "schemaVersion": "1.0",
+  "phase": "G04-R",
+  "finalStatus": "PASS_WITH_RECOVERED_CONTROLLED_MOBILITY_EVIDENCE",
+  "technicalStatus": "PASS_WITH_EXPECTED_STATIC_WORKLOAD_VALIDATOR_REJECTION",
+  "sourceCommit": "5feafbd1942f1f09a809b0941596992fcd67a14a",
+  "runName": "log-20260624-233717-MaGaLiteratureBasedUrbanStudy",
+  "tests": {
+    "T-091": "EVIDENZA_PARZIALE",
+    "T-093": "NOT_REPEATED_ALREADY_PASS_RECOVERED",
+    "T-094": "NON_OSSERVATO",
+    "T-096": "PASS",
+    "T-098": "PASS"
+  },
+  "metrics": {
+    "transitionTimeSeconds": 81.8,
+    "probeSnapshotCount": 1548,
+    "probeTaskSnapshotCount": 400,
+    "appliedRemoteProbeGeneCount": 123,
+    "gaJobsSubmitted": 760,
+    "gaJobsCompleted": 760,
+    "gaJobsApplied": 754,
+    "staleCount": 6,
+    "staleRatioPercent": 0.789474,
+    "maximumAbsoluteSnapshotLagSeconds": 0,
+    "runtimeViolationCount": 0
+  },
+  "validator": {
+    "status": "LITERATURE_SMOKE_TEST_FAILED",
+    "expected": true,
+    "onlyError": "tasksGeneratedCumulative <= 0"
+  },
+  "javaModified": false,
+  "validTargetedRunCount": 1,
+  "totalMosaicAttempts": 2,
+  "priorInvalidHarnessRunCount": 1,
+  "matrices": {
+    "full": "Matrice_test_MA_GA_MOSAIC_SUMO_G04R_allineata.xlsx",
+    "simple": "Matrice_semplificata_G04R_allineata.xlsx",
+    "fullSheetCount": 18,
+    "simpleSheetCount": 10
+  },
+  "nextSequence": [
+    "PRELIMINARY_G07",
+    "FIRST_EXPERIMENTAL_CHAPTER_DRAFT",
+    "REDUCED_HANDOFF_TO_NEW_CONVERSATION",
+    "G02B_EXPERIMENTAL_BRANCH",
+    "INTEGRATE_G02B_RESULTS",
+    "FINAL_G07"
+  ]
+}
