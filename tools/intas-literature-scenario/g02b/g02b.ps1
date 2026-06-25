@@ -47,10 +47,17 @@ function Invoke-G02BPython {
 }
 
 function Get-GitValue {
-    param([string[]]$Args)
-    $value = & git -c "safe.directory=$($RepoRoot.Path.Replace('\', '/'))" -C $RepoRoot @Args
+    param(
+        [Parameter(Mandatory = $true)]
+        [ValidateNotNullOrEmpty()]
+        [string[]]$GitArguments
+    )
+    if ($GitArguments.Count -eq 0) {
+        throw "Get-GitValue requires at least one Git argument"
+    }
+    $value = & git -c "safe.directory=$($RepoRoot.Path.Replace('\', '/'))" -C $RepoRoot @GitArguments
     if ($LASTEXITCODE -ne 0) {
-        throw "git $($Args -join ' ') failed"
+        throw "git $($GitArguments -join ' ') failed"
     }
     return ($value | Out-String).Trim()
 }
@@ -65,12 +72,12 @@ function Resolve-G02BMaybeRelative {
 
 function Assert-G02BExecutionAllowed {
     $spec = Get-Content -Raw -Path $SpecPath | ConvertFrom-Json
-    $branch = Get-GitValue @("branch", "--show-current")
-    $head = Get-GitValue @("rev-parse", "HEAD")
-    $remoteHead = Get-GitValue @("rev-parse", "origin/$($spec.branch)")
-    $baseHead = Get-GitValue @("rev-parse", $spec.baseBranch)
-    $remoteBaseHead = Get-GitValue @("rev-parse", "origin/$($spec.baseBranch)")
-    $status = Get-GitValue @("status", "--short")
+    $branch = Get-GitValue -GitArguments @("branch", "--show-current")
+    $head = Get-GitValue -GitArguments @("rev-parse", "HEAD")
+    $remoteHead = Get-GitValue -GitArguments @("rev-parse", "origin/$($spec.branch)")
+    $baseHead = Get-GitValue -GitArguments @("rev-parse", $spec.baseBranch)
+    $remoteBaseHead = Get-GitValue -GitArguments @("rev-parse", "origin/$($spec.baseBranch)")
+    $status = Get-GitValue -GitArguments @("status", "--short")
     if ($branch -eq $spec.baseBranch) {
         throw "Refusing to run on $($spec.baseBranch)"
     }
@@ -87,7 +94,7 @@ function Assert-G02BExecutionAllowed {
     if ($baseHead -ne $spec.baseHead -or $remoteBaseHead -ne $spec.baseHead) {
         throw "Base branch $($spec.baseBranch) is not at expected commit $($spec.baseHead)"
     }
-    $javaChanges = Get-GitValue @("diff", "--name-only", "$($spec.implementationBaseCommit)..HEAD", "--", "*.java")
+    $javaChanges = Get-GitValue -GitArguments @("diff", "--name-only", "$($spec.implementationBaseCommit)..HEAD", "--", "*.java")
     if (-not [string]::IsNullOrWhiteSpace($javaChanges)) {
         throw "Java changes were introduced after implementation base:`n$javaChanges"
     }
