@@ -1,0 +1,92 @@
+{
+  "schemaVersion": "1.0",
+  "campaignId": "G02B_controlled_ablation",
+  "implementationBaseCommit": "39751f5f0532f7a077a03df92627616683cb887d",
+  "implementationBaseSubject": "feat(g02b): expose controlled ablation variants",
+  "origin": "https://github.com/RaffyManzo/Ma-Ga",
+  "branch": "experiment/g02b-ablation",
+  "baseBranch": "testing/final-campaign",
+  "baseHead": "790c7cf29d72e6e9b9b2717a48f4f4e44a28ad57",
+  "scenarioName": "MaGaLiteratureBasedUrbanStudy",
+  "sourceCampaignId": "final-test-campaign",
+  "sourceGroupId": "G02",
+  "sourceGroup": "G02_main_factorial_experiments",
+  "scientificConfigs": [
+    "CFG-N-I",
+    "CFG-N-S",
+    "CFG-H-I"
+  ],
+  "excludedConfigs": [
+    "CFG-H-S"
+  ],
+  "seeds": [
+    104729,
+    130363,
+    155921,
+    181081,
+    207547
+  ],
+  "scientificVariants": [
+    "LOCAL_ONLY",
+    "NO_MOBILITY_PENALTY",
+    "COLD_START_NO_REUSE"
+  ],
+  "smokeConfig": "CFG-SMOKE",
+  "smokeSeed": 104729,
+  "smokeVariants": [
+    "FULL_MA_GA",
+    "LOCAL_ONLY",
+    "NO_MOBILITY_PENALTY",
+    "COLD_START_NO_REUSE"
+  ],
+  "allowedVariants": [
+    "FULL_MA_GA",
+    "LOCAL_ONLY",
+    "NO_MOBILITY_PENALTY",
+    "COLD_START_NO_REUSE"
+  ],
+  "paths": {
+    "officialPlan": "data/docs/testing/final-campaign/scenario_instance_plan.csv",
+    "sourceCampaignRoot": "tmp/materialized-literature-scenarios/final-test-campaign",
+    "g02bScenarioRoot": "tmp/materialized-literature-scenarios/g02b-ablation",
+    "stateRoot": "tmp/g02b-ablation/state",
+    "resultRoot": "tmp/g02b-ablation/results",
+    "baselineMetrics": "test-results/final-campaign/G02_main_factorial_experiments/metrics_G02_runs.csv",
+    "baselineSummariesRoot": "test-results/final-campaign/G02_main_factorial_experiments/run-summaries",
+    "runtimeJar": "tools/mosaic-live-maga-runtime/out/maga-live-maga-runtime.jar",
+    "scientificPlan": "tools/intas-literature-scenario/g02b/plans/g02b_scientific_plan.csv",
+    "smokePlan": "tools/intas-literature-scenario/g02b/plans/g02b_smoke_plan.csv"
+  },
+  "runtimeConfigRelativePath": "application/ma_ga_live_runtime_config.json",
+  "sourceManifestRelativePath": "final_campaign_manifest.json",
+  "g02bManifestRelativePath": "g02b_manifest.json",
+  "preparedValidationRelativePath": "reports/g02b_pre_run_validation.json",
+  "runContextFileName": "g02b_run_context.json",
+  "postRunValidationFileName": "g02b_variant_validation.json",
+  "causalJobsFileName": "g02b_causal_job_records.csv",
+  "canonicalValidatorFileName": "literature_smoke_validation.json",
+  "weightTolerance": 1.0E-9,
+  "expectedWeights": {
+    "standard": {
+      "wT": 0.35,
+      "wL": 0.25,
+      "wM": 0.25,
+      "wR": 0.15
+    },
+    "noMobilityPenalty": {
+      "wT": 0.4666666666666667,
+      "wL": 0.3333333333333333,
+      "wM": 0.0,
+      "wR": 0.2
+    }
+  },
+  "allowedDifferingFiles": [
+    "application/ma_ga_live_runtime_config.json",
+    "g02b_manifest.json",
+    "reports/g02b_pre_run_validation.json"
+  ],
+  "noMobilityPenalty": {
+    "fitnessTotalComparableWithBaseline": false,
+    "reason": "NO_MOBILITY_PENALTY changes the objective function by setting wM to zero and renormalizing the remaining weights."
+  }
+}
