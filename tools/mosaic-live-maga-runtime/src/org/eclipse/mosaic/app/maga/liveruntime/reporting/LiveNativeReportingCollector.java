@@ -21,8 +21,11 @@ public final class LiveNativeReportingCollector implements AutoCloseable {
 
     private final String scenarioName;
     private final String profile;
+    private final String experimentalVariant;
     private final String bridgeDescription;
     private final String sourceMode;
+    private final String optimizationSourceDescription;
+    private final String populationReusePolicyDescription;
     private final String configuredCellProfile;
     private final String runtimeAccountingSource;
     private final Path reportingDir;
@@ -38,15 +41,21 @@ public final class LiveNativeReportingCollector implements AutoCloseable {
             Path runtimeOutputDir,
             String scenarioName,
             String profile,
+            String experimentalVariant,
             String bridgeDescription,
             String sourceMode,
+            String optimizationSourceDescription,
+            String populationReusePolicyDescription,
             String configuredCellProfile,
             String runtimeAccountingSource
     ) throws IOException {
         this.scenarioName = scenarioName;
         this.profile = profile;
+        this.experimentalVariant = experimentalVariant;
         this.bridgeDescription = bridgeDescription;
         this.sourceMode = sourceMode;
+        this.optimizationSourceDescription = optimizationSourceDescription;
+        this.populationReusePolicyDescription = populationReusePolicyDescription;
         this.configuredCellProfile = configuredCellProfile;
         this.runtimeAccountingSource = runtimeAccountingSource;
         this.reportingDir = runtimeOutputDir.resolve("live-reporting");
@@ -209,6 +218,9 @@ public final class LiveNativeReportingCollector implements AutoCloseable {
         LiveReportingSummary summary = LiveReportingSummary.from(
                 scenarioName,
                 profile,
+                experimentalVariant,
+                optimizationSourceDescription,
+                populationReusePolicyDescription,
                 bridgeDescription,
                 sourceMode,
                 configuredCellProfile,
@@ -216,6 +228,7 @@ public final class LiveNativeReportingCollector implements AutoCloseable {
                 snapshotRecords(),
                 appliedWindowSummaries,
                 discardedWindowSummaries,
+                maGaConfig,
                 reportingDir
         );
         return new LiveDetailedReportWriter().write(

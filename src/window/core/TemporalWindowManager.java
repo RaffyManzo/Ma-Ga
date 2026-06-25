@@ -80,6 +80,32 @@ public final class TemporalWindowManager {
             DynamicityEvaluator dynamicityEvaluator,
             PopulationAdapter populationAdapter,
             PopulationReuseDecisionPolicy reuseDecisionPolicy,
+            CriticalEventDetector criticalEventDetector,
+            SystemStateSource systemStateSource,
+            int targetPopulationSize
+    ) {
+        this(
+                windowConfig,
+                optimizer,
+                dynamicityEvaluator,
+                populationAdapter,
+                reuseDecisionPolicy,
+                defaultAdaptiveWindowController(
+                        windowConfig,
+                        optimizerMobilityConfig(optimizer)
+                ),
+                criticalEventDetector,
+                systemStateSource,
+                targetPopulationSize
+        );
+    }
+
+    public TemporalWindowManager(
+            TemporalWindowConfig windowConfig,
+            MaGaOptimizer optimizer,
+            DynamicityEvaluator dynamicityEvaluator,
+            PopulationAdapter populationAdapter,
+            PopulationReuseDecisionPolicy reuseDecisionPolicy,
             AdaptiveWindowController adaptiveWindowController,
             CriticalEventDetector criticalEventDetector,
             SystemStateSource systemStateSource,

@@ -14,7 +14,10 @@ import window.core.TemporalWindowManager;
 import window.dynamicity.DynamicityEvaluator;
 import window.event.CriticalEventDetector;
 import window.population.PopulationAdapter;
+import window.population.PopulationReuseDecisionPolicy;
+import window.source.LocalOnlySystemStateSource;
 import window.source.MosaicSystemStateSource;
+import window.source.SystemStateSource;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -30,7 +33,7 @@ public class MaGaLiveRuntimeCoordinatorApp extends AbstractApplication<ServerOpe
     private MaGaLiveRuntimeConfig runtimeConfig;
     private LiveStateLayerRuntimeFacade stateFacade;
     private MaGaLiveMosaicSnapshotBridge bridge;
-    private MosaicSystemStateSource systemStateSource;
+    private SystemStateSource systemStateSource;
     private LiveStrategyApplier strategyApplier;
     private LiveRuntimeTraceWriter traceWriter;
     private LiveNativeReportingCollector reportingCollector;
@@ -41,11 +44,27 @@ public class MaGaLiveRuntimeCoordinatorApp extends AbstractApplication<ServerOpe
     @Override
     public void onStartup() {
         runtimeConfig = MaGaLiveRuntimeConfig.load(getOs().getConfigurationPath());
+        MaGaExperimentalVariant experimentalVariant = runtimeConfig.getExperimentalVariant();
         stateFacade = LiveStateLayerRuntimeFacade.load(getOs().getConfigurationPath());
         stateFacade.resetForRun();
         bridge = new MaGaLiveMosaicSnapshotBridge();
-        systemStateSource = new MosaicSystemStateSource(bridge);
+        MosaicSystemStateSource mosaicSystemStateSource = new MosaicSystemStateSource(bridge);
+        systemStateSource = experimentalVariant == MaGaExperimentalVariant.LOCAL_ONLY
+                ? new LocalOnlySystemStateSource(mosaicSystemStateSource)
+                : mosaicSystemStateSource;
         strategyApplier = new LiveStrategyApplier();
+
+        TemporalWindowConfig temporalConfig = TemporalWindowConfig.configuredBoundsForReplay(
+                runtimeConfig.getTemporalInitialWindowSeconds(),
+                runtimeConfig.getConfiguredGaRuntimeEstimateSeconds(),
+                runtimeConfig.getConfiguredMaxWindowSeconds()
+        );
+        GaParameterScalingMode scalingMode = runtimeConfig.getGaParameterScalingMode();
+        maGaConfig = experimentalVariant.applyTo(MaGaConfig.defaultConfig(scalingMode));
+        PopulationReuseDecisionPolicy reuseDecisionPolicy =
+                experimentalVariant == MaGaExperimentalVariant.COLD_START_NO_REUSE
+                        ? PopulationReuseDecisionPolicy.forcedColdStartNoReuse(temporalConfig)
+                        : new PopulationReuseDecisionPolicy(temporalConfig);
 
         try {
             runDirectory = resolveRunDirectory();
@@ -59,8 +78,11 @@ public class MaGaLiveRuntimeCoordinatorApp extends AbstractApplication<ServerOpe
                         traceWriter.getOutputDir(),
                         runtimeConfig.getScenarioName(),
                         runtimeConfig.profileName(),
+                        experimentalVariant.name(),
                         bridge.getDescription(),
                         String.valueOf(systemStateSource.getMode()),
+                        systemStateSource.getDescription(),
+                        reuseDecisionPolicy.getDescription(),
                         stateFacade.configuredCellProfileSummary(),
                         stateFacade.runtimeAccountingSource()
                 );
@@ -69,13 +91,6 @@ public class MaGaLiveRuntimeCoordinatorApp extends AbstractApplication<ServerOpe
             throw new IllegalStateException("Unable to open live MA-GA runtime traces", e);
         }
 
-        TemporalWindowConfig temporalConfig = TemporalWindowConfig.configuredBoundsForReplay(
-                runtimeConfig.getTemporalInitialWindowSeconds(),
-                runtimeConfig.getConfiguredGaRuntimeEstimateSeconds(),
-                runtimeConfig.getConfiguredMaxWindowSeconds()
-        );
-        GaParameterScalingMode scalingMode = runtimeConfig.getGaParameterScalingMode();
-        maGaConfig = MaGaConfig.defaultConfig(scalingMode);
         MaGaOptimizer optimizer = new MaGaOptimizer(maGaConfig);
         DynamicityEvaluator dynamicityEvaluator =
                 new DynamicityEvaluator(temporalConfig, maGaConfig.getMobilityConfig());
@@ -88,6 +103,7 @@ public class MaGaLiveRuntimeCoordinatorApp extends AbstractApplication<ServerOpe
                 optimizer,
                 dynamicityEvaluator,
                 populationAdapter,
+                reuseDecisionPolicy,
                 criticalEventDetector,
                 systemStateSource,
                 maGaConfig.getGeneticAlgorithmConfig().getPopulationSize()
@@ -109,8 +125,10 @@ public class MaGaLiveRuntimeCoordinatorApp extends AbstractApplication<ServerOpe
                 "LIVE_MAGA_RUNTIME_COORDINATOR_START"
                         + "|serverId=" + getOs().getId()
                         + "|profile=" + runtimeConfig.profileName()
+                        + "|experimentalVariant=" + experimentalVariant
                         + "|gaParameterScalingMode=" + scalingMode
                         + "|bridgeDescription=" + bridge.getDescription()
+                        + "|optimizationSourceDescription=" + systemStateSource.getDescription()
                         + "|sourceMode=" + systemStateSource.getMode()
                         + "|traceDir=" + traceWriter.getOutputDir().getFileName()
         );
@@ -206,6 +224,7 @@ public class MaGaLiveRuntimeCoordinatorApp extends AbstractApplication<ServerOpe
                 "LIVE_MAGA_RUNTIME_COORDINATOR_STOP"
                         + "|serverId=" + getOs().getId()
                         + "|profile=" + runtimeConfig.profileName()
+                        + "|experimentalVariant=" + runtimeConfig.getExperimentalVariant()
                         + "|gaParameterScalingMode=" + runtimeConfig.getGaParameterScalingMode()
                         + "|snapshotsRequested=" + bridge.getSnapshotsRequested()
                         + "|snapshotsResolved=" + bridge.getSnapshotsResolved()

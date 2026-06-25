@@ -162,6 +162,20 @@ public final class SystemStateObservation {
     public SystemStateObservation withOptimizationSnapshot(
             SystemSnapshot updatedOptimizationSnapshot
     ) {
+        return withOptimizationSnapshotAndDescription(
+                updatedOptimizationSnapshot,
+                sourceDescription
+        );
+    }
+
+    /**
+     * Restituisce una nuova osservazione mantenendo lo snapshot grezzo e
+     * sostituendo la vista destinata al GA e la descrizione diagnostica.
+     */
+    public SystemStateObservation withOptimizationSnapshotAndDescription(
+            SystemSnapshot updatedOptimizationSnapshot,
+            String updatedSourceDescription
+    ) {
         Objects.requireNonNull(
                 updatedOptimizationSnapshot,
                 "updatedOptimizationSnapshot must not be null."
@@ -172,7 +186,7 @@ public final class SystemStateObservation {
                 requestedObservationTimeSeconds,
                 sourceObservationTimeSeconds,
                 sourceMode,
-                sourceDescription,
+                updatedSourceDescription,
                 sequenceIndex,
                 exactTimeMatch
         );

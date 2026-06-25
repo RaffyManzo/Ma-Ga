@@ -31,8 +31,11 @@ public final class LiveNativeDetailedReportingHarness {
                 output,
                 "HarnessScenario",
                 "normal",
+                "FULL_MA_GA",
                 "LIVE_CAUSAL_MOSAIC_SNAPSHOT_BRIDGE",
                 "MOSAIC_LIVE",
+                "LIVE_CAUSAL_MOSAIC_SNAPSHOT_BRIDGE",
+                "standard adaptive population reuse policy",
                 "profileId=CELL_5G_AVEIRO_P50|source=LITERATURE_BASED_CONFIGURED_CELL_PROFILE",
                 "DIAGNOSTIC_RUNTIME_ACCOUNTING_FROM_CONTROLLED_CELL_MESSAGES"
         );
@@ -91,10 +94,24 @@ public final class LiveNativeDetailedReportingHarness {
 
         String txt = Files.readString(artifacts.getTxt());
         require(txt.contains("LIVE GA JOB SUMMARY"), "live summary section missing");
+        require(txt.contains("experimentalVariant: FULL_MA_GA"), "txt experimental variant missing");
+        require(txt.contains("effectiveFitnessWeights:"), "txt fitness weights missing");
+        require(txt.contains("optimizationSourceDescription:"), "txt optimization source missing");
+        require(txt.contains("populationReusePolicyDescription:"), "txt reuse policy missing");
         require(txt.contains("HISTORICAL CORE REPORT SECTIONS FROM APPLIED LIVE STEPS"), "historical applied-step section missing");
         require(!txt.contains("snapshot_stale | APPLIED"), "stale step must not be reported as applied");
 
+        String markdown = Files.readString(artifacts.getMarkdown());
+        require(markdown.contains("Experimental variant: `FULL_MA_GA`"), "markdown experimental variant missing");
+        require(markdown.contains("Effective fitness weights:"), "markdown fitness weights missing");
+        require(markdown.contains("Optimization source:"), "markdown optimization source missing");
+        require(markdown.contains("Population reuse policy:"), "markdown reuse policy missing");
+
         String json = Files.readString(artifacts.getJson());
+        require(json.contains("\"experimentalVariant\": \"FULL_MA_GA\""), "json experimental variant missing");
+        require(json.contains("\"effectiveFitnessWeights\""), "json fitness weights missing");
+        require(json.contains("\"optimizationSourceDescription\""), "json optimization source missing");
+        require(json.contains("\"populationReusePolicyDescription\""), "json reuse policy missing");
         require(json.contains("\"applied\": 1"), "json applied count mismatch");
         require(json.contains("\"staleDiscarded\": 1"), "json stale count mismatch");
         require(json.contains("\"failed\": 1"), "json failed count mismatch");

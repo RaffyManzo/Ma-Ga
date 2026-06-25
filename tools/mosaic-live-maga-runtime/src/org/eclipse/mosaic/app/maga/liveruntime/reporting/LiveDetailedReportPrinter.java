@@ -41,8 +41,12 @@ final class LiveDetailedReportPrinter {
         title(out, "LIVE REPORT METADATA");
         out.println("scenarioName: " + summary.scenarioName);
         out.println("profile: " + summary.profile);
+        out.println("experimentalVariant: " + summary.experimentalVariant);
+        out.println("effectiveFitnessWeights: " + summary.effectiveFitnessWeights);
         out.println("bridgeDescription: " + summary.bridgeDescription);
         out.println("sourceMode: " + summary.sourceMode);
+        out.println("optimizationSourceDescription: " + summary.optimizationSourceDescription);
+        out.println("populationReusePolicyDescription: " + summary.populationReusePolicyDescription);
         out.println("construction: native live records; no replay; no GA re-execution");
         out.println();
     }

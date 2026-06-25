@@ -33,6 +33,7 @@ public final class MaGaLiveRuntimeConfig {
     boolean nativeLiveDetailedReportingEnabled;
     boolean nativeLiveDetailedReportPrintToConsole;
     String gaParameterScalingMode;
+    String experimentalVariant;
 
     public static MaGaLiveRuntimeConfig load(File configurationPath) {
         if (configurationPath == null) {
@@ -98,6 +99,10 @@ public final class MaGaLiveRuntimeConfig {
         return GaParameterScalingMode.valueOf(gaParameterScalingMode);
     }
 
+    public MaGaExperimentalVariant getExperimentalVariant() {
+        return MaGaExperimentalVariant.parse(experimentalVariant, null);
+    }
+
     public String getScenarioName() {
         return scenarioName == null || scenarioName.isBlank()
                 ? "MaGaLiveMagaRuntimeStudy"
@@ -132,6 +137,7 @@ public final class MaGaLiveRuntimeConfig {
                 );
             }
         }
+        experimentalVariant = MaGaExperimentalVariant.parse(experimentalVariant, source).name();
         requirePositive(coordinatorTickIntervalMs, "coordinatorTickIntervalMs", source);
         requirePositive(initialOptimizationDelayMs, "initialOptimizationDelayMs", source);
         requirePositive(gaPollingIntervalMs, "gaPollingIntervalMs", source);

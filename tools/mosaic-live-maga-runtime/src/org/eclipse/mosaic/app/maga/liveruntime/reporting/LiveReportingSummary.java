@@ -1,5 +1,8 @@
 package org.eclipse.mosaic.app.maga.liveruntime.reporting;
 
+import config.MaGaConfig;
+import config.fitness.FitnessWeights;
+
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -10,8 +13,12 @@ import java.util.Map;
 public final class LiveReportingSummary {
     public final String scenarioName;
     public final String profile;
+    public final String experimentalVariant;
+    public final Map<String, Double> effectiveFitnessWeights;
     public final String bridgeDescription;
     public final String sourceMode;
+    public final String optimizationSourceDescription;
+    public final String populationReusePolicyDescription;
     public final String configuredCellProfile;
     public final String runtimeAccountingSource;
     public final int submitted;
@@ -34,8 +41,12 @@ public final class LiveReportingSummary {
     private LiveReportingSummary(
             String scenarioName,
             String profile,
+            String experimentalVariant,
+            Map<String, Double> effectiveFitnessWeights,
             String bridgeDescription,
             String sourceMode,
+            String optimizationSourceDescription,
+            String populationReusePolicyDescription,
             String configuredCellProfile,
             String runtimeAccountingSource,
             List<LiveGaJobRecord> records,
@@ -45,8 +56,12 @@ public final class LiveReportingSummary {
     ) {
         this.scenarioName = scenarioName;
         this.profile = profile;
+        this.experimentalVariant = experimentalVariant;
+        this.effectiveFitnessWeights = Map.copyOf(effectiveFitnessWeights);
         this.bridgeDescription = bridgeDescription;
         this.sourceMode = sourceMode;
+        this.optimizationSourceDescription = optimizationSourceDescription;
+        this.populationReusePolicyDescription = populationReusePolicyDescription;
         this.configuredCellProfile = configuredCellProfile;
         this.runtimeAccountingSource = runtimeAccountingSource;
         this.jobRecords = List.copyOf(records);
@@ -105,6 +120,9 @@ public final class LiveReportingSummary {
     static LiveReportingSummary from(
             String scenarioName,
             String profile,
+            String experimentalVariant,
+            String optimizationSourceDescription,
+            String populationReusePolicyDescription,
             String bridgeDescription,
             String sourceMode,
             String configuredCellProfile,
@@ -112,6 +130,7 @@ public final class LiveReportingSummary {
             List<LiveGaJobRecord> records,
             List<LiveWindowSummary> appliedWindowSummaries,
             List<LiveWindowSummary> discardedWindowSummaries,
+            MaGaConfig maGaConfig,
             Path reportingDir
     ) {
         Map<String, String> artifacts = new LinkedHashMap<>();
@@ -125,8 +144,12 @@ public final class LiveReportingSummary {
         return new LiveReportingSummary(
                 scenarioName,
                 profile,
+                experimentalVariant,
+                fitnessWeights(maGaConfig),
                 bridgeDescription,
                 sourceMode,
+                optimizationSourceDescription,
+                populationReusePolicyDescription,
                 configuredCellProfile,
                 runtimeAccountingSource,
                 records,
@@ -134,6 +157,16 @@ public final class LiveReportingSummary {
                 discardedWindowSummaries,
                 artifacts
         );
+    }
+
+    private static Map<String, Double> fitnessWeights(MaGaConfig maGaConfig) {
+        FitnessWeights weights = maGaConfig.getFitnessWeights();
+        Map<String, Double> values = new LinkedHashMap<>();
+        values.put("wT", weights.getCompletionTimeWeight());
+        values.put("wL", weights.getCommunicationLatencyWeight());
+        values.put("wM", weights.getMobilityPenaltyWeight());
+        values.put("wR", weights.getResourcePenaltyWeight());
+        return values;
     }
 
     private static Map<String, Object> timing(List<LiveGaJobRecord> records) {

@@ -53,15 +53,46 @@ public final class PopulationReuseDecisionPolicy {
 
     private static final double VERY_HIGH_SINGLE_COMPONENT_SPIKE = 0.85;
     private static final double MODERATE_LOW_DYNAMICITY_FOR_WARM = 0.42;
+    private static final String STANDARD_DESCRIPTION = "standard adaptive population reuse policy";
+    private static final String FORCED_COLD_DESCRIPTION =
+            "forced cold start after first run (G02B no-reuse variant)";
 
     private final TemporalWindowConfig config;
+    private final boolean forceColdStartAfterFirstRun;
+    private final String description;
 
     public PopulationReuseDecisionPolicy() {
         this(TemporalWindowConfig.defaultConfig());
     }
 
     public PopulationReuseDecisionPolicy(TemporalWindowConfig config) {
+        this(config, false, STANDARD_DESCRIPTION);
+    }
+
+    private PopulationReuseDecisionPolicy(
+            TemporalWindowConfig config,
+            boolean forceColdStartAfterFirstRun,
+            String description
+    ) {
         this.config = Objects.requireNonNull(config, "config must not be null.");
+        this.forceColdStartAfterFirstRun = forceColdStartAfterFirstRun;
+        this.description = description == null || description.isBlank()
+                ? STANDARD_DESCRIPTION
+                : description;
+    }
+
+    public static PopulationReuseDecisionPolicy forcedColdStartNoReuse(
+            TemporalWindowConfig config
+    ) {
+        return new PopulationReuseDecisionPolicy(
+                config,
+                true,
+                FORCED_COLD_DESCRIPTION
+        );
+    }
+
+    public String getDescription() {
+        return description;
     }
 
     public PopulationReuseDecision decide(
@@ -80,6 +111,24 @@ public final class PopulationReuseDecisionPolicy {
         boolean spike = hasComponentSpike(dynamicityBreakdown);
         boolean severeSpike = hasSevereComponentSpike(dynamicityBreakdown);
         boolean criticalTaskLinkSpike = hasCriticalTaskLinkSpike(dynamicityBreakdown);
+
+        if (forceColdStartAfterFirstRun) {
+            PopulationReuseMode appliedMode = dynamicityBreakdown.isFirstRun()
+                    ? PopulationReuseMode.FIRST_RUN
+                    : PopulationReuseMode.COLD_START;
+            return new PopulationReuseDecision(
+                    baseMode,
+                    appliedMode,
+                    dynamicityBreakdown.isFirstRun()
+                            ? WindowPerformanceSignal.UNKNOWN
+                            : previousSignal,
+                    spike,
+                    severeSpike,
+                    dynamicityBreakdown.isFirstRun()
+                            ? "First run: no previous population exists."
+                            : "Cold start forced by G02B no-reuse variant."
+            );
+        }
 
         if (baseMode == PopulationReuseMode.FIRST_RUN) {
             return PopulationReuseDecision.unchanged(

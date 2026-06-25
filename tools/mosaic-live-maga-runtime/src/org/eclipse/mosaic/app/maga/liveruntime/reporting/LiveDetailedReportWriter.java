@@ -46,8 +46,12 @@ public final class LiveDetailedReportWriter {
         builder.append("# Native Live Detailed Execution Report\n\n");
         builder.append("- Scenario: `").append(summary.scenarioName).append("`\n");
         builder.append("- Profile: `").append(summary.profile).append("`\n");
+        builder.append("- Experimental variant: `").append(summary.experimentalVariant).append("`\n");
         builder.append("- Bridge: `").append(summary.bridgeDescription).append("`\n");
         builder.append("- Source mode: `").append(summary.sourceMode).append("`\n");
+        builder.append("- Optimization source: `").append(summary.optimizationSourceDescription).append("`\n");
+        builder.append("- Population reuse policy: `").append(summary.populationReusePolicyDescription).append("`\n");
+        builder.append("- Effective fitness weights: `").append(summary.effectiveFitnessWeights).append("`\n");
         builder.append("- Submitted jobs: `").append(summary.submitted).append("`\n");
         builder.append("- Applied jobs: `").append(summary.applied).append("`\n");
         builder.append("- Stale discarded jobs: `").append(summary.staleDiscarded).append("`\n");

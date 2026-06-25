@@ -290,7 +290,7 @@ try {
     Assert-NoJavacInternalFailure -Output $JavacResult.Combined
 
     # Expected class count for the frozen MA-GA + MOSAIC live runtime source set.
-    $ExpectedFrozenClassCount = 252
+    $ExpectedFrozenClassCount = 254
     $ActualClassCount = (Get-ChildItem -LiteralPath $StagingClassesDir -Recurse -Filter "*.class" -File).Count
     if ($ActualClassCount -ne $ExpectedFrozenClassCount) {
         throw "Unexpected class count: expected=$ExpectedFrozenClassCount actual=$ActualClassCount"
