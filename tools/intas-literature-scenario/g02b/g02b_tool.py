@@ -617,13 +617,47 @@ def validate_prepared_row(row: dict[str, str]) -> dict[str, Any]:
     for key in ("durationSeconds", "densityProfile", "workloadProfile", "gaParameterScalingMode"):
         if config.get(key) != source_config.get(key):
             raise G02BError(f"{key} changed for {row['run_id']}")
-    if row["duration_seconds"] and str(config.get("durationSeconds")) != str(row["duration_seconds"]):
-        raise G02BError(f"Duration mismatch for {row['run_id']}")
-    if row["density"] and row["density"] not in (str(config.get("densityProfile")), str(final_manifest.get("density"))):
+    official_sources = source_index(spec)
+    official_key = source_key(row["config_id"], int(row["seed"]))
+    if official_key not in official_sources:
+        raise G02BError(f"Missing official source plan row for {row['run_id']}")
+    official_source_row = official_sources[official_key]
+
+    if row["duration_seconds"]:
+        source_duration = numeric(
+            row_duration_seconds(official_source_row, final_manifest, source_config)
+        )
+        planned_duration = numeric(row["duration_seconds"])
+        if (
+            source_duration is None
+            or planned_duration is None
+            or abs(source_duration - planned_duration) > 1.0e-9
+        ):
+            raise G02BError(f"Duration mismatch for {row['run_id']}")
+
+    authoritative_density = row_field(
+        official_source_row, final_manifest, source_config, "density", "densityProfile"
+    )
+    if row["density"] and row["density"].strip() != authoritative_density.strip():
         raise G02BError(f"Density mismatch for {row['run_id']}")
-    if row["workload"] and row["workload"] not in (str(config.get("workloadProfile")), str(final_manifest.get("workload"))):
+
+    authoritative_workload = row_field(
+        official_source_row, final_manifest, source_config, "workload", "workloadProfile"
+    )
+    if row["workload"] and row["workload"].strip() != authoritative_workload.strip():
         raise G02BError(f"Workload mismatch for {row['run_id']}")
-    if row["ga_parameter_scaling_mode"] and row["ga_parameter_scaling_mode"] != str(config.get("gaParameterScalingMode")):
+
+    authoritative_ga_mode = row_field(
+        official_source_row,
+        final_manifest,
+        source_config,
+        "ga_parameter_scaling_mode",
+        "gaParameterScalingMode",
+    )
+    if (
+        row["ga_parameter_scaling_mode"]
+        and row["ga_parameter_scaling_mode"].strip() != authoritative_ga_mode.strip()
+    ):
         raise G02BError(f"GA scaling mode mismatch for {row['run_id']}")
     current_source = inventory(source)
     if current_source != manifest["sourceFileHashes"]:
@@ -1692,6 +1726,13 @@ def self_test() -> dict[str, Any]:
         }
         test("source_never_modified", lambda: assert_true(inventory(source) == before, "source changed"))
         test("copy_identical_except_allowlist", lambda: assert_true(not compare_to_source(source, dest, set(spec["allowedDifferingFiles"]))["unexpectedChanges"], "unexpected diff"))
+        test(
+            "duration_numeric_equivalence",
+            lambda: assert_true(
+                numeric_equal("300", "300.0"),
+                "Equivalent numeric durations were rejected",
+            ),
+        )
         test("invalid_variant_rejected", lambda: _expect_error(lambda: write_variant_runtime_config(dest, spec, "BAD_VARIANT")))
         test("manifest_config_mismatch_rejected", lambda: _expect_error(lambda: _validate_with_variant(fixture_row, "NO_MOBILITY_PENALTY")))
         test("local_only_validator", lambda: _validate_run_fixture(tmp_root, fixture_row, "LOCAL_ONLY"))
