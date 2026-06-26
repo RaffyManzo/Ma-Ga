@@ -1,0 +1,104 @@
+{
+  "schemaVersion": 1,
+  "generatedAt": "2026-06-27T00:41:50.245346+02:00",
+  "actionId": "M-BACKGROUND-01",
+  "configId": "CFG-M-BACKGROUND",
+  "temporalRecords": {
+    "recordCount": 31,
+    "recordStatusCounts": {
+      "APPLIED": 28,
+      "STALE_DISCARDED": 3
+    },
+    "geneCount": 62,
+    "nodeTypeCounts": {
+      "LOCAL": 54,
+      "VEHICLE": 8
+    },
+    "decisionTypeCounts": {
+      "LOCAL_EXECUTION": 54,
+      "PARTIAL_OFFLOADING": 5,
+      "FULL_OFFLOADING": 3
+    },
+    "mobilityModelCounts": {
+      "LOCAL_CONVENTIONAL": 54,
+      "V2V_SCALAR_RELATIVE_SPEED": 8
+    },
+    "dynamicityLevelCounts": {
+      "UNKNOWN": 1,
+      "STABLE": 25,
+      "MODERATE": 5
+    },
+    "reuseModeCounts": {
+      "FIRST_RUN": 1,
+      "WARM_START": 25,
+      "PARTIAL_RESTART": 2,
+      "COLD_START": 3
+    },
+    "localConventionalCount": 54,
+    "localGenesWithNonZeroMobility": 0,
+    "remoteGeneCount": 8,
+    "coverageInsufficientCount": 0,
+    "legacyCloudPlaceholderCount": 0,
+    "deadlineViolationGeneCount": 7,
+    "mobilityFieldsFiniteForRemoteGenes": true,
+    "phiCov": {
+      "count": 62,
+      "min": 0.0,
+      "max": 0.0,
+      "nonZeroCount": 0
+    },
+    "phiLink": {
+      "count": 62,
+      "min": 0.0,
+      "max": 0.21792027445079742,
+      "nonZeroCount": 8
+    },
+    "phiHo": {
+      "count": 62,
+      "min": 0.0,
+      "max": 0.05841018315581672,
+      "nonZeroCount": 8
+    },
+    "pmob": {
+      "count": 62,
+      "min": 0.0,
+      "max": 0.13816522880330706,
+      "nonZeroCount": 8,
+      "formulaErrorMax": 0.0
+    },
+    "firstRecordTimeSeconds": 2.0,
+    "lastRecordTimeSeconds": 34.9,
+    "lastAppliedRecordTimeSeconds": 24.7,
+    "secondsWithoutAppliedRecordAtEnd": 155.3
+  },
+  "publishedSnapshots": {
+    "snapshotCount": 32,
+    "snapshotTimeMinSeconds": 2.0,
+    "snapshotTimeMaxSeconds": 5.1,
+    "candidateOccurrences": {
+      "LOCAL": 78,
+      "VEHICLE": 82
+    },
+    "snapshotsWithCandidateType": {
+      "LOCAL": 32,
+      "VEHICLE": 32
+    },
+    "gatewayTransitionCount": 0,
+    "gatewaySwitchCount": 0,
+    "coverageEnterCount": 0,
+    "coverageExitCount": 0,
+    "v2vRelativeSpeed": {
+      "count": 82,
+      "min": 0.3248675180989784,
+      "mean": 5.559459686292039,
+      "max": 13.074753477598566,
+      "allFinite": true
+    },
+    "activeLinkCoverageRatio": {
+      "count": 0,
+      "min": null,
+      "mean": null,
+      "max": null
+    }
+  }
+}

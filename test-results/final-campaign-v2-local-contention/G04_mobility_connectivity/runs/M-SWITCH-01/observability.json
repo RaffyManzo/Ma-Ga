@@ -1,0 +1,106 @@
+{
+  "schemaVersion": 1,
+  "generatedAt": "2026-06-27T00:43:28.869782+02:00",
+  "actionId": "M-SWITCH-01",
+  "configId": "CFG-M-SWITCH",
+  "temporalRecords": {
+    "recordCount": 29,
+    "recordStatusCounts": {
+      "APPLIED": 27,
+      "STALE_DISCARDED": 2
+    },
+    "geneCount": 41,
+    "nodeTypeCounts": {
+      "LOCAL": 36,
+      "VEHICLE": 4,
+      "CLOUD": 1
+    },
+    "decisionTypeCounts": {
+      "LOCAL_EXECUTION": 36,
+      "PARTIAL_OFFLOADING": 5
+    },
+    "mobilityModelCounts": {
+      "LOCAL_CONVENTIONAL": 36,
+      "V2V_SCALAR_RELATIVE_SPEED": 4,
+      "CLOUD_GATEWAY_GEOMETRIC": 1
+    },
+    "dynamicityLevelCounts": {
+      "UNKNOWN": 1,
+      "STABLE": 24,
+      "MODERATE": 3,
+      "HIGH": 1
+    },
+    "reuseModeCounts": {
+      "FIRST_RUN": 1,
+      "WARM_START": 24,
+      "PARTIAL_RESTART": 3,
+      "COLD_START": 1
+    },
+    "localConventionalCount": 36,
+    "localGenesWithNonZeroMobility": 0,
+    "remoteGeneCount": 5,
+    "coverageInsufficientCount": 0,
+    "legacyCloudPlaceholderCount": 0,
+    "deadlineViolationGeneCount": 0,
+    "mobilityFieldsFiniteForRemoteGenes": true,
+    "phiCov": {
+      "count": 41,
+      "min": 0.0,
+      "max": 0.0,
+      "nonZeroCount": 0
+    },
+    "phiLink": {
+      "count": 41,
+      "min": 0.0,
+      "max": 0.3862408934933956,
+      "nonZeroCount": 5
+    },
+    "phiHo": {
+      "count": 41,
+      "min": 0.0,
+      "max": 0.06613782088036466,
+      "nonZeroCount": 5
+    },
+    "pmob": {
+      "count": 41,
+      "min": 0.0,
+      "max": 0.2261893571868801,
+      "nonZeroCount": 5,
+      "formulaErrorMax": 0.0
+    },
+    "firstRecordTimeSeconds": 2.0,
+    "lastRecordTimeSeconds": 46.7,
+    "lastAppliedRecordTimeSeconds": 9.0,
+    "secondsWithoutAppliedRecordAtEnd": 171.0
+  },
+  "publishedSnapshots": {
+    "snapshotCount": 32,
+    "snapshotTimeMinSeconds": 2.0,
+    "snapshotTimeMaxSeconds": 5.1,
+    "candidateOccurrences": {
+      "LOCAL": 78,
+      "VEHICLE": 28
+    },
+    "snapshotsWithCandidateType": {
+      "LOCAL": 32,
+      "VEHICLE": 14
+    },
+    "gatewayTransitionCount": 0,
+    "gatewaySwitchCount": 0,
+    "coverageEnterCount": 0,
+    "coverageExitCount": 0,
+    "v2vRelativeSpeed": {
+      "count": 28,
+      "min": 6.036758178686521,
+      "mean": 9.01227454446902,
+      "max": 11.904095426381964,
+      "allFinite": true
+    },
+    "activeLinkCoverageRatio": {
+      "count": 0,
+      "min": null,
+      "mean": null,
+      "max": null
+    }
+  }
+}

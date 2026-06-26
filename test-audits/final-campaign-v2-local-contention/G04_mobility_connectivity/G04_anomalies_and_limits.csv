@@ -1,0 +1,8 @@
+﻿category,severity,description,decision
+RUNTIME_CADENCE_LIMIT,CROSS_GROUP_LIMIT,Le strategie applicate coprono solo la parte iniziale delle run; gap finale massimo 173.0 s.,Il limite resta assegnato a G06 e condiziona l'interpretazione delle assegnazioni G04.
+REMOTE_APPLICATION_COVERAGE,OBSERVABILITY_LIMIT,"Assegnazioni applicate: {'LOCAL': 50, 'VEHICLE': 2, 'EDGE': 0, 'CLOUD': 0}.","EDGE e CLOUD non sono dichiarati applicati; si distinguono candidati, geni stale e strategie applicate."
+RSU1_PROFILE_SPECIFICITY,OBSERVABILITY_LIMIT,Nei geni serializzati di CFG-M-RSU1 il gateway remoto osservato è rsu_0.,"La selezione rsu_1 è sostenuta dal report live-state e dallo switch, non da una decisione remota applicata."
+COVERAGE_INSUFFICIENT,NOT_OBSERVED,Nessun gene con coverageSufficient=false.,T-094 resta NON_OSSERVATO.
+PREFILTER_AND_REPAIR_OBSERVABILITY,OBSERVABILITY_LIMIT,Il freeze non serializza contatori completi delle cause di rifiuto e del fallback del repair.,T-074 e T-076 restano EVIDENZA_PARZIALE.
+TASK_COMPLETION_MODEL,MODEL_LIMIT,taskCompletionModel=NOT_IMPLEMENTED.,Non presentare assegnazione o rimozione alla deadline come completamento applicativo reale.
+SUMO_DIAGNOSTICS,DATA_LIMIT,Teleport ed emergency braking non sono metriche canoniche esposte nel bundle G04.,Non inventare valori; mantenere il limite.

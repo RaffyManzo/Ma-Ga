@@ -1,0 +1,8 @@
+﻿actionId,reportIndex,vehicleId,previousGateway,currentGateway,transitionType,sourceLog
+M-BACKGROUND-01,27,veh_12,-,rsu_0,COVERAGE_GAIN,driver-logs/g04_01_M_BACKGROUND_01_a1_runner.log
+M-RSU0-01,9,veh_2,-,rsu_0,COVERAGE_GAIN,driver-logs/g04_02_M_RSU0_01_a1_runner.log
+M-RSU0-01,26,veh_5,-,rsu_0,COVERAGE_GAIN,driver-logs/g04_02_M_RSU0_01_a1_runner.log
+M-SWITCH-01,18,veh_3,-,rsu_1,COVERAGE_GAIN,driver-logs/g04_04_M_SWITCH_01_a1_runner.log
+M-SWITCH-01,25,veh_3,rsu_1,rsu_0,HANDOVER,driver-logs/g04_04_M_SWITCH_01_a1_runner.log
+M-V2V-01,19,veh_5,-,rsu_1,COVERAGE_GAIN,driver-logs/g04_05_M_V2V_01_a1_runner.log
+M-V2V-01,25,veh_5,rsu_1,rsu_0,HANDOVER,driver-logs/g04_05_M_V2V_01_a1_runner.log

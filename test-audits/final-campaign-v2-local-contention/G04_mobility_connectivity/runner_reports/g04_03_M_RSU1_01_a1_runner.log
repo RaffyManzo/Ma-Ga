@@ -1,0 +1,112 @@
+Runtime artifact mode:
+RECOVERED_VALIDATED_ARTIFACT
+Runtime build executed:
+false
+Runtime artifact path:
+C:\Users\raffa\Downloads\MA_GA_V2_G04_MACRO_RUN_ALL_PACKAGE\payload\runtime_artifact\maga-live-maga-runtime.jar
+Runtime artifact expected SHA-256:
+3821c28a6a0898e94f4d5136b8039595d36bcbce0b6ecc3e9406910f9e083068
+Runtime artifact validation status: PASS
+Runtime artifact SHA-256: 3821c28a6a0898e94f4d5136b8039595d36bcbce0b6ecc3e9406910f9e083068
+Runtime artifact size bytes: 517007
+Runtime artifact fresh build executed: false
+Deploying materialized literature scenario...
+Runtime artifact validation status: PASS
+Runtime artifact SHA-256: 3821c28a6a0898e94f4d5136b8039595d36bcbce0b6ecc3e9406910f9e083068
+Runtime artifact size bytes: 517007
+Runtime artifact fresh build executed: false
+{
+  "configuredDatabaseFile": "intas_literature_urban.db",
+  "database": {
+    "exists": true,
+    "matchingDiagnosticDbs": [],
+    "path": "C:/Users/raffa/IdeaProjects/maga-core/tmp/materialized-literature-scenarios/final-campaign-v2-local-contention/G04_mobility_connectivity/CFG-M-RSU1/104729/application/intas_literature_urban.db",
+    "readable": true,
+    "sha256": "540bcfb877d614151e38372ae7e889feda0aad5f6fe5569b738c8469ec0c3f19",
+    "sizeBytes": 176128,
+    "tableCounts": {
+      "Building": 0,
+      "BuildingConsistsOf": 0,
+      "Connection": 155,
+      "ConnectionConsistsOf": 695,
+      "ConnectionDetails": 0,
+      "Node": 314,
+      "Properties": 2,
+      "Restriction": 125,
+      "Roundabout": 0,
+      "RoundaboutConsistsOf": 0,
+      "Route": 295,
+      "TrafficSignals": 0,
+      "Way": 155,
+      "WayConsistsOf": 695
+    },
+    "tables": [
+      "Building",
+      "BuildingConsistsOf",
+      "Connection",
+      "ConnectionConsistsOf",
+      "ConnectionDetails",
+      "Node",
+      "Properties",
+      "Restriction",
+      "Roundabout",
+      "RoundaboutConsistsOf",
+      "Route",
+      "TrafficSignals",
+      "Way",
+      "WayConsistsOf"
+    ]
+  },
+  "errors": [
+    "Nominal mean active vehicles expected in [28, 36], found 16.155555555555555."
+  ],
+  "gaParameterScalingMode": "STATIC",
+  "generatedAtUtc": "2026-06-26T22:42:38.521447+00:00",
+  "missingFiles": [],
+  "mobilityMode": "SYNTHETIC_CALIBRATED_ON_INTAS_SUBNETWORK",
+  "projection": {
+    "cartesianOffset": {
+      "x": -464198.88,
+      "y": -4952821.58
+    },
+    "centerCoordinates": {
+      "latitude": 48.75619812000397,
+      "longitude": 11.425493114727528
+    }
+  },
+  "reducedNetworkCounts": {
+    "externalEdges": 155,
+    "externalJunctions": 88,
+    "trafficLights": 8
+  },
+  "routeFiles": [
+    "C:/Users/raffa/IdeaProjects/maga-core/tmp/materialized-literature-scenarios/final-campaign-v2-local-contention/G04_mobility_connectivity/CFG-M-RSU1/104729/sumo/intas_literature_urban_nominal.rou.xml"
+  ],
+  "routeVehicleCounts": {
+    "intas_literature_urban_nominal.rou.xml": 50
+  },
+  "scenarioRoot": "C:/Users/raffa/IdeaProjects/maga-core/tmp/materialized-literature-scenarios/final-campaign-v2-local-contention/G04_mobility_connectivity/CFG-M-RSU1/104729",
+  "status": "INVALID_MATERIALIZED_SCENARIO",
+  "sumocfgReferences": [
+    "intas_literature_urban.net.xml",
+    "intas_literature_urban_nominal.rou.xml"
+  ],
+  "tokenFiles": [],
+  "warnings": []
+}
+Materialized scenario validation failed: 
+C:\Users\raffa\IdeaProjects\maga-core\tmp\materialized-literature-scenarios\final-campaign-v2-local-contention\G04_mobility_connectivity\CFG-M-RSU1\104729
+In C:\Users\raffa\IdeaProjects\maga-core\tools\intas-literature-scenario\deploy_materialized_literature_scenario.ps1:82 car:5
++     throw "Materialized scenario validation failed: $ResolvedScenario ...
++     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : OperationStopped: (Materialized sc...G-M-RSU1\104729:String) [], RuntimeException
+    + FullyQualifiedErrorId : Materialized scenario validation failed: C:\Users\raffa\IdeaProjects\maga-core\tmp\materialized-literature-scenarios\final-c 
+   ampaign-v2-local-contention\G04_mobility_connectivity\CFG-M-RSU1\104729
+ 
+Materialized scenario deploy failed
+In C:\Users\raffa\Downloads\MA_GA_V2_G04_MACRO_RUN_ALL_PACKAGE\run_literature_scenario_g04.ps1:134 car:5
++     throw "Materialized scenario deploy failed"
++     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : OperationStopped: (Materialized scenario deploy failed:String) [], RuntimeException
+    + FullyQualifiedErrorId : Materialized scenario deploy failed
+ 

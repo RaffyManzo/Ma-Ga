@@ -1,0 +1,221 @@
+{
+  "campaignBranch": "testing/final-campaign-v2-local-contention",
+  "campaignId": "final-campaign-v2-local-contention",
+  "campaignSeed": 104729,
+  "classification": "DIRECTED_ENGINEERING_TEST_PROFILE",
+  "classificationFlags": [
+    "DIRECTED_ENGINEERING_TEST_PROFILE",
+    "NOT_LITERATURE_CALIBRATED",
+    "NOT_PART_OF_MAIN_FACTORIAL_RESULTS"
+  ],
+  "configId": "CFG-M-V2V",
+  "density": "high_density",
+  "diagnosticArtificialGaDelayMs": 0,
+  "durationProfile": "smoke",
+  "durationSeconds": 180,
+  "expectedRunCount": 1,
+  "frozenCommit": "bf41e5682293a79939af2c53858126ad4b9f2ef0",
+  "gaParameterScalingMode": "STATIC",
+  "generatedFiles": [
+    {
+      "path": "_campaign_inputs/candidate_0045_edge_ids.txt",
+      "sha256": "7277bd98129c4f22b5bea32387ded1c5f201ea855019b4e4ddedbff4d2abedb0",
+      "sizeBytes": 1907
+    },
+    {
+      "path": "_campaign_inputs/synthetic_mobility_profile_CFG-M-V2V.json",
+      "sha256": "4549a42f1e4cbec5a9e6b8692bb433f14f50146d75c0ab7a26eb5a1dab4f2efc",
+      "sizeBytes": 5566
+    },
+    {
+      "path": "_campaign_logs/campaign_builder_stdout.log",
+      "sha256": "e23e1d735d01dca3735140dc168215599259bb8c4c312c7361b598d2cccd705f",
+      "sizeBytes": 32691
+    },
+    {
+      "path": "application/application_config.json",
+      "sha256": "5a13763a030b8a4d74a66307e55a0d0879ec87433bb4210aa24e29d38ec65aba",
+      "sizeBytes": 407
+    },
+    {
+      "path": "application/intas_literature_urban.db",
+      "sha256": "6330041a2588c2b846c402837917ef45b300da5a99ce98d8242b87598b80ea16",
+      "sizeBytes": 176128
+    },
+    {
+      "path": "application/ma_ga_calibration_metadata.json",
+      "sha256": "6e0ce515ab9faabc8408165927d8ccefbbc6ac8e1eb5eb201641f97a740500e5",
+      "sizeBytes": 2896
+    },
+    {
+      "path": "application/ma_ga_live_runtime_config.json",
+      "sha256": "64ceec5dd062c9786b82818582e284fa117ec3c095b5a0c941b7e7becd93052b",
+      "sizeBytes": 736
+    },
+    {
+      "path": "application/ma_ga_live_state_config.json",
+      "sha256": "7d4b4c9541ea1f9fa022db5f86aae6a7623b8bf88adfd9bfe33e03797e49665b",
+      "sizeBytes": 4245
+    },
+    {
+      "path": "application/scenario-convert-command.log",
+      "sha256": "be6d0fc579799caab2e94f90faf986fd6b79b1191020c5fcb9ce222c14840908",
+      "sizeBytes": 5989
+    },
+    {
+      "path": "application/scenario-convert.log",
+      "sha256": "5f23a94b7f08b2c87d0035129b530776b0c9e47b8ac1495464a96724aa9ea2e8",
+      "sizeBytes": 6935
+    },
+    {
+      "path": "cell/cell_config.json",
+      "sha256": "f4ed057288c25ee254ada4c82f52adb8d366fb751dc19a91819c471e2bd94de0",
+      "sizeBytes": 731
+    },
+    {
+      "path": "cell/network.json",
+      "sha256": "38082aa869e3787dfbbd6ba5f43065c40d0bcee7671ef0a91b87263295602878",
+      "sizeBytes": 1468
+    },
+    {
+      "path": "cell/regions.json",
+      "sha256": "d3394c5602b0b0bbf0c2fe5816542cd6101aa925bd207933b30acc61c7851171",
+      "sizeBytes": 1168
+    },
+    {
+      "path": "mapping/mapping_config.json",
+      "sha256": "2ee86d01bbf9251cda6f02ae2a3d485ff95b4c8c67afe555996cc2bf6ba51144",
+      "sizeBytes": 1269
+    },
+    {
+      "path": "materialization_manifest.json",
+      "sha256": "5445736cabd9b58840e0d21697e4da7a17c4281af09532a2fec28e6e9dddc70d",
+      "sizeBytes": 1189
+    },
+    {
+      "path": "output/output_config.xml",
+      "sha256": "909653ff7707f4ae9aa82e30da3534ad9a30e54882dcbefa784963dc97edbcb2",
+      "sizeBytes": 11402
+    },
+    {
+      "path": "reports/final_campaign_validation_report.json",
+      "sha256": "1613865b8163ff5c33489558516c62b84f8d23fd05f6bc427281afb7b4818385",
+      "sizeBytes": 610
+    },
+    {
+      "path": "reports/intas_literature_materialization_report.json",
+      "sha256": "ae0602921099a5a48c8c40ca872b5c0f371e0bd4b340c07fcd0f3dff86595d87",
+      "sizeBytes": 31121
+    },
+    {
+      "path": "reports/intas_literature_materialization_report.md",
+      "sha256": "14b65c7d19aa7f4b21521d002b1665aec859aa95cd2481f55df91d2d525aeecb",
+      "sizeBytes": 812
+    },
+    {
+      "path": "reports/literature_configuration_validation.json",
+      "sha256": "fd9bb6a6d43ada48a51416a0f2e6c558ec512016186b52ead6b61adcfb9350f7",
+      "sizeBytes": 859
+    },
+    {
+      "path": "scenario_config.json",
+      "sha256": "00492099da62b9d2ee4f40b32be424f808b41d2ff045d89de4d0a8301361238d",
+      "sizeBytes": 796
+    },
+    {
+      "path": "sns/sns_config.json",
+      "sha256": "1f0bd939d4d8491ad6beb10d104baaa83557b0a3b36e3dd3e8999bfa09d2dbb9",
+      "sizeBytes": 360
+    },
+    {
+      "path": "sumo/intas_literature_urban.net.xml",
+      "sha256": "af3bfd49909dcd430f5a523375dc66d2460a5c6d0af8bfe2596c7bc33f92690a",
+      "sizeBytes": 380373
+    },
+    {
+      "path": "sumo/intas_literature_urban.sumocfg",
+      "sha256": "96c5044c9b04e070784948f061d8a0a24122f40a135309a3d848285347e5a183",
+      "sizeBytes": 358
+    },
+    {
+      "path": "sumo/intas_literature_urban_high_density.rou.xml",
+      "sha256": "a3558cb190ff41b3913a29a95ea9612cf5c1dca879b18813ceef591c8c9c4f4d",
+      "sizeBytes": 16772
+    },
+    {
+      "path": "sumo/sumo_config.json",
+      "sha256": "5d07eda420d6a8eca6b0888d65b3c12b23196d5c323d14f2635aff6ac790b048",
+      "sizeBytes": 120
+    }
+  ],
+  "groupId": "G04",
+  "limitations": [
+    "DIRECTED_ENGINEERING_TEST_PROFILE",
+    "DIRECT_ROUTE_ACCEPTANCE_RELAXED_TO_DISABLE_CALIBRATED_MEAN_ACTIVE_RANGE_CHECK",
+    "NOT_LITERATURE_CALIBRATED",
+    "NOT_PART_OF_MAIN_FACTORIAL_RESULTS"
+  ],
+  "materializationId": "MAT-CFG-M-V2V-104729",
+  "mobilitySeed": 104729,
+  "resourceMultipliers": {
+    "cellBandwidth": 1.0,
+    "cellRtt": 1.0,
+    "cloudCpu": 1.0,
+    "edgeCpu": 1.0,
+    "localCpu": 1.0,
+    "remoteVehicleCpu": 1.0,
+    "v2vBandwidth": 1.0,
+    "v2vRange": 1.5
+  },
+  "reuseMode": "UNIQUE",
+  "routeFamilyVehicleCounts": {
+    "BACKGROUND": 32,
+    "BOTH_RSU_NO_SWITCH": 6,
+    "DUAL_RSU_SWITCH": 32,
+    "RSU_0_ONLY": 5,
+    "RSU_1_ONLY": 5
+  },
+  "sourceFiles": [
+    {
+      "path": "data/docs/testing/final-campaign-v2-local-contention/scenario_configuration_mapping.csv",
+      "sha256": "a27baecfc7f1b7b321a3f7789123860f9d65d7fbccf799499ba3312d0ce107f4"
+    },
+    {
+      "path": "data/docs/testing/final-campaign-v2-local-contention/scenario_instance_plan.csv",
+      "sha256": "4cb4e34040a31855cebc58ce7518fd4126491e2251cf0e1697131c59e7aeeaf8"
+    },
+    {
+      "path": "tmp/materialized-literature-scenarios/final-campaign-v2-local-contention/G04_mobility_connectivity/CFG-M-V2V/104729/_campaign_inputs/synthetic_mobility_profile_CFG-M-V2V.json",
+      "sha256": "4549a42f1e4cbec5a9e6b8692bb433f14f50146d75c0ab7a26eb5a1dab4f2efc"
+    },
+    {
+      "path": "tools/intas-literature-scenario/build_intas_literature_scenario.py",
+      "sha256": "32421e979cce7844e5fa70c8b9160b565f969aea860f9c9ce9965a0adce6d3d6"
+    },
+    {
+      "path": "tools/intas-literature-scenario/config/synthetic_mobility_profile.json",
+      "sha256": "16d5b146641e1d0306e88958c8b1f64f9fbe2e11802ffd71adc5e115fea626ee"
+    },
+    {
+      "path": "tools/intas-literature-scenario/final_campaign_v2/final_campaign_v2_spec.json",
+      "sha256": "7c9c8dd25f0b786fe86671be4a9db02caf598b9c6b1f429ae49fb40434fcce00"
+    },
+    {
+      "path": "tools/intas-literature-scenario/validate_literature_configuration.py",
+      "sha256": "7a69e2983016c7001bfb6909b4353351b654fe783d836df20cb11f8be732b0c0"
+    },
+    {
+      "path": "tools/intas-literature-scenario/validate_materialized_literature_scenario.py",
+      "sha256": "f9a65c9d968c50566017b267ed89d779edff7b06cf05a9bffa7e87d87a970e01"
+    }
+  ],
+  "targetDirectory": "tmp/materialized-literature-scenarios/final-campaign-v2-local-contention/G04_mobility_connectivity/CFG-M-V2V/104729",
+  "validation": {
+    "errorCount": 0,
+    "report": "reports/final_campaign_validation_report.json",
+    "status": "MATERIALIZED_WITH_WARNINGS",
+    "warningCount": 3
+  },
+  "workloadProfile": "WL-I",
+  "workloadSeed": 1104732
+}

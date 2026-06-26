@@ -1,0 +1,108 @@
+{
+  "schemaVersion": 1,
+  "generatedAt": "2026-06-27T00:42:38.794318+02:00",
+  "actionId": "M-RSU1-01",
+  "configId": "CFG-M-RSU1",
+  "temporalRecords": {
+    "recordCount": 28,
+    "recordStatusCounts": {
+      "APPLIED": 27,
+      "STALE_DISCARDED": 1
+    },
+    "geneCount": 18,
+    "nodeTypeCounts": {
+      "LOCAL": 16,
+      "EDGE": 1,
+      "CLOUD": 1
+    },
+    "decisionTypeCounts": {
+      "LOCAL_EXECUTION": 16,
+      "FULL_OFFLOADING": 2
+    },
+    "mobilityModelCounts": {
+      "LOCAL_CONVENTIONAL": 16,
+      "EDGE_GEOMETRIC": 1,
+      "CLOUD_GATEWAY_GEOMETRIC": 1
+    },
+    "dynamicityLevelCounts": {
+      "UNKNOWN": 1,
+      "STABLE": 25,
+      "MODERATE": 2
+    },
+    "reuseModeCounts": {
+      "FIRST_RUN": 1,
+      "WARM_START": 25,
+      "PARTIAL_RESTART": 2
+    },
+    "localConventionalCount": 16,
+    "localGenesWithNonZeroMobility": 0,
+    "remoteGeneCount": 2,
+    "coverageInsufficientCount": 0,
+    "legacyCloudPlaceholderCount": 0,
+    "deadlineViolationGeneCount": 0,
+    "mobilityFieldsFiniteForRemoteGenes": true,
+    "phiCov": {
+      "count": 18,
+      "min": 0.0,
+      "max": 0.0,
+      "nonZeroCount": 0
+    },
+    "phiLink": {
+      "count": 18,
+      "min": 0.0,
+      "max": 0.2321252635398468,
+      "nonZeroCount": 2
+    },
+    "phiHo": {
+      "count": 18,
+      "min": 0.0,
+      "max": 0.005941429142905353,
+      "nonZeroCount": 2
+    },
+    "pmob": {
+      "count": 18,
+      "min": 0.0,
+      "max": 0.11903334634137608,
+      "nonZeroCount": 2,
+      "formulaErrorMax": 0.0
+    },
+    "firstRecordTimeSeconds": 2.0,
+    "lastRecordTimeSeconds": 10.0,
+    "lastAppliedRecordTimeSeconds": 9.2,
+    "secondsWithoutAppliedRecordAtEnd": 170.8
+  },
+  "publishedSnapshots": {
+    "snapshotCount": 32,
+    "snapshotTimeMinSeconds": 2.0,
+    "snapshotTimeMaxSeconds": 5.1,
+    "candidateOccurrences": {
+      "LOCAL": 78,
+      "VEHICLE": 64,
+      "CLOUD": 14,
+      "EDGE": 14
+    },
+    "snapshotsWithCandidateType": {
+      "LOCAL": 32,
+      "VEHICLE": 32,
+      "CLOUD": 14,
+      "EDGE": 14
+    },
+    "gatewayTransitionCount": 0,
+    "gatewaySwitchCount": 0,
+    "coverageEnterCount": 0,
+    "coverageExitCount": 0,
+    "v2vRelativeSpeed": {
+      "count": 64,
+      "min": 0.5754573248577906,
+      "mean": 0.7089874973700455,
+      "max": 0.804406951639768,
+      "allFinite": true
+    },
+    "activeLinkCoverageRatio": {
+      "count": 14,
+      "min": 0.40792560105356884,
+      "mean": 0.44384100703208634,
+      "max": 0.4796549323189965
+    }
+  }
+}

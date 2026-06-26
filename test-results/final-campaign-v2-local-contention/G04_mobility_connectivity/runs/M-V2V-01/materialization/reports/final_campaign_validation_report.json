@@ -1,0 +1,23 @@
+{
+  "errors": [],
+  "manifest": {
+    "campaignId": "final-campaign-v2-local-contention",
+    "classification": "DIRECTED_ENGINEERING_TEST_PROFILE",
+    "configId": "CFG-M-V2V",
+    "groupId": "G04",
+    "materializationId": "MAT-CFG-M-V2V-104729"
+  },
+  "metrics": {
+    "databasePresent": true,
+    "emergencyBrakingMentions": 0,
+    "sumoErrors": 0,
+    "teleportMentions": 0,
+    "vehicleCount": 80
+  },
+  "status": "MATERIALIZED_WITH_WARNINGS",
+  "warnings": [
+    "DIRECTED_ENGINEERING_TEST_PROFILE",
+    "NOT_LITERATURE_CALIBRATED",
+    "NOT_PART_OF_MAIN_FACTORIAL_RESULTS"
+  ]
+}

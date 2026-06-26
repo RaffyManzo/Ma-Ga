@@ -1,0 +1,102 @@
+{
+  "schemaVersion": 1,
+  "generatedAt": "2026-06-27T00:53:33.268816+02:00",
+  "group": "G04",
+  "status": "PASS_G04_SCIENTIFIC_GATE_WITH_OBSERVABILITY_LIMITS",
+  "passed": true,
+  "formalVerdict": "PASS_G04_COMPLETE_WITH_OBSERVABILITY_LIMITS_READY_FOR_G05",
+  "runCount": 5,
+  "validatorPassCount": 5,
+  "testStatusCounts": {
+    "PASS_CON_LIMITAZIONE": 8,
+    "PASS": 7,
+    "EVIDENZA_PARZIALE": 7,
+    "NON_OSSERVATO": 1
+  },
+  "failedTests": [],
+  "summary": {
+    "schemaVersion": 1,
+    "generatedAt": "2026-06-27T00:53:33.061400+02:00",
+    "runCount": 5,
+    "recordCount": 143,
+    "geneCount": 159,
+    "nodeTypeCounts": {
+      "LOCAL": 135,
+      "VEHICLE": 19,
+      "EDGE": 2,
+      "CLOUD": 3
+    },
+    "appliedNodeTypeCounts": {
+      "LOCAL": 50,
+      "VEHICLE": 2
+    },
+    "staleNodeTypeCounts": {
+      "LOCAL": 85,
+      "VEHICLE": 17,
+      "EDGE": 2,
+      "CLOUD": 3
+    },
+    "decisionTypeCounts": {
+      "LOCAL_EXECUTION": 135,
+      "PARTIAL_OFFLOADING": 15,
+      "FULL_OFFLOADING": 9
+    },
+    "mobilityModelCounts": {
+      "LOCAL_CONVENTIONAL": 135,
+      "V2V_SCALAR_RELATIVE_SPEED": 19,
+      "EDGE_GEOMETRIC": 2,
+      "CLOUD_GATEWAY_GEOMETRIC": 3
+    },
+    "dynamicityLevelCounts": {
+      "UNKNOWN": 5,
+      "STABLE": 123,
+      "MODERATE": 14,
+      "HIGH": 1
+    },
+    "reuseModeCounts": {
+      "FIRST_RUN": 5,
+      "WARM_START": 123,
+      "PARTIAL_RESTART": 11,
+      "COLD_START": 4
+    },
+    "dynamicityComponentRecordCount": 143,
+    "dynamicityComponentsFinite": true,
+    "localGeneCount": 135,
+    "localGenesWithNonZeroMobility": 0,
+    "remoteGeneCount": 24,
+    "coverageInsufficientCount": 0,
+    "legacyCloudPlaceholderCount": 0,
+    "deadlineViolationGeneCount": 10,
+    "phiCovNonZeroCount": 0,
+    "phiLinkNonZeroCount": 24,
+    "phiHoNonZeroCount": 24,
+    "pmobNonZeroCount": 24,
+    "pmobFormulaErrorMax": 0.0,
+    "v2vRelativeSpeedTargetProfile": {
+      "count": 46,
+      "min": 0.21027988956760701,
+      "mean": 0.9117770917358486,
+      "max": 1.1057190921999744,
+      "allFinite": true
+    },
+    "transitionCount": 7,
+    "coverageGainCount": 5,
+    "coverageLossCount": 0,
+    "handoverCount": 2,
+    "switchProfileHandoverCount": 1,
+    "assignmentTotals": {
+      "LOCAL": 50,
+      "VEHICLE": 2,
+      "EDGE": 0,
+      "CLOUD": 0
+    },
+    "taskTotal": 32036,
+    "gaJobsSubmittedTotal": 148,
+    "gaJobsAppliedTotal": 135,
+    "staleResultsTotal": 8,
+    "maximumStaleRatioPercent": 9.677419,
+    "maximumGaRuntimeSeconds": 3.6111489,
+    "minimumLastAppliedStrategyTimeSeconds": 7.0,
+    "maximumFinalStrategyGapSeconds": 173.0
+  }
+}

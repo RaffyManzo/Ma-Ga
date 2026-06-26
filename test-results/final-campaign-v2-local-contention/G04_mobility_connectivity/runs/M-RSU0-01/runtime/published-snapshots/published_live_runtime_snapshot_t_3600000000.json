@@ -1,0 +1,126 @@
+{
+  "snapshotId": "live_runtime_snapshot_t_3600000000",
+  "timeSeconds": 3.6,
+  "vehicles": [
+    {
+      "vehicleId": "veh_0",
+      "x": 214390.78674869688,
+      "y": 450767.2920175825,
+      "speed": 13.619586154252888,
+      "localCpu": 1.0E9
+    },
+    {
+      "vehicleId": "veh_1",
+      "x": 214452.00449306765,
+      "y": 450785.81665398116,
+      "speed": 14.357969574622908,
+      "localCpu": 1.0E9
+    }
+  ],
+  "tasks": [],
+  "candidateNodes": [
+    {
+      "candidateId": "local_for_veh_0",
+      "sourceVehicleId": "veh_0",
+      "executionNodeId": "veh_0",
+      "type": "LOCAL",
+      "availableCpu": 1.0E9,
+      "availableBandwidth": 0.0,
+      "baseLatencySeconds": 0.0
+    },
+    {
+      "candidateId": "local_for_veh_1",
+      "sourceVehicleId": "veh_1",
+      "executionNodeId": "veh_1",
+      "type": "LOCAL",
+      "availableCpu": 1.0E9,
+      "availableBandwidth": 0.0,
+      "baseLatencySeconds": 0.0
+    },
+    {
+      "candidateId": "vehicle_veh_1_for_veh_0",
+      "sourceVehicleId": "veh_0",
+      "executionNodeId": "veh_1",
+      "type": "VEHICLE",
+      "availableCpu": 1.0E9,
+      "availableBandwidth": 4700000.0,
+      "baseLatencySeconds": 0.002,
+      "bandwidthPoolId": "direct_v2v_pool__veh_0__veh_1"
+    },
+    {
+      "candidateId": "vehicle_veh_0_for_veh_1",
+      "sourceVehicleId": "veh_1",
+      "executionNodeId": "veh_0",
+      "type": "VEHICLE",
+      "availableCpu": 1.0E9,
+      "availableBandwidth": 4700000.0,
+      "baseLatencySeconds": 0.002,
+      "bandwidthPoolId": "direct_v2v_pool__veh_0__veh_1"
+    }
+  ],
+  "accessGateways": [
+    {
+      "gatewayId": "rsu_0",
+      "gatewayType": "RSU",
+      "x": 213980.44,
+      "y": 450429.42,
+      "coverageRadiusMeters": 250.0,
+      "bandwidthPoolId": "pool_rsu_0"
+    },
+    {
+      "gatewayId": "rsu_1",
+      "gatewayType": "RSU",
+      "x": 213897.79,
+      "y": 450744.66,
+      "coverageRadiusMeters": 250.0,
+      "bandwidthPoolId": "pool_rsu_1"
+    }
+  ],
+  "accessLinks": [
+    {
+      "accessLinkId": "access_link__veh_0__rsu_0",
+      "vehicleId": "veh_0",
+      "gatewayId": "rsu_0",
+      "active": false,
+      "available": false
+    },
+    {
+      "accessLinkId": "access_link__veh_0__rsu_1",
+      "vehicleId": "veh_0",
+      "gatewayId": "rsu_1",
+      "active": false,
+      "available": false
+    },
+    {
+      "accessLinkId": "access_link__veh_1__rsu_0",
+      "vehicleId": "veh_1",
+      "gatewayId": "rsu_0",
+      "active": false,
+      "available": false
+    },
+    {
+      "accessLinkId": "access_link__veh_1__rsu_1",
+      "vehicleId": "veh_1",
+      "gatewayId": "rsu_1",
+      "active": false,
+      "available": false
+    }
+  ],
+  "bandwidthPools": [
+    {
+      "poolId": "direct_v2v_pool__veh_0__veh_1",
+      "poolType": "DIRECT_V2V",
+      "availableBandwidth": 4700000.0
+    },
+    {
+      "poolId": "pool_rsu_0",
+      "poolType": "GATEWAY",
+      "availableBandwidth": 4.9192E7
+    },
+    {
+      "poolId": "pool_rsu_1",
+      "poolType": "GATEWAY",
+      "availableBandwidth": 4.9192E7
+    }
+  ]
+}
