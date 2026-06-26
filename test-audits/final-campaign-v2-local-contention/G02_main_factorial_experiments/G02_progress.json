@@ -1,0 +1,10 @@
+{
+  "schemaVersion": 1,
+  "group": "G02",
+  "updatedAt": "2026-06-26T23:40:47.509639+02:00",
+  "expectedRuns": 45,
+  "validatedRuns": 45,
+  "pendingRuns": 0,
+  "abortedInfrastructureAttempts": 0,
+  "nextRun": null
+}

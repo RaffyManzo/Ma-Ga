@@ -1,0 +1,7 @@
+﻿category,severity,description,decision
+CORRECTED_SCIENTIFIC_GATE,DOCUMENTED,Il primo gate trattava la monotonia del massimo tempo locale selezionato come criterio di validita' del workload.,Sostituito con la verifica dei pesi configurati e dei cicli CPU attesi. Il risultato locale inverso resta un'evidenza da interpretare.
+WORKLOAD_OUTCOME_INVERSION,SCIENTIFIC_RESULT,"Tempo locale indipendente medio: WL-E=2.595813, WL-I=2.267813, WL-S=1.360000.",Non interpretare come riduzione della complessita' del generatore. La metrica e' condizionata dalle decisioni di offloading e dal numero di porzioni locali osservate.
+BACKLOG_TREND,SCIENTIFIC_RESULT,"Pending peak medio: WL-E=74.400, WL-I=91.667, WL-S=137.267.",Usare come evidenza della maggiore pressione del workload.
+TASK_COMPLETION_MODEL,LIMIT,taskCompletionModel=NOT_IMPLEMENTED in tutte le 45 run.,Non presentare rimozione alla deadline o assegnazione come completamento applicativo reale.
+WORKLOAD_SEED_SCOPE,LIMIT,Il mapping canonico indica che il randomSeed del workload non e' propagato separatamente dal seed di mobilita'.,Descrivere le repliche come configurazioni materializzate canoniche; non attribuire indipendenza separata ai due seed.
+ASYNC_SHUTDOWN,INFORMATIONAL,Job SHUTDOWN_IN_FLIGHT complessivi: 36.,"Conteggiati separatamente; contabilita' GA coerente in 45/45 run, zero failed e zero null."

@@ -12,11 +12,11 @@
   "generatedAtUtc": "2026-06-26T16:31:47.304242+00:00",
   "legacyResultsImported": false,
   "materializationExecuted": true,
-  "phase": "G01_COMPLETE_READY_FOR_G02",
+  "phase": "G02_COMPLETE_READY_FOR_G03",
   "scenarioInstanceCount": 69,
   "schemaVersion": 1,
   "simulationExecuted": true,
-  "lastCompletedGroup": "G01",
+  "lastCompletedGroup": "G02",
   "g01": {
     "verdict": "PASS_G01_COMPLETE_READY_FOR_G02_RUNS",
     "runName": "log-20260626-215940-MaGaLiteratureBasedUrbanStudy",
@@ -30,5 +30,27 @@
     "abortedStartupAttempts": 1,
     "retryWatchdogSeconds": 120,
     "auditSummary": "data/docs/testing/final-campaign-v2-local-contention/G01_AUDIT_SUMMARY_FOR_RESULTS.md"
+  },
+  "g02": {
+    "verdict": "PASS_G02_COMPLETE_READY_FOR_G03_RUNS",
+    "validRuns": 45,
+    "configurations": 9,
+    "seedsPerConfiguration": 5,
+    "durationSeconds": 300,
+    "validatorPasses": 45,
+    "nullResults": 0,
+    "gaFailed": 0,
+    "modelViolations": 0,
+    "contentionRuns": 34,
+    "scientificGate": "PASS_G02_SCIENTIFIC_GATE",
+    "correctedGate": "WORKLOAD_CONFIGURED_COMPLEXITY",
+    "observedWorkloadOutcomeInversion": {
+      "WL-E": 2.5958126444024368,
+      "WL-I": 2.267812644402437,
+      "WL-S": 1.36
+    },
+    "runtimeJarSha256": "3821c28a6a0898e94f4d5136b8039595d36bcbce0b6ecc3e9406910f9e083068",
+    "auditSummary": "data/docs/testing/final-campaign-v2-local-contention/G02_AUDIT_SUMMARY_FOR_RESULTS.md",
+    "chapter7EvidenceIndex": "data/docs/testing/final-campaign-v2-local-contention/G02_CHAPTER7_EVIDENCE_INDEX.md"
   }
 }

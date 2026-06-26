@@ -1,0 +1,126 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-06-26T23:57:11.423681+02:00",
+  "group": "G02",
+  "status": "PASS_G02_SCIENTIFIC_GATE",
+  "passed": true,
+  "checks": [
+    {
+      "id": "RUN-COUNT",
+      "status": "PASS",
+      "expected": 45,
+      "observed": 45
+    },
+    {
+      "id": "VALIDATOR",
+      "status": "PASS",
+      "expected": "45 PASS",
+      "observed": 45
+    },
+    {
+      "id": "ZERO-NULL-FAILED",
+      "status": "PASS",
+      "expected": 0,
+      "observed": {
+        "null": 0,
+        "failed": 0
+      }
+    },
+    {
+      "id": "GA-JOB-ACCOUNTING",
+      "status": "PASS",
+      "expected": "45 run coerenti",
+      "observed": 45
+    },
+    {
+      "id": "ZERO-MODEL-VIOLATIONS",
+      "status": "PASS",
+      "expected": 0,
+      "observed": 0
+    },
+    {
+      "id": "CONTENTION-OBSERVED",
+      "status": "PASS",
+      "expected": "> 0 run",
+      "observed": 34
+    },
+    {
+      "id": "DENSITY-TASK-TREND",
+      "status": "PASS",
+      "expected": "high_density > nominal > low_density",
+      "observed": {
+        "high_density": 15302.0,
+        "low_density": 5499.6,
+        "nominal": 9295.0
+      }
+    },
+    {
+      "id": "WORKLOAD-CONFIGURED-COMPLEXITY",
+      "status": "PASS",
+      "expected": "WL-E < WL-I < WL-S",
+      "observed": {
+        "WL-E": 430000000.0,
+        "WL-I": 790000000.0,
+        "WL-S": 1670000000.0
+      }
+    },
+    {
+      "id": "WORKLOAD-SELECTED-LOCAL-OUTCOME",
+      "status": "OBSERVED_NOT_A_GATE",
+      "expected": "nessuna monotonia imposta",
+      "observed": {
+        "WL-E": 2.5958126444024368,
+        "WL-I": 2.267812644402437,
+        "WL-S": 1.36
+      },
+      "interpretation": "La metrica riguarda soltanto le porzioni selezionate localmente dal MA-GA. La diminuzione non smentisce la complessita' configurata del workload."
+    },
+    {
+      "id": "CONFIGURATION-VARIATION",
+      "status": "PASS",
+      "expected": "variazione osservabile",
+      "observed": {
+        "pendingPeakByWorkload": {
+          "WL-E": 74.4,
+          "WL-I": 91.66666666666667,
+          "WL-S": 137.26666666666668
+        },
+        "remoteShareByWorkload": {
+          "WL-E": 5.401459854014599,
+          "WL-I": 7.981220657276995,
+          "WL-S": 9.876543209876543
+        }
+      }
+    }
+  ],
+  "contentionRuns": 34,
+  "densityTaskMeans": {
+    "high_density": 15302.0,
+    "low_density": 5499.6,
+    "nominal": 9295.0
+  },
+  "workloadConfiguredExpectedCpuCycles": {
+    "WL-E": 430000000.0,
+    "WL-I": 790000000.0,
+    "WL-S": 1670000000.0
+  },
+  "workloadSelectedLocalExecutionTimeMeans": {
+    "WL-E": 2.5958126444024368,
+    "WL-I": 2.267812644402437,
+    "WL-S": 1.36
+  },
+  "workloadPendingPeakMeans": {
+    "WL-E": 74.4,
+    "WL-I": 91.66666666666667,
+    "WL-S": 137.26666666666668
+  },
+  "workloadRemoteSharePercent": {
+    "WL-E": 5.401459854014599,
+    "WL-I": 7.981220657276995,
+    "WL-S": 9.876543209876543
+  },
+  "localAssignmentsTotal": 917,
+  "remoteAssignmentsTotal": 62,
+  "shutdownInFlightTotal": 36,
+  "correction": "Il precedente gate WL-S >= WL-E sul massimo tempo locale indipendente e' stato rimosso: misurava un output della strategia, non la complessita' del generatore."
+}

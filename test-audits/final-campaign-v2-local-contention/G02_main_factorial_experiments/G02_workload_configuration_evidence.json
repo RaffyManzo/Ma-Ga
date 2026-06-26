@@ -1,0 +1,32 @@
+{
+  "schemaVersion": 1,
+  "generatedAt": "2026-06-26T23:57:11.397854+02:00",
+  "profileCpuCycles": {
+    "light": 200000000.0,
+    "medium": 600000000.0,
+    "heavy": 3200000000.0
+  },
+  "workloadWeights": {
+    "WL-E": {
+      "light": 0.75,
+      "medium": 0.2,
+      "heavy": 0.05
+    },
+    "WL-I": {
+      "light": 0.5,
+      "medium": 0.35,
+      "heavy": 0.15
+    },
+    "WL-S": {
+      "light": 0.25,
+      "medium": 0.3,
+      "heavy": 0.45
+    }
+  },
+  "configuredExpectedCpuCycles": {
+    "WL-E": 430000000.0,
+    "WL-I": 790000000.0,
+    "WL-S": 1670000000.0
+  },
+  "interpretation": "La complessita' configurata cresce WL-E < WL-I < WL-S. Le metriche delle sole porzioni assegnate localmente sono output della strategia e non devono essere usate come prova diretta della complessita' del generatore."
+}
