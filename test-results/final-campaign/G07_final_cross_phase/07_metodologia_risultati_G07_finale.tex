@@ -1,0 +1,895 @@
+\chapter{Metodologia sperimentale e risultati}
+\label{chap:metodologia_risultati}
+
+Il capitolo precedente ha descritto la costruzione dello scenario urbano, il collegamento tra Eclipse MOSAIC e SUMO, il live-state layer e il passaggio degli snapshot al core MA-GA. La pipeline è stata presentata separando la ricostruzione dello stato, la gestione temporale e l'ottimizzazione. Questa separazione consente di verificare non soltanto se una simulazione termina correttamente, ma anche se i dati attraversano in modo coerente tutti i componenti previsti.
+
+La valutazione sperimentale considera quindi due livelli distinti. Il primo riguarda la correttezza tecnica della pipeline: materializzazione dello scenario, avanzamento della simulazione, produzione degli snapshot, esecuzione dei job GA, applicazione delle strategie e generazione dei report. Il secondo riguarda il comportamento funzionale osservato, come la crescita del costo computazionale al variare del carico, la presenza di risultati obsoleti, le decisioni di offloading remoto e la relazione tra mobilità e connettività.
+
+I risultati devono essere letti insieme ai limiti del Proof-of-Concept. Il runtime registra task, job GA, strategie e geni applicati, ma non simula ancora il completamento applicativo dei task remoti. Una run tecnicamente valida non implica inoltre che ogni comportamento previsto sia stato esercitato. Per questo motivo, la campagna distingue in modo esplicito tra esito tecnico, evidenza funzionale e limite di osservabilità.
+
+\section{Obiettivi e disegno della valutazione}
+\label{sec:exp_disegno}
+
+La campagna è stata costruita per verificare progressivamente il sistema integrato. Le prime attività hanno controllato la riproducibilità degli input e la correttezza della pipeline. Le prove successive hanno variato densità, workload, durata, mobilità, risorse e condizioni temporali. L'ordine operativo dei gruppi non viene riprodotto come struttura del capitolo, perché le evidenze sono più leggibili quando vengono raccolte secondo la domanda sperimentale affrontata.
+
+La \cref{tab:exp_domande} riassume le domande principali. Esse coprono il funzionamento end-to-end, la riproducibilità, il comportamento sotto carico, la mobilità, la sensibilità alle risorse e la gestione dei risultati stale. L'ultima domanda riguarda l'integrità complessiva del corpus sperimentale e serve a controllare che i risultati usati nella tesi siano coerenti con gli audit finali.
+
+\begin{table}[htbp]
+    \centering
+    \caption{Domande affrontate dalla valutazione sperimentale.}
+    \label{tab:exp_domande}
+    \small
+    \begin{tabularx}{\textwidth}{
+        >{\raggedright\arraybackslash}p{0.17\textwidth}
+        >{\raggedright\arraybackslash}X
+        >{\raggedright\arraybackslash}p{0.26\textwidth}
+    }
+        \toprule
+        \textbf{Area} &
+        \textbf{Domanda sperimentale} &
+        \textbf{Evidenza utilizzata} \\
+        \midrule
+        Pipeline &
+        La catena MOSAIC/SUMO--snapshot--MA-GA--reporting completa una run senza violazioni strutturali o temporali? &
+        Materializzazioni, smoke test, validator e trace runtime. \\
+        Riproducibilità &
+        Gli stessi input e seed producono scenari e contatori funzionali coerenti? &
+        Confronto delle materializzazioni e ripetizioni runtime. \\
+        Carico &
+        Come cambiano runtime, backlog e risultati stale al crescere di densità e complessità del workload? &
+        Nove configurazioni fattoriali, ciascuna eseguita con cinque seed. \\
+        Durata &
+        Il profilo nominale rimane operativo in esecuzioni estese? &
+        Cinque run da 600~s e una prova stress opzionale. \\
+        Mobilità &
+        Le metriche mobility-aware e le decisioni remote risultano osservabili durante un cambio di gateway? &
+        Profili diretti e run controllata \texttt{rsu\_0}--\texttt{rsu\_1}. \\
+        Risorse &
+        Il MA-GA reagisce a variazioni controllate di CPU, banda e RTT? &
+        Sei varianti di risorsa e due repliche di recovery. \\
+        Temporalità &
+        Il runtime scarta risultati obsoleti e applica le politiche di finestra e riuso previste? &
+        Run forced-stale e audit trasversale dei record temporali. \\
+        Ablation &
+        Quale effetto produce la rimozione controllata dell'offloading remoto, della penalità di mobilità e del riuso della popolazione? &
+        Quarantacinque run paired su tre configurazioni e cinque seed. \\
+        Integrità &
+        I report finali sono leggibili, numericamente coerenti e interpretati secondo il modello implementato? &
+        Audit preliminare trasversale del corpus versionato. \\
+        \bottomrule
+    \end{tabularx}
+\end{table}
+
+\subsection{Perimetro e stato congelato}
+\label{subsec:exp_perimetro}
+
+Il core scientifico utilizzato nella campagna principale corrisponde allo stato congelato della repository già adottato come riferimento implementativo. Nelle fasi G00--G07-A non sono state introdotte modifiche alle classi Java del core; le correzioni hanno riguardato strumenti di materializzazione, post-processing, raccolta delle evidenze e test harness. Lo studio di ablation G02B è stato invece isolato nel branch \texttt{experiment/g02b-ablation}. In quel branch sono stati aggiunti soltanto gli interruttori necessari per esporre le tre varianti controllate, senza modificare formule, operatori genetici o baseline già eseguite. Il branch stabile della campagna è rimasto invariato.
+
+La campagna principale usa il profilo \texttt{STATIC} per lo scaling dei parametri del GA. Le configurazioni combinano tre densità veicolari e tre classi di workload. I profili \texttt{low\_density} e \texttt{nominal} rappresentano le condizioni operative controllate, mentre \texttt{high\_density} viene trattato come stress profile. La distinzione è importante perché una run tecnicamente completata in alta densità non rende automaticamente quel profilo una condizione stabile di esercizio.
+
+La \cref{tab:exp_setup} raccoglie le scelte comuni. La durata ordinaria delle run fattoriali è pari a 300~s, mentre i profili funzionali e le varianti di risorsa usano 180~s. La verifica di durata estesa porta il profilo nominale a 600~s. I cinque seed della campagna principale sono mantenuti anche nelle prove nominali estese, in modo da separare la variabilità degli input da quella dovuta al runtime wall-clock.
+
+\begin{table}[htbp]
+    \centering
+    \caption{Configurazione comune della campagna sperimentale.}
+    \label{tab:exp_setup}
+    \small
+    \begin{tabularx}{\textwidth}{
+        >{\raggedright\arraybackslash}p{0.25\textwidth}
+        >{\raggedright\arraybackslash}X
+        >{\raggedright\arraybackslash}p{0.28\textwidth}
+    }
+        \toprule
+        \textbf{Elemento} &
+        \textbf{Impostazione} &
+        \textbf{Ruolo nella valutazione} \\
+        \midrule
+        Scenario &
+        Sottorete sintetico-calibrata derivata da \texttt{candidate\_0045}. &
+        Mantiene topologia, route e copertura controllabili. \\
+        Core MA-GA &
+        Commit congelato \texttt{5a9477735a3d}. &
+        Impedisce variazioni dell'algoritmo durante la campagna. \\
+        Scaling GA &
+        \texttt{STATIC}. &
+        Conserva comparabilità tra configurazioni canoniche. \\
+        Seed &
+        \texttt{104729}, \texttt{130363}, \texttt{155921}, \texttt{181081}, \texttt{207547}. &
+        Produce cinque repliche deterministiche degli input. \\
+        Durate &
+        180~s, 300~s e 600~s. &
+        Separa smoke e prove funzionali, campagna principale ed endurance nominale. \\
+        Densità &
+        \texttt{low\_density}, \texttt{nominal}, \texttt{high\_density}. &
+        Distingue condizioni operative e stress profile. \\
+        Workload &
+        \texttt{WL-E}, \texttt{WL-I}, \texttt{WL-S}. &
+        Varia il mix di task leggeri, intermedi e pesanti. \\
+        Sorgente dati &
+        Snapshot costruiti dal live-state layer durante MOSAIC. &
+        Mantiene il core indipendente dal simulatore. \\
+        \bottomrule
+    \end{tabularx}
+\end{table}
+
+\subsection{Profili di densità e workload}
+\label{subsec:exp_profili}
+
+Le configurazioni fattoriali seguono la notazione \texttt{CFG-X-Y}, dove \texttt{X} identifica la densità e \texttt{Y} la classe di workload. Le lettere \texttt{L}, \texttt{N} e \texttt{H} corrispondono rispettivamente a bassa densità, densità nominale e alta densità. Le classi \texttt{E}, \texttt{I} e \texttt{S} rappresentano invece mix con prevalenza di task leggeri, intermedi e pesanti.
+
+La frequenza di arrivo resta pari a un task al secondo per veicolo attivo nella campagna principale. Cambia la distribuzione delle classi: \texttt{WL-E} assegna probabilità 0,75, 0,20 e 0,05; \texttt{WL-I} usa 0,50, 0,35 e 0,15; \texttt{WL-S} usa 0,25, 0,30 e 0,45. In questo modo il confronto modifica la composizione del carico senza cambiare il meccanismo seeded Poisson descritto nel capitolo precedente.
+
+\begin{table}[htbp]
+    \centering
+    \caption{Profili di workload utilizzati nella campagna principale.}
+    \label{tab:exp_workload}
+    \small
+    \begin{tabularx}{\textwidth}{
+        >{\centering\arraybackslash}p{0.15\textwidth}
+        >{\centering\arraybackslash}p{0.14\textwidth}
+        >{\centering\arraybackslash}p{0.14\textwidth}
+        >{\centering\arraybackslash}p{0.14\textwidth}
+        >{\raggedright\arraybackslash}X
+    }
+        \toprule
+        \textbf{Profilo} &
+        \textbf{Leggeri} &
+        \textbf{Intermedi} &
+        \textbf{Pesanti} &
+        \textbf{Uso sperimentale} \\
+        \midrule
+        \texttt{WL-E} & 0,75 & 0,20 & 0,05 & Carico prevalentemente leggero. \\
+        \texttt{WL-I} & 0,50 & 0,35 & 0,15 & Mix centrale usato come riferimento nominale. \\
+        \texttt{WL-S} & 0,25 & 0,30 & 0,45 & Pressione applicativa con quota maggiore di task pesanti. \\
+        \bottomrule
+    \end{tabularx}
+\end{table}
+
+\section{Metriche e regole di interpretazione}
+\label{sec:exp_metriche}
+
+Le metriche sono state definite prima dell'esecuzione delle run e raccolte attraverso summary JSON, trace CSV e record JSONL. Il validator controlla relazioni strutturali e temporali, mentre gli audit successivi ricostruiscono il significato funzionale dei valori. La stessa metrica può quindi essere usata sia come controllo hard, sia come indicatore di un limite operativo.
+
+La distinzione più importante riguarda task, job e strategie. Un task generato entra nel lifecycle applicativo, ma il prototipo non ne simula il completamento reale. Un job GA rappresenta invece un'esecuzione dell'ottimizzatore su uno snapshot. Quando il job termina, il risultato può essere applicato oppure scartato come stale. La strategia applicata contiene uno o più geni, e i conteggi \texttt{LOCAL}, \texttt{VEHICLE}, \texttt{EDGE} e \texttt{CLOUD} rappresentano i geni cumulativi presenti nelle strategie, non task unici completati.
+
+\begingroup
+\small
+\setlength{\tabcolsep}{4pt}
+\begin{longtable}{
+    >{\raggedright\arraybackslash}p{0.22\textwidth}
+    >{\raggedright\arraybackslash}p{0.31\textwidth}
+    >{\raggedright\arraybackslash}p{0.27\textwidth}
+}
+    \caption{Significato e limite delle metriche principali.}
+    \label{tab:exp_metriche}\\
+    \toprule
+    \textbf{Metrica} &
+    \textbf{Significato} &
+    \textbf{Regola di interpretazione} \\
+    \midrule
+    \endfirsthead
+
+    \toprule
+    \textbf{Metrica} &
+    \textbf{Significato} &
+    \textbf{Regola di interpretazione} \\
+    \midrule
+    \endhead
+
+    \midrule
+    \multicolumn{3}{r}{Continua nella pagina successiva.}\\
+    \endfoot
+
+    \bottomrule
+    \endlastfoot
+
+    Task generati e attivati &
+    Arrivi prodotti dal workload e task entrati nello stato attivo. &
+    Non indicano il completamento applicativo. \\
+    Task rimossi alla deadline &
+    Task eliminati dalla cache quando la deadline è raggiunta. &
+    La rimozione non equivale a esecuzione completata. \\
+    Task pendenti e picco pending &
+    Backlog presente alla fine e valore massimo durante la run. &
+    Misurano pressione sul lifecycle, non un tasso di fallimento. \\
+    Job submitted e completed &
+    Ottimizzazioni inviate al worker e terminate. &
+    Un job completato può essere scartato e non produrre una strategia applicata. \\
+    Strategie applicate &
+    Risultati del GA accettati dal runtime. &
+    Non corrispondono a task applicativi completati. \\
+    Risultati stale e stale ratio &
+    Risposte del GA divenute obsolete rispetto alla finestra temporale. &
+    Non rappresentano un errore del GA o un task fallito. \\
+    Runtime medio, mediana, P95 e massimo &
+    Tempo wall-clock impiegato dal job GA. &
+    Dipende anche dall'host; non è atteso un determinismo bitwise. \\
+    Snapshot lag &
+    Differenza tra il tempo richiesto e lo snapshot causale restituito. &
+    Un valore nullo indica coerenza temporale, non latenza di rete nulla. \\
+    Ultimo apply e gap finale &
+    Ultimo istante con strategia applicata e coda finale senza nuove applicazioni. &
+    Evidenziano eventuali limiti di continuità temporale. \\
+    Conteggi per destinazione &
+    Numero cumulativo di geni \texttt{LOCAL}, \texttt{VEHICLE}, \texttt{EDGE} e \texttt{CLOUD}. &
+    Non rappresentano task unici né completamenti. \\
+    Modalità di riuso &
+    \texttt{FIRST\_RUN}, \texttt{WARM\_START}, \texttt{PARTIAL\_RESTART} e \texttt{COLD\_START}. &
+    Descrivono la decisione del gestore temporale sulla popolazione. \\
+    Azione sulla finestra &
+    Mantenimento o correzione della durata entro i limiti configurati. &
+    Deve rispettare i bound temporali e le regole del manager. \\
+\end{longtable}
+\endgroup
+
+Il campo \texttt{taskCompletionModel} è risultato \texttt{NOT\_IMPLEMENTED} in tutte le occorrenze esaminate dall'audit trasversale. Di conseguenza, il capitolo non calcola un completion rate. I contatori dei task vengono utilizzati per descrivere generazione, attivazione, backlog e rimozione alla deadline, ma non per sostenere che il servizio applicativo sia stato completato.
+
+Anche il verdetto del validator richiede una lettura contestuale. Il validator ordinario è progettato per le run canoniche e richiede, tra gli altri controlli, almeno una strategia applicata e task generati dal workload Poisson. Le prove forced-stale e con task statici possono quindi produrre un rigetto atteso pur mantenendo validi gli oracoli specifici del test. La \cref{tab:exp_verdetti} mostra le categorie usate per evitare di confondere questi casi.
+
+\begin{table}[htbp]
+    \centering
+    \caption{Classificazione dei verdetti sperimentali.}
+    \label{tab:exp_verdetti}
+    \small
+    \begin{tabularx}{\textwidth}{
+        >{\raggedright\arraybackslash}p{0.25\textwidth}
+        >{\raggedright\arraybackslash}X
+        >{\raggedright\arraybackslash}p{0.25\textwidth}
+    }
+        \toprule
+        \textbf{Verdetto} &
+        \textbf{Significato} &
+        \textbf{Uso nel capitolo} \\
+        \midrule
+        \texttt{PASS} &
+        L'oracolo previsto è soddisfatto con evidenza diretta. &
+        Il comportamento può essere descritto nel perimetro provato. \\
+        \texttt{PASS\_CON\_}\allowbreak\texttt{LIMITAZIONE} &
+        Il comportamento centrale è presente, ma il campione o l'osservabilità sono ridotti. &
+        La conclusione deve riportare il limite. \\
+        \texttt{EVIDENZA\_}\allowbreak\texttt{PARZIALE} &
+        Sono presenti alcune componenti, ma manca un elemento necessario alla prova completa. &
+        Non viene trasformata in PASS. \\
+        \texttt{NON\_}\allowbreak\texttt{OSSERVATO} &
+        La run è valida, ma l'evento cercato non si verifica. &
+        L'assenza di evidenza non diventa prova di impossibilità. \\
+        Rigetto atteso &
+        Il validator canonico respinge una configurazione diagnostica progettata fuori dal suo oracolo ordinario. &
+        Il motivo deve essere unico, verificato e separato dagli oracoli hard. \\
+        \bottomrule
+    \end{tabularx}
+\end{table}
+
+\section{Correttezza della pipeline e riproducibilità}
+\label{sec:exp_validazione}
+
+La prima parte della campagna ha verificato che gli scenari potessero essere prodotti in modo sistematico e che l'intera catena fosse eseguibile. Sono state completate 69 materializzazioni: 63 hanno superato il validator senza warning e 6 hanno prodotto esclusivamente warning metodologici attesi per profili diretti di engineering. Non sono rimaste materializzazioni fallite o bloccate. Questa fase non misura il comportamento del MA-GA, ma stabilisce che ogni configurazione dispone di manifest, report e file coerenti.
+
+La run smoke successiva ha attraversato materializzazione, deploy, MOSAIC, SUMO, live-state layer, snapshot, bridge, TemporalWindowManager, MA-GA, reporting e validator. La simulazione ha raggiunto 180~s. Il post-processing automatico iniziale si è fermato per un errore nel summarizer, ma è stato recuperato offline sul run già concluso, senza eseguire una seconda simulazione. Il JAR utilizzato era un artefatto precedente validato per hash, dimensione e contenuto, e non viene presentato come fresh build prodotta durante la campagna.
+
+La \cref{tab:exp_smoke} mostra che i 243 job inviati sono stati completati e che 233 strategie sono state applicate. I 10 risultati stale non hanno prodotto violazioni temporali. Lo snapshot lag massimo è rimasto nullo e l'ultima strategia è stata applicata al termine della run. Questi dati sostengono la fattibilità tecnica end-to-end, ma non costituiscono un confronto prestazionale con algoritmi alternativi.
+
+\begin{table}[htbp]
+    \centering
+    \caption{Metriche principali della validazione end-to-end da 180~s.}
+    \label{tab:exp_smoke}
+    \small
+    \begin{tabularx}{\textwidth}{
+        >{\raggedright\arraybackslash}X
+        >{\centering\arraybackslash}p{0.14\textwidth}
+        >{\raggedright\arraybackslash}X
+        >{\centering\arraybackslash}p{0.14\textwidth}
+    }
+        \toprule
+        \textbf{Metrica} & \textbf{Valore} & \textbf{Metrica} & \textbf{Valore} \\
+        \midrule
+        Task generati / attivati & 101 / 101 & Task pendenti finali / picco & 0 / 5 \\
+        Job submitted / completed & 243 / 243 & Strategie applicate & 233 \\
+        Risultati stale & 10 & Stale ratio & 4,115\% \\
+        Runtime medio / mediano & 0,0368 / 0,0047~s & P95 / massimo & 0,1787 / 0,5147~s \\
+        Snapshot lag massimo & 0~s & Violazioni runtime & 0 \\
+        Ultima strategia applicata & 180~s & Gap finale senza apply & 0~s \\
+        \bottomrule
+    \end{tabularx}
+\end{table}
+
+\subsection{Riproducibilità degli input e delle run}
+\label{subsec:exp_riproducibilita}
+
+La riproducibilità è stata verificata su due livelli. Due materializzazioni ottenute dalla stessa configurazione e dallo stesso seed sono risultate logicamente identiche dopo aver escluso identificatori e metadati di esecuzione. Tre run ripetute sullo stesso scenario hanno inoltre prodotto gli stessi contatori principali del workload: 9.306 task generati, 9.241 rimossi alla deadline, 65 pendenti finali e picco pending pari a 79.
+
+Il numero di job GA e il runtime wall-clock non sono invece identici. I job submitted variano tra 474 e 616, mentre il runtime medio varia tra 0,0340 e 0,0441~s. Il coefficiente di variazione delle medie è pari all'11,184\%. La differenza è compatibile con l'esecuzione asincrona e con la temporizzazione dell'host: gli input e i contatori funzionali principali restano ripetibili, mentre il ritmo con cui il worker completa i job può cambiare.
+
+\begin{table}[htbp]
+    \centering
+    \caption{Ripetibilità runtime e verifica nominale estesa.}
+    \label{tab:exp_riproducibilita}
+    \small
+    \begin{tabularx}{\textwidth}{
+        >{\raggedright\arraybackslash}p{0.22\textwidth}
+        >{\raggedright\arraybackslash}p{0.22\textwidth}
+        >{\raggedright\arraybackslash}X
+        >{\raggedright\arraybackslash}p{0.23\textwidth}
+    }
+        \toprule
+        \textbf{Prova} &
+        \textbf{Evidenza} &
+        \textbf{Risultato} &
+        \textbf{Limite} \\
+        \midrule
+        Materializzazione ripetuta &
+        Due istanze con stessa configurazione e seed. &
+        Confronto normalizzato: istanze logicamente identiche. &
+        I campi documentali restano differenti. \\
+        Tre run ripetute &
+        9.306 task, 9.241 rimozioni e 65 pending in tutte le run. &
+        Contatori funzionali principali identici. &
+        Runtime medio e job submitted dipendono dall'host. \\
+        Cinque run nominali estese &
+        96.337 task, 6.021 job submitted e 5.968 strategie applicate. &
+        5/5 run da 600~s completate; stale pesato 0,880\%. &
+        Il risultato vale per il profilo nominale provato. \\
+        Prova stress estesa &
+        Alta densità con workload \texttt{WL-S}. &
+        Interruzione a 464/600~s per watchdog federati e TraCI. &
+        Nessuna conclusione di endurance o regressione del core. \\
+        \bottomrule
+    \end{tabularx}
+\end{table}
+
+Le cinque run nominali estese hanno mantenuto snapshot lag e violazioni runtime pari a zero. L'ultima strategia è stata applicata tra 599,9 e 600~s, con un gap finale massimo di 0,1~s. Il dato mostra continuità del runtime nelle condizioni nominali provate. La prova opzionale in alta densità è invece terminata a 464~s per un problema federato/TraCI e viene conservata come limite dello stress profile, non come fallimento del core MA-GA.
+
+\section{Effetto di densità e workload}
+\label{sec:exp_carico}
+
+La campagna fattoriale combina nove configurazioni, ottenute incrociando le tre densità con le tre classi di workload. Ogni configurazione è stata eseguita con cinque seed, per un totale di 45 run. Tutte le run hanno superato il validator con zero errori e zero warning; lo snapshot lag massimo e le violazioni runtime sono rimasti pari a zero.
+
+La \cref{tab:exp_g02_carico} mostra la crescita del carico e dei risultati stale. A parità di densità, l'aumento della componente pesante riduce il numero di strategie applicate e tende ad aumentare backlog e stale ratio. Il comportamento diventa più evidente nei profili nominali e ad alta densità: \texttt{CFG-N-S} raggiunge uno stale ratio medio dell'11,935\%, mentre \texttt{CFG-H-S} arriva al 23,065\%.
+
+\begingroup
+\footnotesize
+\setlength{\tabcolsep}{3.5pt}
+\begin{table}[htbp]
+    \centering
+    \caption{Carico e attività del runtime nelle nove configurazioni fattoriali.}
+    \label{tab:exp_g02_carico}
+    \begin{tabularx}{\textwidth}{
+        >{\raggedright\arraybackslash}p{0.13\textwidth}
+        >{\centering\arraybackslash}p{0.12\textwidth}
+        >{\centering\arraybackslash}p{0.17\textwidth}
+        >{\centering\arraybackslash}p{0.12\textwidth}
+        >{\centering\arraybackslash}p{0.12\textwidth}
+        >{\raggedright\arraybackslash}X
+    }
+        \toprule
+        \textbf{Config.} &
+        \textbf{Task} &
+        \textbf{Job sub./appl.} &
+        \textbf{Stale} &
+        \textbf{Pending finali} &
+        \textbf{Lettura del risultato} \\
+        \midrule
+        \texttt{CFG-L-E} & 27.498 & 3.775 / 3.767 & 0,219\% & 126 & Basso carico e applicazione quasi completa. \\
+        \texttt{CFG-L-I} & 27.498 & 3.547 / 3.541 & 0,170\% & 162 & Stabilità analoga con mix intermedio. \\
+        \texttt{CFG-L-S} & 27.498 & 3.030 / 3.029 & 0,034\% & 262 & Più backlog, ma quasi nessun risultato stale. \\
+        \texttt{CFG-N-E} & 46.475 & 2.936 / 2.929 & 0,245\% & 256 & Aumento dei task senza perdita rilevante di strategie. \\
+        \texttt{CFG-N-I} & 46.475 & 2.756 / 2.745 & 0,405\% & 305 & Profilo nominale centrale stabile. \\
+        \texttt{CFG-N-S} & 46.475 & 2.177 / 1.917 & 11,935\% & 514 & Pressione applicativa e crescita degli stale. \\
+        \texttt{CFG-H-E} & 76.510 & 2.418 / 2.266 & 6,272\% & 435 & Effetto della densità già visibile con task leggeri. \\
+        \texttt{CFG-H-I} & 76.510 & 2.101 / 1.834 & 12,856\% & 545 & Maggiore distanza tra job completati e applicati. \\
+        \texttt{CFG-H-S} & 76.510 & 1.670 / 1.285 & 23,065\% & 894 & Stress combinato massimo della matrice principale. \\
+        \bottomrule
+    \end{tabularx}
+\end{table}
+\endgroup
+
+Il runtime GA cresce insieme alla pressione esercitata dalla configurazione. Nella \cref{tab:exp_g02_runtime}, la media passa da 0,0268~s in \texttt{CFG-L-E} a 0,1382~s in \texttt{CFG-H-S}. Anche il P95 aumenta da circa 0,060~s a 0,472~s. Il massimo osservato nella campagna è pari a 0,6401~s. Queste misure descrivono una tendenza coerente, ma non costituiscono un'analisi di significatività statistica.
+
+\begingroup
+\footnotesize
+\setlength{\tabcolsep}{3.5pt}
+\begin{table}[H]
+    \centering
+    \caption{Runtime del GA e assegnazioni remote nelle configurazioni fattoriali.}
+    \label{tab:exp_g02_runtime}
+    \begin{tabularx}{\textwidth}{
+        >{\raggedright\arraybackslash}p{0.13\textwidth}
+        >{\centering\arraybackslash}p{0.13\textwidth}
+        >{\centering\arraybackslash}p{0.13\textwidth}
+        >{\centering\arraybackslash}p{0.13\textwidth}
+        >{\centering\arraybackslash}p{0.13\textwidth}
+        >{\raggedright\arraybackslash}X
+    }
+        \toprule
+        \textbf{Config.} &
+        \textbf{Media [s]} &
+        \textbf{P95 [s]} &
+        \textbf{Max [s]} &
+        \textbf{Geni remoti} &
+        \textbf{Osservazione} \\
+        \midrule
+        \texttt{CFG-L-E} & 0,0268 & 0,0596 & 0,2303 & 354 & Maggiore quota remota della campagna principale. \\
+        \texttt{CFG-L-I} & 0,0296 & 0,0610 & 0,2951 & 39 & Prevalenza locale. \\
+        \texttt{CFG-L-S} & 0,0408 & 0,0809 & 0,2149 & 3 & Quasi esclusivamente locale. \\
+        \texttt{CFG-N-E} & 0,0569 & 0,1278 & 0,2600 & 91 & Alcune decisioni remote applicate. \\
+        \texttt{CFG-N-I} & 0,0656 & 0,1461 & 0,3080 & 8 & Baseline nominale prevalentemente locale. \\
+        \texttt{CFG-N-S} & 0,1010 & 0,2803 & 0,4811 & 3 & Aumento del costo senza crescita dell'offloading remoto. \\
+        \texttt{CFG-H-E} & 0,0763 & 0,2130 & 0,4155 & 27 & Densità elevata con poche scelte remote. \\
+        \texttt{CFG-H-I} & 0,0955 & 0,3072 & 0,5458 & 5 & Costo e stale aumentano insieme. \\
+        \texttt{CFG-H-S} & 0,1382 & 0,4720 & 0,6401 & 2 & Limite più gravoso della matrice principale. \\
+        \bottomrule
+    \end{tabularx}
+\end{table}
+\endgroup
+
+Complessivamente, le 45 run hanno prodotto 451.449 task, 24.410 job submitted e completed, 23.313 strategie applicate e 1.097 risultati stale. Lo stale ratio pesato è pari al 4,494\%. Le assegnazioni sono quasi interamente locali: su 750.495 geni applicati, 749.963 sono \texttt{LOCAL}, mentre 532 sono distribuiti tra \texttt{VEHICLE}, \texttt{EDGE} e \texttt{CLOUD}. La quota remota, pari a circa lo 0,071\%, indica che nelle condizioni fattoriali il modello di costo ha favorito l'esecuzione locale. Non consente invece di concludere che le destinazioni remote siano assenti dal prototipo, perché prove mirate successive le hanno rese osservabili.
+
+\FloatBarrier
+
+\section{Mobilità, connettività e cambio di gateway}
+\label{sec:exp_mobilita}
+
+La valutazione della mobilità ha usato cinque configurazioni dirette, progettate per osservare il caso locale, le due aree RSU, un percorso di switch e opportunità V2V. Tutte le run hanno terminato tecnicamente con validator superato, snapshot lag nullo e zero violazioni runtime. I risultati funzionali sono però più articolati: alcuni modelli vengono osservati direttamente, altri compaiono solo nei candidati o in strategie non applicate.
+
+Le cinque run hanno prodotto 29.624 task, 1.715 job completed, 1.601 strategie applicate e 114 risultati stale. Il profilo \texttt{M-V2V-01}, eseguito in alta densità, raggiunge uno stale ratio del 48,187\% e un runtime massimo di 1,3607~s. Questo valore documenta un limite operativo dello stress profile, ma non è accompagnato da errori del validator, lag causale o violazioni del runtime.
+
+La prima configurazione denominata \texttt{M-SWITCH-01} non ha prodotto una transizione reale: il file dedicato conteneva soltanto l'intestazione. Il nome della configurazione non è stato quindi usato come prova dell'evento. Una successiva run controllata ha assegnato al veicolo probe una route che attraversa realmente le due aree RSU e ha ricostruito la corrispondenza tra identificativo SUMO e identificativo runtime MOSAIC.
+
+\begingroup
+\small
+\setlength{\tabcolsep}{4pt}
+\begin{longtable}{
+    >{\raggedright\arraybackslash}p{0.13\textwidth}
+    >{\raggedright\arraybackslash}p{0.21\textwidth}
+    >{\raggedright\arraybackslash}p{0.23\textwidth}
+    >{\raggedright\arraybackslash}p{0.16\textwidth}
+    >{\raggedright\arraybackslash}p{0.15\textwidth}
+}
+    \caption{Sintesi delle evidenze mobility-aware e dei verdetti finali.}
+    \label{tab:exp_mobilita}\\
+    \toprule
+    \textbf{Test} &
+    \textbf{Funzione} &
+    \textbf{Evidenza finale} &
+    \textbf{Verdetto} &
+    \textbf{Limite} \\
+    \midrule
+    \endfirsthead
+
+    \toprule
+    \textbf{Test} &
+    \textbf{Funzione} &
+    \textbf{Evidenza finale} &
+    \textbf{Verdetto} &
+    \textbf{Limite} \\
+    \midrule
+    \endhead
+
+    \midrule
+    \multicolumn{5}{r}{Continua nella pagina successiva.}\\
+    \endfoot
+
+    \bottomrule
+    \endlastfoot
+
+    \texttt{T-090} &
+    Esecuzione locale convenzionale &
+    14.233 geni locali con componenti mobility-aware nulle. &
+    \texttt{PASS} &
+    Caso locale, senza offloading. \\
+    \texttt{T-091} &
+    Modello geometrico EDGE &
+    Candidati EDGE, un gene stale e quattro geni EDGE applicati nelle recovery di risorsa. &
+    \texttt{EVIDENZA\_}\allowbreak\texttt{PARZIALE} &
+    La variante EDGE dedicata non seleziona EDGE. \\
+    \texttt{T-092} &
+    CLOUD gateway-aware &
+    Due decisioni CLOUD applicate nel profilo RSU e 123 nella run controllata. &
+    \texttt{PASS\_CON\_}\allowbreak\texttt{LIMITAZIONE} &
+    Campione originario ridotto; la run controllata usa un solo percorso. \\
+    \texttt{T-093} &
+    Modello V2V a velocità relativa &
+    Metriche finite e decisioni \texttt{VEHICLE} applicate nelle prove di risorsa. &
+    \texttt{PASS\_}\allowbreak\texttt{RECOVERED} &
+    Il profilo V2V originario non applica scelte \texttt{VEHICLE}. \\
+    \texttt{T-094} &
+    Copertura insufficiente &
+    Nessun gene applicato presenta copertura insufficiente. &
+    \texttt{NON\_}\allowbreak\texttt{OSSERVATO} &
+    I soli casi stale non vengono usati come prova. \\
+    \texttt{T-096} &
+    Transizione e rischio di handover &
+    Passaggio \texttt{rsu\_0}--\texttt{rsu\_1} osservato tra 81,7 e 81,8~s. &
+    \texttt{PASS\_}\allowbreak\texttt{RECOVERED} &
+    Evidenza riferita alla route controllata. \\
+    \texttt{T-097} &
+    Penalità di mobilità &
+    Componenti finite e formula verificata sui geni remoti osservati. &
+    \texttt{PASS\_CON\_}\allowbreak\texttt{LIMITAZIONE} &
+    Campione applicato limitato. \\
+    \texttt{T-098} &
+    Switch con offloading remoto &
+    123 geni CLOUD applicati prima, vicino e dopo la transizione. &
+    \texttt{PASS\_}\allowbreak\texttt{RECOVERED} &
+    Non generalizza a ogni traiettoria. \\
+    \texttt{T-099} &
+    Assenza del placeholder cloud legacy &
+    Nessun uso del modello deprecato nei geni analizzati. &
+    \texttt{PASS} &
+    Il metodo resta soltanto come API legacy. \\
+\end{longtable}
+\endgroup
+
+La run controllata dura 180~s, usa il seed \texttt{104729}, il profilo \texttt{low\_density} e la route \texttt{route\_dual\_rsu\_switch\_04}. Il veicolo sorgente \texttt{synthetic\_005} viene identificato nel runtime come \texttt{veh\_2}. Il probe compare in 1.548 snapshot e i suoi task in 400 snapshot. Il cambio di gateway è osservato a circa 81,8~s.
+
+Durante la stessa run sono stati inviati e completati 760 job; 754 strategie sono state applicate e 6 risultati sono diventati stale, pari allo 0,789\%. I 123 geni remoti sono tutti di tipo \texttt{CLOUD}: 38 precedono la transizione, 51 ricadono nella finestra vicina allo switch e 13 la seguono. Questa distribuzione fornisce una relazione temporale tra mobilità, task attivi e offloading remoto.
+
+Il validator canonico ha respinto la run esclusivamente perché il contatore dei task generati è rimasto a zero. La configurazione usa 19 task statici attivati e disabilita il generatore Poisson; per questo il contatore richiesto dallo smoke ordinario non viene incrementato. La simulazione ha comunque raggiunto 180~s, con snapshot lag e violazioni runtime pari a zero. Il caso viene quindi classificato come rigetto atteso del validator per workload statico, non come fallimento della pipeline.
+
+\section{Sensibilità alle risorse e continuità delle strategie}
+\label{sec:exp_risorse}
+
+Le prove di sensibilità modificano una sola famiglia di parametri alla volta, mantenendo invariato il core Java. Le varianti interessano CPU locale, CPU EDGE, CPU CLOUD, banda CELL, RTT CELL e banda V2V. Le baseline corrispondenti provengono dalla campagna fattoriale e non vengono rieseguite. Poiché le durate differiscono, l'interpretazione privilegia percentuali, tassi e rapporti di runtime rispetto ai conteggi grezzi.
+
+La \cref{tab:exp_risorse} mostra che tutte le sei run sono tecnicamente valide, ma non tutte esercitano la risorsa modificata. Quando EDGE, CLOUD o il link CELL diventano meno convenienti, le strategie applicate restano locali. Questo comportamento è compatibile con l'evitamento della risorsa degradata, ma non dimostra direttamente saturazione, repair o fallback. Il report non espone infatti una causa strutturata che colleghi la correzione di un gene alla capacità insufficiente.
+
+\begin{table}[htbp]
+    \centering
+    \caption{Effetto delle variazioni controllate di risorsa.}
+    \label{tab:exp_risorse}
+    \footnotesize
+    \begin{tabularx}{\textwidth}{
+        >{\raggedright\arraybackslash}p{0.17\textwidth}
+        >{\raggedright\arraybackslash}p{0.19\textwidth}
+        >{\raggedright\arraybackslash}X
+        >{\raggedright\arraybackslash}p{0.23\textwidth}
+    }
+        \toprule
+        \textbf{Variante} &
+        \textbf{Modifica} &
+        \textbf{Evidenza osservata} &
+        \textbf{Interpretazione} \\
+        \midrule
+        \texttt{R-LOCALCPU-01} &
+        CPU locale moltiplicata per 0,5. &
+        Offloading remoto in tre osservazioni; stale circa 25\%; lungo gap finale senza nuove strategie. &
+        Pass con limite temporale riproducibile. \\
+        \texttt{R-EDGECPU-01} &
+        CPU EDGE moltiplicata per 0,25. &
+        Nessun gene EDGE applicato; stale 15,020\%. &
+        Risorsa caricata ma non esercitata. \\
+        \texttt{R-CLOUDCPU-01} &
+        CPU CLOUD moltiplicata per 0,02. &
+        Nessun gene CLOUD applicato; stale 21,702\%. &
+        Evitamento compatibile, senza prova di repair. \\
+        \texttt{R-CELLBW-01} &
+        Banda CELL moltiplicata per 0,25. &
+        Nessuna assegnazione EDGE o CLOUD attraversa il link. &
+        Link modificato ma non esercitato. \\
+        \texttt{R-RTT-01} &
+        RTT CELL moltiplicato per 3. &
+        Run stabile; stale 0,307\%; una decisione \texttt{VEHICLE}. &
+        Il traffico applicato non usa il link CELL. \\
+        \texttt{R-V2VBW-01} &
+        Banda V2V moltiplicata per 0,25 in alta densità. &
+        Stale 46,809\%; runtime medio circa quattro volte la baseline; nessun gene \texttt{VEHICLE}. &
+        Limite dello stress profile, non prova della banda V2V ridotta. \\
+        \bottomrule
+    \end{tabularx}
+\end{table}
+
+\subsection{Riduzione della CPU locale}
+\label{subsec:exp_localcpu}
+
+La variante sulla CPU locale produce il risultato funzionale più chiaro. La run originale applica decisioni \texttt{LOCAL} e \texttt{VEHICLE}, ma smette di applicare strategie dopo 7,7~s, lasciando un gap finale di 172,3~s. Per distinguere un evento occasionale da un comportamento riproducibile, la stessa materializzazione e lo stesso seed sono stati riutilizzati in due recovery isolate.
+
+Le recovery confermano sia l'offloading remoto sia il limite temporale. La prima applica 23 geni \texttt{VEHICLE}, un gene \texttt{EDGE} e due geni \texttt{CLOUD}; la seconda applica nove geni \texttt{VEHICLE}, tre \texttt{EDGE} e due \texttt{CLOUD}. In entrambi i casi lo stale ratio rimane intorno al 25,64\% e l'ultima strategia arriva molto prima del termine della simulazione.
+
+\begin{table}[htbp]
+    \centering
+    \caption{Riproducibilità dell'offloading e del limite temporale con CPU locale ridotta.}
+    \label{tab:exp_localcpu}
+    \footnotesize
+    \begin{tabularx}{\textwidth}{
+        >{\raggedright\arraybackslash}p{0.17\textwidth}
+        >{\centering\arraybackslash}p{0.13\textwidth}
+        >{\centering\arraybackslash}p{0.12\textwidth}
+        >{\centering\arraybackslash}p{0.13\textwidth}
+        >{\centering\arraybackslash}p{0.13\textwidth}
+        >{\raggedright\arraybackslash}X
+    }
+        \toprule
+        \textbf{Osservazione} &
+        \textbf{Strategie appl.} &
+        \textbf{Stale} &
+        \textbf{Ultimo apply} &
+        \textbf{Gap finale} &
+        \textbf{Destinazioni applicate} \\
+        \midrule
+        Run originale & 27 & 25,000\% & 7,7~s & 172,3~s & 4 \texttt{LOCAL}, 2 \texttt{VEHICLE}. \\
+        Recovery A & 29 & 25,641\% & 24,9~s & 155,1~s & 9 \texttt{LOCAL}, 23 \texttt{VEHICLE}, 1 \texttt{EDGE}, 2 \texttt{CLOUD}. \\
+        Recovery B & 29 & 25,641\% & 12,1~s & 167,9~s & 10 \texttt{LOCAL}, 9 \texttt{VEHICLE}, 3 \texttt{EDGE}, 2 \texttt{CLOUD}. \\
+        \bottomrule
+    \end{tabularx}
+\end{table}
+
+Il risultato mostra che una minore capacità locale può spostare alcune decisioni verso il continuum remoto. Mostra anche che il costo della ricerca può compromettere la continuità delle strategie applicate. Non dimostra invece il completamento dei task remoti, né consente di attribuire i geni EDGE osservati alla variante con CPU EDGE ridotta. Le due conclusioni devono quindi rimanere separate.
+
+\section{Comportamento temporale e risultati stale}
+\label{sec:exp_temporalita}
+
+Il runtime asincrono deve impedire l'applicazione di una soluzione prodotta per uno stato ormai superato. La prova forced-stale introduce un ritardo artificiale di 300~ms e rende obsoleti tutti i risultati del GA. I 33 job inviati sono stati completati, ma nessuno è stato applicato. Lo stale ratio è quindi pari al 100\%, mentre snapshot lag e violazioni runtime rimangono nulli.
+
+Il validator canonico fallisce esclusivamente perché non esistono strategie applicate. Questa condizione è attesa nella configurazione estrema e non viene nascosta. Gli oracoli hard confermano che i risultati sono stati scartati correttamente, ma la run non può dimostrare il mantenimento dell'ultima strategia valida, perché non esiste una strategia precedente. Nella stessa prova ogni ciclo resta classificato come \texttt{FIRST\_RUN}, per cui la progressione ordinaria viene verificata attraverso il corpus trasversale.
+
+L'audit cross-run analizza 72 file temporali e 36.486 record. La \cref{tab:exp_temporalita} mostra che il corpus contiene sia l'avvio iniziale, sia le scadenze programmate; comprende inoltre tutte le modalità di riuso previste e 22 correzioni della policy. Le azioni sulla finestra rimangono entro i bound e non vengono osservate incoerenze temporali.
+
+\begin{table}[H]
+    \centering
+    \caption{Copertura delle politiche temporali nel corpus cross-run.}
+    \label{tab:exp_temporalita}
+    \small
+    \begin{tabularx}{\textwidth}{
+        >{\raggedright\arraybackslash}p{0.20\textwidth}
+        >{\raggedright\arraybackslash}p{0.29\textwidth}
+        >{\raggedright\arraybackslash}X
+        >{\raggedright\arraybackslash}p{0.19\textwidth}
+    }
+        \toprule
+        \textbf{Famiglia} &
+        \textbf{Conteggi osservati} &
+        \textbf{Interpretazione} &
+        \textbf{Verdetto} \\
+        \midrule
+        Trigger &
+        \texttt{FIRST\_RUN}=104; scadenza programmata=36.382. &
+        Sono osservati avvio iniziale e progressione delle finestre. &
+        \texttt{PASS}. \\
+        Dinamicità &
+        \texttt{UNKNOWN}=104; \texttt{STABLE}=33.736; \texttt{MODERATE}=2.493; \texttt{HIGH}=153. &
+        Tutti i livelli usati dal manager compaiono nel corpus. &
+        \texttt{PASS}. \\
+        Riuso &
+        \texttt{FIRST\_RUN}=104; \texttt{WARM}=33.746; \texttt{PARTIAL}=2.471; \texttt{COLD}=165. &
+        Le quattro modalità di riuso risultano osservabili. &
+        \texttt{PASS}. \\
+        Azioni finestra &
+        \texttt{FIRST\_RUN}=104; \texttt{KEEP}=19; \texttt{CLAMP}=36.363. &
+        Le durate restano nei bound configurati. &
+        \texttt{PASS}. \\
+        Correzioni &
+        22 decisioni di riuso corrette con motivazione. &
+        La policy interviene quando la decisione di base non è applicabile. &
+        Correzioni osservate. \\
+        Forced stale &
+        33 completed, 33 stale, 0 applied. &
+        Lo scarto protegge la causalità; keep-last non osservabile senza strategia precedente. &
+        \texttt{PASS} con limite dichiarato. \\
+        \bottomrule
+    \end{tabularx}
+\end{table}
+
+Questi risultati mostrano che lo stale ratio non deve essere letto isolatamente. Nelle configurazioni ordinarie rappresenta la quota di job completati troppo tardi rispetto alla finestra; nella prova forced-stale è invece la variabile intenzionalmente portata al 100\%. In entrambi i casi il comportamento corretto consiste nel non applicare la soluzione obsoleta.
+
+
+\section{Studio di ablation del MA-GA}
+\label{sec:exp_ablation}
+
+Lo studio G02B è stato aggiunto dopo la campagna principale per isolare il contributo di tre componenti del MA-GA. L'obiettivo non è stabilire quale variante sia migliore in assoluto, ma osservare che cosa cambia quando viene rimosso un singolo elemento del modello. Le baseline \texttt{FULL\_MA\_GA} non sono state rieseguite: sono state riutilizzate quindici run G02, mantenendo per ogni confronto la stessa configurazione e lo stesso seed.
+
+Il piano sperimentale usa tre configurazioni: \texttt{CFG-N-I}, \texttt{CFG-N-S} e \texttt{CFG-H-I}. Per ciascuna configurazione sono stati mantenuti i cinque seed della campagna principale. Le tre varianti producono quindi 45 run scientifiche. Prima del batch sono stati eseguiti quattro smoke tecnici, uno per ogni variante, includendo anche \texttt{FULL\_MA\_GA}. Tutti gli scenari preparati e tutte le run previste hanno superato i validator.
+
+\begin{table}[htbp]
+    \centering
+    \caption{Varianti considerate nello studio di ablation G02B.}
+    \label{tab:exp_g02b_varianti}
+    \small
+    \begin{tabularx}{\textwidth}{
+        >{\raggedright\arraybackslash}p{0.24\textwidth}
+        >{\raggedright\arraybackslash}p{0.30\textwidth}
+        >{\raggedright\arraybackslash}X
+    }
+        \toprule
+        \textbf{Variante} &
+        \textbf{Modifica controllata} &
+        \textbf{Regola di interpretazione} \\
+        \midrule
+        \texttt{LOCAL\_ONLY} &
+        Tutte le destinazioni remote vengono escluse e ogni gene viene assegnato a \texttt{LOCAL}. &
+        Il dominio decisionale è più semplice; un runtime minore non dimostra superiorità. \\
+        \texttt{NO\_MOBILITY\_}\allowbreak\texttt{PENALTY} &
+        Il peso della penalità di mobilità viene posto a zero e gli altri pesi vengono rinormalizzati. &
+        La funzione obiettivo cambia; la fitness totale non è confrontabile con la baseline. \\
+        \texttt{COLD\_START\_}\allowbreak\texttt{NO\_REUSE} &
+        Warm start e partial restart vengono disabilitati; dopo il primo ciclo si usa sempre il cold start. &
+        Il confronto mostra l'effetto operativo del riuso, che può dipendere dal carico. \\
+        \bottomrule
+    \end{tabularx}
+\end{table}
+
+I confronti sono paired: ogni run G02B è associata alla baseline con uguale configurazione e uguale seed. Le metriche sono espresse come differenza \emph{variante meno baseline}. La \cref{tab:exp_g02b_delta} riporta runtime medio del GA e stale ratio, che sono disponibili in entrambi i lati del confronto. I valori descrivono la media sui cinque seed e non sono accompagnati da test inferenziali.
+
+\begin{table}[htbp]
+    \centering
+    \caption{Delta medi paired nello studio G02B.}
+    \label{tab:exp_g02b_delta}
+    \scriptsize
+    \begin{tabularx}{\textwidth}{
+        >{\raggedright\arraybackslash}p{0.22\textwidth}
+        >{\centering\arraybackslash}p{0.11\textwidth}
+        >{\centering\arraybackslash}p{0.15\textwidth}
+        >{\centering\arraybackslash}p{0.15\textwidth}
+        >{\raggedright\arraybackslash}X
+    }
+        \toprule
+        \textbf{Variante} &
+        \textbf{Config.} &
+        \textbf{$\Delta$ runtime medio [s]} &
+        \textbf{$\Delta$ stale [p.p.]} &
+        \textbf{Lettura} \\
+        \midrule
+        \texttt{LOCAL\_ONLY} & \texttt{CFG-N-I} & -0,0530 & -0,405 & Problema nominale semplificato. \\
+        \texttt{LOCAL\_ONLY} & \texttt{CFG-N-S} & -0,0822 & -11,935 & Riduzione netta con workload pesante. \\
+        \texttt{LOCAL\_ONLY} & \texttt{CFG-H-I} & -0,0682 & -12,856 & Riduzione nello stress profile. \\
+        \texttt{NO\_MOBILITY\_}\allowbreak\texttt{PENALTY} & \texttt{CFG-N-I} & -0,0281 & -0,330 & Differenza contenuta nel profilo nominale. \\
+        \texttt{NO\_MOBILITY\_}\allowbreak\texttt{PENALTY} & \texttt{CFG-N-S} & -0,0583 & -11,935 & Minore pressione temporale osservata. \\
+        \texttt{NO\_MOBILITY\_}\allowbreak\texttt{PENALTY} & \texttt{CFG-H-I} & +0,0049 & -0,474 & Runtime vicino alla baseline. \\
+        \texttt{COLD\_START\_}\allowbreak\texttt{NO\_REUSE} & \texttt{CFG-N-I} & -0,0185 & -0,405 & Effetto ridotto nel profilo nominale. \\
+        \texttt{COLD\_START\_}\allowbreak\texttt{NO\_REUSE} & \texttt{CFG-N-S} & -0,0223 & -9,489 & Meno job applicati, ma stale ratio inferiore. \\
+        \texttt{COLD\_START\_}\allowbreak\texttt{NO\_REUSE} & \texttt{CFG-H-I} & +0,0476 & +11,810 & Peggioramento netto sotto alta densità. \\
+        \bottomrule
+    \end{tabularx}
+\end{table}
+
+La variante \texttt{LOCAL\_ONLY} ha prodotto esclusivamente assegnazioni locali. Il runtime medio e lo stale ratio risultano inferiori in tutte e tre le configurazioni, ma il risultato deriva anche dalla rimozione delle destinazioni remote e dalla conseguente riduzione dello spazio di ricerca. La variante deve quindi essere letta come controllo strutturale.
+
+Con \texttt{NO\_MOBILITY\_PENALTY}, il peso $w_M$ è pari a zero. Nei due profili nominali il runtime medio diminuisce, mentre in alta densità resta vicino alla baseline. La fitness totale non viene usata nel confronto, perché i pesi rinormalizzati cambiano il significato del valore ottimizzato. Restano invece utilizzabili i contatori, il runtime e lo stale ratio.
+
+La variante \texttt{COLD\_START\_NO\_REUSE} riduce in media di circa 140 i job sottoposti al GA e di circa 130 le strategie applicate per run. Nei profili nominali non emerge un peggioramento uniforme. Il segnale più chiaro compare in \texttt{CFG-H-I}, dove il runtime medio aumenta di 0,0476~s e lo stale ratio di 11,81 punti percentuali. L'effetto del riuso è quindi dipendente dalla configurazione e diventa più importante nello stress profile.
+
+Le 45 run G02B mantengono snapshot lag massimo pari a zero e nessuna violazione runtime. Rimangono però i limiti generali della campagna: cinque seed per configurazione, assenza di test inferenziali e modello di completamento dei task non implementato. Alcune metriche temporali della baseline G02 non erano disponibili e i relativi delta sono stati lasciati vuoti, senza sostituirli con valori artificiali.
+
+\section{Audit trasversale delle evidenze}
+\label{sec:exp_audit}
+
+Al termine di G02B è stato eseguito il G07 finale. Lo scopo non era produrre nuove simulazioni, ma consolidare le evidenze di G00--G06, G04-R e G02B e controllare la coerenza tra matrici, audit, cartelle dei risultati e testo della tesi. Il controllo ha mantenuto separati il corpus storico già verificato in G07-A e il bundle canonico dell'ablation study.
+
+Il corpus G07-A comprende 303 file strutturati, 210 documenti JSON, 982 record JSONL e 33.283 righe CSV. Il bundle G02B aggiunge 254 file strutturati, costituiti da 201 JSON e 53 CSV con 31.057 righe dati. Lo scope finale raggiunge quindi 557 file strutturati, 411 JSON, 982 record JSONL e 64.340 righe CSV. Gli otto bundle finali considerati risultano leggibili e coerenti con i rispettivi manifest; non sono emersi errori di parsing o valori non finiti.
+
+\begin{table}[htbp]
+    \centering
+    \caption{Risultati dell'audit trasversale finale.}
+    \label{tab:exp_audit}
+    \small
+    \begin{tabularx}{\textwidth}{
+        >{\raggedright\arraybackslash}p{0.27\textwidth}
+        >{\centering\arraybackslash}p{0.16\textwidth}
+        >{\raggedright\arraybackslash}X
+    }
+        \toprule
+        \textbf{Controllo} &
+        \textbf{Risultato} &
+        \textbf{Interpretazione} \\
+        \midrule
+        Bundle finali verificati & 8 & G00--G06, G04-R e G02B dispongono di evidenze leggibili e versionate. \\
+        File strutturati & 557 & Il conteggio unisce lo scope G07-A e il bundle canonico G02B. \\
+        JSON / record JSONL & 411 / 982 & I report, i manifest e gli eventi risultano analizzabili. \\
+        Righe CSV & 64.340 & I trace e gli aggregati tabellari non presentano errori di parsing. \\
+        Controlli G02B & 49/49 & Quattro smoke e 45 run scientifiche risultano validate. \\
+        Righe paired / aggregate & 45 / 162 & L'ablation study è completo rispetto al piano. \\
+        Valori non finiti & 0 & Non sono presenti \texttt{NaN} o \texttt{Infinity} nello scope controllato. \\
+        Modifiche Java / nuove run in G07 & 0 / 0 & Il G07 finale consolida le evidenze senza alterare il sistema. \\
+        \bottomrule
+    \end{tabularx}
+\end{table}
+
+Il controllo aritmetico non sostituisce l'interpretazione semantica. La relazione tra submitted, completed, applied e stale può essere coerente anche quando una risorsa non viene realmente esercitata. Per questo motivo l'audit mantiene separati i risultati tecnici dai verdetti funzionali e conserva come limiti espliciti le funzioni non osservate o non esposte.
+
+\section{Discussione complessiva}
+\label{sec:exp_discussione}
+
+Le evidenze raccolte sostengono innanzitutto il funzionamento della pipeline completa. Le run ordinarie terminano con snapshot causali, assenza di job GA paralleli e produzione dei report previsti. Nella campagna principale le correzioni hanno riguardato compatibilità dei file, serializzazione, summarizer e test harness, senza modificare il core Java congelato. G02B è stato eseguito separatamente su un branch sperimentale che espone soltanto le tre varianti controllate. Questa separazione consente di mantenere intatte le baseline e di attribuire i confronti alle singole componenti rimosse.
+
+La seconda conclusione riguarda la riproducibilità. Le materializzazioni ottenute dagli stessi input sono logicamente identiche e le ripetizioni runtime mantengono i contatori funzionali principali. Il tempo wall-clock del GA e il numero di job completabili nella stessa durata possono variare, perché il worker asincrono dipende dall'host. La riproducibilità deve quindi essere riferita agli input e allo stato simulato, non a una sequenza bitwise identica dei tempi di esecuzione.
+
+La campagna fattoriale mostra una relazione coerente tra carico, runtime e risultati stale. I profili a bassa densità rimangono vicini allo zero per la quota stale, mentre le combinazioni nominali e ad alta densità con workload pesante aumentano backlog e distanza tra job completed e strategie applicate. Il profilo nominale è stato verificato anche per 600~s. L'alta densità rimane invece uno stress profile: alcune run da 180 o 300~s terminano correttamente, ma la prova estesa si interrompe a 464~s e non fornisce una garanzia di endurance.
+
+Le decisioni della campagna principale sono prevalentemente locali. Le prove mirate mostrano però che le destinazioni \texttt{VEHICLE}, \texttt{EDGE} e \texttt{CLOUD} sono raggiungibili dal modello. La riduzione della CPU locale produce offloading remoto in tre osservazioni, mentre la run controllata di mobilità applica geni CLOUD durante il passaggio tra due gateway. La presenza di scelte remote non deve essere confusa con il completamento dei task e non consente, da sola, una valutazione comparativa dell'efficacia dell'algoritmo.
+
+La gestione temporale risulta osservabile sia in condizioni ordinarie, sia nella configurazione estrema forced-stale. Il runtime scarta le soluzioni obsolete e il corpus contiene warm start, partial restart, cold start e correzioni della policy di riuso. Rimangono tuttavia limiti sulla continuità delle strategie in alcune configurazioni di risorsa: la CPU locale ridotta e lo stress V2V producono lunghi intervalli finali senza nuove applicazioni.
+
+Lo studio di ablation completa questa lettura. \texttt{LOCAL\_ONLY} conferma che la semplificazione del dominio riduce il costo temporale, ma non rappresenta un'alternativa equivalente al problema originale. La rimozione della penalità di mobilità produce differenze descrittive senza rendere confrontabile la fitness totale. La disattivazione del riuso non porta a un effetto uniforme nei profili nominali, mentre in alta densità aumenta runtime e stale ratio. Il riuso della popolazione appare quindi utile soprattutto quando la pressione computazionale è maggiore, ma il risultato non può essere generalizzato oltre le configurazioni provate.
+
+\begingroup
+\small
+\setlength{\tabcolsep}{4pt}
+\begin{longtable}{
+    >{\raggedright\arraybackslash}p{0.20\textwidth}
+    >{\raggedright\arraybackslash}p{0.27\textwidth}
+    >{\raggedright\arraybackslash}p{0.27\textwidth}
+    >{\raggedright\arraybackslash}p{0.14\textwidth}
+}
+    \caption{Principali conclusioni e limiti della valutazione finale.}
+    \label{tab:exp_limiti}\\
+    \toprule
+    \textbf{Tema} &
+    \textbf{Conclusione sostenuta} &
+    \textbf{Conclusione non sostenuta} &
+    \textbf{Stato} \\
+    \midrule
+    \endfirsthead
+
+    \toprule
+    \textbf{Tema} &
+    \textbf{Conclusione sostenuta} &
+    \textbf{Conclusione non sostenuta} &
+    \textbf{Stato} \\
+    \midrule
+    \endhead
+
+    \midrule
+    \multicolumn{4}{r}{Continua nella pagina successiva.}\\
+    \endfoot
+
+    \bottomrule
+    \endlastfoot
+
+    Pipeline &
+    La catena end-to-end è eseguibile e osservabile nelle condizioni provate. &
+    Ogni funzionalità prevista è stata esercitata in ogni run. &
+    Verificata. \\
+    Riproducibilità &
+    Input e contatori funzionali principali sono ripetibili. &
+    Il runtime wall-clock è deterministico bit per bit. &
+    Verificata con limite. \\
+    Profili operativi &
+    \texttt{low\_density} e \texttt{nominal} sono stabili nelle durate provate. &
+    \texttt{high\_density} è un profilo operativo stabile fino a 600~s. &
+    Limite stress. \\
+    Mobilità &
+    Uno switch \texttt{rsu\_0}--\texttt{rsu\_1} è correlato a decisioni remote applicate. &
+    Ogni traiettoria o handover produce lo stesso comportamento. &
+    Verificata su route controllata. \\
+    Risorse &
+    La CPU locale ridotta produce offloading remoto e un limite temporale riproducibile. &
+    Le varianti EDGE, CLOUD e CELL dimostrano direttamente saturazione o repair. &
+    Evidenza mista. \\
+    Coverage &
+    I geni applicati osservati mantengono copertura sufficiente. &
+    Il caso con copertura insufficiente è stato validato live. &
+    Non osservato. \\
+    Repair e fallback &
+    Le strategie finali rispettano gli oracoli hard. &
+    Il report identifica causalmente ogni gene corretto dal repair. &
+    Non esposto. \\
+    Stale result &
+    I risultati obsoleti vengono scartati e non applicati. &
+    Uno stale result equivale a task fallito o errore della simulazione. &
+    Verificato. \\
+    Completamento task &
+    Il lifecycle di generazione, attivazione e deadline è osservabile. &
+    È disponibile un completion rate applicativo. &
+    Non implementato. \\
+    Ablation &
+    Le tre componenti rimosse producono effetti diversi e dipendenti dalla configurazione. &
+    Una variante è superiore in generale o le differenze sono statisticamente significative. &
+    Verificata con limiti. \\
+    Confronti &
+    Le configurazioni mostrano differenze descrittive di carico e runtime. &
+    Le differenze sono statisticamente significative o dimostrano superiorità algoritmica. &
+    Fuori dal perimetro. \\
+\end{longtable}
+\endgroup
+
+I campi SUMO relativi a errori, teleport ed emergency braking non vengono trasformati in valori numerici quando il report li espone come \texttt{null} o non li include. Allo stesso modo, l'assenza di un evento in una run valida viene classificata come non osservata e non come prova negativa generale. Queste regole riducono il rischio di attribuire al simulatore o all'algoritmo conclusioni che i dati non sostengono.
+
+\section{Conclusioni del capitolo}
+\label{sec:exp_conclusioni}
+
+La campagna ha verificato una pipeline completa per il computation offloading nel Vehicular Edge-to-Cloud Continuum. Gli scenari risultano materializzabili e riproducibili, il collegamento MOSAIC/SUMO produce snapshot causali e il MA-GA viene eseguito attraverso un runtime asincrono che applica o scarta le strategie secondo la loro validità temporale. Le 45 run fattoriali e le prove successive mostrano che il costo dell'ottimizzazione e lo stale ratio crescono nelle configurazioni più gravose, mentre il profilo nominale rimane operativo nelle esecuzioni da 600~s.
+
+Le prove mirate rendono osservabili decisioni \texttt{VEHICLE}, \texttt{EDGE} e \texttt{CLOUD}, oltre a una transizione reale tra due gateway. La riduzione della CPU locale produce offloading remoto, ma evidenzia anche un limite nella continuità delle strategie. La prova forced-stale conferma che il runtime protegge la causalità scartando tutte le soluzioni obsolete. Questi risultati descrivono il comportamento del Proof-of-Concept senza estenderlo oltre le condizioni effettivamente provate.
+
+G02B aggiunge un confronto controllato tra il modello completo e tre varianti. \texttt{LOCAL\_ONLY} riduce runtime e stale ratio semplificando il problema; \texttt{NO\_MOBILITY\_PENALTY} modifica la funzione obiettivo e richiede di escludere la fitness totale; \texttt{COLD\_START\_NO\_REUSE} mostra l'effetto più negativo in alta densità, con un aumento del runtime medio e dello stale ratio. L'ablation study non dimostra una superiorità universale, ma chiarisce il ruolo operativo delle componenti considerate.
+
+Restano aperti i limiti dichiarati: il completamento applicativo dei task non è implementato, repair e fallback non sono esposti causalmente, la copertura insufficiente non è stata osservata in una strategia applicata e l'alta densità rimane uno stress profile. I confronti G02B sono descrittivi e usano cinque seed per configurazione. Il G07 finale ha verificato la coerenza tra otto bundle, matrici, audit e testo del capitolo senza eseguire nuove simulazioni. Il risultato complessivo non è quindi una dimostrazione di ottimalità, ma la validazione sperimentale di una soluzione implementabile, misurabile e capace di reagire a mobilità, risorse e vincoli temporali nel perimetro considerato.

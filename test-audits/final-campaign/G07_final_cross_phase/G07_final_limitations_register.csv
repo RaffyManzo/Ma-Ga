@@ -1,0 +1,9 @@
+Limit_ID,Area,Limitazione,Conclusione_consentita,Conclusione_non_consentita,Mitigazione,Evidenza
+L-048,Scope G07,"Il conteggio 557 combina G07-A e G02B canonico.",Descrivere lo scope autorevole composito,Che rappresenti ogni file locale o temporaneo,Indicare sempre i due corpus,G07 T-131
+L-049,Statistiche G02B,"Cinque seed e nessun test inferenziale.",Descrivere medie e delta paired,Che i delta siano significativi o universali,Usare formulazioni descrittive,G07 thesis audit
+L-050,Branch sperimentale,"G02B espone varianti su branch isolato.",Confrontare con baseline immutate,Che il core stabile sia stato modificato,Separare campagna principale e ablation,G02B Git metadata
+L-051,Integrazione LaTeX,"Il capitolo è compilato in isolamento.",Il frammento è sintatticamente valido,Che il PDF completo sia già aggiornato,Ricompilare nel progetto autorevole,G07 compile audit
+L-052,Chiusura G07,"Il G07 non esegue nuove run.",Consolidare evidenze esistenti,Che sostituisca esperimenti non pianificati,Nuove run solo per anomalie concrete,G07 decision
+L-053,Task completion,taskCompletionModel=NOT_IMPLEMENTED,Discutere lifecycle job e strategie,Calcolare completion rate,Conservare il limite nel capitolo,G00-G07
+L-054,High density,Profilo di stress non stabile fino a 600 s,Usarlo per evidenziare limiti,Definirlo profilo operativo stabile,Dichiarare lo stress profile,G03/G02B
+L-055,Fitness NO_MOBILITY,"wM=0 cambia la funzione obiettivo.",Confrontare metriche operative,Confrontare fitness totale,Escludere fitness dal paired,G02B T-124

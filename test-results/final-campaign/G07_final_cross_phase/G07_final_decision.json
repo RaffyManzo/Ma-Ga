@@ -1,0 +1,42 @@
+{
+  "schemaVersion": "1.0",
+  "phase": "G07_FINAL",
+  "status": "PASS_FINAL_READY_FOR_THESIS_CONCLUSIONS",
+  "branch": "experiment/g02b-ablation",
+  "preG07Head": "0d12707e0ba65194055d936c532a5615bf1169e2",
+  "stableBaseHead": "790c7cf29d72e6e9b9b2717a48f4f4e44a28ad57",
+  "newSimulations": 0,
+  "javaChanges": 0,
+  "scope": {
+    "bundles": 8,
+    "structuredFiles": 557,
+    "jsonDocuments": 411,
+    "jsonlRecords": 982,
+    "csvDataRows": 64340,
+    "g02bValidatedRuns": 49,
+    "g02bPairedRows": 45,
+    "g02bAggregateRows": 162
+  },
+  "tests": {
+    "T-130": "PASS_FINAL_CROSS_PHASE",
+    "T-131": "PASS_FINAL_AUTHORITATIVE_CORPUS",
+    "T-132": "PASS_FINAL_COUNTER_AND_PAIRING_COHERENCE",
+    "T-133": "PASS_FINAL_COMPLETION_MODEL_DECLARED",
+    "T-134": "PASS_FINAL_PROVENANCE_LEDGER",
+    "T-135": "PASS_FINAL_NUMERIC_AND_THESIS_INTEGRITY"
+  },
+  "thesis": {
+    "chapterFile": "07_metodologia_risultati_G07_finale.tex",
+    "isolatedCompile": "PASS",
+    "fullProjectCompileRequired": true,
+    "readyForConclusions": true
+  },
+  "limitations": [
+    "taskCompletionModel=NOT_IMPLEMENTED",
+    "high_density remains a stress profile",
+    "G02B uses five seeds per configuration and no inferential test",
+    "NO_MOBILITY_PENALTY total fitness is not comparable",
+    "LOCAL_ONLY simplifies the decision problem",
+    "runtime wall-clock is host-dependent"
+  ]
+}

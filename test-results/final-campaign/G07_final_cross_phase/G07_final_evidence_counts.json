@@ -1,0 +1,31 @@
+{
+  "schemaVersion": "1.0",
+  "scopePolicy": "Composite authoritative scope: G07-A historical corpus plus disjoint G02B canonical bundle.",
+  "g07a": {
+    "structuredFiles": 303,
+    "jsonDocuments": 210,
+    "jsonlRecords": 982,
+    "csvDataRows": 33283,
+    "bundles": 7
+  },
+  "g02b": {
+    "structuredFiles": 254,
+    "jsonDocuments": 201,
+    "jsonlRecords": 0,
+    "csvFiles": 53,
+    "csvDataRows": 31057,
+    "bundles": 1,
+    "validatedRuns": 49,
+    "pairedRows": 45,
+    "aggregateRows": 162
+  },
+  "final": {
+    "structuredFiles": 557,
+    "jsonDocuments": 411,
+    "jsonlRecords": 982,
+    "csvDataRows": 64340,
+    "bundles": 8
+  },
+  "parseErrors": 0,
+  "nonFiniteValues": 0
+}

@@ -1,0 +1,10 @@
+Fase,Tema,Stato_finale,Evidenza_principale,Limite_residuo
+G00,Preparazione,PASS,69 materializzazioni completate,Warning metodologici documentati
+G01,Pipeline end-to-end,PASS_CON_LIMITAZIONE,Smoke e recovery post-processing,Fresh build non dimostrata nella run originaria
+G02,Campagna fattoriale,PASS_45_OF_45,9 configurazioni x 5 seed,taskCompletionModel NOT_IMPLEMENTED
+G03,Riproducibilità e durata,PASS_CON_LIMITE_STRESS,Nominal extended completate,High density interrotta a 464 s
+G04/G04-R,Mobilità e connettività,PASS_WITH_RECOVERED_CONTROLLED_MOBILITY_EVIDENCE,Switch rsu_0-rsu_1 e decisioni remote,Una route controllata
+G05,Risorse,PASS_WITH_RESOURCE_AND_TEMPORAL_LIMITS,Offloading remoto con CPU locale ridotta,Target remoti non sempre esercitati
+G06,Temporalità,PASS_WITH_CONTROLLED_STALE_AND_DOCUMENTED_LIMITS,Forced stale e riuso auditato,Keep-last non osservabile senza strategia precedente
+G02B,Ablation,PASS_CANONICAL_COMPLETE,4 smoke + 45 scientifiche + 15 baseline,Descrittivo e senza test inferenziale
+G07,Audit finale,PASS_FINAL_READY_FOR_THESIS_CONCLUSIONS,Matrici audit e capitolo allineati,Nessuna nuova run
