@@ -28,3 +28,16 @@ Questa directory contiene il control plane della nuova campagna sperimentale.
 - `source_plan_hashes.csv`: hash delle fonti legacy canoniche.
 
 Non modificare i parametri scientifici per cambiare la quota di offloading.
+
+## G00 Scenario Preparation And Generation
+
+Stato G00 V2: `COMPLETED`.
+
+- planned materializations: `69`
+- completed materializations: `69`
+- validated materializations: `63`
+- warning materializations: `6`
+- failed materializations: `0`
+- blocked materializations: `0`
+
+Gli scenari sono isolati sotto `tmp/materialized-literature-scenarios/final-campaign-v2-local-contention/`. G00 non esegue MOSAIC o SUMO.

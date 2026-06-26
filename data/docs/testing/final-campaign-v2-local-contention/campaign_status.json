@@ -1,18 +1,19 @@
-{
-  "allStatuses": [
-    "NOT_STARTED_V2"
-  ],
-  "branch": "testing/final-campaign-v2-local-contention",
-  "buildExecuted": false,
-  "coreModified": false,
-  "freezeCommit": "bf41e5682293a79939af2c53858126ad4b9f2ef0",
-  "freezeTag": "maga-local-contention-freeze-20260626",
-  "g02InstanceCount": 45,
-  "generatedAtUtc": "2026-06-26T16:31:47.304242+00:00",
-  "legacyResultsImported": false,
-  "materializationExecuted": false,
-  "phase": "G00_CONTROL_PLANE_CREATED",
-  "scenarioInstanceCount": 69,
-  "schemaVersion": 1,
-  "simulationExecuted": false
+﻿{
+    "allStatuses":  [
+                        "MATERIALIZED_VALIDATED",
+                        "MATERIALIZED_WITH_WARNINGS"
+                    ],
+    "branch":  "testing/final-campaign-v2-local-contention",
+    "buildExecuted":  false,
+    "coreModified":  false,
+    "freezeCommit":  "bf41e5682293a79939af2c53858126ad4b9f2ef0",
+    "freezeTag":  "maga-local-contention-freeze-20260626",
+    "g02InstanceCount":  45,
+    "generatedAtUtc":  "2026-06-26T16:31:47.304242+00:00",
+    "legacyResultsImported":  false,
+    "materializationExecuted":  true,
+    "phase":  "G00_COMPLETE_READY_FOR_G01",
+    "scenarioInstanceCount":  69,
+    "schemaVersion":  1,
+    "simulationExecuted":  false
 }

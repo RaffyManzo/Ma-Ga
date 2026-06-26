@@ -43,3 +43,16 @@ di passare al successivo. Le quattro run di freeze non sono risultati V2.
 - non considerare `localRepairApplied` un campo runtime obbligatorio;
 - distinguere sempre dati configurati, osservati, derivati e misurati;
 - non modificare il capitolo 7 prima della chiusura di G07.
+
+## G00 Execution Result
+
+Stato G00 V2: `COMPLETED`.
+
+- planned materializations: `69`
+- completed materializations: `69`
+- validated materializations: `63`
+- warning materializations: `6`
+- failed materializations: `0`
+- blocked materializations: `0`
+
+Gli scenari sono isolati sotto `tmp/materialized-literature-scenarios/final-campaign-v2-local-contention/`. G00 non esegue MOSAIC o SUMO.

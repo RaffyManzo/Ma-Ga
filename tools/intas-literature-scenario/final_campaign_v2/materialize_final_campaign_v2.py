@@ -897,7 +897,7 @@ def append_section(path: Path, title: str, body: str) -> None:
 
 
 def update_docs(repo_root: Path, spec: dict[str, Any], summary: dict[str, Any]) -> None:
-    docs_root = repo_root / "data" / "docs" / "testing" / "final-campaign"
+    docs_root = repo_root / "data" / "docs" / "testing" / "final-campaign-v2-local-contention"
     status = summary.get("overallStatus", "UNKNOWN")
     completed = summary.get("completedMaterializations", 0)
     planned = summary.get("plannedMaterializations", 0)
@@ -1282,7 +1282,7 @@ def collect_archived_failure_anomalies(repo_root: Path) -> tuple[list[dict[str, 
             "MAT-CFG-M-RSU1-104729_failed_materialization.json",
         ),
     }
-    resolved_root = repo_root / "test-results" / "final-campaign" / "G00_scenario_preparation_generation" / "resolved_attempts"
+    resolved_root = repo_root / "test-results" / "final-campaign-v2-local-contention" / "G00_scenario_preparation_generation" / "resolved_attempts"
     resolved_root.mkdir(parents=True, exist_ok=True)
     rows: list[dict[str, str]] = []
     evidence_paths: list[Path] = []
@@ -1309,7 +1309,7 @@ def collect_archived_failure_anomalies(repo_root: Path) -> tuple[list[dict[str, 
 
 
 def build_materialization_input_index(repo_root: Path, spec: dict[str, Any], plan: list[dict[str, str]]) -> Path:
-    output = repo_root / "test-results" / "final-campaign" / "G00_scenario_preparation_generation" / "materialization_input_index.csv"
+    output = repo_root / "test-results" / "final-campaign-v2-local-contention" / "G00_scenario_preparation_generation" / "materialization_input_index.csv"
     fieldnames = [
         "campaign_id",
         "group_id",
@@ -1409,9 +1409,9 @@ def create_audit(repo_root: Path, spec: dict[str, Any], plan: list[dict[str, str
     repro = summary.get("repro", {})
     raw_repro = repro.get("rawComparison", {})
     logical_repro = repro.get("logicalComparison", {})
-    bandwidth_repair_path = repo_root / "test-results" / "final-campaign" / "G00_scenario_preparation_generation" / "bandwidth_serialization_repair_report.json"
-    bandwidth_scan_before_path = repo_root / "test-results" / "final-campaign" / "G00_scenario_preparation_generation" / "bandwidth_serialization_scan_before.csv"
-    bandwidth_scan_after_path = repo_root / "test-results" / "final-campaign" / "G00_scenario_preparation_generation" / "bandwidth_serialization_scan_after.csv"
+    bandwidth_repair_path = repo_root / "test-results" / "final-campaign-v2-local-contention" / "G00_scenario_preparation_generation" / "bandwidth_serialization_repair_report.json"
+    bandwidth_scan_before_path = repo_root / "test-results" / "final-campaign-v2-local-contention" / "G00_scenario_preparation_generation" / "bandwidth_serialization_scan_before.csv"
+    bandwidth_scan_after_path = repo_root / "test-results" / "final-campaign-v2-local-contention" / "G00_scenario_preparation_generation" / "bandwidth_serialization_scan_after.csv"
     bandwidth_repair = read_json(bandwidth_repair_path) if bandwidth_repair_path.exists() else {}
     sumo_errors_total = sum(int(result.get("metrics", {}).get("sumoErrors") or 0) for result in summary["results"])
     teleport_mentions_total = sum(int(result.get("metrics", {}).get("teleportMentions") or 0) for result in summary["results"])
@@ -1497,8 +1497,8 @@ def create_audit(repo_root: Path, spec: dict[str, Any], plan: list[dict[str, str
     write_csv_rows(metrics_path, metric_rows, metric_fields)
 
     anomalies_path = audit_root / "anomalies_G00.csv"
-    canonical_repair_path = repo_root / "test-results" / "final-campaign" / "G00_scenario_preparation_generation" / "canonical_metadata_repair_report.json"
-    canonical_matrix_path = repo_root / "test-results" / "final-campaign" / "G00_scenario_preparation_generation" / "canonical_deploy_compatibility_matrix.csv"
+    canonical_repair_path = repo_root / "test-results" / "final-campaign-v2-local-contention" / "G00_scenario_preparation_generation" / "canonical_metadata_repair_report.json"
+    canonical_matrix_path = repo_root / "test-results" / "final-campaign-v2-local-contention" / "G00_scenario_preparation_generation" / "canonical_deploy_compatibility_matrix.csv"
     archived_anomalies, archived_failure_paths = collect_archived_failure_anomalies(repo_root)
     recovered_intermediate_path = audit_root / "g00f_recovered_intermediate_statuses.json"
     write_json(recovered_intermediate_path, summary.get("intermediateAnomalies", []))
@@ -1963,7 +1963,7 @@ def scan_bandwidth_serialization(repo_root: Path, spec: dict[str, Any], plan: li
     if len(plan) != int(spec["expectedMaterializationCount"]) or len(found_manifests) != int(spec["expectedMaterializationCount"]):
         raise RuntimeError(f"expected exactly 69 materializations, found plan={len(plan)} manifests={len(found_manifests)}")
 
-    output = repo_root / "test-results" / "final-campaign" / "G00_scenario_preparation_generation" / f"bandwidth_serialization_scan_{suffix}.csv"
+    output = repo_root / "test-results" / "final-campaign-v2-local-contention" / "G00_scenario_preparation_generation" / f"bandwidth_serialization_scan_{suffix}.csv"
     rows: list[dict[str, Any]] = []
     exponent_field_count = 0
     incompatible_field_count = 0
@@ -2052,7 +2052,7 @@ def write_canonical_compatibility_matrix(
     plan: list[dict[str, str]],
     repair_items: list[dict[str, Any]],
 ) -> Path:
-    output = repo_root / "test-results" / "final-campaign" / "G00_scenario_preparation_generation" / "canonical_deploy_compatibility_matrix.csv"
+    output = repo_root / "test-results" / "final-campaign-v2-local-contention" / "G00_scenario_preparation_generation" / "canonical_deploy_compatibility_matrix.csv"
     rows: list[dict[str, str]] = []
     repair_by_id = {item["materializationId"]: item for item in repair_items}
     for row in plan:
@@ -2094,8 +2094,8 @@ def write_canonical_compatibility_matrix(
 
 
 def update_g01_root_cause(repo_root: Path) -> None:
-    anomaly_path = repo_root / "test-audits" / "final-campaign" / "G01_pipeline_validation" / "anomalies_G01.csv"
-    audit_path = repo_root / "test-audits" / "final-campaign" / "G01_pipeline_validation" / "audit_G01_pipeline_validation.md"
+    anomaly_path = repo_root / "test-audits" / "final-campaign-v2-local-contention" / "G01_pipeline_validation" / "anomalies_G01.csv"
+    audit_path = repo_root / "test-audits" / "final-campaign-v2-local-contention" / "G01_pipeline_validation" / "audit_G01_pipeline_validation.md"
     if anomaly_path.exists():
         rows = read_csv_rows(anomaly_path)
         for row in rows:
@@ -2130,7 +2130,7 @@ def repair_canonical_metadata_mode(repo_root: Path, spec: dict[str, Any], plan: 
     if len(plan) != int(spec["expectedMaterializationCount"]) or len(found_manifests) != int(spec["expectedMaterializationCount"]):
         raise RuntimeError(f"expected exactly 69 materializations, found plan={len(plan)} manifests={len(found_manifests)}")
 
-    output_root = repo_root / "test-results" / "final-campaign" / "G00_scenario_preparation_generation"
+    output_root = repo_root / "test-results" / "final-campaign-v2-local-contention" / "G00_scenario_preparation_generation"
     canonical_reports_root = output_root / "canonical_validator_reports"
     repair_items: list[dict[str, Any]] = []
     modified_files: list[str] = []
@@ -2244,7 +2244,7 @@ def repair_bandwidth_serialization_mode(repo_root: Path, spec: dict[str, Any], p
     if len(plan) != int(spec["expectedMaterializationCount"]) or len(found_manifests) != int(spec["expectedMaterializationCount"]):
         raise RuntimeError(f"expected exactly 69 materializations, found plan={len(plan)} manifests={len(found_manifests)}")
 
-    output_root = repo_root / "test-results" / "final-campaign" / "G00_scenario_preparation_generation"
+    output_root = repo_root / "test-results" / "final-campaign-v2-local-contention" / "G00_scenario_preparation_generation"
     canonical_reports_root = output_root / "canonical_validator_reports"
     before_scan = scan_bandwidth_serialization(repo_root, spec, plan, "before")
     repair_items: list[dict[str, Any]] = []

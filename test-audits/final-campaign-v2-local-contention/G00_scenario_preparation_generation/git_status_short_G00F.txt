@@ -1,0 +1,27 @@
+$ git -c safe.directory=C:/Users/raffa/IdeaProjects/maga-core status --short
+# returncode: 0
+
+[stdout]
+ M data/docs/testing/final-campaign-v2-local-contention/02_test_group_plan.md
+ M data/docs/testing/final-campaign-v2-local-contention/README.md
+ M data/docs/testing/final-campaign-v2-local-contention/campaign_status.json
+ M data/docs/testing/final-campaign-v2-local-contention/scenario_configuration_mapping.csv
+ M data/docs/testing/final-campaign-v2-local-contention/scenario_instance_plan.csv
+ M tools/intas-literature-scenario/final_campaign_v2/__pycache__/materialize_final_campaign_v2.cpython-312.pyc
+ M tools/intas-literature-scenario/final_campaign_v2/materialize_final_campaign_v2.py
+?? data/docs/testing/final-campaign-v2-local-contention/G00_CLOSURE.md
+?? test-audits/final-campaign-v2-local-contention/G00_scenario_preparation_generation/anomalies_G00.csv
+?? test-audits/final-campaign-v2-local-contention/G00_scenario_preparation_generation/audit_G00_scenario_preparation_generation.md
+?? test-audits/final-campaign-v2-local-contention/G00_scenario_preparation_generation/evidence_manifest_G00.json
+?? test-audits/final-campaign-v2-local-contention/G00_scenario_preparation_generation/git_diff_check_G00F.txt
+?? test-audits/final-campaign-v2-local-contention/G00_scenario_preparation_generation/git_diff_name_only_G00F.txt
+?? test-audits/final-campaign-v2-local-contention/G00_scenario_preparation_generation/git_frozen_diff_name_only_G00F.txt
+?? test-audits/final-campaign-v2-local-contention/G00_scenario_preparation_generation/git_status_short_G00F.txt
+?? test-audits/final-campaign-v2-local-contention/G00_scenario_preparation_generation/materialization_summary_all.json
+?? test-audits/final-campaign-v2-local-contention/G00_scenario_preparation_generation/materialization_summary_materialization.json
+?? test-audits/final-campaign-v2-local-contention/G00_scenario_preparation_generation/metrics_G00.csv
+?? test-results/final-campaign-v2-local-contention/G00_scenario_preparation_generation/
+?? test-results/final-campaign-v2-local-contention/G03_reproducibility_duration/
+
+[stderr]
+<empty>

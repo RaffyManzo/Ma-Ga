@@ -1,0 +1,10 @@
+campaign_id,group_id,config_id,materialization_id,run_id,test_id,metric_name,metric_value,metric_unit,source_file,validator_status,notes
+final-campaign-v2-local-contention,G00,ALL,ALL,,T-001,planned_materializations,69,count,test-audits/final-campaign-v2-local-contention/G00_scenario_preparation_generation/materialization_summary_all.json,PASS,
+final-campaign-v2-local-contention,G00,ALL,ALL,,T-001,completed_materializations,69,count,test-audits/final-campaign-v2-local-contention/G00_scenario_preparation_generation/materialization_summary_all.json,PASS,
+final-campaign-v2-local-contention,G00,ALL,ALL,,T-002,validated_materializations,63,count,test-audits/final-campaign-v2-local-contention/G00_scenario_preparation_generation/materialization_summary_all.json,PASS,
+final-campaign-v2-local-contention,G00,ALL,ALL,,T-002,warning_materializations,6,count,test-audits/final-campaign-v2-local-contention/G00_scenario_preparation_generation/materialization_summary_all.json,WARN,
+final-campaign-v2-local-contention,G00,ALL,ALL,,T-001,failed_materializations,0,count,test-audits/final-campaign-v2-local-contention/G00_scenario_preparation_generation/materialization_summary_all.json,PASS,
+final-campaign-v2-local-contention,G00,ALL,ALL,,T-001,blocked_materializations,0,count,test-audits/final-campaign-v2-local-contention/G00_scenario_preparation_generation/materialization_summary_all.json,PASS,
+final-campaign-v2-local-contention,G00,ALL,ALL,,T-001,unique_materialization_ids,69,count,test-audits/final-campaign-v2-local-contention/G00_scenario_preparation_generation/materialization_summary_all.json,PASS,
+final-campaign-v2-local-contention,G00,ALL,ALL,,T-001,unique_target_directories,69,count,test-audits/final-campaign-v2-local-contention/G00_scenario_preparation_generation/materialization_summary_all.json,PASS,
+final-campaign-v2-local-contention,G00,ALL,ALL,,T-001,scenario_root_size_bytes,47425809,bytes,test-audits/final-campaign-v2-local-contention/G00_scenario_preparation_generation/materialization_summary_all.json,NOT_APPLICABLE,

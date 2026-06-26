@@ -1,0 +1,10 @@
+$ git -c safe.directory=C:/Users/raffa/IdeaProjects/maga-core diff --check
+# returncode: 0
+
+[stdout]
+<empty>
+
+[stderr]
+warning: in the working copy of 'data/docs/testing/final-campaign-v2-local-contention/scenario_configuration_mapping.csv', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'data/docs/testing/final-campaign-v2-local-contention/scenario_instance_plan.csv', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'tools/intas-literature-scenario/final_campaign_v2/materialize_final_campaign_v2.py', LF will be replaced by CRLF the next time Git touches it
