@@ -1,0 +1,85 @@
+{
+  "cellProfiles": {
+    "classification": "CALIBRATED_ABSTRACTION",
+    "configuredNominalProfile": "CELL_5G_AVEIRO_P50",
+    "configuredProfileSource": "LITERATURE_BASED_CONFIGURED_CELL_PROFILE",
+    "runtimeAccountingSource": "DIAGNOSTIC_RUNTIME_ACCOUNTING_FROM_CONTROLLED_CELL_MESSAGES"
+  },
+  "computeAssumptions": {
+    "cloudCpuCyclesPerSecond": {
+      "classification": "CALIBRATED_ABSTRACTION",
+      "value": 100000000000
+    },
+    "edgeCpuCyclesPerSecond": {
+      "classification": "CALIBRATED_ABSTRACTION",
+      "value": 5000000000
+    },
+    "localVehicleCpuCyclesPerSecond": {
+      "classification": "CONTROLLED_ASSUMPTION",
+      "value": 1000000000
+    },
+    "remoteVehicleCpuCyclesPerSecondTarget": {
+      "classification": "IMPLEMENTED_CONFIGURABLE_LITERATURE_BASED_PROFILE",
+      "value": 1000000000
+    }
+  },
+  "materializationStatus": "SYNTHETIC_CALIBRATED_SCENARIO_GENERATED",
+  "mobility": {
+    "calibrationEvidence": {
+      "intasReferenceMaximumActiveVehicles": 34,
+      "intasReferenceMeanActiveVehicles": 29.52,
+      "intasReferenceMinimumActiveVehicles": 26,
+      "intasReferenceWindowSeconds": {
+        "begin": 14250,
+        "end": 14430
+      },
+      "validatedSyntheticNominalBaseline": {
+        "durationSeconds": 180,
+        "emergencyBrakingMentions": 0,
+        "gatewaySwitchEvents": 17,
+        "maximumActiveVehicles": 46,
+        "meanActiveVehicles": 31.86,
+        "minimumActiveVehicles": 1,
+        "sumoErrors": 0,
+        "teleportMentions": 0,
+        "vehicleCount": 50,
+        "vehiclesVisitingBothRsus": 20,
+        "vehiclesWithGatewaySwitch": 17
+      }
+    },
+    "demandClassification": "CALIBRATED_ABSTRACTION",
+    "mode": "SYNTHETIC_CALIBRATED_ON_INTAS_SUBNETWORK",
+    "repository": "https://github.com/silaslobo/InTAS",
+    "selectedSubnetworkId": "candidate_0045",
+    "topologyClassification": "MODELLED_DIRECTLY",
+    "topologySource": "InTAS"
+  },
+  "pendingLiveStateExtensions": [
+    "calibrated workload rate matrix",
+    "40 replicate runner"
+  ],
+  "projection": {
+    "classification": "MODELLED_DIRECTLY",
+    "fallback": null,
+    "method": "SUMOLIB_CONVERT_XY2LONLAT"
+  },
+  "scenarioName": "MaGaLiteratureBasedUrbanStudy",
+  "selectedIntasCandidate": "candidate_0045",
+  "sourceCommit": "0f7951ba01dda8483f0a852f2c3e4ff0d8a1c0ee",
+  "wirelessAssumptions": [
+    {
+      "classification": "CALIBRATED_ABSTRACTION",
+      "name": "ITS-G5 / IEEE 802.11p"
+    },
+    {
+      "classification": "CALIBRATED_ABSTRACTION",
+      "name": "Nominal direct V2V radius 250 m"
+    }
+  ],
+  "workloadGeneration": {
+    "arrivalRateTasksPerSecondPerActiveVehicle": 1.0,
+    "classification": "IMPLEMENTED_CONFIGURABLE_LITERATURE_BASED_PROFILE",
+    "randomSeed": 104729,
+    "workloadMode": "SEEDED_POISSON_PER_ACTIVE_VEHICLE"
+  }
+}

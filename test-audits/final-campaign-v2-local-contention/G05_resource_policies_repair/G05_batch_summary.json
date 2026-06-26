@@ -1,0 +1,68 @@
+{
+  "schemaVersion": 1,
+  "generatedAt": "2026-06-27T01:09:45.320333+02:00",
+  "group": "G05",
+  "status": "PASS_TECHNICAL_RUNS_FORMAL_FUNCTIONAL_AUDIT_PENDING",
+  "parentCommit": "c6141e3ae7550f7ab71ab1a9fc9cea903727b7f8",
+  "runCount": 6,
+  "validatorPassCount": 6,
+  "taskTotal": 37596,
+  "gaJobsSubmittedTotal": 175,
+  "gaJobsAppliedTotal": 160,
+  "staleResultsTotal": 9,
+  "maximumStaleRatioPercent": 9.677419,
+  "maximumGaRuntimeSeconds": 9.9108653,
+  "minimumLastAppliedStrategyTimeSeconds": 6.8,
+  "maximumFinalStrategyGapSeconds": 173.2,
+  "assignmentTotals": {
+    "LOCAL": 34,
+    "VEHICLE": 3,
+    "EDGE": 0,
+    "CLOUD": 0
+  },
+  "ratioBucketCounts": {
+    "P0": 101,
+    "MID_LOW": 9,
+    "MID_HIGH": 6,
+    "LOW": 2,
+    "HIGH": 13,
+    "P1": 17
+  },
+  "appliedRatioBucketCounts": {
+    "P0": 34,
+    "P1": 3
+  },
+  "windowActionCounts": {
+    "FIRST_RUN": 6,
+    "CLAMP_TO_BOUNDS": 163
+  },
+  "reuseCorrectedCount": 5,
+  "suggestedAppliedReuseMismatchCount": 5,
+  "stopReasonCounts": {
+    "EMPTY_TASK_SET": 150,
+    "STAGNATION_REACHED": 17,
+    "MAX_GENERATIONS_REACHED": 2
+  },
+  "directRepairOrFallbackCounterExposedRunCount": 0,
+  "appliedCapacityOverflowRecords": {
+    "cpu": 0,
+    "link": 0,
+    "pool": 0
+  },
+  "targetExerciseStatuses": {
+    "R-LOCALCPU-01": "TARGET_APPLIED",
+    "R-EDGECPU-01": "TARGET_NOT_EXERCISED",
+    "R-CLOUDCPU-01": "TARGET_STALE_ONLY",
+    "R-CELLBW-01": "TARGET_STALE_ONLY",
+    "R-V2VBW-01": "TARGET_STALE_ONLY",
+    "R-RTT-01": "TARGET_STALE_ONLY"
+  },
+  "limitations": [
+    "Repair e fallback diretti possono non essere serializzati come contatori.",
+    "Evitamento della risorsa degradata non dimostra da solo l'attivazione del repair.",
+    "Il cadence limit di G03 può ridurre la copertura decisionale delle run G05.",
+    "taskCompletionModel=NOT_IMPLEMENTED.",
+    "Le baseline G02 durano 300 s; i confronti usano tassi e percentuali."
+  ],
+  "nextStep": "Audit formale del bundle, classificazione dei 12 test primari e decisione su eventuali recuperi selettivi."
+}

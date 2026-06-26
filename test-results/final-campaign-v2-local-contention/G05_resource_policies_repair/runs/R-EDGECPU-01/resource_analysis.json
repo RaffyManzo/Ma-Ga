@@ -1,0 +1,125 @@
+{
+  "schemaVersion": 1,
+  "generatedAt": "2026-06-27T01:06:09.436039+02:00",
+  "actionId": "R-EDGECPU-01",
+  "configId": "CFG-R-EDGECPU",
+  "targetResource": "EDGE_CPU",
+  "recordCount": 28,
+  "geneCount": 19,
+  "appliedGeneCount": 7,
+  "staleGeneCount": 12,
+  "recordStatusCounts": {
+    "APPLIED": 27,
+    "STALE_DISCARDED": 1
+  },
+  "nodeTypeCounts": {
+    "LOCAL": 15,
+    "VEHICLE": 2,
+    "CLOUD": 2
+  },
+  "appliedNodeTypeCounts": {
+    "LOCAL": 6,
+    "VEHICLE": 1
+  },
+  "staleNodeTypeCounts": {
+    "LOCAL": 9,
+    "VEHICLE": 1,
+    "CLOUD": 2
+  },
+  "decisionTypeCounts": {
+    "LOCAL_EXECUTION": 15,
+    "FULL_OFFLOADING": 3,
+    "PARTIAL_OFFLOADING": 1
+  },
+  "appliedDecisionTypeCounts": {
+    "LOCAL_EXECUTION": 6,
+    "FULL_OFFLOADING": 1
+  },
+  "ratioBucketCounts": {
+    "P0": 15,
+    "P1": 3,
+    "HIGH": 1
+  },
+  "appliedRatioBucketCounts": {
+    "P0": 6,
+    "P1": 1
+  },
+  "stopReasonCounts": {
+    "EMPTY_TASK_SET": 25,
+    "STAGNATION_REACHED": 3
+  },
+  "reuseBaseModeCounts": {
+    "FIRST_RUN": 1,
+    "WARM_START": 24,
+    "PARTIAL_RESTART": 3
+  },
+  "reuseAppliedModeCounts": {
+    "FIRST_RUN": 1,
+    "WARM_START": 24,
+    "PARTIAL_RESTART": 2,
+    "COLD_START": 1
+  },
+  "windowActionCounts": {
+    "FIRST_RUN": 1,
+    "CLAMP_TO_BOUNDS": 27
+  },
+  "reuseCorrectedCount": 1,
+  "suggestedAppliedReuseMismatchCount": 1,
+  "resourcePenalty": {
+    "count": 28,
+    "nonZeroCount": 1,
+    "max": 5.999999999999998,
+    "mean": 0.21428571428571422,
+    "appliedNonZeroCount": 1,
+    "appliedMax": 5.999999999999998
+  },
+  "constraintPenalty": {
+    "count": 19,
+    "nonZeroCount": 1,
+    "max": 3.999999999999999,
+    "appliedNonZeroCount": 1,
+    "appliedMax": 3.999999999999999
+  },
+  "deadlineViolationGeneCount": 1,
+  "appliedDeadlineViolationGeneCount": 1,
+  "resourceRatios": {
+    "maxAppliedCpuRatio": 0.0,
+    "maxStaleCpuRatio": 0.0,
+    "maxAppliedLinkRatio": 0.0,
+    "maxStaleLinkRatio": 0.0,
+    "maxAppliedPoolRatio": 0.0,
+    "maxStalePoolRatio": 0.0,
+    "appliedCpuOverflowRecords": 0,
+    "staleCpuOverflowRecords": 0,
+    "appliedLinkOverflowRecords": 0,
+    "staleLinkOverflowRecords": 0,
+    "appliedPoolOverflowRecords": 0,
+    "stalePoolOverflowRecords": 0
+  },
+  "targetExercise": {
+    "allGeneCount": 0,
+    "appliedGeneCount": 0,
+    "staleGeneCount": 0
+  },
+  "structuredResourceFieldPaths": [
+    "fitness.normalizedResourcePenalty",
+    "fitness.resourcePenalty",
+    "genes[0].constraintPenalty",
+    "genes[10].constraintPenalty",
+    "genes[11].constraintPenalty",
+    "genes[1].constraintPenalty",
+    "genes[2].constraintPenalty",
+    "genes[3].constraintPenalty",
+    "genes[4].constraintPenalty",
+    "genes[5].constraintPenalty",
+    "genes[6].constraintPenalty",
+    "genes[7].constraintPenalty",
+    "genes[8].constraintPenalty",
+    "genes[9].constraintPenalty"
+  ],
+  "directRepairOrFallbackCounterExposed": false,
+  "firstRecordTimeSeconds": 2.0,
+  "lastRecordTimeSeconds": 10.0,
+  "lastAppliedRecordTimeSeconds": 8.5,
+  "secondsWithoutAppliedRecordAtEnd": 171.5
+}

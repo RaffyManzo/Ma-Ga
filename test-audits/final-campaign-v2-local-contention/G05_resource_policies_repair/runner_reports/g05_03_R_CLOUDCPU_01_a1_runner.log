@@ -1,0 +1,1538 @@
+Runtime artifact mode:
+RECOVERED_VALIDATED_ARTIFACT
+Runtime build executed:
+false
+Runtime artifact path:
+C:\Users\raffa\Downloads\MA_GA_V2_G05_MACRO_RUN_ALL_PACKAGE\payload\runtime_artifact\maga-live-maga-runtime.jar
+Runtime artifact expected SHA-256:
+3821c28a6a0898e94f4d5136b8039595d36bcbce0b6ecc3e9406910f9e083068
+Runtime artifact validation status: PASS
+Runtime artifact SHA-256: 3821c28a6a0898e94f4d5136b8039595d36bcbce0b6ecc3e9406910f9e083068
+Runtime artifact size bytes: 517007
+Runtime artifact fresh build executed: false
+Deploying materialized literature scenario...
+Runtime artifact validation status: PASS
+Runtime artifact SHA-256: 3821c28a6a0898e94f4d5136b8039595d36bcbce0b6ecc3e9406910f9e083068
+Runtime artifact size bytes: 517007
+Runtime artifact fresh build executed: false
+{
+  "configuredDatabaseFile": "intas_literature_urban.db",
+  "database": {
+    "exists": true,
+    "matchingDiagnosticDbs": [],
+    "path": "C:/Users/raffa/IdeaProjects/maga-core/tmp/materialized-literature-scenarios/final-campaign-v2-local-contention/G05_resource_policies_repair/CFG-R-CLOUDCPU/104729/application/intas_literature_urban.db",
+    "readable": true,
+    "sha256": "b05b5c708751b1fa1732728a6db8b7cfd497d326986ce709aa6be3bf53a009ac",
+    "sizeBytes": 176128,
+    "tableCounts": {
+      "Building": 0,
+      "BuildingConsistsOf": 0,
+      "Connection": 155,
+      "ConnectionConsistsOf": 695,
+      "ConnectionDetails": 0,
+      "Node": 314,
+      "Properties": 2,
+      "Restriction": 125,
+      "Roundabout": 0,
+      "RoundaboutConsistsOf": 0,
+      "Route": 295,
+      "TrafficSignals": 0,
+      "Way": 155,
+      "WayConsistsOf": 695
+    },
+    "tables": [
+      "Building",
+      "BuildingConsistsOf",
+      "Connection",
+      "ConnectionConsistsOf",
+      "ConnectionDetails",
+      "Node",
+      "Properties",
+      "Restriction",
+      "Roundabout",
+      "RoundaboutConsistsOf",
+      "Route",
+      "TrafficSignals",
+      "Way",
+      "WayConsistsOf"
+    ]
+  },
+  "errors": [],
+  "gaParameterScalingMode": "STATIC",
+  "generatedAtUtc": "2026-06-26T23:06:11.362269+00:00",
+  "missingFiles": [],
+  "mobilityMode": "SYNTHETIC_CALIBRATED_ON_INTAS_SUBNETWORK",
+  "projection": {
+    "cartesianOffset": {
+      "x": -464198.88,
+      "y": -4952821.58
+    },
+    "centerCoordinates": {
+      "latitude": 48.75619812000397,
+      "longitude": 11.425493114727528
+    }
+  },
+  "reducedNetworkCounts": {
+    "externalEdges": 155,
+    "externalJunctions": 88,
+    "trafficLights": 8
+  },
+  "routeFiles": [
+    "C:/Users/raffa/IdeaProjects/maga-core/tmp/materialized-literature-scenarios/final-campaign-v2-local-contention/G05_resource_policies_repair/CFG-R-CLOUDCPU/104729/sumo/intas_literature_urban_nominal.rou.xml"
+  ],
+  "routeVehicleCounts": {
+    "intas_literature_urban_nominal.rou.xml": 50
+  },
+  "scenarioRoot": "C:/Users/raffa/IdeaProjects/maga-core/tmp/materialized-literature-scenarios/final-campaign-v2-local-contention/G05_resource_policies_repair/CFG-R-CLOUDCPU/104729",
+  "status": "VALID_MATERIALIZED_SCENARIO",
+  "sumocfgReferences": [
+    "intas_literature_urban.net.xml",
+    "intas_literature_urban_nominal.rou.xml"
+  ],
+  "tokenFiles": [],
+  "warnings": []
+}
+Runtime artifact source: C:\Users\raffa\Downloads\MA_GA_V2_G05_MACRO_RUN_ALL_PACKAGE\payload\runtime_artifact\maga-live-maga-runtime.jar
+Runtime artifact mode: EXPLICIT_RUNTIME_JAR
+Runtime artifact SHA-256: 3821c28a6a0898e94f4d5136b8039595d36bcbce0b6ecc3e9406910f9e083068
+Runtime artifact fresh build: false
+DEPLOYED_MATERIALIZED_LITERATURE_SCENARIO
+ScenarioName: MaGaLiteratureBasedUrbanStudy
+Source: C:\Users\raffa\IdeaProjects\maga-core\tmp\materialized-literature-scenarios\final-campaign-v2-local-contention\G05_resource_policies_repair\CFG-R-CLOUDCPU\104729
+Target: C:\Users\raffa\IdeaProjects\maga-core\tmp\mosaic-25.2\scenarios\MaGaLiteratureBasedUrbanStudy
+Database: C:\Users\raffa\IdeaProjects\maga-core\tmp\mosaic-25.2\scenarios\MaGaLiteratureBasedUrbanStudy\application\intas_literature_urban.db
+Injected runtime JAR: C:\Users\raffa\Downloads\MA_GA_V2_G05_MACRO_RUN_ALL_PACKAGE\payload\runtime_artifact\maga-live-maga-runtime.jar
+Injected ad-hoc radio diagnostic JAR: C:\Users\raffa\IdeaProjects\maga-core\tools\mosaic-adhoc-radio-diagnostic\out\maga-adhoc-radio-diagnostic.jar
+Running: .\mosaic.bat -s MaGaLiteratureBasedUrbanStudy -w 120
+2026-06-27 01:06:12,490 INFO  ROOT - Running Eclipse MOSAIC 25.2 on Java JRE v17.0.12 (Oracle Corporation)
+2026-06-27 01:06:12,510 INFO  FederationManagement - Start federation with id 'MaGaLiteratureBasedUrbanStudy'
+2026-06-27 01:06:12,595 INFO  FederationManagement - Add ambassador/federate with id 'application'
+2026-06-27 01:06:12,595 INFO  FederationManagement - Add ambassador/federate with id 'mapping'
+2026-06-27 01:06:12,595 INFO  FederationManagement - Add ambassador/federate with id 'cell'
+2026-06-27 01:06:12,595 INFO  FederationManagement - Add ambassador/federate with id 'sns'
+2026-06-27 01:06:12,595 INFO  FederationManagement - Add ambassador/federate with id 'sumo'
+2026-06-27 01:06:12,595 INFO  FederationManagement - Deploying federate 'sumo' locally in .\tmp\sumo
+2026-06-27 01:06:12,607 INFO  FederationManagement - Starting federate 'sumo' locally in .\tmp\sumo
+2026-06-27 01:06:12,607 INFO  FederationManagement - Add ambassador/federate with id 'output'
+01:06:27 - Simulating: 0ns (0.0s / 180.0s) - 0.0% (RTF:0.00, ETC:unknown)                        
+01:06:28 - Simulating: 6300000000ns (6.3s / 180.0s) - 3.5% (RTF:0.00, ETC:unknown)                        
+01:06:28 - Simulating: 16100000000ns (16.1s / 180.0s) - 8.9% (RTF:0.00, ETC:unknown)                        
+01:06:29 - Simulating: 25200000000ns (25.2s / 180.0s) - 14.0% (RTF:0.00, ETC:unknown)                        
+01:06:29 - Simulating: 32600000000ns (32.6s / 180.0s) - 18.1% (RTF:0.00, ETC:unknown)                        
+01:06:30 - Simulating: 39600000000ns (39.6s / 180.0s) - 22.0% (RTF:0.00, ETC:unknown)                        
+01:06:30 - Simulating: 46000000000ns (46.0s / 180.0s) - 25.6% (RTF:0.00, ETC:unknown)                        
+01:06:31 - Simulating: 52500000000ns (52.5s / 180.0s) - 29.2% (RTF:0.00, ETC:unknown)                        
+01:06:31 - Simulating: 59500000000ns (59.5s / 180.0s) - 33.1% (RTF:0.00, ETC:unknown)                        
+01:06:32 - Simulating: 66100000000ns (66.1s / 180.0s) - 36.7% (RTF:0.00, ETC:unknown)                        
+01:06:32 - Simulating: 72700000000ns (72.7s / 180.0s) - 40.4% (RTF:14.50, ETC:7.4s)                        
+01:06:33 - Simulating: 78100000000ns (78.1s / 180.0s) - 43.4% (RTF:14.50, ETC:7.4s)                        
+01:06:33 - Simulating: 83200000000ns (83.2s / 180.0s) - 46.2% (RTF:14.50, ETC:7.4s)                        
+01:06:34 - Simulating: 87500000000ns (87.5s / 180.0s) - 48.6% (RTF:14.50, ETC:7.4s)                        
+01:06:34 - Simulating: 91800000000ns (91.8s / 180.0s) - 51.0% (RTF:14.50, ETC:7.4s)                        
+01:06:35 - Simulating: 96900000000ns (96.9s / 180.0s) - 53.8% (RTF:14.50, ETC:7.4s)                        
+01:06:35 - Simulating: 101800000000ns (101.8s / 180.0s) - 56.6% (RTF:14.50, ETC:7.4s)                        
+01:06:36 - Simulating: 106800000000ns (106.8s / 180.0s) - 59.3% (RTF:14.50, ETC:7.4s)                        
+01:06:36 - Simulating: 111600000000ns (111.6s / 180.0s) - 62.0% (RTF:14.50, ETC:7.4s)                        
+01:06:37 - Simulating: 116600000000ns (116.6s / 180.0s) - 64.8% (RTF:14.50, ETC:7.4s)                        
+01:06:37 - Simulating: 122200000000ns (122.2s / 180.0s) - 67.9% (RTF:9.83, ETC:5.9s)                        
+01:06:38 - Simulating: 128100000000ns (128.1s / 180.0s) - 71.2% (RTF:9.83, ETC:5.9s)                        
+01:06:38 - Simulating: 133400000000ns (133.4s / 180.0s) - 74.1% (RTF:9.83, ETC:5.9s)                        
+01:06:39 - Simulating: 139400000000ns (139.4s / 180.0s) - 77.4% (RTF:9.83, ETC:5.9s)                        
+01:06:39 - Simulating: 145000000000ns (145.0s / 180.0s) - 80.6% (RTF:9.83, ETC:5.9s)                        
+01:06:40 - Simulating: 150800000000ns (150.8s / 180.0s) - 83.8% (RTF:9.83, ETC:5.9s)                        
+01:06:40 - Simulating: 157800000000ns (157.8s / 180.0s) - 87.7% (RTF:9.83, ETC:5.9s)                        
+01:06:41 - Simulating: 165000000000ns (165.0s / 180.0s) - 91.7% (RTF:9.83, ETC:5.9s)                        
+01:06:41 - Simulating: 173900000000ns (173.9s / 180.0s) - 96.6% (RTF:9.83, ETC:5.9s)                        
+01:06:52 - Simulating: 180000000000ns (180.0s / 180.0s) - 100.0% (RTF:3.97, ETC:0.0s)                        
+01:06:52 - Simulating: 180000000000ns (180.0s) - 100.0%                                         
+01:06:52 - 
+2026-06-27 01:06:52,384 INFO  SequentialTimeManagement - Simulation ended after 180s of 180s (100%)
+2026-06-27 01:06:52,384 INFO  SequentialTimeManagement - Started: 2026-06-27 01:06:27
+2026-06-27 01:06:52,384 INFO  SequentialTimeManagement - Ended: 2026-06-27 01:06:52
+2026-06-27 01:06:52,391 INFO  SequentialTimeManagement - Duration: 00h 00m 25.034s (RTF: 7.00)
+2026-06-27 01:06:52,391 INFO  SequentialTimeManagement - 
+2026-06-27 01:06:52,391 INFO  SequentialTimeManagement - Simulation finished: 101
+Summarizing run log-20260627-010612-MaGaLiteratureBasedUrbanStudy...
+Simulation completed: True
+Run directory: C:\Users\raffa\IdeaProjects\maga-core\tmp\mosaic-25.2\logs\log-20260627-010612-MaGaLiteratureBasedUrbanStudy
+Summary Markdown: C:\Users\raffa\IdeaProjects\maga-core\tmp\mosaic-25.2\logs\log-20260627-010612-MaGaLiteratureBasedUrbanStudy\live-maga-runtime\live_run_summary.md
+Summary JSON: C:\Users\raffa\IdeaProjects\maga-core\tmp\mosaic-25.2\logs\log-20260627-010612-MaGaLiteratureBasedUrbanStudy\live-maga-runtime\live_run_summary.json
+Tasks generated cumulative: 5640
+Tasks activated cumulative: 5640
+Tasks removed at deadline cumulative: 5577
+Tasks pending at end: 63
+Tasks pending peak: 117
+Task completion model: NOT_IMPLEMENTED
+GA parameter scaling mode: STATIC
+GA stale ratio percent: 3.571429
+GA runtime mean/median/P95/max seconds: 0.092367475 / 0.0008293 / 0.0960882 / 2.3830285
+Maximum absolute snapshot lag seconds: 0
+Strategy trace: C:\Users\raffa\IdeaProjects\maga-core\tmp\mosaic-25.2\logs\log-20260627-010612-MaGaLiteratureBasedUrbanStudy\live-maga-runtime\live_strategy_application_trace.csv
+GA trace: C:\Users\raffa\IdeaProjects\maga-core\tmp\mosaic-25.2\logs\log-20260627-010612-MaGaLiteratureBasedUrbanStudy\live-maga-runtime\live_ga_runtime_trace.csv
+Bridge trace: C:\Users\raffa\IdeaProjects\maga-core\tmp\mosaic-25.2\logs\log-20260627-010612-MaGaLiteratureBasedUrbanStudy\live-maga-runtime\live_bridge_snapshot_trace.csv
+Overrun trace: C:\Users\raffa\IdeaProjects\maga-core\tmp\mosaic-25.2\logs\log-20260627-010612-MaGaLiteratureBasedUrbanStudy\live-maga-runtime\live_overrun_trace.csv
+Native detailed TXT: C:\Users\raffa\IdeaProjects\maga-core\tmp\mosaic-25.2\logs\log-20260627-010612-MaGaLiteratureBasedUrbanStudy\live-maga-runtime\live-reporting\live_detailed_execution_report.txt
+Native detailed Markdown: C:\Users\raffa\IdeaProjects\maga-core\tmp\mosaic-25.2\logs\log-20260627-010612-MaGaLiteratureBasedUrbanStudy\live-maga-runtime\live-reporting\live_detailed_execution_report.md
+Native detailed JSON: C:\Users\raffa\IdeaProjects\maga-core\tmp\mosaic-25.2\logs\log-20260627-010612-MaGaLiteratureBasedUrbanStudy\live-maga-runtime\live-reporting\live_detailed_execution_report.json
+Native GA events JSONL: C:\Users\raffa\IdeaProjects\maga-core\tmp\mosaic-25.2\logs\log-20260627-010612-MaGaLiteratureBasedUrbanStudy\live-maga-runtime\live-reporting\live_ga_job_events.jsonl
+Native temporal step records JSONL: C:\Users\raffa\IdeaProjects\maga-core\tmp\mosaic-25.2\logs\log-20260627-010612-MaGaLiteratureBasedUrbanStudy\live-maga-runtime\live-reporting\live_temporal_step_records.jsonl
+Native applied windows CSV: C:\Users\raffa\IdeaProjects\maga-core\tmp\mosaic-25.2\logs\log-20260627-010612-MaGaLiteratureBasedUrbanStudy\live-maga-runtime\live-reporting\live_applied_window_records.csv
+Native discarded windows CSV: C:\Users\raffa\IdeaProjects\maga-core\tmp\mosaic-25.2\logs\log-20260627-010612-MaGaLiteratureBasedUrbanStudy\live-maga-runtime\live-reporting\live_discarded_window_records.csv
+
+===== NATIVE LIVE DETAILED REPORT =====
+============================================================
+LIVE REPORT METADATA
+============================================================
+scenarioName: MaGaLiteratureBasedUrbanStudy
+profile: normal
+experimentalVariant: FULL_MA_GA
+effectiveFitnessWeights: {wR=0.15, wT=0.35, wL=0.25, wM=0.25}
+bridgeDescription: LIVE_CAUSAL_MOSAIC_SNAPSHOT_BRIDGE
+sourceMode: MOSAIC_LIVE
+optimizationSourceDescription: LIVE_CAUSAL_MOSAIC_SNAPSHOT_BRIDGE
+populationReusePolicyDescription: standard adaptive population reuse policy
+construction: native live records; no replay; no GA re-execution
+
+============================================================
+LIVE GA JOB SUMMARY
+============================================================
+submitted: 29
+completed: 29
+applied: 27
+stale discarded: 1
+failed: 0
+null results: 0
+shutdown in-flight: 1
+
+============================================================
+LIVE GA WALL-CLOCK TIMING
+============================================================
+count: 28
+min: 0.000535200 s
+mean: 0.092367475 s
+median: 0.000829300 s
+p95: 0.096088200 s
+max: 2.383028500 s
+
+jobId | status | runtime | deltaTMaxAtSubmission | timeoutBeforeCompletion | mismatch
+live_ga_job_000001 | APPLIED | 0.017286500 | 0.200000000 | false | 0.000000000
+live_ga_job_000002 | APPLIED | 0.007646000 | 0.200000000 | false | 0.000000000
+live_ga_job_000003 | APPLIED | 0.001419700 | 0.200000000 | false | 0.000000000
+live_ga_job_000004 | APPLIED | 0.001325700 | 0.200000000 | false | 0.000000000
+live_ga_job_000005 | APPLIED | 0.001305100 | 0.200000000 | false | 0.000000000
+live_ga_job_000006 | APPLIED | 0.001410900 | 0.200000000 | false | 0.000000000
+live_ga_job_000007 | APPLIED | 0.001462100 | 0.200000000 | false | 0.000000000
+live_ga_job_000008 | APPLIED | 0.001224400 | 0.200000000 | false | 0.000000000
+live_ga_job_000009 | APPLIED | 0.006077400 | 0.200000000 | false | 0.000000000
+live_ga_job_000010 | APPLIED | 0.000955100 | 0.200000000 | false | 0.000000000
+live_ga_job_000011 | APPLIED | 0.001197900 | 0.200000000 | false | 0.000000000
+live_ga_job_000012 | APPLIED | 0.000829300 | 0.200000000 | false | 0.000000000
+live_ga_job_000013 | APPLIED | 0.000621800 | 0.200000000 | false | 0.000000000
+live_ga_job_000014 | APPLIED | 0.000637900 | 0.200000000 | false | 0.000000000
+live_ga_job_000015 | APPLIED | 0.000555600 | 0.200000000 | false | 0.000000000
+live_ga_job_000016 | APPLIED | 0.000618500 | 0.200000000 | false | 0.000000000
+live_ga_job_000017 | APPLIED | 0.000535200 | 0.200000000 | false | 0.000000000
+live_ga_job_000018 | APPLIED | 0.000599000 | 0.200000000 | false | 0.000000000
+live_ga_job_000019 | APPLIED | 0.000651200 | 0.200000000 | false | 0.000000000
+live_ga_job_000020 | APPLIED | 0.000626200 | 0.200000000 | false | 0.000000000
+live_ga_job_000021 | APPLIED | 0.000624700 | 0.200000000 | false | 0.000000000
+live_ga_job_000022 | APPLIED | 0.000561900 | 0.200000000 | false | 0.000000000
+live_ga_job_000023 | APPLIED | 0.000554400 | 0.200000000 | false | 0.000000000
+live_ga_job_000024 | APPLIED | 0.000761700 | 0.200000000 | false | 0.000000000
+live_ga_job_000025 | APPLIED | 0.000751300 | 0.200000000 | false | 0.000000000
+live_ga_job_000026 | APPLIED | 0.056933100 | 0.200000000 | false | 0.000000000
+live_ga_job_000027 | APPLIED | 0.096088200 | 0.200000000 | false | 0.000000000
+live_ga_job_000028 | STALE_DISCARDED | 2.383028500 | 0.200000000 | true | 0.000000000
+live_ga_job_000029 | SHUTDOWN_IN_FLIGHT | 0.000000000 | 0.200000000 | true | 0.000000000
+
+============================================================
+LIVE RESULT APPLICATION SUMMARY
+============================================================
+jobId | window | completedSnapshot | appliedAtSimulationTimeNs | status
+live_ga_job_000001 | 0 | live_runtime_snapshot_t_2000000000 | 2100000000 | APPLIED
+live_ga_job_000002 | 1 | live_runtime_snapshot_t_2200000000 | 2300000000 | APPLIED
+live_ga_job_000003 | 2 | live_runtime_snapshot_t_2400000000 | 2500000000 | APPLIED
+live_ga_job_000004 | 3 | live_runtime_snapshot_t_2600000000 | 2700000000 | APPLIED
+live_ga_job_000005 | 4 | live_runtime_snapshot_t_2800000000 | 2900000000 | APPLIED
+live_ga_job_000006 | 5 | live_runtime_snapshot_t_3000000000 | 3100000000 | APPLIED
+live_ga_job_000007 | 6 | live_runtime_snapshot_t_3200000000 | 3300000000 | APPLIED
+live_ga_job_000008 | 7 | live_runtime_snapshot_t_3400000000 | 3500000000 | APPLIED
+live_ga_job_000009 | 8 | live_runtime_snapshot_t_3600000000 | 3700000000 | APPLIED
+live_ga_job_000010 | 9 | live_runtime_snapshot_t_3800000000 | 3900000000 | APPLIED
+live_ga_job_000011 | 10 | live_runtime_snapshot_t_4000000000 | 4100000000 | APPLIED
+live_ga_job_000012 | 11 | live_runtime_snapshot_t_4200000000 | 4300000000 | APPLIED
+live_ga_job_000013 | 12 | live_runtime_snapshot_t_4400000000 | 4500000000 | APPLIED
+live_ga_job_000014 | 13 | live_runtime_snapshot_t_4600000000 | 4700000000 | APPLIED
+live_ga_job_000015 | 14 | live_runtime_snapshot_t_4800000000 | 4900000000 | APPLIED
+live_ga_job_000016 | 15 | live_runtime_snapshot_t_5000000000 | 5100000000 | APPLIED
+live_ga_job_000017 | 16 | live_runtime_snapshot_t_5200000000 | 5300000000 | APPLIED
+live_ga_job_000018 | 17 | live_runtime_snapshot_t_5400000000 | 5500000000 | APPLIED
+live_ga_job_000019 | 18 | live_runtime_snapshot_t_5600000000 | 5700000000 | APPLIED
+live_ga_job_000020 | 19 | live_runtime_snapshot_t_5800000000 | 5900000000 | APPLIED
+live_ga_job_000021 | 20 | live_runtime_snapshot_t_6000000000 | 6100000000 | APPLIED
+live_ga_job_000022 | 21 | live_runtime_snapshot_t_6200000000 | 6300000000 | APPLIED
+live_ga_job_000023 | 22 | live_runtime_snapshot_t_6400000000 | 6500000000 | APPLIED
+live_ga_job_000024 | 23 | live_runtime_snapshot_t_6600000000 | 6700000000 | APPLIED
+live_ga_job_000025 | 24 | live_runtime_snapshot_t_6800000000 | 6900000000 | APPLIED
+live_ga_job_000026 | 25 | live_runtime_snapshot_t_7000000000 | 8500000000 | APPLIED
+live_ga_job_000027 | 26 | live_runtime_snapshot_t_8500000000 | 10100000000 | APPLIED
+
+============================================================
+LIVE STALE RESULT SUMMARY
+============================================================
+jobId | waitCapSimulationTimeNs | waitCapWallClockNs | completionWallClockNs | freshReoptimization
+live_ga_job_000028 | 14600000000 | 397670846668100 | 397673023398800 | requested
+
+============================================================
+LIVE SNAPSHOT AUDIT
+============================================================
+The live report uses SystemSnapshot objects published in memory by the bridge.
+Diagnostic JSON snapshot copies remain secondary and are not read to build this report.
+eventsJsonl: C:\Users\raffa\IdeaProjects\maga-core\tmp\mosaic-25.2\logs\log-20260627-010612-MaGaLiteratureBasedUrbanStudy\live-maga-runtime\live-reporting\live_ga_job_events.jsonl
+stepRecordsJsonl: C:\Users\raffa\IdeaProjects\maga-core\tmp\mosaic-25.2\logs\log-20260627-010612-MaGaLiteratureBasedUrbanStudy\live-maga-runtime\live-reporting\live_temporal_step_records.jsonl
+
+============================================================
+LIVE ASSIGNMENT SUMMARY
+============================================================
+LOCAL: 6
+VEHICLE: 1
+EDGE: 0
+CLOUD: 0
+
+============================================================
+LIVE LOCAL CPU CONTENTION SUMMARY
+============================================================
+local task portions: 6
+vehicle-window contention count: 1
+vehicle-window CPU overflow count: 1
+windows with local contention: 1
+windows with local CPU overflow: 1
+local deadline violations: 1
+max independent local execution time: 3.200000000 s
+max contended local completion time: 3.200000000 s
+max local contention delay: 0.600000000 s
+max local demand ratio: 1.200000000
+max local CPU overflow ratio: 0.200000000
+
+============================================================
+LIVE CONFIGURED CELL PROFILE VS RUNTIME ACCOUNTING
+============================================================
+configuredProfile: |profileId=CELL_5G_AVEIRO_P50|technology=5G|source=LITERATURE_BASED_CONFIGURED_CELL_PROFILE|classification=CALIBRATED_ABSTRACTION|capacityBitsPerSecond=49200000|measuredRttSeconds=0.0522|symmetricOneWayDelaySeconds=0.0261|runtimeAccountingSource=DIAGNOSTIC_RUNTIME_ACCOUNTING_FROM_CONTROLLED_CELL_MESSAGES
+configuredSource: LITERATURE_BASED_CONFIGURED_CELL_PROFILE when present
+runtimeAccountingSource: DIAGNOSTIC_RUNTIME_ACCOUNTING_FROM_CONTROLLED_CELL_MESSAGES
+distinction: configured Cell profile documents the literature scenario; runtime buckets still come from diagnostic accounting.
+
+============================================================
+LIVE REPORT LIMITATIONS
+============================================================
+- Built from the true live run records.
+- No offline replay is used.
+- No MaGaOptimizer or TemporalWindowManager execution is triggered while writing reports.
+- Strategy application is diagnostic, not real task execution.
+- Remote task execution, migration and checkpointing are still out of scope.
+
+============================================================
+HISTORICAL CORE REPORT SECTIONS FROM APPLIED LIVE STEPS
+============================================================
+============================================================
+MA-GA TEMPORAL DIAGNOSTIC REPORT
+============================================================
+
+------------------------------------------------------------
+1. EXECUTIVE SUMMARY
+------------------------------------------------------------
+Executed windows: 27
+Critical-event windows: 0
+Population-reuse windows: 25
+Best final fitness: 0,000000
+
+Main diagnostic counters:
+- task evaluations: 7
+- deadline violations: 1 (14,285714%)
+- coverage insufficient: 0
+- CPU violations: 0
+- bandwidth violations: 0
+- CPU saturated >= 95,000000%: 1
+- bandwidth saturated >= 95,000000%: 1
+
+Dominant deadline causes:
+- LOCAL_EXECUTION_BOTTLENECK: 1
+
+------------------------------------------------------------
+2. TEMPORAL / DYNAMICITY SUMMARY
+------------------------------------------------------------
+idx | trigger | obsTime | snapshot | D | Dv | Dt | Dr | Dl | level | suggested | applied | initPop | finalPop
+0 | FIRST_RUN | 2,000000 s | live_runtime_snapshot_t_2000000000 | 0,000000 | 0,000000 | 0,000000 | 0,000000 | 0,000000 | UNKNOWN | FIRST_RUN | FIRST_RUN | 40 | 1
+1 | SCHEDULED | 2,200000 s | live_runtime_snapshot_t_2200000000 | 0,000000 | 0,000000 | 0,000000 | 0,000000 | 0,000000 | STABLE | WARM_START | WARM_START | 40 | 1
+2 | SCHEDULED | 2,400000 s | live_runtime_snapshot_t_2400000000 | 0,000000 | 0,000000 | 0,000000 | 0,000000 | 0,000000 | STABLE | WARM_START | WARM_START | 40 | 1
+3 | SCHEDULED | 2,600000 s | live_runtime_snapshot_t_2600000000 | 0,000000 | 0,000000 | 0,000000 | 0,000000 | 0,000000 | STABLE | WARM_START | WARM_START | 40 | 1
+4 | SCHEDULED | 2,800000 s | live_runtime_snapshot_t_2800000000 | 0,000000 | 0,000000 | 0,000000 | 0,000000 | 0,000000 | STABLE | WARM_START | WARM_START | 40 | 1
+5 | SCHEDULED | 3,000000 s | live_runtime_snapshot_t_3000000000 | 0,000000 | 0,000000 | 0,000000 | 0,000000 | 0,000000 | STABLE | WARM_START | WARM_START | 40 | 1
+6 | SCHEDULED | 3,200000 s | live_runtime_snapshot_t_3200000000 | 0,000000 | 0,000000 | 0,000000 | 0,000000 | 0,000000 | STABLE | WARM_START | WARM_START | 40 | 1
+7 | SCHEDULED | 3,400000 s | live_runtime_snapshot_t_3400000000 | 0,000000 | 0,000000 | 0,000000 | 0,000000 | 0,000000 | STABLE | WARM_START | WARM_START | 40 | 1
+8 | SCHEDULED | 3,600000 s | live_runtime_snapshot_t_3600000000 | 0,000000 | 0,000000 | 0,000000 | 0,000000 | 0,000000 | STABLE | WARM_START | WARM_START | 40 | 1
+9 | SCHEDULED | 3,800000 s | live_runtime_snapshot_t_3800000000 | 0,166667 | 0,333333 | 0,000000 | 0,333333 | 0,000000 | STABLE | WARM_START | WARM_START | 40 | 1
+10 | SCHEDULED | 4,000000 s | live_runtime_snapshot_t_4000000000 | 0,000000 | 0,000000 | 0,000000 | 0,000000 | 0,000000 | STABLE | WARM_START | WARM_START | 40 | 1
+11 | SCHEDULED | 4,200000 s | live_runtime_snapshot_t_4200000000 | 0,000000 | 0,000000 | 0,000000 | 0,000000 | 0,000000 | STABLE | WARM_START | WARM_START | 40 | 1
+12 | SCHEDULED | 4,400000 s | live_runtime_snapshot_t_4400000000 | 0,000000 | 0,000000 | 0,000000 | 0,000000 | 0,000000 | STABLE | WARM_START | WARM_START | 40 | 1
+13 | SCHEDULED | 4,600000 s | live_runtime_snapshot_t_4600000000 | 0,000000 | 0,000000 | 0,000000 | 0,000000 | 0,000000 | STABLE | WARM_START | WARM_START | 40 | 1
+14 | SCHEDULED | 4,800000 s | live_runtime_snapshot_t_4800000000 | 0,000000 | 0,000000 | 0,000000 | 0,000000 | 0,000000 | STABLE | WARM_START | WARM_START | 40 | 1
+15 | SCHEDULED | 5,000000 s | live_runtime_snapshot_t_5000000000 | 0,000000 | 0,000000 | 0,000000 | 0,000000 | 0,000000 | STABLE | WARM_START | WARM_START | 40 | 1
+16 | SCHEDULED | 5,200000 s | live_runtime_snapshot_t_5200000000 | 0,000000 | 0,000000 | 0,000000 | 0,000000 | 0,000000 | STABLE | WARM_START | WARM_START | 40 | 1
+17 | SCHEDULED | 5,400000 s | live_runtime_snapshot_t_5400000000 | 0,000000 | 0,000000 | 0,000000 | 0,000000 | 0,000000 | STABLE | WARM_START | WARM_START | 40 | 1
+18 | SCHEDULED | 5,600000 s | live_runtime_snapshot_t_5600000000 | 0,125000 | 0,250000 | 0,000000 | 0,250000 | 0,000000 | STABLE | WARM_START | WARM_START | 40 | 1
+19 | SCHEDULED | 5,800000 s | live_runtime_snapshot_t_5800000000 | 0,000000 | 0,000000 | 0,000000 | 0,000000 | 0,000000 | STABLE | WARM_START | WARM_START | 40 | 1
+20 | SCHEDULED | 6,000000 s | live_runtime_snapshot_t_6000000000 | 0,000000 | 0,000000 | 0,000000 | 0,000000 | 0,000000 | STABLE | WARM_START | WARM_START | 40 | 1
+21 | SCHEDULED | 6,200000 s | live_runtime_snapshot_t_6200000000 | 0,000000 | 0,000000 | 0,000000 | 0,000000 | 0,000000 | STABLE | WARM_START | WARM_START | 40 | 1
+22 | SCHEDULED | 6,400000 s | live_runtime_snapshot_t_6400000000 | 0,000000 | 0,000000 | 0,000000 | 0,000000 | 0,000000 | STABLE | WARM_START | WARM_START | 40 | 1
+23 | SCHEDULED | 6,600000 s | live_runtime_snapshot_t_6600000000 | 0,000000 | 0,000000 | 0,000000 | 0,000000 | 0,000000 | STABLE | WARM_START | WARM_START | 40 | 1
+24 | SCHEDULED | 6,800000 s | live_runtime_snapshot_t_6800000000 | 0,000000 | 0,000000 | 0,000000 | 0,000000 | 0,000000 | STABLE | WARM_START | WARM_START | 40 | 1
+25 | SCHEDULED | 7,000000 s | live_runtime_snapshot_t_7000000000 | 0,250000 | 0,000000 | 1,000000 | 0,000000 | 0,000000 | MODERATE | PARTIAL_RESTART | PARTIAL_RESTART | 40 | 40
+26 | SCHEDULED | 8,500000 s | live_runtime_snapshot_t_8500000000 | 0,407143 | 0,200000 | 1,000000 | 0,428571 | 0,000000 | MODERATE | PARTIAL_RESTART | COLD_START | 40 | 40
+
+------------------------------------------------------------
+3. GA CONVERGENCE SUMMARY
+------------------------------------------------------------
+idx | pop | maxGen | genRun | stop | initBest | finalBest | gain% | last10 | last50
+0 | 40 | 100 | 0 | EMPTY_TASK_SET | 0,000000 | 0,000000 | 0,000000% | 0,000000 | 0,000000
+1 | 40 | 100 | 0 | EMPTY_TASK_SET | 0,000000 | 0,000000 | 0,000000% | 0,000000 | 0,000000
+2 | 40 | 100 | 0 | EMPTY_TASK_SET | 0,000000 | 0,000000 | 0,000000% | 0,000000 | 0,000000
+3 | 40 | 100 | 0 | EMPTY_TASK_SET | 0,000000 | 0,000000 | 0,000000% | 0,000000 | 0,000000
+4 | 40 | 100 | 0 | EMPTY_TASK_SET | 0,000000 | 0,000000 | 0,000000% | 0,000000 | 0,000000
+5 | 40 | 100 | 0 | EMPTY_TASK_SET | 0,000000 | 0,000000 | 0,000000% | 0,000000 | 0,000000
+6 | 40 | 100 | 0 | EMPTY_TASK_SET | 0,000000 | 0,000000 | 0,000000% | 0,000000 | 0,000000
+7 | 40 | 100 | 0 | EMPTY_TASK_SET | 0,000000 | 0,000000 | 0,000000% | 0,000000 | 0,000000
+8 | 40 | 100 | 0 | EMPTY_TASK_SET | 0,000000 | 0,000000 | 0,000000% | 0,000000 | 0,000000
+9 | 40 | 100 | 0 | EMPTY_TASK_SET | 0,000000 | 0,000000 | 0,000000% | 0,000000 | 0,000000
+10 | 40 | 100 | 0 | EMPTY_TASK_SET | 0,000000 | 0,000000 | 0,000000% | 0,000000 | 0,000000
+11 | 40 | 100 | 0 | EMPTY_TASK_SET | 0,000000 | 0,000000 | 0,000000% | 0,000000 | 0,000000
+12 | 40 | 100 | 0 | EMPTY_TASK_SET | 0,000000 | 0,000000 | 0,000000% | 0,000000 | 0,000000
+13 | 40 | 100 | 0 | EMPTY_TASK_SET | 0,000000 | 0,000000 | 0,000000% | 0,000000 | 0,000000
+14 | 40 | 100 | 0 | EMPTY_TASK_SET | 0,000000 | 0,000000 | 0,000000% | 0,000000 | 0,000000
+15 | 40 | 100 | 0 | EMPTY_TASK_SET | 0,000000 | 0,000000 | 0,000000% | 0,000000 | 0,000000
+16 | 40 | 100 | 0 | EMPTY_TASK_SET | 0,000000 | 0,000000 | 0,000000% | 0,000000 | 0,000000
+17 | 40 | 100 | 0 | EMPTY_TASK_SET | 0,000000 | 0,000000 | 0,000000% | 0,000000 | 0,000000
+18 | 40 | 100 | 0 | EMPTY_TASK_SET | 0,000000 | 0,000000 | 0,000000% | 0,000000 | 0,000000
+19 | 40 | 100 | 0 | EMPTY_TASK_SET | 0,000000 | 0,000000 | 0,000000% | 0,000000 | 0,000000
+20 | 40 | 100 | 0 | EMPTY_TASK_SET | 0,000000 | 0,000000 | 0,000000% | 0,000000 | 0,000000
+21 | 40 | 100 | 0 | EMPTY_TASK_SET | 0,000000 | 0,000000 | 0,000000% | 0,000000 | 0,000000
+22 | 40 | 100 | 0 | EMPTY_TASK_SET | 0,000000 | 0,000000 | 0,000000% | 0,000000 | 0,000000
+23 | 40 | 100 | 0 | EMPTY_TASK_SET | 0,000000 | 0,000000 | 0,000000% | 0,000000 | 0,000000
+24 | 40 | 100 | 0 | EMPTY_TASK_SET | 0,000000 | 0,000000 | 0,000000% | 0,000000 | 0,000000
+25 | 40 | 100 | 15 | STAGNATION_REACHED | 1000000000001,520000 | 1000000000001,520000 | 0,000000% | 0,000000 | 0,000000
+26 | 40 | 100 | 32 | STAGNATION_REACHED | 1,268881 | 1,252939 | 1,256449% | 0,000000 | 0,015943
+
+------------------------------------------------------------
+4. DECISION / OFFLOADING SUMMARY
+------------------------------------------------------------
+idx | LOCAL | EDGE | CLOUD | VEHICLE | localExec | partial | full | avgP | p=0 | low | midLow | midHigh | high | p=1
+0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0,000000 | 0 | 0 | 0 | 0 | 0 | 0
+1 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0,000000 | 0 | 0 | 0 | 0 | 0 | 0
+2 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0,000000 | 0 | 0 | 0 | 0 | 0 | 0
+3 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0,000000 | 0 | 0 | 0 | 0 | 0 | 0
+4 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0,000000 | 0 | 0 | 0 | 0 | 0 | 0
+5 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0,000000 | 0 | 0 | 0 | 0 | 0 | 0
+6 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0,000000 | 0 | 0 | 0 | 0 | 0 | 0
+7 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0,000000 | 0 | 0 | 0 | 0 | 0 | 0
+8 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0,000000 | 0 | 0 | 0 | 0 | 0 | 0
+9 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0,000000 | 0 | 0 | 0 | 0 | 0 | 0
+10 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0,000000 | 0 | 0 | 0 | 0 | 0 | 0
+11 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0,000000 | 0 | 0 | 0 | 0 | 0 | 0
+12 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0,000000 | 0 | 0 | 0 | 0 | 0 | 0
+13 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0,000000 | 0 | 0 | 0 | 0 | 0 | 0
+14 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0,000000 | 0 | 0 | 0 | 0 | 0 | 0
+15 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0,000000 | 0 | 0 | 0 | 0 | 0 | 0
+16 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0,000000 | 0 | 0 | 0 | 0 | 0 | 0
+17 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0,000000 | 0 | 0 | 0 | 0 | 0 | 0
+18 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0,000000 | 0 | 0 | 0 | 0 | 0 | 0
+19 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0,000000 | 0 | 0 | 0 | 0 | 0 | 0
+20 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0,000000 | 0 | 0 | 0 | 0 | 0 | 0
+21 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0,000000 | 0 | 0 | 0 | 0 | 0 | 0
+22 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0,000000 | 0 | 0 | 0 | 0 | 0 | 0
+23 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0,000000 | 0 | 0 | 0 | 0 | 0 | 0
+24 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0,000000 | 0 | 0 | 0 | 0 | 0 | 0
+25 | 4 | 0 | 0 | 0 | 4 | 0 | 0 | 0,000000 | 4 | 0 | 0 | 0 | 0 | 0
+26 | 2 | 0 | 0 | 1 | 2 | 0 | 1 | 0,333333 | 2 | 0 | 0 | 0 | 0 | 1
+
+------------------------------------------------------------
+5. DEADLINE CAUSE SUMMARY
+------------------------------------------------------------
+idx | violated | rate | local | upload | remoteExec | download | baseLat | mixedLocalRemote | mixedRemote | coverage | unknown
+0 | 0 | 0,000000% | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0
+1 | 0 | 0,000000% | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0
+2 | 0 | 0,000000% | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0
+3 | 0 | 0,000000% | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0
+4 | 0 | 0,000000% | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0
+5 | 0 | 0,000000% | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0
+6 | 0 | 0,000000% | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0
+7 | 0 | 0,000000% | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0
+8 | 0 | 0,000000% | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0
+9 | 0 | 0,000000% | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0
+10 | 0 | 0,000000% | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0
+11 | 0 | 0,000000% | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0
+12 | 0 | 0,000000% | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0
+13 | 0 | 0,000000% | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0
+14 | 0 | 0,000000% | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0
+15 | 0 | 0,000000% | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0
+16 | 0 | 0,000000% | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0
+17 | 0 | 0,000000% | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0
+18 | 0 | 0,000000% | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0
+19 | 0 | 0,000000% | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0
+20 | 0 | 0,000000% | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0
+21 | 0 | 0,000000% | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0
+22 | 0 | 0,000000% | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0
+23 | 0 | 0,000000% | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0
+24 | 0 | 0,000000% | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0
+25 | 1 | 25,000000% | 1 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0
+26 | 0 | 0,000000% | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0
+
+------------------------------------------------------------
+6. TOP DEADLINE VIOLATIONS BY WINDOW
+------------------------------------------------------------
+Window 0 | snapshot=live_runtime_snapshot_t_2000000000 | violated=0
+- no deadline violations
+
+Window 1 | snapshot=live_runtime_snapshot_t_2200000000 | violated=0
+- no deadline violations
+
+Window 2 | snapshot=live_runtime_snapshot_t_2400000000 | violated=0
+- no deadline violations
+
+Window 3 | snapshot=live_runtime_snapshot_t_2600000000 | violated=0
+- no deadline violations
+
+Window 4 | snapshot=live_runtime_snapshot_t_2800000000 | violated=0
+- no deadline violations
+
+Window 5 | snapshot=live_runtime_snapshot_t_3000000000 | violated=0
+- no deadline violations
+
+Window 6 | snapshot=live_runtime_snapshot_t_3200000000 | violated=0
+- no deadline violations
+
+Window 7 | snapshot=live_runtime_snapshot_t_3400000000 | violated=0
+- no deadline violations
+
+Window 8 | snapshot=live_runtime_snapshot_t_3600000000 | violated=0
+- no deadline violations
+
+Window 9 | snapshot=live_runtime_snapshot_t_3800000000 | violated=0
+- no deadline violations
+
+Window 10 | snapshot=live_runtime_snapshot_t_4000000000 | violated=0
+- no deadline violations
+
+Window 11 | snapshot=live_runtime_snapshot_t_4200000000 | violated=0
+- no deadline violations
+
+Window 12 | snapshot=live_runtime_snapshot_t_4400000000 | violated=0
+- no deadline violations
+
+Window 13 | snapshot=live_runtime_snapshot_t_4600000000 | violated=0
+- no deadline violations
+
+Window 14 | snapshot=live_runtime_snapshot_t_4800000000 | violated=0
+- no deadline violations
+
+Window 15 | snapshot=live_runtime_snapshot_t_5000000000 | violated=0
+- no deadline violations
+
+Window 16 | snapshot=live_runtime_snapshot_t_5200000000 | violated=0
+- no deadline violations
+
+Window 17 | snapshot=live_runtime_snapshot_t_5400000000 | violated=0
+- no deadline violations
+
+Window 18 | snapshot=live_runtime_snapshot_t_5600000000 | violated=0
+- no deadline violations
+
+Window 19 | snapshot=live_runtime_snapshot_t_5800000000 | violated=0
+- no deadline violations
+
+Window 20 | snapshot=live_runtime_snapshot_t_6000000000 | violated=0
+- no deadline violations
+
+Window 21 | snapshot=live_runtime_snapshot_t_6200000000 | violated=0
+- no deadline violations
+
+Window 22 | snapshot=live_runtime_snapshot_t_6400000000 | violated=0
+- no deadline violations
+
+Window 23 | snapshot=live_runtime_snapshot_t_6600000000 | violated=0
+- no deadline violations
+
+Window 24 | snapshot=live_runtime_snapshot_t_6800000000 | violated=0
+- no deadline violations
+
+Window 25 | snapshot=live_runtime_snapshot_t_7000000000 | violated=1
+task | source | node | decision | p | completion | deadline | ratio | cause | secondary | dominant | coverage | note
+task_generated__medium__veh_1__t_7000000000__seq_2 | veh_1 | LOCAL | LOCAL_EXECUTION | 0,000000 | 1,200000 s | 1,000000 s | 0,200000 | LOCAL_EXECUTION_BOTTLENECK | UNKNOWN | localExecution=1,200000 s | 300,000000 s | Pure local execution is slower than the task deadline.
+
+Window 26 | snapshot=live_runtime_snapshot_t_8500000000 | violated=0
+- no deadline violations
+
+------------------------------------------------------------
+7. COVERAGE PROBLEM SUMMARY
+------------------------------------------------------------
+idx | insufficient | worstTask | node | completion | coverage | cause
+0 | 0 | none | - | - | - | -
+1 | 0 | none | - | - | - | -
+2 | 0 | none | - | - | - | -
+3 | 0 | none | - | - | - | -
+4 | 0 | none | - | - | - | -
+5 | 0 | none | - | - | - | -
+6 | 0 | none | - | - | - | -
+7 | 0 | none | - | - | - | -
+8 | 0 | none | - | - | - | -
+9 | 0 | none | - | - | - | -
+10 | 0 | none | - | - | - | -
+11 | 0 | none | - | - | - | -
+12 | 0 | none | - | - | - | -
+13 | 0 | none | - | - | - | -
+14 | 0 | none | - | - | - | -
+15 | 0 | none | - | - | - | -
+16 | 0 | none | - | - | - | -
+17 | 0 | none | - | - | - | -
+18 | 0 | none | - | - | - | -
+19 | 0 | none | - | - | - | -
+20 | 0 | none | - | - | - | -
+21 | 0 | none | - | - | - | -
+22 | 0 | none | - | - | - | -
+23 | 0 | none | - | - | - | -
+24 | 0 | none | - | - | - | -
+25 | 0 | none | - | - | - | -
+26 | 0 | none | - | - | - | -
+
+------------------------------------------------------------
+8. RESOURCE PRESSURE SUMMARY
+------------------------------------------------------------
+idx | CPUviol | CPUsat | worstCpuNode | worstCpu% | BWviol | BWsat | worstBwLink | worstBw%
+0 | 0 | 0 | none | - | 0 | 0 | none | -
+1 | 0 | 0 | none | - | 0 | 0 | none | -
+2 | 0 | 0 | none | - | 0 | 0 | none | -
+3 | 0 | 0 | none | - | 0 | 0 | none | -
+4 | 0 | 0 | none | - | 0 | 0 | none | -
+5 | 0 | 0 | none | - | 0 | 0 | none | -
+6 | 0 | 0 | none | - | 0 | 0 | none | -
+7 | 0 | 0 | none | - | 0 | 0 | none | -
+8 | 0 | 0 | none | - | 0 | 0 | none | -
+9 | 0 | 0 | none | - | 0 | 0 | none | -
+10 | 0 | 0 | none | - | 0 | 0 | none | -
+11 | 0 | 0 | none | - | 0 | 0 | none | -
+12 | 0 | 0 | none | - | 0 | 0 | none | -
+13 | 0 | 0 | none | - | 0 | 0 | none | -
+14 | 0 | 0 | none | - | 0 | 0 | none | -
+15 | 0 | 0 | none | - | 0 | 0 | none | -
+16 | 0 | 0 | none | - | 0 | 0 | none | -
+17 | 0 | 0 | none | - | 0 | 0 | none | -
+18 | 0 | 0 | none | - | 0 | 0 | none | -
+19 | 0 | 0 | none | - | 0 | 0 | none | -
+20 | 0 | 0 | none | - | 0 | 0 | none | -
+21 | 0 | 0 | none | - | 0 | 0 | none | -
+22 | 0 | 0 | none | - | 0 | 0 | none | -
+23 | 0 | 0 | none | - | 0 | 0 | none | -
+24 | 0 | 0 | none | - | 0 | 0 | none | -
+25 | 0 | 0 | none | - | 0 | 0 | none | -
+26 | 0 | 1 | veh_1 | 100,000000% | 0 | 1 | vehicle_veh_1_for_veh_4 | 100,000000%
+
+------------------------------------------------------------
+9. WORST WINDOWS
+------------------------------------------------------------
+Worst by final fitness:
+- idx=25 J=1000000000001,520000 Pres=6,000000 violated=1 coverage=0 reuse=PARTIAL_RESTART
+- idx=26 J=1,252939 Pres=0,000000 violated=0 coverage=0 reuse=COLD_START
+- idx=0 J=0,000000 Pres=0,000000 violated=0 coverage=0 reuse=FIRST_RUN
+- idx=1 J=0,000000 Pres=0,000000 violated=0 coverage=0 reuse=WARM_START
+- idx=2 J=0,000000 Pres=0,000000 violated=0 coverage=0 reuse=WARM_START
+- idx=3 J=0,000000 Pres=0,000000 violated=0 coverage=0 reuse=WARM_START
+- idx=4 J=0,000000 Pres=0,000000 violated=0 coverage=0 reuse=WARM_START
+- idx=5 J=0,000000 Pres=0,000000 violated=0 coverage=0 reuse=WARM_START
+- idx=6 J=0,000000 Pres=0,000000 violated=0 coverage=0 reuse=WARM_START
+- idx=7 J=0,000000 Pres=0,000000 violated=0 coverage=0 reuse=WARM_START
+Worst by deadline violations:
+- idx=25 violated=1 rate=25,000000% J=1000000000001,520000 mainCause=LOCAL_EXECUTION_BOTTLENECK
+- idx=0 violated=0 rate=0,000000% J=0,000000 mainCause=UNKNOWN
+- idx=1 violated=0 rate=0,000000% J=0,000000 mainCause=UNKNOWN
+- idx=2 violated=0 rate=0,000000% J=0,000000 mainCause=UNKNOWN
+- idx=3 violated=0 rate=0,000000% J=0,000000 mainCause=UNKNOWN
+- idx=4 violated=0 rate=0,000000% J=0,000000 mainCause=UNKNOWN
+- idx=5 violated=0 rate=0,000000% J=0,000000 mainCause=UNKNOWN
+- idx=6 violated=0 rate=0,000000% J=0,000000 mainCause=UNKNOWN
+- idx=7 violated=0 rate=0,000000% J=0,000000 mainCause=UNKNOWN
+- idx=8 violated=0 rate=0,000000% J=0,000000 mainCause=UNKNOWN
+Worst by coverage problems:
+- idx=0 coverageInsufficient=0 violated=0 J=0,000000
+- idx=1 coverageInsufficient=0 violated=0 J=0,000000
+- idx=2 coverageInsufficient=0 violated=0 J=0,000000
+- idx=3 coverageInsufficient=0 violated=0 J=0,000000
+- idx=4 coverageInsufficient=0 violated=0 J=0,000000
+- idx=5 coverageInsufficient=0 violated=0 J=0,000000
+- idx=6 coverageInsufficient=0 violated=0 J=0,000000
+- idx=7 coverageInsufficient=0 violated=0 J=0,000000
+- idx=8 coverageInsufficient=0 violated=0 J=0,000000
+- idx=9 coverageInsufficient=0 violated=0 J=0,000000
+
+------------------------------------------------------------
+10. DIAGNOSIS
+------------------------------------------------------------
+- CPU aggregate repair appears effective: no CPU violations were observed.
+- Hierarchical bandwidth repair appears effective: no link-level bandwidth violations were observed.
+- Use the bandwidth pool diagnostic report to inspect shared pool saturation and unresolved pool bindings.
+- Deadline violations remain the main problem.
+- Use sections 5 and 6 to identify whether the dominant cause is local execution, upload, remote execution, latency, mixed execution, or coverage.
+
+============================================================
+DEADLINE / DEGRADED BEST-EFFORT REPORT
+============================================================
+
+Interpretation:
+- ordinary mode: the repaired decision respects the task deadline;
+- DEGRADED_BEST_EFFORT: the final decision still exceeds the deadline;
+- the degraded label records a bounded-repair outcome, not a proof of global infeasibility;
+- CLOUD is never preferred automatically: the retained decision is the one with the lowest predicted lateness among the alternatives evaluated by the repair policy.
+
+------------------------------------------------------------
+1. DEGRADED SUMMARY BY WINDOW
+------------------------------------------------------------
+idx | snapshot | tasks | deadlineOK | degradedBestEffort | maxLateness | avgLateness
+0 | live_runtime_snapshot_t_2000000000 | 0 | 0 | 0 | 0,000000 s | 0,000000 s
+1 | live_runtime_snapshot_t_2200000000 | 0 | 0 | 0 | 0,000000 s | 0,000000 s
+2 | live_runtime_snapshot_t_2400000000 | 0 | 0 | 0 | 0,000000 s | 0,000000 s
+3 | live_runtime_snapshot_t_2600000000 | 0 | 0 | 0 | 0,000000 s | 0,000000 s
+4 | live_runtime_snapshot_t_2800000000 | 0 | 0 | 0 | 0,000000 s | 0,000000 s
+5 | live_runtime_snapshot_t_3000000000 | 0 | 0 | 0 | 0,000000 s | 0,000000 s
+6 | live_runtime_snapshot_t_3200000000 | 0 | 0 | 0 | 0,000000 s | 0,000000 s
+7 | live_runtime_snapshot_t_3400000000 | 0 | 0 | 0 | 0,000000 s | 0,000000 s
+8 | live_runtime_snapshot_t_3600000000 | 0 | 0 | 0 | 0,000000 s | 0,000000 s
+9 | live_runtime_snapshot_t_3800000000 | 0 | 0 | 0 | 0,000000 s | 0,000000 s
+10 | live_runtime_snapshot_t_4000000000 | 0 | 0 | 0 | 0,000000 s | 0,000000 s
+11 | live_runtime_snapshot_t_4200000000 | 0 | 0 | 0 | 0,000000 s | 0,000000 s
+12 | live_runtime_snapshot_t_4400000000 | 0 | 0 | 0 | 0,000000 s | 0,000000 s
+13 | live_runtime_snapshot_t_4600000000 | 0 | 0 | 0 | 0,000000 s | 0,000000 s
+14 | live_runtime_snapshot_t_4800000000 | 0 | 0 | 0 | 0,000000 s | 0,000000 s
+15 | live_runtime_snapshot_t_5000000000 | 0 | 0 | 0 | 0,000000 s | 0,000000 s
+16 | live_runtime_snapshot_t_5200000000 | 0 | 0 | 0 | 0,000000 s | 0,000000 s
+17 | live_runtime_snapshot_t_5400000000 | 0 | 0 | 0 | 0,000000 s | 0,000000 s
+18 | live_runtime_snapshot_t_5600000000 | 0 | 0 | 0 | 0,000000 s | 0,000000 s
+19 | live_runtime_snapshot_t_5800000000 | 0 | 0 | 0 | 0,000000 s | 0,000000 s
+20 | live_runtime_snapshot_t_6000000000 | 0 | 0 | 0 | 0,000000 s | 0,000000 s
+21 | live_runtime_snapshot_t_6200000000 | 0 | 0 | 0 | 0,000000 s | 0,000000 s
+22 | live_runtime_snapshot_t_6400000000 | 0 | 0 | 0 | 0,000000 s | 0,000000 s
+23 | live_runtime_snapshot_t_6600000000 | 0 | 0 | 0 | 0,000000 s | 0,000000 s
+24 | live_runtime_snapshot_t_6800000000 | 0 | 0 | 0 | 0,000000 s | 0,000000 s
+25 | live_runtime_snapshot_t_7000000000 | 4 | 3 | 1 | 0,200000 s | 0,200000 s
+26 | live_runtime_snapshot_t_8500000000 | 3 | 3 | 0 | 0,000000 s | 0,000000 s
+
+------------------------------------------------------------
+2. TOP DEGRADED BEST-EFFORT DECISIONS BY WINDOW
+------------------------------------------------------------
+Window 0 | snapshot=live_runtime_snapshot_t_2000000000 | degradedBestEffort=0
+- no degraded best-effort decision
+
+Window 1 | snapshot=live_runtime_snapshot_t_2200000000 | degradedBestEffort=0
+- no degraded best-effort decision
+
+Window 2 | snapshot=live_runtime_snapshot_t_2400000000 | degradedBestEffort=0
+- no degraded best-effort decision
+
+Window 3 | snapshot=live_runtime_snapshot_t_2600000000 | degradedBestEffort=0
+- no degraded best-effort decision
+
+Window 4 | snapshot=live_runtime_snapshot_t_2800000000 | degradedBestEffort=0
+- no degraded best-effort decision
+
+Window 5 | snapshot=live_runtime_snapshot_t_3000000000 | degradedBestEffort=0
+- no degraded best-effort decision
+
+Window 6 | snapshot=live_runtime_snapshot_t_3200000000 | degradedBestEffort=0
+- no degraded best-effort decision
+
+Window 7 | snapshot=live_runtime_snapshot_t_3400000000 | degradedBestEffort=0
+- no degraded best-effort decision
+
+Window 8 | snapshot=live_runtime_snapshot_t_3600000000 | degradedBestEffort=0
+- no degraded best-effort decision
+
+Window 9 | snapshot=live_runtime_snapshot_t_3800000000 | degradedBestEffort=0
+- no degraded best-effort decision
+
+Window 10 | snapshot=live_runtime_snapshot_t_4000000000 | degradedBestEffort=0
+- no degraded best-effort decision
+
+Window 11 | snapshot=live_runtime_snapshot_t_4200000000 | degradedBestEffort=0
+- no degraded best-effort decision
+
+Window 12 | snapshot=live_runtime_snapshot_t_4400000000 | degradedBestEffort=0
+- no degraded best-effort decision
+
+Window 13 | snapshot=live_runtime_snapshot_t_4600000000 | degradedBestEffort=0
+- no degraded best-effort decision
+
+Window 14 | snapshot=live_runtime_snapshot_t_4800000000 | degradedBestEffort=0
+- no degraded best-effort decision
+
+Window 15 | snapshot=live_runtime_snapshot_t_5000000000 | degradedBestEffort=0
+- no degraded best-effort decision
+
+Window 16 | snapshot=live_runtime_snapshot_t_5200000000 | degradedBestEffort=0
+- no degraded best-effort decision
+
+Window 17 | snapshot=live_runtime_snapshot_t_5400000000 | degradedBestEffort=0
+- no degraded best-effort decision
+
+Window 18 | snapshot=live_runtime_snapshot_t_5600000000 | degradedBestEffort=0
+- no degraded best-effort decision
+
+Window 19 | snapshot=live_runtime_snapshot_t_5800000000 | degradedBestEffort=0
+- no degraded best-effort decision
+
+Window 20 | snapshot=live_runtime_snapshot_t_6000000000 | degradedBestEffort=0
+- no degraded best-effort decision
+
+Window 21 | snapshot=live_runtime_snapshot_t_6200000000 | degradedBestEffort=0
+- no degraded best-effort decision
+
+Window 22 | snapshot=live_runtime_snapshot_t_6400000000 | degradedBestEffort=0
+- no degraded best-effort decision
+
+Window 23 | snapshot=live_runtime_snapshot_t_6600000000 | degradedBestEffort=0
+- no degraded best-effort decision
+
+Window 24 | snapshot=live_runtime_snapshot_t_6800000000 | degradedBestEffort=0
+- no degraded best-effort decision
+
+Window 25 | snapshot=live_runtime_snapshot_t_7000000000 | degradedBestEffort=1
+task | source | candidate | nodeType | decision | p | completion | deadline | lateness | status
+task_generated__medium__veh_1__t_7000000000__seq_2 | veh_1 | local_for_veh_1 | LOCAL | LOCAL_EXECUTION | 0,000000 | 1,200000 s | 1,000000 s | 0,200000 s | DEGRADED_BEST_EFFORT
+
+Window 26 | snapshot=live_runtime_snapshot_t_8500000000 | degradedBestEffort=0
+- no degraded best-effort decision
+
+------------------------------------------------------------
+CLOUD GATEWAY CONFIGURATION SUMMARY
+------------------------------------------------------------
+mode: STRICT_GATEWAY
+legacyPlaceholderEnabled: false
+configuredGatewayCountAcrossRun: 2
+firstSnapshotAccessLinkCount: 4
+maximumAccessLinkCountAcrossWindows: 10
+maximumActiveAccessLinkCountAcrossWindows: 0
+windowsWithActiveAccessLinks: 0
+windowsWithoutActiveAccessLinks: 27
+
+------------------------------------------------------------
+CLOUD GATEWAY SUMMARY BY WINDOW
+------------------------------------------------------------
+idx | snapshot | vehicles | gateways | activeLinks | cloudCandidates | cloudDecisions | gatewayAwareCloud | placeholderCloud | filteredCloud | avgPhiLink | maxPhiLink | avgCoverage | minCoverage
+0 | live_runtime_snapshot_t_2000000000 | 2 | 2 | 0 | 0 | 0 | 0 | 0 | 0 | - | - | - | -
+1 | live_runtime_snapshot_t_2200000000 | 2 | 2 | 0 | 0 | 0 | 0 | 0 | 0 | - | - | - | -
+2 | live_runtime_snapshot_t_2400000000 | 2 | 2 | 0 | 0 | 0 | 0 | 0 | 0 | - | - | - | -
+3 | live_runtime_snapshot_t_2600000000 | 2 | 2 | 0 | 0 | 0 | 0 | 0 | 0 | - | - | - | -
+4 | live_runtime_snapshot_t_2800000000 | 2 | 2 | 0 | 0 | 0 | 0 | 0 | 0 | - | - | - | -
+5 | live_runtime_snapshot_t_3000000000 | 2 | 2 | 0 | 0 | 0 | 0 | 0 | 0 | - | - | - | -
+6 | live_runtime_snapshot_t_3200000000 | 2 | 2 | 0 | 0 | 0 | 0 | 0 | 0 | - | - | - | -
+7 | live_runtime_snapshot_t_3400000000 | 2 | 2 | 0 | 0 | 0 | 0 | 0 | 0 | - | - | - | -
+8 | live_runtime_snapshot_t_3600000000 | 2 | 2 | 0 | 0 | 0 | 0 | 0 | 0 | - | - | - | -
+9 | live_runtime_snapshot_t_3800000000 | 3 | 2 | 0 | 0 | 0 | 0 | 0 | 0 | - | - | - | -
+10 | live_runtime_snapshot_t_4000000000 | 3 | 2 | 0 | 0 | 0 | 0 | 0 | 0 | - | - | - | -
+11 | live_runtime_snapshot_t_4200000000 | 3 | 2 | 0 | 0 | 0 | 0 | 0 | 0 | - | - | - | -
+12 | live_runtime_snapshot_t_4400000000 | 3 | 2 | 0 | 0 | 0 | 0 | 0 | 0 | - | - | - | -
+13 | live_runtime_snapshot_t_4600000000 | 3 | 2 | 0 | 0 | 0 | 0 | 0 | 0 | - | - | - | -
+14 | live_runtime_snapshot_t_4800000000 | 3 | 2 | 0 | 0 | 0 | 0 | 0 | 0 | - | - | - | -
+15 | live_runtime_snapshot_t_5000000000 | 3 | 2 | 0 | 0 | 0 | 0 | 0 | 0 | - | - | - | -
+16 | live_runtime_snapshot_t_5200000000 | 3 | 2 | 0 | 0 | 0 | 0 | 0 | 0 | - | - | - | -
+17 | live_runtime_snapshot_t_5400000000 | 3 | 2 | 0 | 0 | 0 | 0 | 0 | 0 | - | - | - | -
+18 | live_runtime_snapshot_t_5600000000 | 4 | 2 | 0 | 0 | 0 | 0 | 0 | 0 | - | - | - | -
+19 | live_runtime_snapshot_t_5800000000 | 4 | 2 | 0 | 0 | 0 | 0 | 0 | 0 | - | - | - | -
+20 | live_runtime_snapshot_t_6000000000 | 4 | 2 | 0 | 0 | 0 | 0 | 0 | 0 | - | - | - | -
+21 | live_runtime_snapshot_t_6200000000 | 4 | 2 | 0 | 0 | 0 | 0 | 0 | 0 | - | - | - | -
+22 | live_runtime_snapshot_t_6400000000 | 4 | 2 | 0 | 0 | 0 | 0 | 0 | 0 | - | - | - | -
+23 | live_runtime_snapshot_t_6600000000 | 4 | 2 | 0 | 0 | 0 | 0 | 0 | 0 | - | - | - | -
+24 | live_runtime_snapshot_t_6800000000 | 4 | 2 | 0 | 0 | 0 | 0 | 0 | 0 | - | - | - | -
+25 | live_runtime_snapshot_t_7000000000 | 4 | 2 | 0 | 0 | 0 | 0 | 0 | 0 | - | - | - | -
+26 | live_runtime_snapshot_t_8500000000 | 5 | 2 | 0 | 0 | 0 | 0 | 0 | 0 | - | - | - | -
+
+------------------------------------------------------------
+CLOUD ACCESS-RISK DECISIONS BY WINDOW
+------------------------------------------------------------
+idx | task | vehicle | cloudCandidate | gateway | distance | radius | coverage | phiLink | phiHo | model
+
+------------------------------------------------------------
+ACCESS LINK TRANSITIONS
+------------------------------------------------------------
+idx | vehicle | previousGateway | currentGateway | transition
+
+------------------------------------------------------------
+ACCESS LINK DYNAMICITY DIAGNOSTIC
+------------------------------------------------------------
+idx | snapshot | commonVehicles | avgPrevQ | avgCurrQ | Dl | degradedLinks | recoveredLinks | unavailableLinks | coverageLosses | coverageGains | handovers
+0 | live_runtime_snapshot_t_2000000000 | 0 | - | - | 0,000000 | 0 | 0 | 0 | 0
+1 | live_runtime_snapshot_t_2200000000 | 2 | 0,000000 | 0,000000 | 0,000000 | 0 | 0 | 2 | 0 | 0 | 0
+2 | live_runtime_snapshot_t_2400000000 | 2 | 0,000000 | 0,000000 | 0,000000 | 0 | 0 | 2 | 0 | 0 | 0
+3 | live_runtime_snapshot_t_2600000000 | 2 | 0,000000 | 0,000000 | 0,000000 | 0 | 0 | 2 | 0 | 0 | 0
+4 | live_runtime_snapshot_t_2800000000 | 2 | 0,000000 | 0,000000 | 0,000000 | 0 | 0 | 2 | 0 | 0 | 0
+5 | live_runtime_snapshot_t_3000000000 | 2 | 0,000000 | 0,000000 | 0,000000 | 0 | 0 | 2 | 0 | 0 | 0
+6 | live_runtime_snapshot_t_3200000000 | 2 | 0,000000 | 0,000000 | 0,000000 | 0 | 0 | 2 | 0 | 0 | 0
+7 | live_runtime_snapshot_t_3400000000 | 2 | 0,000000 | 0,000000 | 0,000000 | 0 | 0 | 2 | 0 | 0 | 0
+8 | live_runtime_snapshot_t_3600000000 | 2 | 0,000000 | 0,000000 | 0,000000 | 0 | 0 | 2 | 0 | 0 | 0
+9 | live_runtime_snapshot_t_3800000000 | 2 | 0,000000 | 0,000000 | 0,000000 | 0 | 0 | 2 | 0 | 0 | 0
+10 | live_runtime_snapshot_t_4000000000 | 3 | 0,000000 | 0,000000 | 0,000000 | 0 | 0 | 3 | 0 | 0 | 0
+11 | live_runtime_snapshot_t_4200000000 | 3 | 0,000000 | 0,000000 | 0,000000 | 0 | 0 | 3 | 0 | 0 | 0
+12 | live_runtime_snapshot_t_4400000000 | 3 | 0,000000 | 0,000000 | 0,000000 | 0 | 0 | 3 | 0 | 0 | 0
+13 | live_runtime_snapshot_t_4600000000 | 3 | 0,000000 | 0,000000 | 0,000000 | 0 | 0 | 3 | 0 | 0 | 0
+14 | live_runtime_snapshot_t_4800000000 | 3 | 0,000000 | 0,000000 | 0,000000 | 0 | 0 | 3 | 0 | 0 | 0
+15 | live_runtime_snapshot_t_5000000000 | 3 | 0,000000 | 0,000000 | 0,000000 | 0 | 0 | 3 | 0 | 0 | 0
+16 | live_runtime_snapshot_t_5200000000 | 3 | 0,000000 | 0,000000 | 0,000000 | 0 | 0 | 3 | 0 | 0 | 0
+17 | live_runtime_snapshot_t_5400000000 | 3 | 0,000000 | 0,000000 | 0,000000 | 0 | 0 | 3 | 0 | 0 | 0
+18 | live_runtime_snapshot_t_5600000000 | 3 | 0,000000 | 0,000000 | 0,000000 | 0 | 0 | 3 | 0 | 0 | 0
+19 | live_runtime_snapshot_t_5800000000 | 4 | 0,000000 | 0,000000 | 0,000000 | 0 | 0 | 4 | 0 | 0 | 0
+20 | live_runtime_snapshot_t_6000000000 | 4 | 0,000000 | 0,000000 | 0,000000 | 0 | 0 | 4 | 0 | 0 | 0
+21 | live_runtime_snapshot_t_6200000000 | 4 | 0,000000 | 0,000000 | 0,000000 | 0 | 0 | 4 | 0 | 0 | 0
+22 | live_runtime_snapshot_t_6400000000 | 4 | 0,000000 | 0,000000 | 0,000000 | 0 | 0 | 4 | 0 | 0 | 0
+23 | live_runtime_snapshot_t_6600000000 | 4 | 0,000000 | 0,000000 | 0,000000 | 0 | 0 | 4 | 0 | 0 | 0
+24 | live_runtime_snapshot_t_6800000000 | 4 | 0,000000 | 0,000000 | 0,000000 | 0 | 0 | 4 | 0 | 0 | 0
+25 | live_runtime_snapshot_t_7000000000 | 4 | 0,000000 | 0,000000 | 0,000000 | 0 | 0 | 4 | 0 | 0 | 0
+26 | live_runtime_snapshot_t_8500000000 | 4 | 0,000000 | 0,000000 | 0,000000 | 0 | 0 | 4 | 0 | 0 | 0
+
+------------------------------------------------------------
+TOP ACCESS LINK QUALITY CHANGES
+------------------------------------------------------------
+idx | vehicle | previousGateway | currentGateway | prevAvailable | currAvailable | prevDistance | currDistance | prevPhiLink | currPhiLink | prevQ | currQ | deltaQ | transition
+
+------------------------------------------------------------
+ACCESS LINK DYNAMICITY INTERPRETATION
+------------------------------------------------------------
+- Dv(k) now measures only vehicle entry/exit churn.
+- Dl(k) is the mean absolute variation of q_v(k) over vehicles present in both consecutive windows.
+- q_v(k) = 1 - phi_link(v, activeGateway); unavailable or missing access links have q_v(k) = 0.
+- Missing gateways do not create synthetic distance or phi_link metrics; unavailable metrics are rendered as '-'.
+- Coverage loss and coverage gain are reported separately from gateway-to-gateway handover.
+- Computational candidate additions do not alter Dl(k) when active access links stay unchanged.
+- A gateway transition is reported separately. It affects Dl(k) only through the resulting quality variation.
+
+------------------------------------------------------------
+HIERARCHICAL BANDWIDTH INTERPRETATION
+------------------------------------------------------------
+- link constraint: sum bandwidth by candidateId <= candidate.availableBandwidth
+- pool constraint: sum bandwidth by poolId <= pool.availableBandwidth
+- the pool does not replace the source-aware link limit: both constraints must hold
+- EDGE/CLOUD resolve poolId through the active access gateway; V2V uses the explicit DIRECT_V2V binding
+
+------------------------------------------------------------
+BANDWIDTH POOL CONFIGURATION SUMMARY
+------------------------------------------------------------
+poolCount: 2
+- pool_rsu_0 | type=GATEWAY | capacity=49192000,000000
+- pool_rsu_1 | type=GATEWAY | capacity=49192000,000000
+
+------------------------------------------------------------
+HIERARCHICAL BANDWIDTH CHECK BY WINDOW
+------------------------------------------------------------
+idx | snapshot | remoteGenes | unresolved | violatedLinks | saturatedLinks | violatedPools | saturatedPools | status
+0 | live_runtime_snapshot_t_2000000000 | 0 | 0 | 0 | 0 | 0 | 0 | OK
+1 | live_runtime_snapshot_t_2200000000 | 0 | 0 | 0 | 0 | 0 | 0 | OK
+2 | live_runtime_snapshot_t_2400000000 | 0 | 0 | 0 | 0 | 0 | 0 | OK
+3 | live_runtime_snapshot_t_2600000000 | 0 | 0 | 0 | 0 | 0 | 0 | OK
+4 | live_runtime_snapshot_t_2800000000 | 0 | 0 | 0 | 0 | 0 | 0 | OK
+5 | live_runtime_snapshot_t_3000000000 | 0 | 0 | 0 | 0 | 0 | 0 | OK
+6 | live_runtime_snapshot_t_3200000000 | 0 | 0 | 0 | 0 | 0 | 0 | OK
+7 | live_runtime_snapshot_t_3400000000 | 0 | 0 | 0 | 0 | 0 | 0 | OK
+8 | live_runtime_snapshot_t_3600000000 | 0 | 0 | 0 | 0 | 0 | 0 | OK
+9 | live_runtime_snapshot_t_3800000000 | 0 | 0 | 0 | 0 | 0 | 0 | OK
+10 | live_runtime_snapshot_t_4000000000 | 0 | 0 | 0 | 0 | 0 | 0 | OK
+11 | live_runtime_snapshot_t_4200000000 | 0 | 0 | 0 | 0 | 0 | 0 | OK
+12 | live_runtime_snapshot_t_4400000000 | 0 | 0 | 0 | 0 | 0 | 0 | OK
+13 | live_runtime_snapshot_t_4600000000 | 0 | 0 | 0 | 0 | 0 | 0 | OK
+14 | live_runtime_snapshot_t_4800000000 | 0 | 0 | 0 | 0 | 0 | 0 | OK
+15 | live_runtime_snapshot_t_5000000000 | 0 | 0 | 0 | 0 | 0 | 0 | OK
+16 | live_runtime_snapshot_t_5200000000 | 0 | 0 | 0 | 0 | 0 | 0 | OK
+17 | live_runtime_snapshot_t_5400000000 | 0 | 0 | 0 | 0 | 0 | 0 | OK
+18 | live_runtime_snapshot_t_5600000000 | 0 | 0 | 0 | 0 | 0 | 0 | OK
+19 | live_runtime_snapshot_t_5800000000 | 0 | 0 | 0 | 0 | 0 | 0 | OK
+20 | live_runtime_snapshot_t_6000000000 | 0 | 0 | 0 | 0 | 0 | 0 | OK
+21 | live_runtime_snapshot_t_6200000000 | 0 | 0 | 0 | 0 | 0 | 0 | OK
+22 | live_runtime_snapshot_t_6400000000 | 0 | 0 | 0 | 0 | 0 | 0 | OK
+23 | live_runtime_snapshot_t_6600000000 | 0 | 0 | 0 | 0 | 0 | 0 | OK
+24 | live_runtime_snapshot_t_6800000000 | 0 | 0 | 0 | 0 | 0 | 0 | OK
+25 | live_runtime_snapshot_t_7000000000 | 0 | 0 | 0 | 0 | 0 | 0 | OK
+26 | live_runtime_snapshot_t_8500000000 | 1 | 0 | 0 | 1 | 0 | 1 | OK
+
+------------------------------------------------------------
+LINK BANDWIDTH PRESSURE SUMMARY BY WINDOW
+------------------------------------------------------------
+idx | snapshot | usedLinks | violatedLinks | saturatedLinks | worstLink | worstUsage% | totalRequested
+0 | live_runtime_snapshot_t_2000000000 | 0 | 0 | 0 | none | 0,000000 | 0,000000
+1 | live_runtime_snapshot_t_2200000000 | 0 | 0 | 0 | none | 0,000000 | 0,000000
+2 | live_runtime_snapshot_t_2400000000 | 0 | 0 | 0 | none | 0,000000 | 0,000000
+3 | live_runtime_snapshot_t_2600000000 | 0 | 0 | 0 | none | 0,000000 | 0,000000
+4 | live_runtime_snapshot_t_2800000000 | 0 | 0 | 0 | none | 0,000000 | 0,000000
+5 | live_runtime_snapshot_t_3000000000 | 0 | 0 | 0 | none | 0,000000 | 0,000000
+6 | live_runtime_snapshot_t_3200000000 | 0 | 0 | 0 | none | 0,000000 | 0,000000
+7 | live_runtime_snapshot_t_3400000000 | 0 | 0 | 0 | none | 0,000000 | 0,000000
+8 | live_runtime_snapshot_t_3600000000 | 0 | 0 | 0 | none | 0,000000 | 0,000000
+9 | live_runtime_snapshot_t_3800000000 | 0 | 0 | 0 | none | 0,000000 | 0,000000
+10 | live_runtime_snapshot_t_4000000000 | 0 | 0 | 0 | none | 0,000000 | 0,000000
+11 | live_runtime_snapshot_t_4200000000 | 0 | 0 | 0 | none | 0,000000 | 0,000000
+12 | live_runtime_snapshot_t_4400000000 | 0 | 0 | 0 | none | 0,000000 | 0,000000
+13 | live_runtime_snapshot_t_4600000000 | 0 | 0 | 0 | none | 0,000000 | 0,000000
+14 | live_runtime_snapshot_t_4800000000 | 0 | 0 | 0 | none | 0,000000 | 0,000000
+15 | live_runtime_snapshot_t_5000000000 | 0 | 0 | 0 | none | 0,000000 | 0,000000
+16 | live_runtime_snapshot_t_5200000000 | 0 | 0 | 0 | none | 0,000000 | 0,000000
+17 | live_runtime_snapshot_t_5400000000 | 0 | 0 | 0 | none | 0,000000 | 0,000000
+18 | live_runtime_snapshot_t_5600000000 | 0 | 0 | 0 | none | 0,000000 | 0,000000
+19 | live_runtime_snapshot_t_5800000000 | 0 | 0 | 0 | none | 0,000000 | 0,000000
+20 | live_runtime_snapshot_t_6000000000 | 0 | 0 | 0 | none | 0,000000 | 0,000000
+21 | live_runtime_snapshot_t_6200000000 | 0 | 0 | 0 | none | 0,000000 | 0,000000
+22 | live_runtime_snapshot_t_6400000000 | 0 | 0 | 0 | none | 0,000000 | 0,000000
+23 | live_runtime_snapshot_t_6600000000 | 0 | 0 | 0 | none | 0,000000 | 0,000000
+24 | live_runtime_snapshot_t_6800000000 | 0 | 0 | 0 | none | 0,000000 | 0,000000
+25 | live_runtime_snapshot_t_7000000000 | 0 | 0 | 0 | none | 0,000000 | 0,000000
+26 | live_runtime_snapshot_t_8500000000 | 1 | 0 | 1 | vehicle_veh_1_for_veh_4 | 100,000000 | 4700000,000000
+
+------------------------------------------------------------
+LINK BANDWIDTH DETAILS BY WINDOW
+------------------------------------------------------------
+idx | snapshot | candidateId | sourceVehicle | executionNode | type | used | capacity | usage% | violation | saturated | taskCount | resolvedPool
+26 | live_runtime_snapshot_t_8500000000 | vehicle_veh_1_for_veh_4 | veh_4 | veh_1 | VEHICLE | 4700000,000000 | 4700000,000000 | 100,000000 | false | true | 1 | direct_v2v_pool__veh_1__veh_4
+
+------------------------------------------------------------
+BANDWIDTH POOL SUMMARY BY WINDOW
+------------------------------------------------------------
+idx | snapshot | pools | remoteGenes | unresolved | violatedPools | saturatedPools | worstPool | worstUsage% | totalRequested | totalCapacity
+0 | live_runtime_snapshot_t_2000000000 | 2 | 0 | 0 | 0 | 0 | none | 0,000000 | 0,000000 | 98384000,000000
+1 | live_runtime_snapshot_t_2200000000 | 2 | 0 | 0 | 0 | 0 | none | 0,000000 | 0,000000 | 98384000,000000
+2 | live_runtime_snapshot_t_2400000000 | 2 | 0 | 0 | 0 | 0 | none | 0,000000 | 0,000000 | 98384000,000000
+3 | live_runtime_snapshot_t_2600000000 | 2 | 0 | 0 | 0 | 0 | none | 0,000000 | 0,000000 | 98384000,000000
+4 | live_runtime_snapshot_t_2800000000 | 2 | 0 | 0 | 0 | 0 | none | 0,000000 | 0,000000 | 98384000,000000
+5 | live_runtime_snapshot_t_3000000000 | 2 | 0 | 0 | 0 | 0 | none | 0,000000 | 0,000000 | 98384000,000000
+6 | live_runtime_snapshot_t_3200000000 | 2 | 0 | 0 | 0 | 0 | none | 0,000000 | 0,000000 | 98384000,000000
+7 | live_runtime_snapshot_t_3400000000 | 2 | 0 | 0 | 0 | 0 | none | 0,000000 | 0,000000 | 98384000,000000
+8 | live_runtime_snapshot_t_3600000000 | 2 | 0 | 0 | 0 | 0 | none | 0,000000 | 0,000000 | 98384000,000000
+9 | live_runtime_snapshot_t_3800000000 | 2 | 0 | 0 | 0 | 0 | none | 0,000000 | 0,000000 | 98384000,000000
+10 | live_runtime_snapshot_t_4000000000 | 2 | 0 | 0 | 0 | 0 | none | 0,000000 | 0,000000 | 98368000,000000
+11 | live_runtime_snapshot_t_4200000000 | 2 | 0 | 0 | 0 | 0 | none | 0,000000 | 0,000000 | 98368000,000000
+12 | live_runtime_snapshot_t_4400000000 | 2 | 0 | 0 | 0 | 0 | none | 0,000000 | 0,000000 | 98368000,000000
+13 | live_runtime_snapshot_t_4600000000 | 2 | 0 | 0 | 0 | 0 | none | 0,000000 | 0,000000 | 98368000,000000
+14 | live_runtime_snapshot_t_4800000000 | 2 | 0 | 0 | 0 | 0 | none | 0,000000 | 0,000000 | 98368000,000000
+15 | live_runtime_snapshot_t_5000000000 | 2 | 0 | 0 | 0 | 0 | none | 0,000000 | 0,000000 | 98352000,000000
+16 | live_runtime_snapshot_t_5200000000 | 2 | 0 | 0 | 0 | 0 | none | 0,000000 | 0,000000 | 98352000,000000
+17 | live_runtime_snapshot_t_5400000000 | 2 | 0 | 0 | 0 | 0 | none | 0,000000 | 0,000000 | 98352000,000000
+18 | live_runtime_snapshot_t_5600000000 | 2 | 0 | 0 | 0 | 0 | none | 0,000000 | 0,000000 | 98352000,000000
+19 | live_runtime_snapshot_t_5800000000 | 2 | 0 | 0 | 0 | 0 | none | 0,000000 | 0,000000 | 98352000,000000
+20 | live_runtime_snapshot_t_6000000000 | 2 | 0 | 0 | 0 | 0 | none | 0,000000 | 0,000000 | 98352000,000000
+21 | live_runtime_snapshot_t_6200000000 | 2 | 0 | 0 | 0 | 0 | none | 0,000000 | 0,000000 | 98352000,000000
+22 | live_runtime_snapshot_t_6400000000 | 2 | 0 | 0 | 0 | 0 | none | 0,000000 | 0,000000 | 98352000,000000
+23 | live_runtime_snapshot_t_6600000000 | 2 | 0 | 0 | 0 | 0 | none | 0,000000 | 0,000000 | 98352000,000000
+24 | live_runtime_snapshot_t_6800000000 | 2 | 0 | 0 | 0 | 0 | none | 0,000000 | 0,000000 | 98352000,000000
+25 | live_runtime_snapshot_t_7000000000 | 2 | 0 | 0 | 0 | 0 | none | 0,000000 | 0,000000 | 98336000,000000
+26 | live_runtime_snapshot_t_8500000000 | 3 | 1 | 0 | 0 | 1 | direct_v2v_pool__veh_1__veh_4 | 100,000000 | 4700000,000000 | 103036000,000000
+
+------------------------------------------------------------
+BANDWIDTH POOL DETAILS BY WINDOW
+------------------------------------------------------------
+idx | snapshot | poolId | type | used | capacity | usage% | violation | saturated | taskCount
+0 | live_runtime_snapshot_t_2000000000 | pool_rsu_0 | GATEWAY | 0,000000 | 49192000,000000 | 0,000000 | false | false | 0
+0 | live_runtime_snapshot_t_2000000000 | pool_rsu_1 | GATEWAY | 0,000000 | 49192000,000000 | 0,000000 | false | false | 0
+1 | live_runtime_snapshot_t_2200000000 | pool_rsu_0 | GATEWAY | 0,000000 | 49192000,000000 | 0,000000 | false | false | 0
+1 | live_runtime_snapshot_t_2200000000 | pool_rsu_1 | GATEWAY | 0,000000 | 49192000,000000 | 0,000000 | false | false | 0
+2 | live_runtime_snapshot_t_2400000000 | pool_rsu_0 | GATEWAY | 0,000000 | 49192000,000000 | 0,000000 | false | false | 0
+2 | live_runtime_snapshot_t_2400000000 | pool_rsu_1 | GATEWAY | 0,000000 | 49192000,000000 | 0,000000 | false | false | 0
+3 | live_runtime_snapshot_t_2600000000 | pool_rsu_0 | GATEWAY | 0,000000 | 49192000,000000 | 0,000000 | false | false | 0
+3 | live_runtime_snapshot_t_2600000000 | pool_rsu_1 | GATEWAY | 0,000000 | 49192000,000000 | 0,000000 | false | false | 0
+4 | live_runtime_snapshot_t_2800000000 | pool_rsu_0 | GATEWAY | 0,000000 | 49192000,000000 | 0,000000 | false | false | 0
+4 | live_runtime_snapshot_t_2800000000 | pool_rsu_1 | GATEWAY | 0,000000 | 49192000,000000 | 0,000000 | false | false | 0
+5 | live_runtime_snapshot_t_3000000000 | pool_rsu_0 | GATEWAY | 0,000000 | 49192000,000000 | 0,000000 | false | false | 0
+5 | live_runtime_snapshot_t_3000000000 | pool_rsu_1 | GATEWAY | 0,000000 | 49192000,000000 | 0,000000 | false | false | 0
+6 | live_runtime_snapshot_t_3200000000 | pool_rsu_0 | GATEWAY | 0,000000 | 49192000,000000 | 0,000000 | false | false | 0
+6 | live_runtime_snapshot_t_3200000000 | pool_rsu_1 | GATEWAY | 0,000000 | 49192000,000000 | 0,000000 | false | false | 0
+7 | live_runtime_snapshot_t_3400000000 | pool_rsu_0 | GATEWAY | 0,000000 | 49192000,000000 | 0,000000 | false | false | 0
+7 | live_runtime_snapshot_t_3400000000 | pool_rsu_1 | GATEWAY | 0,000000 | 49192000,000000 | 0,000000 | false | false | 0
+8 | live_runtime_snapshot_t_3600000000 | pool_rsu_0 | GATEWAY | 0,000000 | 49192000,000000 | 0,000000 | false | false | 0
+8 | live_runtime_snapshot_t_3600000000 | pool_rsu_1 | GATEWAY | 0,000000 | 49192000,000000 | 0,000000 | false | false | 0
+9 | live_runtime_snapshot_t_3800000000 | pool_rsu_0 | GATEWAY | 0,000000 | 49192000,000000 | 0,000000 | false | false | 0
+9 | live_runtime_snapshot_t_3800000000 | pool_rsu_1 | GATEWAY | 0,000000 | 49192000,000000 | 0,000000 | false | false | 0
+10 | live_runtime_snapshot_t_4000000000 | pool_rsu_0 | GATEWAY | 0,000000 | 49184000,000000 | 0,000000 | false | false | 0
+10 | live_runtime_snapshot_t_4000000000 | pool_rsu_1 | GATEWAY | 0,000000 | 49184000,000000 | 0,000000 | false | false | 0
+11 | live_runtime_snapshot_t_4200000000 | pool_rsu_0 | GATEWAY | 0,000000 | 49184000,000000 | 0,000000 | false | false | 0
+11 | live_runtime_snapshot_t_4200000000 | pool_rsu_1 | GATEWAY | 0,000000 | 49184000,000000 | 0,000000 | false | false | 0
+12 | live_runtime_snapshot_t_4400000000 | pool_rsu_0 | GATEWAY | 0,000000 | 49184000,000000 | 0,000000 | false | false | 0
+12 | live_runtime_snapshot_t_4400000000 | pool_rsu_1 | GATEWAY | 0,000000 | 49184000,000000 | 0,000000 | false | false | 0
+13 | live_runtime_snapshot_t_4600000000 | pool_rsu_0 | GATEWAY | 0,000000 | 49184000,000000 | 0,000000 | false | false | 0
+13 | live_runtime_snapshot_t_4600000000 | pool_rsu_1 | GATEWAY | 0,000000 | 49184000,000000 | 0,000000 | false | false | 0
+14 | live_runtime_snapshot_t_4800000000 | pool_rsu_0 | GATEWAY | 0,000000 | 49184000,000000 | 0,000000 | false | false | 0
+14 | live_runtime_snapshot_t_4800000000 | pool_rsu_1 | GATEWAY | 0,000000 | 49184000,000000 | 0,000000 | false | false | 0
+15 | live_runtime_snapshot_t_5000000000 | pool_rsu_0 | GATEWAY | 0,000000 | 49176000,000000 | 0,000000 | false | false | 0
+15 | live_runtime_snapshot_t_5000000000 | pool_rsu_1 | GATEWAY | 0,000000 | 49176000,000000 | 0,000000 | false | false | 0
+16 | live_runtime_snapshot_t_5200000000 | pool_rsu_0 | GATEWAY | 0,000000 | 49176000,000000 | 0,000000 | false | false | 0
+16 | live_runtime_snapshot_t_5200000000 | pool_rsu_1 | GATEWAY | 0,000000 | 49176000,000000 | 0,000000 | false | false | 0
+17 | live_runtime_snapshot_t_5400000000 | pool_rsu_0 | GATEWAY | 0,000000 | 49176000,000000 | 0,000000 | false | false | 0
+17 | live_runtime_snapshot_t_5400000000 | pool_rsu_1 | GATEWAY | 0,000000 | 49176000,000000 | 0,000000 | false | false | 0
+18 | live_runtime_snapshot_t_5600000000 | pool_rsu_0 | GATEWAY | 0,000000 | 49176000,000000 | 0,000000 | false | false | 0
+18 | live_runtime_snapshot_t_5600000000 | pool_rsu_1 | GATEWAY | 0,000000 | 49176000,000000 | 0,000000 | false | false | 0
+19 | live_runtime_snapshot_t_5800000000 | pool_rsu_0 | GATEWAY | 0,000000 | 49176000,000000 | 0,000000 | false | false | 0
+19 | live_runtime_snapshot_t_5800000000 | pool_rsu_1 | GATEWAY | 0,000000 | 49176000,000000 | 0,000000 | false | false | 0
+20 | live_runtime_snapshot_t_6000000000 | pool_rsu_0 | GATEWAY | 0,000000 | 49176000,000000 | 0,000000 | false | false | 0
+20 | live_runtime_snapshot_t_6000000000 | pool_rsu_1 | GATEWAY | 0,000000 | 49176000,000000 | 0,000000 | false | false | 0
+21 | live_runtime_snapshot_t_6200000000 | pool_rsu_0 | GATEWAY | 0,000000 | 49176000,000000 | 0,000000 | false | false | 0
+21 | live_runtime_snapshot_t_6200000000 | pool_rsu_1 | GATEWAY | 0,000000 | 49176000,000000 | 0,000000 | false | false | 0
+22 | live_runtime_snapshot_t_6400000000 | pool_rsu_0 | GATEWAY | 0,000000 | 49176000,000000 | 0,000000 | false | false | 0
+22 | live_runtime_snapshot_t_6400000000 | pool_rsu_1 | GATEWAY | 0,000000 | 49176000,000000 | 0,000000 | false | false | 0
+23 | live_runtime_snapshot_t_6600000000 | pool_rsu_0 | GATEWAY | 0,000000 | 49176000,000000 | 0,000000 | false | false | 0
+23 | live_runtime_snapshot_t_6600000000 | pool_rsu_1 | GATEWAY | 0,000000 | 49176000,000000 | 0,000000 | false | false | 0
+24 | live_runtime_snapshot_t_6800000000 | pool_rsu_0 | GATEWAY | 0,000000 | 49176000,000000 | 0,000000 | false | false | 0
+24 | live_runtime_snapshot_t_6800000000 | pool_rsu_1 | GATEWAY | 0,000000 | 49176000,000000 | 0,000000 | false | false | 0
+25 | live_runtime_snapshot_t_7000000000 | pool_rsu_0 | GATEWAY | 0,000000 | 49168000,000000 | 0,000000 | false | false | 0
+25 | live_runtime_snapshot_t_7000000000 | pool_rsu_1 | GATEWAY | 0,000000 | 49168000,000000 | 0,000000 | false | false | 0
+26 | live_runtime_snapshot_t_8500000000 | direct_v2v_pool__veh_1__veh_4 | DIRECT_V2V | 4700000,000000 | 4700000,000000 | 100,000000 | false | true | 1
+26 | live_runtime_snapshot_t_8500000000 | pool_rsu_0 | GATEWAY | 0,000000 | 49168000,000000 | 0,000000 | false | false | 0
+26 | live_runtime_snapshot_t_8500000000 | pool_rsu_1 | GATEWAY | 0,000000 | 49168000,000000 | 0,000000 | false | false | 0
+
+------------------------------------------------------------
+MOBILITY CONFIGURATION SUMMARY
+------------------------------------------------------------
+coverageRiskWeight: 1,000000
+linkInstabilityWeight: 0,500000
+handoverRiskWeight: 0,500000
+
+epsilonSpeed: 0,100000 m/s
+v2vCommunicationRadius: 250,000000 m
+localCoverageTime: 300,000000 s
+maxCoverageTime: 300,000000 s
+cloudCoverageTime: derived from active access gateway
+
+------------------------------------------------------------
+MOBILITY PENALTY SUMMARY BY WINDOW
+------------------------------------------------------------
+idx | snapshot | remote | Pmob | normalizedPmob | avgCoverage | minCoverage | avgPhiCov | maxPhiCov | avgPhiLink | maxPhiLink | avgPhiHo | maxPhiHo | gatewayAwareCloud | placeholderCloud
+0 | live_runtime_snapshot_t_2000000000 | 0 | 0,000000 | 0,000000 | - | - | 0,000000 | 0,000000 | 0,000000 | 0,000000 | 0,000000 | 0,000000 | 0 | 0
+1 | live_runtime_snapshot_t_2200000000 | 0 | 0,000000 | 0,000000 | - | - | 0,000000 | 0,000000 | 0,000000 | 0,000000 | 0,000000 | 0,000000 | 0 | 0
+2 | live_runtime_snapshot_t_2400000000 | 0 | 0,000000 | 0,000000 | - | - | 0,000000 | 0,000000 | 0,000000 | 0,000000 | 0,000000 | 0,000000 | 0 | 0
+3 | live_runtime_snapshot_t_2600000000 | 0 | 0,000000 | 0,000000 | - | - | 0,000000 | 0,000000 | 0,000000 | 0,000000 | 0,000000 | 0,000000 | 0 | 0
+4 | live_runtime_snapshot_t_2800000000 | 0 | 0,000000 | 0,000000 | - | - | 0,000000 | 0,000000 | 0,000000 | 0,000000 | 0,000000 | 0,000000 | 0 | 0
+5 | live_runtime_snapshot_t_3000000000 | 0 | 0,000000 | 0,000000 | - | - | 0,000000 | 0,000000 | 0,000000 | 0,000000 | 0,000000 | 0,000000 | 0 | 0
+6 | live_runtime_snapshot_t_3200000000 | 0 | 0,000000 | 0,000000 | - | - | 0,000000 | 0,000000 | 0,000000 | 0,000000 | 0,000000 | 0,000000 | 0 | 0
+7 | live_runtime_snapshot_t_3400000000 | 0 | 0,000000 | 0,000000 | - | - | 0,000000 | 0,000000 | 0,000000 | 0,000000 | 0,000000 | 0,000000 | 0 | 0
+8 | live_runtime_snapshot_t_3600000000 | 0 | 0,000000 | 0,000000 | - | - | 0,000000 | 0,000000 | 0,000000 | 0,000000 | 0,000000 | 0,000000 | 0 | 0
+9 | live_runtime_snapshot_t_3800000000 | 0 | 0,000000 | 0,000000 | - | - | 0,000000 | 0,000000 | 0,000000 | 0,000000 | 0,000000 | 0,000000 | 0 | 0
+10 | live_runtime_snapshot_t_4000000000 | 0 | 0,000000 | 0,000000 | - | - | 0,000000 | 0,000000 | 0,000000 | 0,000000 | 0,000000 | 0,000000 | 0 | 0
+11 | live_runtime_snapshot_t_4200000000 | 0 | 0,000000 | 0,000000 | - | - | 0,000000 | 0,000000 | 0,000000 | 0,000000 | 0,000000 | 0,000000 | 0 | 0
+12 | live_runtime_snapshot_t_4400000000 | 0 | 0,000000 | 0,000000 | - | - | 0,000000 | 0,000000 | 0,000000 | 0,000000 | 0,000000 | 0,000000 | 0 | 0
+13 | live_runtime_snapshot_t_4600000000 | 0 | 0,000000 | 0,000000 | - | - | 0,000000 | 0,000000 | 0,000000 | 0,000000 | 0,000000 | 0,000000 | 0 | 0
+14 | live_runtime_snapshot_t_4800000000 | 0 | 0,000000 | 0,000000 | - | - | 0,000000 | 0,000000 | 0,000000 | 0,000000 | 0,000000 | 0,000000 | 0 | 0
+15 | live_runtime_snapshot_t_5000000000 | 0 | 0,000000 | 0,000000 | - | - | 0,000000 | 0,000000 | 0,000000 | 0,000000 | 0,000000 | 0,000000 | 0 | 0
+16 | live_runtime_snapshot_t_5200000000 | 0 | 0,000000 | 0,000000 | - | - | 0,000000 | 0,000000 | 0,000000 | 0,000000 | 0,000000 | 0,000000 | 0 | 0
+17 | live_runtime_snapshot_t_5400000000 | 0 | 0,000000 | 0,000000 | - | - | 0,000000 | 0,000000 | 0,000000 | 0,000000 | 0,000000 | 0,000000 | 0 | 0
+18 | live_runtime_snapshot_t_5600000000 | 0 | 0,000000 | 0,000000 | - | - | 0,000000 | 0,000000 | 0,000000 | 0,000000 | 0,000000 | 0,000000 | 0 | 0
+19 | live_runtime_snapshot_t_5800000000 | 0 | 0,000000 | 0,000000 | - | - | 0,000000 | 0,000000 | 0,000000 | 0,000000 | 0,000000 | 0,000000 | 0 | 0
+20 | live_runtime_snapshot_t_6000000000 | 0 | 0,000000 | 0,000000 | - | - | 0,000000 | 0,000000 | 0,000000 | 0,000000 | 0,000000 | 0,000000 | 0 | 0
+21 | live_runtime_snapshot_t_6200000000 | 0 | 0,000000 | 0,000000 | - | - | 0,000000 | 0,000000 | 0,000000 | 0,000000 | 0,000000 | 0,000000 | 0 | 0
+22 | live_runtime_snapshot_t_6400000000 | 0 | 0,000000 | 0,000000 | - | - | 0,000000 | 0,000000 | 0,000000 | 0,000000 | 0,000000 | 0,000000 | 0 | 0
+23 | live_runtime_snapshot_t_6600000000 | 0 | 0,000000 | 0,000000 | - | - | 0,000000 | 0,000000 | 0,000000 | 0,000000 | 0,000000 | 0,000000 | 0 | 0
+24 | live_runtime_snapshot_t_6800000000 | 0 | 0,000000 | 0,000000 | - | - | 0,000000 | 0,000000 | 0,000000 | 0,000000 | 0,000000 | 0,000000 | 0 | 0
+25 | live_runtime_snapshot_t_7000000000 | 0 | 0,000000 | 0,000000 | - | - | 0,000000 | 0,000000 | 0,000000 | 0,000000 | 0,000000 | 0,000000 | 0 | 0
+26 | live_runtime_snapshot_t_8500000000 | 1 | 0,357840 | 0,357840 | 7,650661 | 7,650661 | 0,000000 | 0,000000 | 0,614523 | 0,614523 | 0,101157 | 0,101157 | 0 | 0
+
+------------------------------------------------------------
+MOBILITY SUMMARY BY NODE TYPE
+------------------------------------------------------------
+idx | type | tasks | avgDistance | avgRadius | avgCoverage | avgPhiLink | avgPhiHo | totalPenalty | model
+25 | LOCAL | 4 | - | - | 300,000000 | 0,000000 | 0,000000 | 0,000000 | LOCAL_CONVENTIONAL
+26 | LOCAL | 2 | - | - | 300,000000 | 0,000000 | 0,000000 | 0,000000 | LOCAL_CONVENTIONAL
+26 | VEHICLE | 1 | 153,630660 | 250,000000 | 7,650661 | 0,614523 | 0,101157 | 0,357840 | V2V_SCALAR_RELATIVE_SPEED
+
+------------------------------------------------------------
+TOP MOBILITY-RISK DECISIONS BY WINDOW
+------------------------------------------------------------
+Window 0 | snapshot=live_runtime_snapshot_t_2000000000 | remote=0
+- no remote mobility-aware decisions
+
+Window 1 | snapshot=live_runtime_snapshot_t_2200000000 | remote=0
+- no remote mobility-aware decisions
+
+Window 2 | snapshot=live_runtime_snapshot_t_2400000000 | remote=0
+- no remote mobility-aware decisions
+
+Window 3 | snapshot=live_runtime_snapshot_t_2600000000 | remote=0
+- no remote mobility-aware decisions
+
+Window 4 | snapshot=live_runtime_snapshot_t_2800000000 | remote=0
+- no remote mobility-aware decisions
+
+Window 5 | snapshot=live_runtime_snapshot_t_3000000000 | remote=0
+- no remote mobility-aware decisions
+
+Window 6 | snapshot=live_runtime_snapshot_t_3200000000 | remote=0
+- no remote mobility-aware decisions
+
+Window 7 | snapshot=live_runtime_snapshot_t_3400000000 | remote=0
+- no remote mobility-aware decisions
+
+Window 8 | snapshot=live_runtime_snapshot_t_3600000000 | remote=0
+- no remote mobility-aware decisions
+
+Window 9 | snapshot=live_runtime_snapshot_t_3800000000 | remote=0
+- no remote mobility-aware decisions
+
+Window 10 | snapshot=live_runtime_snapshot_t_4000000000 | remote=0
+- no remote mobility-aware decisions
+
+Window 11 | snapshot=live_runtime_snapshot_t_4200000000 | remote=0
+- no remote mobility-aware decisions
+
+Window 12 | snapshot=live_runtime_snapshot_t_4400000000 | remote=0
+- no remote mobility-aware decisions
+
+Window 13 | snapshot=live_runtime_snapshot_t_4600000000 | remote=0
+- no remote mobility-aware decisions
+
+Window 14 | snapshot=live_runtime_snapshot_t_4800000000 | remote=0
+- no remote mobility-aware decisions
+
+Window 15 | snapshot=live_runtime_snapshot_t_5000000000 | remote=0
+- no remote mobility-aware decisions
+
+Window 16 | snapshot=live_runtime_snapshot_t_5200000000 | remote=0
+- no remote mobility-aware decisions
+
+Window 17 | snapshot=live_runtime_snapshot_t_5400000000 | remote=0
+- no remote mobility-aware decisions
+
+Window 18 | snapshot=live_runtime_snapshot_t_5600000000 | remote=0
+- no remote mobility-aware decisions
+
+Window 19 | snapshot=live_runtime_snapshot_t_5800000000 | remote=0
+- no remote mobility-aware decisions
+
+Window 20 | snapshot=live_runtime_snapshot_t_6000000000 | remote=0
+- no remote mobility-aware decisions
+
+Window 21 | snapshot=live_runtime_snapshot_t_6200000000 | remote=0
+- no remote mobility-aware decisions
+
+Window 22 | snapshot=live_runtime_snapshot_t_6400000000 | remote=0
+- no remote mobility-aware decisions
+
+Window 23 | snapshot=live_runtime_snapshot_t_6600000000 | remote=0
+- no remote mobility-aware decisions
+
+Window 24 | snapshot=live_runtime_snapshot_t_6800000000 | remote=0
+- no remote mobility-aware decisions
+
+Window 25 | snapshot=live_runtime_snapshot_t_7000000000 | remote=0
+- no remote mobility-aware decisions
+
+Window 26 | snapshot=live_runtime_snapshot_t_8500000000 | remote=1
+task | source | candidate | type | p | gateway | distance | radius | completion | coverage | phiCov | phiLink | phiHo | Pmob | model
+task_generated__medium__veh_4__t_8000000000__seq_5 | veh_4 | vehicle_veh_1_for_veh_4 | VEHICLE | 1,000000 | - | 153,630660 | 250,000000 | 0,773915 s | 7,650661 s | 0,000000 | 0,614523 | 0,101157 | 0,357840 | V2V_SCALAR_RELATIVE_SPEED
+
+------------------------------------------------------------
+MOBILITY MODEL ASSUMPTIONS
+------------------------------------------------------------
+- LOCAL decisions use a conventional coverage time of 300,000000 s.
+- CLOUD decisions derive coverage and phi_link from the active radio access gateway.
+- CLOUD_STABLE_PLACEHOLDER is not used in STRICT_GATEWAY mode.
+- EDGE coverage uses current Euclidean distance, node radius and source speed.
+- V2V coverage uses Euclidean distance and scalar relative speed abs(v_source - v_target).
+- V2V heading and trajectory vectors are not modeled yet.
+- Coverage estimates are clamped to 300,000000 s.
+
+------------------------------------------------------------
+COMMUNICATION LATENCY CONFIGURATION SUMMARY
+------------------------------------------------------------
+Lref: 1,000000 s
+Aggregation rule: L(C) = sum_i L_i(C)
+Partial upload rule: p * input / bandwidth
+Partial download rule: output / bandwidth for every remote choice p > 0
+Propagation delay rule: tau_n is included once as aggregated end-to-end delay
+
+------------------------------------------------------------
+COMMUNICATION LATENCY SUMMARY BY WINDOW
+------------------------------------------------------------
+idx | snapshot | tasks | remote | partial | full | L(C) | Lref | normalizedL | avgPerTask | avgPerRemote | uploadSum | downloadSum | tauSum | componentDelta
+0 | live_runtime_snapshot_t_2000000000 | 0 | 0 | 0 | 0 | 0,000000 | 1,000000 | 0,000000 | 0,000000 | 0,000000 | 0,000000 | 0,000000 | 0,000000 | 0,000000000
+1 | live_runtime_snapshot_t_2200000000 | 0 | 0 | 0 | 0 | 0,000000 | 1,000000 | 0,000000 | 0,000000 | 0,000000 | 0,000000 | 0,000000 | 0,000000 | 0,000000000
+2 | live_runtime_snapshot_t_2400000000 | 0 | 0 | 0 | 0 | 0,000000 | 1,000000 | 0,000000 | 0,000000 | 0,000000 | 0,000000 | 0,000000 | 0,000000 | 0,000000000
+3 | live_runtime_snapshot_t_2600000000 | 0 | 0 | 0 | 0 | 0,000000 | 1,000000 | 0,000000 | 0,000000 | 0,000000 | 0,000000 | 0,000000 | 0,000000 | 0,000000000
+4 | live_runtime_snapshot_t_2800000000 | 0 | 0 | 0 | 0 | 0,000000 | 1,000000 | 0,000000 | 0,000000 | 0,000000 | 0,000000 | 0,000000 | 0,000000 | 0,000000000
+5 | live_runtime_snapshot_t_3000000000 | 0 | 0 | 0 | 0 | 0,000000 | 1,000000 | 0,000000 | 0,000000 | 0,000000 | 0,000000 | 0,000000 | 0,000000 | 0,000000000
+6 | live_runtime_snapshot_t_3200000000 | 0 | 0 | 0 | 0 | 0,000000 | 1,000000 | 0,000000 | 0,000000 | 0,000000 | 0,000000 | 0,000000 | 0,000000 | 0,000000000
+7 | live_runtime_snapshot_t_3400000000 | 0 | 0 | 0 | 0 | 0,000000 | 1,000000 | 0,000000 | 0,000000 | 0,000000 | 0,000000 | 0,000000 | 0,000000 | 0,000000000
+8 | live_runtime_snapshot_t_3600000000 | 0 | 0 | 0 | 0 | 0,000000 | 1,000000 | 0,000000 | 0,000000 | 0,000000 | 0,000000 | 0,000000 | 0,000000 | 0,000000000
+9 | live_runtime_snapshot_t_3800000000 | 0 | 0 | 0 | 0 | 0,000000 | 1,000000 | 0,000000 | 0,000000 | 0,000000 | 0,000000 | 0,000000 | 0,000000 | 0,000000000
+10 | live_runtime_snapshot_t_4000000000 | 0 | 0 | 0 | 0 | 0,000000 | 1,000000 | 0,000000 | 0,000000 | 0,000000 | 0,000000 | 0,000000 | 0,000000 | 0,000000000
+11 | live_runtime_snapshot_t_4200000000 | 0 | 0 | 0 | 0 | 0,000000 | 1,000000 | 0,000000 | 0,000000 | 0,000000 | 0,000000 | 0,000000 | 0,000000 | 0,000000000
+12 | live_runtime_snapshot_t_4400000000 | 0 | 0 | 0 | 0 | 0,000000 | 1,000000 | 0,000000 | 0,000000 | 0,000000 | 0,000000 | 0,000000 | 0,000000 | 0,000000000
+13 | live_runtime_snapshot_t_4600000000 | 0 | 0 | 0 | 0 | 0,000000 | 1,000000 | 0,000000 | 0,000000 | 0,000000 | 0,000000 | 0,000000 | 0,000000 | 0,000000000
+14 | live_runtime_snapshot_t_4800000000 | 0 | 0 | 0 | 0 | 0,000000 | 1,000000 | 0,000000 | 0,000000 | 0,000000 | 0,000000 | 0,000000 | 0,000000 | 0,000000000
+15 | live_runtime_snapshot_t_5000000000 | 0 | 0 | 0 | 0 | 0,000000 | 1,000000 | 0,000000 | 0,000000 | 0,000000 | 0,000000 | 0,000000 | 0,000000 | 0,000000000
+16 | live_runtime_snapshot_t_5200000000 | 0 | 0 | 0 | 0 | 0,000000 | 1,000000 | 0,000000 | 0,000000 | 0,000000 | 0,000000 | 0,000000 | 0,000000 | 0,000000000
+17 | live_runtime_snapshot_t_5400000000 | 0 | 0 | 0 | 0 | 0,000000 | 1,000000 | 0,000000 | 0,000000 | 0,000000 | 0,000000 | 0,000000 | 0,000000 | 0,000000000
+18 | live_runtime_snapshot_t_5600000000 | 0 | 0 | 0 | 0 | 0,000000 | 1,000000 | 0,000000 | 0,000000 | 0,000000 | 0,000000 | 0,000000 | 0,000000 | 0,000000000
+19 | live_runtime_snapshot_t_5800000000 | 0 | 0 | 0 | 0 | 0,000000 | 1,000000 | 0,000000 | 0,000000 | 0,000000 | 0,000000 | 0,000000 | 0,000000 | 0,000000000
+20 | live_runtime_snapshot_t_6000000000 | 0 | 0 | 0 | 0 | 0,000000 | 1,000000 | 0,000000 | 0,000000 | 0,000000 | 0,000000 | 0,000000 | 0,000000 | 0,000000000
+21 | live_runtime_snapshot_t_6200000000 | 0 | 0 | 0 | 0 | 0,000000 | 1,000000 | 0,000000 | 0,000000 | 0,000000 | 0,000000 | 0,000000 | 0,000000 | 0,000000000
+22 | live_runtime_snapshot_t_6400000000 | 0 | 0 | 0 | 0 | 0,000000 | 1,000000 | 0,000000 | 0,000000 | 0,000000 | 0,000000 | 0,000000 | 0,000000 | 0,000000000
+23 | live_runtime_snapshot_t_6600000000 | 0 | 0 | 0 | 0 | 0,000000 | 1,000000 | 0,000000 | 0,000000 | 0,000000 | 0,000000 | 0,000000 | 0,000000 | 0,000000000
+24 | live_runtime_snapshot_t_6800000000 | 0 | 0 | 0 | 0 | 0,000000 | 1,000000 | 0,000000 | 0,000000 | 0,000000 | 0,000000 | 0,000000 | 0,000000 | 0,000000000
+25 | live_runtime_snapshot_t_7000000000 | 4 | 0 | 0 | 0 | 0,000000 | 1,000000 | 0,000000 | 0,000000 | 0,000000 | 0,000000 | 0,000000 | 0,000000 | 0,000000000
+26 | live_runtime_snapshot_t_8500000000 | 3 | 1 | 0 | 1 | 0,173915 | 1,000000 | 0,173915 | 0,057972 | 0,173915 | 0,170213 | 0,001702 | 0,002000 | 0,000000000
+
+------------------------------------------------------------
+TOP COMMUNICATION-LATENCY DECISIONS BY WINDOW
+------------------------------------------------------------
+Window 0 | snapshot=live_runtime_snapshot_t_2000000000 | remote=0
+- no remote communication decisions
+
+Window 1 | snapshot=live_runtime_snapshot_t_2200000000 | remote=0
+- no remote communication decisions
+
+Window 2 | snapshot=live_runtime_snapshot_t_2400000000 | remote=0
+- no remote communication decisions
+
+Window 3 | snapshot=live_runtime_snapshot_t_2600000000 | remote=0
+- no remote communication decisions
+
+Window 4 | snapshot=live_runtime_snapshot_t_2800000000 | remote=0
+- no remote communication decisions
+
+Window 5 | snapshot=live_runtime_snapshot_t_3000000000 | remote=0
+- no remote communication decisions
+
+Window 6 | snapshot=live_runtime_snapshot_t_3200000000 | remote=0
+- no remote communication decisions
+
+Window 7 | snapshot=live_runtime_snapshot_t_3400000000 | remote=0
+- no remote communication decisions
+
+Window 8 | snapshot=live_runtime_snapshot_t_3600000000 | remote=0
+- no remote communication decisions
+
+Window 9 | snapshot=live_runtime_snapshot_t_3800000000 | remote=0
+- no remote communication decisions
+
+Window 10 | snapshot=live_runtime_snapshot_t_4000000000 | remote=0
+- no remote communication decisions
+
+Window 11 | snapshot=live_runtime_snapshot_t_4200000000 | remote=0
+- no remote communication decisions
+
+Window 12 | snapshot=live_runtime_snapshot_t_4400000000 | remote=0
+- no remote communication decisions
+
+Window 13 | snapshot=live_runtime_snapshot_t_4600000000 | remote=0
+- no remote communication decisions
+
+Window 14 | snapshot=live_runtime_snapshot_t_4800000000 | remote=0
+- no remote communication decisions
+
+Window 15 | snapshot=live_runtime_snapshot_t_5000000000 | remote=0
+- no remote communication decisions
+
+Window 16 | snapshot=live_runtime_snapshot_t_5200000000 | remote=0
+- no remote communication decisions
+
+Window 17 | snapshot=live_runtime_snapshot_t_5400000000 | remote=0
+- no remote communication decisions
+
+Window 18 | snapshot=live_runtime_snapshot_t_5600000000 | remote=0
+- no remote communication decisions
+
+Window 19 | snapshot=live_runtime_snapshot_t_5800000000 | remote=0
+- no remote communication decisions
+
+Window 20 | snapshot=live_runtime_snapshot_t_6000000000 | remote=0
+- no remote communication decisions
+
+Window 21 | snapshot=live_runtime_snapshot_t_6200000000 | remote=0
+- no remote communication decisions
+
+Window 22 | snapshot=live_runtime_snapshot_t_6400000000 | remote=0
+- no remote communication decisions
+
+Window 23 | snapshot=live_runtime_snapshot_t_6600000000 | remote=0
+- no remote communication decisions
+
+Window 24 | snapshot=live_runtime_snapshot_t_6800000000 | remote=0
+- no remote communication decisions
+
+Window 25 | snapshot=live_runtime_snapshot_t_7000000000 | remote=0
+- no remote communication decisions
+
+Window 26 | snapshot=live_runtime_snapshot_t_8500000000 | remote=1
+task | source | candidate | type | p | upload | download | tau_n | L_i | remoteExec | remotePart | completion
+task_generated__medium__veh_4__t_8000000000__seq_5 | veh_4 | vehicle_veh_1_for_veh_4 | VEHICLE | 1,000000 | 0,170213 s | 0,001702 s | 0,002000 s | 0,173915 s | 0,600000 s | 0,773915 s | 0,773915 s
+
+------------------------------------------------------------
+COMMUNICATION LATENCY MODEL ASSUMPTIONS
+------------------------------------------------------------
+- LOCAL decisions have L_i = 0.
+- For every remote choice p > 0, upload scales with p.
+- For every remote choice p > 0, download uses the integral remote output.
+- L(C) is the sum of the task communication latencies, not their average.
+- tau_n is included once as aggregated end-to-end propagation delay.
+- tau_n is independent of p and excludes bandwidth-dependent transfer times.
+
+------------------------------------------------------------
+ADAPTIVE WINDOW SUMMARY
+------------------------------------------------------------
+idx | snapshot | currentDt | nextDt | minDt | maxDt | TcovRef | minMode | maxMode | gaUsed | gaObserved | adaptiveMax | configuredMax | raisedMax | runtimeBudget | action | reason
+0 | live_runtime_snapshot_t_2000000000 | 1,000000 s | 0,200000 s | 0,060001 s | 0,200000 s | 0,000000 s | CONFIGURED_GA_ESTIMATE | CONFIGURED_MAX | 0,010000 s | 0,010000 s | 1,000000 s | 0,200000 s | false | WITHIN_WINDOW | FIRST_RUN | First run: keep the initial window inside the computed bounds.
+1 | live_runtime_snapshot_t_2200000000 | 0,200000 s | 0,200000 s | 0,060001 s | 0,200000 s | 0,000000 s | CONFIGURED_GA_ESTIMATE | CONFIGURED_MAX | 0,010000 s | 0,000993 s | 0,200000 s | 0,200000 s | false | WITHIN_WINDOW | CLAMP_TO_BOUNDS | Stable dynamicity: increase the next window additively. The candidate value was clamped to temporal bounds.
+2 | live_runtime_snapshot_t_2400000000 | 0,200000 s | 0,200000 s | 0,060001 s | 0,200000 s | 0,000000 s | CONFIGURED_GA_ESTIMATE | CONFIGURED_MAX | 0,010000 s | 0,000038 s | 0,200000 s | 0,200000 s | false | WITHIN_WINDOW | CLAMP_TO_BOUNDS | Stable dynamicity: increase the next window additively. The candidate value was clamped to temporal bounds.
+3 | live_runtime_snapshot_t_2600000000 | 0,200000 s | 0,200000 s | 0,060001 s | 0,200000 s | 0,000000 s | CONFIGURED_GA_ESTIMATE | CONFIGURED_MAX | 0,010000 s | 0,000026 s | 0,200000 s | 0,200000 s | false | WITHIN_WINDOW | CLAMP_TO_BOUNDS | Stable dynamicity: increase the next window additively. The candidate value was clamped to temporal bounds.
+4 | live_runtime_snapshot_t_2800000000 | 0,200000 s | 0,200000 s | 0,060001 s | 0,200000 s | 0,000000 s | CONFIGURED_GA_ESTIMATE | CONFIGURED_MAX | 0,010000 s | 0,000024 s | 0,200000 s | 0,200000 s | false | WITHIN_WINDOW | CLAMP_TO_BOUNDS | Stable dynamicity: increase the next window additively. The candidate value was clamped to temporal bounds.
+5 | live_runtime_snapshot_t_3000000000 | 0,200000 s | 0,200000 s | 0,060001 s | 0,200000 s | 0,000000 s | CONFIGURED_GA_ESTIMATE | CONFIGURED_MAX | 0,010000 s | 0,000027 s | 0,200000 s | 0,200000 s | false | WITHIN_WINDOW | CLAMP_TO_BOUNDS | Stable dynamicity: increase the next window additively. The candidate value was clamped to temporal bounds.
+6 | live_runtime_snapshot_t_3200000000 | 0,200000 s | 0,200000 s | 0,060001 s | 0,200000 s | 0,000000 s | CONFIGURED_GA_ESTIMATE | CONFIGURED_MAX | 0,010000 s | 0,000024 s | 0,200000 s | 0,200000 s | false | WITHIN_WINDOW | CLAMP_TO_BOUNDS | Stable dynamicity: increase the next window additively. The candidate value was clamped to temporal bounds.
+7 | live_runtime_snapshot_t_3400000000 | 0,200000 s | 0,200000 s | 0,060001 s | 0,200000 s | 0,000000 s | CONFIGURED_GA_ESTIMATE | CONFIGURED_MAX | 0,010000 s | 0,000025 s | 0,200000 s | 0,200000 s | false | WITHIN_WINDOW | CLAMP_TO_BOUNDS | Stable dynamicity: increase the next window additively. The candidate value was clamped to temporal bounds.
+8 | live_runtime_snapshot_t_3600000000 | 0,200000 s | 0,200000 s | 0,060001 s | 0,200000 s | 0,000000 s | CONFIGURED_GA_ESTIMATE | CONFIGURED_MAX | 0,010000 s | 0,000024 s | 0,200000 s | 0,200000 s | false | WITHIN_WINDOW | CLAMP_TO_BOUNDS | Stable dynamicity: increase the next window additively. The candidate value was clamped to temporal bounds.
+9 | live_runtime_snapshot_t_3800000000 | 0,200000 s | 0,200000 s | 0,060001 s | 0,200000 s | 0,000000 s | CONFIGURED_GA_ESTIMATE | CONFIGURED_MAX | 0,010000 s | 0,000061 s | 0,200000 s | 0,200000 s | false | WITHIN_WINDOW | CLAMP_TO_BOUNDS | Stable dynamicity: increase the next window additively. The candidate value was clamped to temporal bounds.
+10 | live_runtime_snapshot_t_4000000000 | 0,200000 s | 0,200000 s | 0,060001 s | 0,200000 s | 0,000000 s | CONFIGURED_GA_ESTIMATE | CONFIGURED_MAX | 0,010000 s | 0,000024 s | 0,200000 s | 0,200000 s | false | WITHIN_WINDOW | CLAMP_TO_BOUNDS | Stable dynamicity: increase the next window additively. The candidate value was clamped to temporal bounds.
+11 | live_runtime_snapshot_t_4200000000 | 0,200000 s | 0,200000 s | 0,060001 s | 0,200000 s | 0,000000 s | CONFIGURED_GA_ESTIMATE | CONFIGURED_MAX | 0,010000 s | 0,000026 s | 0,200000 s | 0,200000 s | false | WITHIN_WINDOW | CLAMP_TO_BOUNDS | Stable dynamicity: increase the next window additively. The candidate value was clamped to temporal bounds.
+12 | live_runtime_snapshot_t_4400000000 | 0,200000 s | 0,200000 s | 0,060001 s | 0,200000 s | 0,000000 s | CONFIGURED_GA_ESTIMATE | CONFIGURED_MAX | 0,010000 s | 0,000013 s | 0,200000 s | 0,200000 s | false | WITHIN_WINDOW | CLAMP_TO_BOUNDS | Stable dynamicity: increase the next window additively. The candidate value was clamped to temporal bounds.
+13 | live_runtime_snapshot_t_4600000000 | 0,200000 s | 0,200000 s | 0,060001 s | 0,200000 s | 0,000000 s | CONFIGURED_GA_ESTIMATE | CONFIGURED_MAX | 0,010000 s | 0,000013 s | 0,200000 s | 0,200000 s | false | WITHIN_WINDOW | CLAMP_TO_BOUNDS | Stable dynamicity: increase the next window additively. The candidate value was clamped to temporal bounds.
+14 | live_runtime_snapshot_t_4800000000 | 0,200000 s | 0,200000 s | 0,060001 s | 0,200000 s | 0,000000 s | CONFIGURED_GA_ESTIMATE | CONFIGURED_MAX | 0,010000 s | 0,000013 s | 0,200000 s | 0,200000 s | false | WITHIN_WINDOW | CLAMP_TO_BOUNDS | Stable dynamicity: increase the next window additively. The candidate value was clamped to temporal bounds.
+15 | live_runtime_snapshot_t_5000000000 | 0,200000 s | 0,200000 s | 0,060001 s | 0,200000 s | 0,000000 s | CONFIGURED_GA_ESTIMATE | CONFIGURED_MAX | 0,010000 s | 0,000016 s | 0,200000 s | 0,200000 s | false | WITHIN_WINDOW | CLAMP_TO_BOUNDS | Stable dynamicity: increase the next window additively. The candidate value was clamped to temporal bounds.
+16 | live_runtime_snapshot_t_5200000000 | 0,200000 s | 0,200000 s | 0,060001 s | 0,200000 s | 0,000000 s | CONFIGURED_GA_ESTIMATE | CONFIGURED_MAX | 0,010000 s | 0,000013 s | 0,200000 s | 0,200000 s | false | WITHIN_WINDOW | CLAMP_TO_BOUNDS | Stable dynamicity: increase the next window additively. The candidate value was clamped to temporal bounds.
+17 | live_runtime_snapshot_t_5400000000 | 0,200000 s | 0,200000 s | 0,060001 s | 0,200000 s | 0,000000 s | CONFIGURED_GA_ESTIMATE | CONFIGURED_MAX | 0,010000 s | 0,000012 s | 0,200000 s | 0,200000 s | false | WITHIN_WINDOW | CLAMP_TO_BOUNDS | Stable dynamicity: increase the next window additively. The candidate value was clamped to temporal bounds.
+18 | live_runtime_snapshot_t_5600000000 | 0,200000 s | 0,200000 s | 0,060001 s | 0,200000 s | 0,000000 s | CONFIGURED_GA_ESTIMATE | CONFIGURED_MAX | 0,010000 s | 0,000013 s | 0,200000 s | 0,200000 s | false | WITHIN_WINDOW | CLAMP_TO_BOUNDS | Stable dynamicity: increase the next window additively. The candidate value was clamped to temporal bounds.
+19 | live_runtime_snapshot_t_5800000000 | 0,200000 s | 0,200000 s | 0,060001 s | 0,200000 s | 0,000000 s | CONFIGURED_GA_ESTIMATE | CONFIGURED_MAX | 0,010000 s | 0,000013 s | 0,200000 s | 0,200000 s | false | WITHIN_WINDOW | CLAMP_TO_BOUNDS | Stable dynamicity: increase the next window additively. The candidate value was clamped to temporal bounds.
+20 | live_runtime_snapshot_t_6000000000 | 0,200000 s | 0,200000 s | 0,060001 s | 0,200000 s | 0,000000 s | CONFIGURED_GA_ESTIMATE | CONFIGURED_MAX | 0,010000 s | 0,000016 s | 0,200000 s | 0,200000 s | false | WITHIN_WINDOW | CLAMP_TO_BOUNDS | Stable dynamicity: increase the next window additively. The candidate value was clamped to temporal bounds.
+21 | live_runtime_snapshot_t_6200000000 | 0,200000 s | 0,200000 s | 0,060001 s | 0,200000 s | 0,000000 s | CONFIGURED_GA_ESTIMATE | CONFIGURED_MAX | 0,010000 s | 0,000018 s | 0,200000 s | 0,200000 s | false | WITHIN_WINDOW | CLAMP_TO_BOUNDS | Stable dynamicity: increase the next window additively. The candidate value was clamped to temporal bounds.
+22 | live_runtime_snapshot_t_6400000000 | 0,200000 s | 0,200000 s | 0,060001 s | 0,200000 s | 0,000000 s | CONFIGURED_GA_ESTIMATE | CONFIGURED_MAX | 0,010000 s | 0,000022 s | 0,200000 s | 0,200000 s | false | WITHIN_WINDOW | CLAMP_TO_BOUNDS | Stable dynamicity: increase the next window additively. The candidate value was clamped to temporal bounds.
+23 | live_runtime_snapshot_t_6600000000 | 0,200000 s | 0,200000 s | 0,060001 s | 0,200000 s | 0,000000 s | CONFIGURED_GA_ESTIMATE | CONFIGURED_MAX | 0,010000 s | 0,000017 s | 0,200000 s | 0,200000 s | false | WITHIN_WINDOW | CLAMP_TO_BOUNDS | Stable dynamicity: increase the next window additively. The candidate value was clamped to temporal bounds.
+24 | live_runtime_snapshot_t_6800000000 | 0,200000 s | 0,200000 s | 0,060001 s | 0,200000 s | 0,000000 s | CONFIGURED_GA_ESTIMATE | CONFIGURED_MAX | 0,010000 s | 0,000018 s | 0,200000 s | 0,200000 s | false | WITHIN_WINDOW | CLAMP_TO_BOUNDS | Stable dynamicity: increase the next window additively. The candidate value was clamped to temporal bounds.
+25 | live_runtime_snapshot_t_7000000000 | 0,200000 s | 0,060001 s | 0,060001 s | 0,200000 s | 0,000000 s | CONFIGURED_GA_ESTIMATE | CONFIGURED_MAX | 0,010000 s | 0,000013 s | 0,200000 s | 0,200000 s | false | WITHIN_WINDOW | CLAMP_TO_BOUNDS | High dynamicity or severe component spike: decrease the next window. The candidate value was clamped to temporal bounds.
+26 | live_runtime_snapshot_t_8500000000 | 0,060001 s | 0,060001 s | 0,060001 s | 0,200000 s | 0,000000 s | CONFIGURED_GA_ESTIMATE | CONFIGURED_MAX | 0,010000 s | 0,041700 s | 0,060001 s | 0,200000 s | false | WITHIN_WINDOW | CLAMP_TO_BOUNDS | High dynamicity or severe component spike: decrease the next window. The candidate value was clamped to temporal bounds.
+
+Runtime budget notes:
+- WITHIN_WINDOW: the observed GA runtime fits both the current and next logical window.
+- EXCEEDS_CURRENT: the GA completed after the current logical window duration.
+- EXCEEDS_NEXT: the measured runtime is longer than the next planned window.
+- EXCEEDS_CURRENT_AND_NEXT: both conditions hold. This requires an explicit orchestration decision before live integration.
+- Runtime budget warnings: 0
+
+------------------------------------------------------------
+TEMPORAL TIMING SUMMARY
+------------------------------------------------------------
+idx | snapshot | triggerTime | managerObsTime | sourceTime | currentDt | nextDt
+0 | live_runtime_snapshot_t_2000000000 | 2,000000 s | 2,000000 s | 2,000000 s | 1,000000 s | 0,200000 s
+1 | live_runtime_snapshot_t_2200000000 | 2,200000 s | 2,200000 s | 2,200000 s | 0,200000 s | 0,200000 s
+2 | live_runtime_snapshot_t_2400000000 | 2,400000 s | 2,400000 s | 2,400000 s | 0,200000 s | 0,200000 s
+3 | live_runtime_snapshot_t_2600000000 | 2,600000 s | 2,600000 s | 2,600000 s | 0,200000 s | 0,200000 s
+4 | live_runtime_snapshot_t_2800000000 | 2,800000 s | 2,800000 s | 2,800000 s | 0,200000 s | 0,200000 s
+5 | live_runtime_snapshot_t_3000000000 | 3,000000 s | 3,000000 s | 3,000000 s | 0,200000 s | 0,200000 s
+6 | live_runtime_snapshot_t_3200000000 | 3,200000 s | 3,200000 s | 3,200000 s | 0,200000 s | 0,200000 s
+7 | live_runtime_snapshot_t_3400000000 | 3,400000 s | 3,400000 s | 3,400000 s | 0,200000 s | 0,200000 s
+8 | live_runtime_snapshot_t_3600000000 | 3,600000 s | 3,600000 s | 3,600000 s | 0,200000 s | 0,200000 s
+9 | live_runtime_snapshot_t_3800000000 | 3,800000 s | 3,800000 s | 3,800000 s | 0,200000 s | 0,200000 s
+10 | live_runtime_snapshot_t_4000000000 | 4,000000 s | 4,000000 s | 4,000000 s | 0,200000 s | 0,200000 s
+11 | live_runtime_snapshot_t_4200000000 | 4,200000 s | 4,200000 s | 4,200000 s | 0,200000 s | 0,200000 s
+12 | live_runtime_snapshot_t_4400000000 | 4,400000 s | 4,400000 s | 4,400000 s | 0,200000 s | 0,200000 s
+13 | live_runtime_snapshot_t_4600000000 | 4,600000 s | 4,600000 s | 4,600000 s | 0,200000 s | 0,200000 s
+14 | live_runtime_snapshot_t_4800000000 | 4,800000 s | 4,800000 s | 4,800000 s | 0,200000 s | 0,200000 s
+15 | live_runtime_snapshot_t_5000000000 | 5,000000 s | 5,000000 s | 5,000000 s | 0,200000 s | 0,200000 s
+16 | live_runtime_snapshot_t_5200000000 | 5,200000 s | 5,200000 s | 5,200000 s | 0,200000 s | 0,200000 s
+17 | live_runtime_snapshot_t_5400000000 | 5,400000 s | 5,400000 s | 5,400000 s | 0,200000 s | 0,200000 s
+18 | live_runtime_snapshot_t_5600000000 | 5,600000 s | 5,600000 s | 5,600000 s | 0,200000 s | 0,200000 s
+19 | live_runtime_snapshot_t_5800000000 | 5,800000 s | 5,800000 s | 5,800000 s | 0,200000 s | 0,200000 s
+20 | live_runtime_snapshot_t_6000000000 | 6,000000 s | 6,000000 s | 6,000000 s | 0,200000 s | 0,200000 s
+21 | live_runtime_snapshot_t_6200000000 | 6,200000 s | 6,200000 s | 6,200000 s | 0,200000 s | 0,200000 s
+22 | live_runtime_snapshot_t_6400000000 | 6,400000 s | 6,400000 s | 6,400000 s | 0,200000 s | 0,200000 s
+23 | live_runtime_snapshot_t_6600000000 | 6,600000 s | 6,600000 s | 6,600000 s | 0,200000 s | 0,200000 s
+24 | live_runtime_snapshot_t_6800000000 | 6,800000 s | 6,800000 s | 6,800000 s | 0,200000 s | 0,200000 s
+25 | live_runtime_snapshot_t_7000000000 | 7,000000 s | 7,000000 s | 7,000000 s | 0,200000 s | 0,060001 s
+26 | live_runtime_snapshot_t_8500000000 | 8,500000 s | 8,500000 s | 8,500000 s | 0,060001 s | 0,060001 s
+
+------------------------------------------------------------
+POPULATION REUSE DECISION SUMMARY
+------------------------------------------------------------
+idx | snapshot | D | Dt | Dl | Dr | Dv | base | applied | prevPerf | spike | severeSpike | corrected | reason
+0 | live_runtime_snapshot_t_2000000000 | 0,000000 | 0,000000 | 0,000000 | 0,000000 | 0,000000 | FIRST_RUN | FIRST_RUN | UNKNOWN | false | false | false | First run: no previous population exists.
+1 | live_runtime_snapshot_t_2200000000 | 0,000000 | 0,000000 | 0,000000 | 0,000000 | 0,000000 | WARM_START | WARM_START | UNKNOWN | false | false | false | Scenario is stable and previous population can be reused.
+2 | live_runtime_snapshot_t_2400000000 | 0,000000 | 0,000000 | 0,000000 | 0,000000 | 0,000000 | WARM_START | WARM_START | UNKNOWN | false | false | false | Scenario is stable and previous population can be reused.
+3 | live_runtime_snapshot_t_2600000000 | 0,000000 | 0,000000 | 0,000000 | 0,000000 | 0,000000 | WARM_START | WARM_START | UNKNOWN | false | false | false | Scenario is stable and previous population can be reused.
+4 | live_runtime_snapshot_t_2800000000 | 0,000000 | 0,000000 | 0,000000 | 0,000000 | 0,000000 | WARM_START | WARM_START | UNKNOWN | false | false | false | Scenario is stable and previous population can be reused.
+5 | live_runtime_snapshot_t_3000000000 | 0,000000 | 0,000000 | 0,000000 | 0,000000 | 0,000000 | WARM_START | WARM_START | UNKNOWN | false | false | false | Scenario is stable and previous population can be reused.
+6 | live_runtime_snapshot_t_3200000000 | 0,000000 | 0,000000 | 0,000000 | 0,000000 | 0,000000 | WARM_START | WARM_START | UNKNOWN | false | false | false | Scenario is stable and previous population can be reused.
+7 | live_runtime_snapshot_t_3400000000 | 0,000000 | 0,000000 | 0,000000 | 0,000000 | 0,000000 | WARM_START | WARM_START | UNKNOWN | false | false | false | Scenario is stable and previous population can be reused.
+8 | live_runtime_snapshot_t_3600000000 | 0,000000 | 0,000000 | 0,000000 | 0,000000 | 0,000000 | WARM_START | WARM_START | UNKNOWN | false | false | false | Scenario is stable and previous population can be reused.
+9 | live_runtime_snapshot_t_3800000000 | 0,166667 | 0,000000 | 0,000000 | 0,333333 | 0,333333 | WARM_START | WARM_START | UNKNOWN | false | false | false | Scenario is stable and previous population can be reused.
+10 | live_runtime_snapshot_t_4000000000 | 0,000000 | 0,000000 | 0,000000 | 0,000000 | 0,000000 | WARM_START | WARM_START | UNKNOWN | false | false | false | Scenario is stable and previous population can be reused.
+11 | live_runtime_snapshot_t_4200000000 | 0,000000 | 0,000000 | 0,000000 | 0,000000 | 0,000000 | WARM_START | WARM_START | UNKNOWN | false | false | false | Scenario is stable and previous population can be reused.
+12 | live_runtime_snapshot_t_4400000000 | 0,000000 | 0,000000 | 0,000000 | 0,000000 | 0,000000 | WARM_START | WARM_START | UNKNOWN | false | false | false | Scenario is stable and previous population can be reused.
+13 | live_runtime_snapshot_t_4600000000 | 0,000000 | 0,000000 | 0,000000 | 0,000000 | 0,000000 | WARM_START | WARM_START | UNKNOWN | false | false | false | Scenario is stable and previous population can be reused.
+14 | live_runtime_snapshot_t_4800000000 | 0,000000 | 0,000000 | 0,000000 | 0,000000 | 0,000000 | WARM_START | WARM_START | UNKNOWN | false | false | false | Scenario is stable and previous population can be reused.
+15 | live_runtime_snapshot_t_5000000000 | 0,000000 | 0,000000 | 0,000000 | 0,000000 | 0,000000 | WARM_START | WARM_START | UNKNOWN | false | false | false | Scenario is stable and previous population can be reused.
+16 | live_runtime_snapshot_t_5200000000 | 0,000000 | 0,000000 | 0,000000 | 0,000000 | 0,000000 | WARM_START | WARM_START | UNKNOWN | false | false | false | Scenario is stable and previous population can be reused.
+17 | live_runtime_snapshot_t_5400000000 | 0,000000 | 0,000000 | 0,000000 | 0,000000 | 0,000000 | WARM_START | WARM_START | UNKNOWN | false | false | false | Scenario is stable and previous population can be reused.
+18 | live_runtime_snapshot_t_5600000000 | 0,125000 | 0,000000 | 0,000000 | 0,250000 | 0,250000 | WARM_START | WARM_START | UNKNOWN | false | false | false | Scenario is stable and previous population can be reused.
+19 | live_runtime_snapshot_t_5800000000 | 0,000000 | 0,000000 | 0,000000 | 0,000000 | 0,000000 | WARM_START | WARM_START | UNKNOWN | false | false | false | Scenario is stable and previous population can be reused.
+20 | live_runtime_snapshot_t_6000000000 | 0,000000 | 0,000000 | 0,000000 | 0,000000 | 0,000000 | WARM_START | WARM_START | UNKNOWN | false | false | false | Scenario is stable and previous population can be reused.
+21 | live_runtime_snapshot_t_6200000000 | 0,000000 | 0,000000 | 0,000000 | 0,000000 | 0,000000 | WARM_START | WARM_START | UNKNOWN | false | false | false | Scenario is stable and previous population can be reused.
+22 | live_runtime_snapshot_t_6400000000 | 0,000000 | 0,000000 | 0,000000 | 0,000000 | 0,000000 | WARM_START | WARM_START | UNKNOWN | false | false | false | Scenario is stable and previous population can be reused.
+23 | live_runtime_snapshot_t_6600000000 | 0,000000 | 0,000000 | 0,000000 | 0,000000 | 0,000000 | WARM_START | WARM_START | UNKNOWN | false | false | false | Scenario is stable and previous population can be reused.
+24 | live_runtime_snapshot_t_6800000000 | 0,000000 | 0,000000 | 0,000000 | 0,000000 | 0,000000 | WARM_START | WARM_START | UNKNOWN | false | false | false | Scenario is stable and previous population can be reused.
+25 | live_runtime_snapshot_t_7000000000 | 0,250000 | 1,000000 | 0,000000 | 0,000000 | 0,000000 | PARTIAL_RESTART | PARTIAL_RESTART | UNKNOWN | true | true | false | Partial restart confirmed: no critical task-link spike and no performance condition requires correction.
+26 | live_runtime_snapshot_t_8500000000 | 0,407143 | 1,000000 | 0,000000 | 0,428571 | 0,200000 | PARTIAL_RESTART | COLD_START | BAD | true | true | true | Previous solution quality was bad and at least one dynamicity component has a spike.
+
+------------------------------------------------------------
+SYSTEM STATE SOURCE SUMMARY
+------------------------------------------------------------
+idx | snapshot | mode | seq | managerTime | sourceTime | shift | exactMatch | futureLookAhead | interpretation | source
+0 | live_runtime_snapshot_t_2000000000 | MOSAIC_LIVE | 0 | 2,000000 s | 2,000000 s | 0,000000 s | true | false | aligned | LIVE_CAUSAL_MOSAIC_SNAPSHOT_BRIDGE
+1 | live_runtime_snapshot_t_2200000000 | MOSAIC_LIVE | 1 | 2,200000 s | 2,200000 s | 0,000000 s | true | false | aligned | LIVE_CAUSAL_MOSAIC_SNAPSHOT_BRIDGE
+2 | live_runtime_snapshot_t_2400000000 | MOSAIC_LIVE | 2 | 2,400000 s | 2,400000 s | 0,000000 s | true | false | aligned | LIVE_CAUSAL_MOSAIC_SNAPSHOT_BRIDGE
+3 | live_runtime_snapshot_t_2600000000 | MOSAIC_LIVE | 3 | 2,600000 s | 2,600000 s | 0,000000 s | true | false | aligned | LIVE_CAUSAL_MOSAIC_SNAPSHOT_BRIDGE
+4 | live_runtime_snapshot_t_2800000000 | MOSAIC_LIVE | 4 | 2,800000 s | 2,800000 s | 0,000000 s | true | false | aligned | LIVE_CAUSAL_MOSAIC_SNAPSHOT_BRIDGE
+5 | live_runtime_snapshot_t_3000000000 | MOSAIC_LIVE | 5 | 3,000000 s | 3,000000 s | 0,000000 s | true | false | aligned | LIVE_CAUSAL_MOSAIC_SNAPSHOT_BRIDGE
+6 | live_runtime_snapshot_t_3200000000 | MOSAIC_LIVE | 6 | 3,200000 s | 3,200000 s | 0,000000 s | true | false | aligned | LIVE_CAUSAL_MOSAIC_SNAPSHOT_BRIDGE
+7 | live_runtime_snapshot_t_3400000000 | MOSAIC_LIVE | 7 | 3,400000 s | 3,400000 s | 0,000000 s | true | false | aligned | LIVE_CAUSAL_MOSAIC_SNAPSHOT_BRIDGE
+8 | live_runtime_snapshot_t_3600000000 | MOSAIC_LIVE | 8 | 3,600000 s | 3,600000 s | 0,000000 s | true | false | aligned | LIVE_CAUSAL_MOSAIC_SNAPSHOT_BRIDGE
+9 | live_runtime_snapshot_t_3800000000 | MOSAIC_LIVE | 9 | 3,800000 s | 3,800000 s | 0,000000 s | true | false | aligned | LIVE_CAUSAL_MOSAIC_SNAPSHOT_BRIDGE
+10 | live_runtime_snapshot_t_4000000000 | MOSAIC_LIVE | 10 | 4,000000 s | 4,000000 s | 0,000000 s | true | false | aligned | LIVE_CAUSAL_MOSAIC_SNAPSHOT_BRIDGE
+11 | live_runtime_snapshot_t_4200000000 | MOSAIC_LIVE | 11 | 4,200000 s | 4,200000 s | 0,000000 s | true | false | aligned | LIVE_CAUSAL_MOSAIC_SNAPSHOT_BRIDGE
+12 | live_runtime_snapshot_t_4400000000 | MOSAIC_LIVE | 12 | 4,400000 s | 4,400000 s | 0,000000 s | true | false | aligned | LIVE_CAUSAL_MOSAIC_SNAPSHOT_BRIDGE
+13 | live_runtime_snapshot_t_4600000000 | MOSAIC_LIVE | 13 | 4,600000 s | 4,600000 s | 0,000000 s | true | false | aligned | LIVE_CAUSAL_MOSAIC_SNAPSHOT_BRIDGE
+14 | live_runtime_snapshot_t_4800000000 | MOSAIC_LIVE | 14 | 4,800000 s | 4,800000 s | 0,000000 s | true | false | aligned | LIVE_CAUSAL_MOSAIC_SNAPSHOT_BRIDGE
+15 | live_runtime_snapshot_t_5000000000 | MOSAIC_LIVE | 15 | 5,000000 s | 5,000000 s | 0,000000 s | true | false | aligned | LIVE_CAUSAL_MOSAIC_SNAPSHOT_BRIDGE
+16 | live_runtime_snapshot_t_5200000000 | MOSAIC_LIVE | 16 | 5,200000 s | 5,200000 s | 0,000000 s | true | false | aligned | LIVE_CAUSAL_MOSAIC_SNAPSHOT_BRIDGE
+17 | live_runtime_snapshot_t_5400000000 | MOSAIC_LIVE | 17 | 5,400000 s | 5,400000 s | 0,000000 s | true | false | aligned | LIVE_CAUSAL_MOSAIC_SNAPSHOT_BRIDGE
+18 | live_runtime_snapshot_t_5600000000 | MOSAIC_LIVE | 18 | 5,600000 s | 5,600000 s | 0,000000 s | true | false | aligned | LIVE_CAUSAL_MOSAIC_SNAPSHOT_BRIDGE
+19 | live_runtime_snapshot_t_5800000000 | MOSAIC_LIVE | 19 | 5,800000 s | 5,800000 s | 0,000000 s | true | false | aligned | LIVE_CAUSAL_MOSAIC_SNAPSHOT_BRIDGE
+20 | live_runtime_snapshot_t_6000000000 | MOSAIC_LIVE | 20 | 6,000000 s | 6,000000 s | 0,000000 s | true | false | aligned | LIVE_CAUSAL_MOSAIC_SNAPSHOT_BRIDGE
+21 | live_runtime_snapshot_t_6200000000 | MOSAIC_LIVE | 21 | 6,200000 s | 6,200000 s | 0,000000 s | true | false | aligned | LIVE_CAUSAL_MOSAIC_SNAPSHOT_BRIDGE
+22 | live_runtime_snapshot_t_6400000000 | MOSAIC_LIVE | 22 | 6,400000 s | 6,400000 s | 0,000000 s | true | false | aligned | LIVE_CAUSAL_MOSAIC_SNAPSHOT_BRIDGE
+23 | live_runtime_snapshot_t_6600000000 | MOSAIC_LIVE | 23 | 6,600000 s | 6,600000 s | 0,000000 s | true | false | aligned | LIVE_CAUSAL_MOSAIC_SNAPSHOT_BRIDGE
+24 | live_runtime_snapshot_t_6800000000 | MOSAIC_LIVE | 24 | 6,800000 s | 6,800000 s | 0,000000 s | true | false | aligned | LIVE_CAUSAL_MOSAIC_SNAPSHOT_BRIDGE
+25 | live_runtime_snapshot_t_7000000000 | MOSAIC_LIVE | 25 | 7,000000 s | 7,000000 s | 0,000000 s | true | false | aligned | LIVE_CAUSAL_MOSAIC_SNAPSHOT_BRIDGE
+26 | live_runtime_snapshot_t_8500000000 | MOSAIC_LIVE | 26 | 8,500000 s | 8,500000 s | 0,000000 s | true | false | aligned | LIVE_CAUSAL_MOSAIC_SNAPSHOT_BRIDGE
+
+Interpretation notes:
+- In JSON_SEQUENCE mode, a positive shift is expected when the adaptive window duration changes because files are consumed ordinally.
+- In JSON_TIME mode, a futureLookAhead=true row is anomalous: it means that a snapshot newer than the manager time was exposed.
+
+Validating literature smoke run...
+LITERATURE_SMOKE_TEST_PASSED
+Run: log-20260627-010612-MaGaLiteratureBasedUrbanStudy
+Tasks generated cumulative: 5640
+Tasks activated cumulative: 5640
+Tasks removed at deadline cumulative: 5577
+Tasks pending at end: 63
+Tasks pending peak: 117
+Task completion model: NOT_IMPLEMENTED
+GA parameter scaling mode: STATIC
+GA stale ratio percent: 3.571429
+GA runtime mean/median/P95/max seconds: 0.092367475 / 0.0008293 / 0.0960882 / 2.3830285
+Maximum absolute snapshot lag seconds: 0
+Validation JSON: C:\Users\raffa\IdeaProjects\maga-core\tmp\mosaic-25.2\logs\log-20260627-010612-MaGaLiteratureBasedUrbanStudy\live-maga-runtime\literature_smoke_validation.json
+Validation Markdown: C:\Users\raffa\IdeaProjects\maga-core\tmp\mosaic-25.2\logs\log-20260627-010612-MaGaLiteratureBasedUrbanStudy\live-maga-runtime\literature_smoke_validation.md
+LITERATURE_SCENARIO_RUN_COMPLETED
+Run name: log-20260627-010612-MaGaLiteratureBasedUrbanStudy
+Run directory: C:\Users\raffa\IdeaProjects\maga-core\tmp\mosaic-25.2\logs\log-20260627-010612-MaGaLiteratureBasedUrbanStudy
+Summary JSON: C:\Users\raffa\IdeaProjects\maga-core\tmp\mosaic-25.2\logs\log-20260627-010612-MaGaLiteratureBasedUrbanStudy\live-maga-runtime\live_run_summary.json
+Summary Markdown: C:\Users\raffa\IdeaProjects\maga-core\tmp\mosaic-25.2\logs\log-20260627-010612-MaGaLiteratureBasedUrbanStudy\live-maga-runtime\live_run_summary.md
+Smoke validation JSON: C:\Users\raffa\IdeaProjects\maga-core\tmp\mosaic-25.2\logs\log-20260627-010612-MaGaLiteratureBasedUrbanStudy\live-maga-runtime\literature_smoke_validation.json
+Smoke validation Markdown: C:\Users\raffa\IdeaProjects\maga-core\tmp\mosaic-25.2\logs\log-20260627-010612-MaGaLiteratureBasedUrbanStudy\live-maga-runtime\literature_smoke_validation.md
+Detailed live report TXT: C:\Users\raffa\IdeaProjects\maga-core\tmp\mosaic-25.2\logs\log-20260627-010612-MaGaLiteratureBasedUrbanStudy\live-maga-runtime\live-reporting\live_detailed_execution_report.txt
+Detailed live report Markdown: C:\Users\raffa\IdeaProjects\maga-core\tmp\mosaic-25.2\logs\log-20260627-010612-MaGaLiteratureBasedUrbanStudy\live-maga-runtime\live-reporting\live_detailed_execution_report.md
+Detailed live report JSON: C:\Users\raffa\IdeaProjects\maga-core\tmp\mosaic-25.2\logs\log-20260627-010612-MaGaLiteratureBasedUrbanStudy\live-maga-runtime\live-reporting\live_detailed_execution_report.json

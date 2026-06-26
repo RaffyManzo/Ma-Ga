@@ -1,0 +1,55 @@
+{
+  "schemaVersion": 1,
+  "generatedAt": "2026-06-27T01:26:59.798837+02:00",
+  "runCount": 6,
+  "taskTotal": 37596,
+  "gaJobsSubmittedTotal": 175,
+  "gaJobsAppliedTotal": 160,
+  "staleResultsTotal": 9,
+  "assignmentTotals": {
+    "LOCAL": 34,
+    "VEHICLE": 3,
+    "EDGE": 0,
+    "CLOUD": 0
+  },
+  "ratioBucketCounts": {
+    "P0": 101,
+    "MID_LOW": 9,
+    "MID_HIGH": 6,
+    "LOW": 2,
+    "HIGH": 13,
+    "P1": 17
+  },
+  "appliedRatioBucketCounts": {
+    "P0": 34,
+    "P1": 3
+  },
+  "windowActionCounts": {
+    "FIRST_RUN": 6,
+    "CLAMP_TO_BOUNDS": 163
+  },
+  "reuseCorrectedCount": 5,
+  "suggestedAppliedReuseMismatchCount": 5,
+  "stopReasonCounts": {
+    "EMPTY_TASK_SET": 150,
+    "STAGNATION_REACHED": 17,
+    "MAX_GENERATIONS_REACHED": 2
+  },
+  "directRepairOrFallbackCounterExposedRunCount": 0,
+  "appliedCapacityOverflowRecords": {
+    "cpu": 0,
+    "link": 0,
+    "pool": 0
+  },
+  "targetExerciseStatuses": {
+    "R-LOCALCPU-01": "TARGET_APPLIED",
+    "R-EDGECPU-01": "TARGET_NOT_EXERCISED",
+    "R-CLOUDCPU-01": "TARGET_STALE_ONLY",
+    "R-CELLBW-01": "TARGET_STALE_ONLY",
+    "R-V2VBW-01": "TARGET_STALE_ONLY",
+    "R-RTT-01": "TARGET_STALE_ONLY"
+  },
+  "minimumLastAppliedStrategyTimeSeconds": 6.8,
+  "maximumFinalStrategyGapSeconds": 173.2,
+  "maximumStaleRatioPercent": 9.677419
+}

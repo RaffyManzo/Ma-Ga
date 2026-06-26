@@ -1,0 +1,107 @@
+{
+  "schemaVersion": 1,
+  "generatedAt": "2026-06-27T01:08:58.148248+02:00",
+  "actionId": "R-V2VBW-01",
+  "configId": "CFG-R-V2VBW",
+  "targetResource": "V2V_BANDWIDTH",
+  "recordCount": 26,
+  "geneCount": 5,
+  "appliedGeneCount": 0,
+  "staleGeneCount": 5,
+  "recordStatusCounts": {
+    "APPLIED": 25,
+    "STALE_DISCARDED": 1
+  },
+  "nodeTypeCounts": {
+    "CLOUD": 1,
+    "LOCAL": 3,
+    "VEHICLE": 1
+  },
+  "appliedNodeTypeCounts": {},
+  "staleNodeTypeCounts": {
+    "CLOUD": 1,
+    "LOCAL": 3,
+    "VEHICLE": 1
+  },
+  "decisionTypeCounts": {
+    "PARTIAL_OFFLOADING": 2,
+    "LOCAL_EXECUTION": 3
+  },
+  "appliedDecisionTypeCounts": {},
+  "ratioBucketCounts": {
+    "HIGH": 1,
+    "P0": 3,
+    "MID_HIGH": 1
+  },
+  "appliedRatioBucketCounts": {},
+  "stopReasonCounts": {
+    "EMPTY_TASK_SET": 25,
+    "STAGNATION_REACHED": 1
+  },
+  "reuseBaseModeCounts": {
+    "FIRST_RUN": 1,
+    "WARM_START": 24,
+    "PARTIAL_RESTART": 1
+  },
+  "reuseAppliedModeCounts": {
+    "FIRST_RUN": 1,
+    "WARM_START": 24,
+    "PARTIAL_RESTART": 1
+  },
+  "windowActionCounts": {
+    "FIRST_RUN": 1,
+    "CLAMP_TO_BOUNDS": 25
+  },
+  "reuseCorrectedCount": 0,
+  "suggestedAppliedReuseMismatchCount": 0,
+  "resourcePenalty": {
+    "count": 26,
+    "nonZeroCount": 0,
+    "max": 0.0,
+    "mean": 0.0,
+    "appliedNonZeroCount": 0,
+    "appliedMax": 0.0
+  },
+  "constraintPenalty": {
+    "count": 5,
+    "nonZeroCount": 0,
+    "max": 0.0,
+    "appliedNonZeroCount": 0,
+    "appliedMax": 0.0
+  },
+  "deadlineViolationGeneCount": 0,
+  "appliedDeadlineViolationGeneCount": 0,
+  "resourceRatios": {
+    "maxAppliedCpuRatio": 0.0,
+    "maxStaleCpuRatio": 0.0,
+    "maxAppliedLinkRatio": 0.0,
+    "maxStaleLinkRatio": 0.0,
+    "maxAppliedPoolRatio": 0.0,
+    "maxStalePoolRatio": 0.0,
+    "appliedCpuOverflowRecords": 0,
+    "staleCpuOverflowRecords": 0,
+    "appliedLinkOverflowRecords": 0,
+    "staleLinkOverflowRecords": 0,
+    "appliedPoolOverflowRecords": 0,
+    "stalePoolOverflowRecords": 0
+  },
+  "targetExercise": {
+    "allGeneCount": 1,
+    "appliedGeneCount": 0,
+    "staleGeneCount": 1
+  },
+  "structuredResourceFieldPaths": [
+    "fitness.normalizedResourcePenalty",
+    "fitness.resourcePenalty",
+    "genes[0].constraintPenalty",
+    "genes[1].constraintPenalty",
+    "genes[2].constraintPenalty",
+    "genes[3].constraintPenalty",
+    "genes[4].constraintPenalty"
+  ],
+  "directRepairOrFallbackCounterExposed": false,
+  "firstRecordTimeSeconds": 2.0,
+  "lastRecordTimeSeconds": 7.0,
+  "lastAppliedRecordTimeSeconds": 6.8,
+  "secondsWithoutAppliedRecordAtEnd": 173.2
+}

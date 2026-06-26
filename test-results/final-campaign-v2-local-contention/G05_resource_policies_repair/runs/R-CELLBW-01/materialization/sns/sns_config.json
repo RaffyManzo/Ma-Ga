@@ -1,0 +1,17 @@
+{
+  "adhocTransmissionModel": {
+    "type": "SophisticatedAdhocTransmissionModel"
+  },
+  "maximumTtl": 10,
+  "singleHopTransmission": {
+    "lossProbability": 0.0,
+    "maxRetries": 0
+  },
+  "singlehopDelay": {
+    "maxDelay": "10 ms",
+    "minDelay": "1 ms",
+    "steps": 10,
+    "type": "SimpleRandomDelay"
+  },
+  "singlehopRadius": 250.0
+}

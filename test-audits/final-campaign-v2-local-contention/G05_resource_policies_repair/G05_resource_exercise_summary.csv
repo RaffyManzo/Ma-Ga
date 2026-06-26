@@ -1,0 +1,7 @@
+﻿actionId,configId,targetResource,targetAppliedGenes,targetStaleGenes,localAssignments,vehicleAssignments,edgeAssignments,cloudAssignments,repairCounterExposed,lastAppliedSeconds,finalGapSeconds
+R-LOCALCPU-01,CFG-R-LOCALCPU,LOCAL_CPU,4,0,4,0,0,0,False,7.0,173.0
+R-EDGECPU-01,CFG-R-EDGECPU,EDGE_CPU,0,0,6,1,0,0,False,8.5,171.5
+R-CLOUDCPU-01,CFG-R-CLOUDCPU,CLOUD_CPU,0,1,6,1,0,0,False,8.5,171.5
+R-CELLBW-01,CFG-R-CELLBW,CELL_BANDWIDTH,0,2,6,1,0,0,False,8.4,171.6
+R-V2VBW-01,CFG-R-V2VBW,V2V_BANDWIDTH,0,1,0,0,0,0,False,6.8,173.2
+R-RTT-01,CFG-R-RTT,CELL_RTT,0,4,12,0,0,0,False,9.2,170.8

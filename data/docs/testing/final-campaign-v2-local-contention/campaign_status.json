@@ -12,11 +12,11 @@
   "generatedAtUtc": "2026-06-26T16:31:47.304242+00:00",
   "legacyResultsImported": false,
   "materializationExecuted": true,
-  "phase": "G04_COMPLETE_WITH_OBSERVABILITY_LIMITS_READY_FOR_G05",
+  "phase": "G05_COMPLETE_WITH_REPAIR_OBSERVABILITY_LIMITS_READY_FOR_G06",
   "scenarioInstanceCount": 69,
   "schemaVersion": 1,
   "simulationExecuted": true,
-  "lastCompletedGroup": "G04",
+  "lastCompletedGroup": "G05",
   "g01": {
     "verdict": "PASS_G01_COMPLETE_READY_FOR_G02_RUNS",
     "runName": "log-20260626-215940-MaGaLiteratureBasedUrbanStudy",
@@ -103,5 +103,34 @@
     "auditSummary": "data/docs/testing/final-campaign-v2-local-contention/G04_AUDIT_SUMMARY_FOR_RESULTS.md",
     "chapter7EvidenceIndex": "data/docs/testing/final-campaign-v2-local-contention/G04_CHAPTER7_EVIDENCE_INDEX.md",
     "nextGroup": "G05"
+  },
+  "g05": {
+    "verdict": "PASS_G05_COMPLETE_WITH_REPAIR_OBSERVABILITY_LIMITS_READY_FOR_G06",
+    "validRuns": 6,
+    "validatorPasses": 6,
+    "primaryTests": 12,
+    "testStatusCounts": {
+      "PASS": 4,
+      "EVIDENZA_PARZIALE": 7,
+      "PASS_CON_LIMITAZIONE": 1
+    },
+    "assignmentTotals": {
+      "LOCAL": 34,
+      "VEHICLE": 3,
+      "EDGE": 0,
+      "CLOUD": 0
+    },
+    "appliedCapacityOverflowRecords": {
+      "cpu": 0,
+      "link": 0,
+      "pool": 0
+    },
+    "directRepairCounterExposed": false,
+    "runtimeCadenceLimitInheritedFromG03": true,
+    "taskCompletionModel": "NOT_IMPLEMENTED",
+    "runtimeJarSha256": "3821c28a6a0898e94f4d5136b8039595d36bcbce0b6ecc3e9406910f9e083068",
+    "auditSummary": "data/docs/testing/final-campaign-v2-local-contention/G05_AUDIT_SUMMARY_FOR_RESULTS.md",
+    "chapter7EvidenceIndex": "data/docs/testing/final-campaign-v2-local-contention/G05_CHAPTER7_EVIDENCE_INDEX.md",
+    "nextGroup": "G06"
   }
 }

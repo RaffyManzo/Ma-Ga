@@ -1,0 +1,135 @@
+{
+  "cellDiagnosticAccounting": {
+    "availableFromPolicy": "SAFE_AFTER_TIMESTAMP",
+    "bandwidthSource": "DIAGNOSTIC_RUNTIME_ACCOUNTING_FROM_CONTROLLED_CELL_MESSAGES",
+    "bucketDurationMs": 1000,
+    "configuredCellProfileSource": "LITERATURE_BASED_CONFIGURED_CELL_PROFILE",
+    "destinationId": "server_0",
+    "gatewayPools": [
+      {
+        "nominalCapacityBitsPerSecond": 49200000.0,
+        "poolId": "pool_rsu_0"
+      },
+      {
+        "nominalCapacityBitsPerSecond": 49200000.0,
+        "poolId": "pool_rsu_1"
+      }
+    ],
+    "initialDelayMs": 1000,
+    "intervalMs": 1000,
+    "maxDownlinkBitrate": "49200000 bps",
+    "maxUplinkBitrate": "49200000 bps",
+    "relationship": "CONFIGURED_CELL_PROFILE_AND_RUNTIME_ACCOUNTING_ARE_DISTINCT_CONCEPTS",
+    "requestPayloadBytes": 1000,
+    "responsePayloadBytes": 500
+  },
+  "configuredCellProfile": {
+    "capacityBitsPerSecond": 49200000.0,
+    "classification": "CALIBRATED_ABSTRACTION",
+    "measuredRttSeconds": 0.0522,
+    "profileId": "CELL_5G_AVEIRO_P50",
+    "source": "LITERATURE_BASED_CONFIGURED_CELL_PROFILE",
+    "symmetricOneWayDelaySeconds": 0.0261,
+    "technology": "5G"
+  },
+  "localCpuCyclesPerSecond": 1000000000.0,
+  "localCpuSource": "LITERATURE_BASED_RANGE_CHOICE",
+  "remoteVehicleCpuCyclesPerSecond": 1000000000.0,
+  "remoteVehicleCpuSource": "LITERATURE_BASED_RANGE_CHOICE",
+  "singlehopRadiusMeters": 375.0,
+  "staticInfrastructure": {
+    "cloudNodes": [
+      {
+        "availableCpuCyclesPerSecond": 100000000000.0,
+        "executionNodeId": "cloud_regional",
+        "mosaicServerRuntimeId": "server_0",
+        "serverBaseDelaySeconds": 0.05
+      }
+    ],
+    "edgeNodes": [
+      {
+        "availableCpuCyclesPerSecond": 5000000000.0,
+        "basePropagationDelaySeconds": 0.0357,
+        "executionNodeId": "edge_rsu_0",
+        "gatewayIds": [
+          "rsu_0"
+        ]
+      },
+      {
+        "availableCpuCyclesPerSecond": 5000000000.0,
+        "basePropagationDelaySeconds": 0.0357,
+        "executionNodeId": "edge_rsu_1",
+        "gatewayIds": [
+          "rsu_1"
+        ]
+      }
+    ],
+    "gateways": [
+      {
+        "bandwidthPoolId": "pool_rsu_0",
+        "cellRegionId": "region_cell_5g_aveiro_p50",
+        "coverageRadiusMeters": 250,
+        "gatewayId": "rsu_0",
+        "gatewayType": "RSU",
+        "latitude": 48.756752882188884,
+        "longitude": 11.424366883877795,
+        "projectedX": 213980.44,
+        "projectedY": 450429.42,
+        "runtimeId": "rsu_0"
+      },
+      {
+        "bandwidthPoolId": "pool_rsu_1",
+        "cellRegionId": "region_cell_5g_aveiro_p50",
+        "coverageRadiusMeters": 250,
+        "gatewayId": "rsu_1",
+        "gatewayType": "RSU",
+        "latitude": 48.759609883864506,
+        "longitude": 11.423379740113285,
+        "projectedX": 213897.79,
+        "projectedY": 450744.66,
+        "runtimeId": "rsu_1"
+      }
+    ]
+  },
+  "taskProfiles": [],
+  "tickIntervalMs": 1000,
+  "v2vBandwidthSource": "LITERATURE_BASED_CALIBRATED_ABSTRACTION",
+  "v2vNominalBandwidthBitsPerSecond": 1175000.0,
+  "v2vPropagationDelaySeconds": 0.002,
+  "workloadGeneration": {
+    "arrivalRateTasksPerSecondPerActiveVehicle": 1.0,
+    "classification": "IMPLEMENTED_CONFIGURABLE_LITERATURE_BASED_PROFILE",
+    "enabled": true,
+    "maxGeneratedTasksPerTickPerVehicle": 10,
+    "mode": "SEEDED_POISSON_PER_ACTIVE_VEHICLE",
+    "outputSizeBitsClassification": "CONTROLLED_ASSUMPTION",
+    "profiles": [
+      {
+        "cpuCycles": 200000000,
+        "deadlineSeconds": 0.5,
+        "inputSizeBits": 160000,
+        "outputSizeBits": 8000,
+        "profileId": "light",
+        "weight": 0.25
+      },
+      {
+        "cpuCycles": 600000000,
+        "deadlineSeconds": 1.0,
+        "inputSizeBits": 800000,
+        "outputSizeBits": 8000,
+        "profileId": "medium",
+        "weight": 0.3
+      },
+      {
+        "cpuCycles": 3200000000,
+        "deadlineSeconds": 4.0,
+        "inputSizeBits": 8000000,
+        "outputSizeBits": 8000,
+        "profileId": "heavy",
+        "weight": 0.45
+      }
+    ],
+    "randomSeed": 1104732,
+    "startTimeMs": 7000
+  }
+}

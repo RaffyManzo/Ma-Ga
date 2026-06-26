@@ -1,0 +1,52 @@
+{
+  "regions": [
+    {
+      "area": {
+        "nw": {
+          "lat": 48.76095894865191,
+          "lon": 11.41686033145787
+        },
+        "se": {
+          "lat": 48.751436667172655,
+          "lon": 11.43412425800514
+        }
+      },
+      "downlink": {
+        "capacity": 49200000.0,
+        "multicast": {
+          "delay": {
+            "delay": "26.1 ms",
+            "type": "ConstantDelay"
+          },
+          "transmission": {
+            "lossProbability": 0.0,
+            "maxRetries": 0
+          },
+          "usableCapacity": 0.6
+        },
+        "unicast": {
+          "delay": {
+            "delay": "26.1 ms",
+            "type": "ConstantDelay"
+          },
+          "transmission": {
+            "lossProbability": 0.0,
+            "maxRetries": 0
+          }
+        }
+      },
+      "id": "region_cell_5g_aveiro_p50",
+      "uplink": {
+        "capacity": 49200000.0,
+        "delay": {
+          "delay": "26.1 ms",
+          "type": "ConstantDelay"
+        },
+        "transmission": {
+          "lossProbability": 0.0,
+          "maxRetries": 0
+        }
+      }
+    }
+  ]
+}

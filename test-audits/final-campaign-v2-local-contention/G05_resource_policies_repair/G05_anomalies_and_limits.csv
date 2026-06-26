@@ -1,0 +1,7 @@
+﻿category,severity,description,decision
+RUNTIME_CADENCE_LIMIT,CROSS_GROUP_LIMIT,"L'ultima strategia è applicata tra 6,8 e 9,2 s nelle run da 180 s.",Il limite resta di proprietà G06 e condiziona l'osservabilità delle risorse target.
+TARGET_RESOURCE_EXERCISE,OBSERVABILITY_LIMIT,"Solo LOCAL_CPU è esercitata in una strategia applicata; CLOUD, CELL, V2V e RTT sono stale-only; EDGE non esercitata.",Non interpretare l'evitamento come repair causale.
+PARTIAL_OFFLOADING,EVIDENCE_PARTIAL,Ratio intermedi presenti nei geni ma assenti nelle strategie applicate.,T-066 resta EVIDENZA_PARZIALE.
+REPAIR_COUNTERS,OBSERVABILITY_LIMIT,Nessuna run espone un contatore diretto di repair/fallback.,"T-071, T-072 e T-073 restano evidenze parziali."
+WINDOW_ACTIONS,EVIDENCE_PARTIAL,Osservate solo FIRST_RUN e CLAMP_TO_BOUNDS.,T-114 resta parziale e viene integrato in G06.
+TASK_COMPLETION_MODEL,MODEL_LIMIT,taskCompletionModel=NOT_IMPLEMENTED.,Non presentare assegnazioni o deadline come completamenti applicativi reali.

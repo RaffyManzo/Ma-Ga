@@ -1,0 +1,68 @@
+{
+  "defaultDownlinkCapacity": "12300000 bps",
+  "defaultUplinkCapacity": "12300000 bps",
+  "globalNetwork": {
+    "downlink": {
+      "capacity": 12300000.0,
+      "multicast": {
+        "delay": {
+          "delay": "26.1 ms",
+          "type": "ConstantDelay"
+        },
+        "transmission": {
+          "lossProbability": 0.0,
+          "maxRetries": 0
+        },
+        "usableCapacity": 0.6
+      },
+      "unicast": {
+        "delay": {
+          "delay": "26.1 ms",
+          "type": "ConstantDelay"
+        },
+        "transmission": {
+          "lossProbability": 0.0,
+          "maxRetries": 0
+        }
+      }
+    },
+    "uplink": {
+      "capacity": 12300000.0,
+      "delay": {
+        "delay": "26.1 ms",
+        "type": "ConstantDelay"
+      },
+      "transmission": {
+        "lossProbability": 0.0,
+        "maxRetries": 0
+      }
+    }
+  },
+  "servers": [
+    {
+      "downlink": {
+        "unicast": {
+          "delay": {
+            "delay": "50 ms",
+            "type": "ConstantDelay"
+          },
+          "transmission": {
+            "lossProbability": 0.0,
+            "maxRetries": 0
+          }
+        }
+      },
+      "id": "server_0",
+      "uplink": {
+        "delay": {
+          "delay": "50 ms",
+          "type": "ConstantDelay"
+        },
+        "transmission": {
+          "lossProbability": 0.0,
+          "maxRetries": 0
+        }
+      }
+    }
+  ]
+}

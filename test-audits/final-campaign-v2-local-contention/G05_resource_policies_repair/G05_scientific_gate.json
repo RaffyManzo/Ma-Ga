@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "generatedAt": "2026-06-27T01:26:59.807396+02:00",
+  "group": "G05",
+  "status": "PASS_G05_SCIENTIFIC_GATE_WITH_REPAIR_OBSERVABILITY_LIMITS",
+  "passed": true,
+  "formalVerdict": "PASS_G05_COMPLETE_WITH_REPAIR_OBSERVABILITY_LIMITS_READY_FOR_G06",
+  "runCount": 6,
+  "validatorPassCount": 6,
+  "testStatusCounts": {
+    "PASS": 4,
+    "EVIDENZA_PARZIALE": 7,
+    "PASS_CON_LIMITAZIONE": 1
+  },
+  "failedTests": [],
+  "appliedCapacityOverflowRecords": {
+    "cpu": 0,
+    "link": 0,
+    "pool": 0
+  },
+  "directRepairCounterExposed": false
+}

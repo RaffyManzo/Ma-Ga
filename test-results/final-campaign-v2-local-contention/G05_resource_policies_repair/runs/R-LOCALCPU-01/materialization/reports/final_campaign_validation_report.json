@@ -1,0 +1,19 @@
+{
+  "errors": [],
+  "manifest": {
+    "campaignId": "final-campaign-v2-local-contention",
+    "classification": "TECHNICAL",
+    "configId": "CFG-R-LOCALCPU",
+    "groupId": "G05",
+    "materializationId": "MAT-CFG-R-LOCALCPU-104729"
+  },
+  "metrics": {
+    "databasePresent": true,
+    "emergencyBrakingMentions": 0,
+    "sumoErrors": 0,
+    "teleportMentions": 0,
+    "vehicleCount": 50
+  },
+  "status": "MATERIALIZED_VALIDATED",
+  "warnings": []
+}

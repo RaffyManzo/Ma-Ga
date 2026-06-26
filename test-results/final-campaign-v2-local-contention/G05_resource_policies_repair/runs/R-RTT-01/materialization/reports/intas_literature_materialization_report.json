@@ -1,0 +1,952 @@
+{
+  "candidateCount": 1,
+  "candidateSearchExpansions": [],
+  "candidates": [],
+  "cellRegionGeographicBoundary": {
+    "method": "SUMOLIB_CONVERT_XY2LONLAT",
+    "nw": {
+      "lat": 48.76095894865191,
+      "lon": 11.41686033145787
+    },
+    "se": {
+      "lat": 48.751436667172655,
+      "lon": 11.43412425800514
+    },
+    "valid": true
+  },
+  "errors": [],
+  "gaParameterScalingMode": "STATIC",
+  "generatedAtUtc": "2026-06-26T19:14:08.002166+00:00",
+  "generatedConfigurations": {
+    "application": {
+      "encodePayloads": true,
+      "eventSchedulerThreads": 1,
+      "messageCacheTime": "30s",
+      "navigationConfiguration": {
+        "databaseFile": "intas_literature_urban.db",
+        "type": "database"
+      },
+      "perceptionConfiguration": {
+        "trafficLightIndex": {
+          "enabled": true
+        },
+        "vehicleIndex": {
+          "enabled": true
+        },
+        "wallIndex": {
+          "enabled": false
+        }
+      }
+    },
+    "cell": {
+      "cell_config": {
+        "bandwidthMeasurementCompression": false,
+        "bandwidthMeasurementInterval": 1,
+        "bandwidthMeasurements": [
+          {
+            "fromRegion": "*",
+            "toRegion": "*",
+            "transmissionMode": "UplinkUnicast"
+          },
+          {
+            "fromRegion": "*",
+            "toRegion": "*",
+            "transmissionMode": "DownlinkUnicast"
+          },
+          {
+            "fromRegion": "*",
+            "toRegion": "*",
+            "transmissionMode": "DownlinkMulticast"
+          }
+        ],
+        "headerLengths": {
+          "cellularHeader": "18 Bytes",
+          "ethernetHeader": "18 Bytes",
+          "ipHeader": "20 Bytes",
+          "tcpHeader": "20 Bytes",
+          "udpHeader": "8 Bytes"
+        },
+        "networkConfigurationFile": "network.json",
+        "regionConfigurationFile": "regions.json"
+      },
+      "network": {
+        "defaultDownlinkCapacity": "100 Gbps",
+        "defaultUplinkCapacity": "100 Gbps",
+        "globalNetwork": {
+          "downlink": {
+            "capacity": 49200000,
+            "multicast": {
+              "delay": {
+                "delay": "26.1 ms",
+                "type": "ConstantDelay"
+              },
+              "transmission": {
+                "lossProbability": 0.0,
+                "maxRetries": 0
+              },
+              "usableCapacity": 0.6
+            },
+            "unicast": {
+              "delay": {
+                "delay": "26.1 ms",
+                "type": "ConstantDelay"
+              },
+              "transmission": {
+                "lossProbability": 0.0,
+                "maxRetries": 0
+              }
+            }
+          },
+          "uplink": {
+            "capacity": 49200000,
+            "delay": {
+              "delay": "26.1 ms",
+              "type": "ConstantDelay"
+            },
+            "transmission": {
+              "lossProbability": 0.0,
+              "maxRetries": 0
+            }
+          }
+        },
+        "servers": [
+          {
+            "downlink": {
+              "unicast": {
+                "delay": {
+                  "delay": "50 ms",
+                  "type": "ConstantDelay"
+                },
+                "transmission": {
+                  "lossProbability": 0.0,
+                  "maxRetries": 0
+                }
+              }
+            },
+            "id": "server_0",
+            "uplink": {
+              "delay": {
+                "delay": "50 ms",
+                "type": "ConstantDelay"
+              },
+              "transmission": {
+                "lossProbability": 0.0,
+                "maxRetries": 0
+              }
+            }
+          }
+        ]
+      },
+      "regions": {
+        "regions": [
+          {
+            "area": {
+              "nw": {
+                "lat": 48.76095894865191,
+                "lon": 11.41686033145787
+              },
+              "se": {
+                "lat": 48.751436667172655,
+                "lon": 11.43412425800514
+              }
+            },
+            "downlink": {
+              "capacity": 49200000,
+              "multicast": {
+                "delay": {
+                  "delay": "26.1 ms",
+                  "type": "ConstantDelay"
+                },
+                "transmission": {
+                  "lossProbability": 0.0,
+                  "maxRetries": 0
+                },
+                "usableCapacity": 0.6
+              },
+              "unicast": {
+                "delay": {
+                  "delay": "26.1 ms",
+                  "type": "ConstantDelay"
+                },
+                "transmission": {
+                  "lossProbability": 0.0,
+                  "maxRetries": 0
+                }
+              }
+            },
+            "id": "region_cell_5g_aveiro_p50",
+            "uplink": {
+              "capacity": 49200000,
+              "delay": {
+                "delay": "26.1 ms",
+                "type": "ConstantDelay"
+              },
+              "transmission": {
+                "lossProbability": 0.0,
+                "maxRetries": 0
+              }
+            }
+          }
+        ]
+      }
+    },
+    "liveRuntime": {
+      "configuredGaRuntimeEstimateSeconds": 0.01,
+      "configuredMaxWindowSeconds": 0.2,
+      "coordinatorTickIntervalMs": 100,
+      "deltaTMaxComparisonEpsilonSeconds": 1e-09,
+      "diagnosticArtificialGaDelayMs": 0,
+      "discardLateResult": true,
+      "freshReoptimizationAfterTimeout": true,
+      "gaParameterScalingMode": "STATIC",
+      "gaPollingIntervalMs": 50,
+      "initialOptimizationDelayMs": 1000,
+      "keepLastAppliedStrategyWhileRunning": true,
+      "nativeLiveDetailedReportPrintToConsole": false,
+      "nativeLiveDetailedReportingEnabled": true,
+      "publishedSnapshotCopyLimit": 32,
+      "runtimeTraceEnabled": true,
+      "scenarioName": "MaGaLiteratureBasedUrbanStudy",
+      "singleInFlightGaOnly": true,
+      "temporalInitialWindowSeconds": 1.0
+    },
+    "liveState": {
+      "cellDiagnosticAccounting": {
+        "availableFromPolicy": "SAFE_AFTER_TIMESTAMP",
+        "bandwidthSource": "DIAGNOSTIC_RUNTIME_ACCOUNTING_FROM_CONTROLLED_CELL_MESSAGES",
+        "bucketDurationMs": 1000,
+        "configuredCellProfileSource": "LITERATURE_BASED_CONFIGURED_CELL_PROFILE",
+        "destinationId": "server_0",
+        "gatewayPools": [
+          {
+            "nominalCapacityBitsPerSecond": 49200000,
+            "poolId": "pool_rsu_0"
+          },
+          {
+            "nominalCapacityBitsPerSecond": 49200000,
+            "poolId": "pool_rsu_1"
+          }
+        ],
+        "initialDelayMs": 1000,
+        "intervalMs": 1000,
+        "maxDownlinkBitrate": "49.2 Mbps",
+        "maxUplinkBitrate": "49.2 Mbps",
+        "relationship": "CONFIGURED_CELL_PROFILE_AND_RUNTIME_ACCOUNTING_ARE_DISTINCT_CONCEPTS",
+        "requestPayloadBytes": 1000,
+        "responsePayloadBytes": 500
+      },
+      "configuredCellProfile": {
+        "capacityBitsPerSecond": 49200000,
+        "classification": "CALIBRATED_ABSTRACTION",
+        "measuredRttSeconds": 0.0522,
+        "profileId": "CELL_5G_AVEIRO_P50",
+        "source": "LITERATURE_BASED_CONFIGURED_CELL_PROFILE",
+        "symmetricOneWayDelaySeconds": 0.0261,
+        "technology": "5G"
+      },
+      "localCpuCyclesPerSecond": 1000000000,
+      "localCpuSource": "LITERATURE_BASED_RANGE_CHOICE",
+      "remoteVehicleCpuCyclesPerSecond": 1000000000,
+      "remoteVehicleCpuSource": "LITERATURE_BASED_RANGE_CHOICE",
+      "singlehopRadiusMeters": 250,
+      "staticInfrastructure": {
+        "cloudNodes": [
+          {
+            "availableCpuCyclesPerSecond": 100000000000,
+            "executionNodeId": "cloud_regional",
+            "mosaicServerRuntimeId": "server_0",
+            "serverBaseDelaySeconds": 0.05
+          }
+        ],
+        "edgeNodes": [
+          {
+            "availableCpuCyclesPerSecond": 5000000000,
+            "basePropagationDelaySeconds": 0.0357,
+            "executionNodeId": "edge_rsu_0",
+            "gatewayIds": [
+              "rsu_0"
+            ]
+          },
+          {
+            "availableCpuCyclesPerSecond": 5000000000,
+            "basePropagationDelaySeconds": 0.0357,
+            "executionNodeId": "edge_rsu_1",
+            "gatewayIds": [
+              "rsu_1"
+            ]
+          }
+        ],
+        "gateways": [
+          {
+            "bandwidthPoolId": "pool_rsu_0",
+            "cellRegionId": "region_cell_5g_aveiro_p50",
+            "coverageRadiusMeters": 250,
+            "gatewayId": "rsu_0",
+            "gatewayType": "RSU",
+            "latitude": 48.756752882188884,
+            "longitude": 11.424366883877795,
+            "projectedX": 213980.44,
+            "projectedY": 450429.42,
+            "runtimeId": "rsu_0"
+          },
+          {
+            "bandwidthPoolId": "pool_rsu_1",
+            "cellRegionId": "region_cell_5g_aveiro_p50",
+            "coverageRadiusMeters": 250,
+            "gatewayId": "rsu_1",
+            "gatewayType": "RSU",
+            "latitude": 48.759609883864506,
+            "longitude": 11.423379740113285,
+            "projectedX": 213897.79,
+            "projectedY": 450744.66,
+            "runtimeId": "rsu_1"
+          }
+        ]
+      },
+      "taskProfiles": [],
+      "tickIntervalMs": 1000,
+      "v2vBandwidthSource": "LITERATURE_BASED_CALIBRATED_ABSTRACTION",
+      "v2vNominalBandwidthBitsPerSecond": 4700000,
+      "v2vPropagationDelaySeconds": 0.002,
+      "workloadGeneration": {
+        "arrivalRateTasksPerSecondPerActiveVehicle": 1.0,
+        "classification": "IMPLEMENTED_CONFIGURABLE_LITERATURE_BASED_PROFILE",
+        "enabled": true,
+        "maxGeneratedTasksPerTickPerVehicle": 10,
+        "mode": "SEEDED_POISSON_PER_ACTIVE_VEHICLE",
+        "outputSizeBitsClassification": "CONTROLLED_ASSUMPTION",
+        "profiles": [
+          {
+            "cpuCycles": 200000000,
+            "deadlineSeconds": 0.5,
+            "inputSizeBits": 160000,
+            "outputSizeBits": 8000,
+            "profileId": "light",
+            "weight": 0.5
+          },
+          {
+            "cpuCycles": 600000000,
+            "deadlineSeconds": 1.0,
+            "inputSizeBits": 800000,
+            "outputSizeBits": 8000,
+            "profileId": "medium",
+            "weight": 0.35
+          },
+          {
+            "cpuCycles": 3200000000,
+            "deadlineSeconds": 4.0,
+            "inputSizeBits": 8000000,
+            "outputSizeBits": 8000,
+            "profileId": "heavy",
+            "weight": 0.15
+          }
+        ],
+        "randomSeed": 104729,
+        "startTimeMs": 7000
+      }
+    },
+    "mapping": {
+      "config": {
+        "fixedOrder": true
+      },
+      "prototypes": [
+        {
+          "applications": [
+            "org.eclipse.mosaic.app.maga.adhocradio.MaGaAdHocRadioDiagnosticApp",
+            "org.eclipse.mosaic.app.maga.livestate.MaGaLiveVehicleStateApp",
+            "org.eclipse.mosaic.app.maga.livestate.MaGaLiveCellDiagnosticVehicleApp"
+          ],
+          "name": "default_001",
+          "weight": 1.0
+        }
+      ],
+      "rsus": [
+        {
+          "applications": [],
+          "group": "MaGaGateway",
+          "name": "rsu_0",
+          "position": {
+            "conversionMethod": "SUMOLIB_CONVERT_XY2LONLAT",
+            "latitude": 48.756752882188884,
+            "longitude": 11.424366883877795
+          }
+        },
+        {
+          "applications": [],
+          "group": "MaGaGateway",
+          "name": "rsu_1",
+          "position": {
+            "conversionMethod": "SUMOLIB_CONVERT_XY2LONLAT",
+            "latitude": 48.759609883864506,
+            "longitude": 11.423379740113285
+          }
+        }
+      ],
+      "servers": [
+        {
+          "applications": [
+            "org.eclipse.mosaic.app.maga.liveruntime.MaGaLiveRuntimeCoordinatorApp",
+            "org.eclipse.mosaic.app.maga.livestate.MaGaLiveCellDiagnosticServerApp"
+          ],
+          "group": "server_0",
+          "name": "server_0"
+        }
+      ],
+      "vehicles": []
+    },
+    "sns": {
+      "adhocTransmissionModel": {
+        "type": "SophisticatedAdhocTransmissionModel"
+      },
+      "maximumTtl": 10,
+      "singleHopTransmission": {
+        "lossProbability": 0.0,
+        "maxRetries": 0
+      },
+      "singlehopDelay": {
+        "maxDelay": "10 ms",
+        "minDelay": "1 ms",
+        "steps": 10,
+        "type": "SimpleRandomDelay"
+      },
+      "singlehopRadius": 250
+    }
+  },
+  "mobilityMode": "SYNTHETIC_CALIBRATED_ON_INTAS_SUBNETWORK",
+  "projection": {
+    "cartesianOffset": {
+      "x": -464198.88,
+      "y": -4952821.58
+    },
+    "centerCoordinates": {
+      "latitude": 48.75619812000397,
+      "longitude": 11.425493114727528
+    },
+    "fallback": null,
+    "method": "SUMOLIB_CONVERT_XY2LONLAT",
+    "plausibleIngolstadtCoordinate": true,
+    "valid": true
+  },
+  "reducedNetwork": "C:\\Users\\raffa\\IdeaProjects\\maga-core\\tmp\\materialized-literature-scenarios\\final-campaign-v2-local-contention\\G05_resource_policies_repair\\CFG-R-RTT\\104729\\_builder_output\\MaGaLiteratureBasedUrbanStudy\\sumo\\intas_literature_urban.net.xml",
+  "reducedNetworkCounts": {
+    "externalEdges": 155,
+    "externalJunctions": 88,
+    "trafficLights": 8
+  },
+  "routeCatalog": {
+    "candidateCount": 11282,
+    "familyCounts": {
+      "BACKGROUND": 5836,
+      "BOTH_RSU_NO_SWITCH": 771,
+      "DUAL_RSU_SWITCH": 4091,
+      "RSU_0_ONLY": 580,
+      "RSU_1_ONLY": 4
+    }
+  },
+  "routeSubsets": {
+    "nominal": {
+      "baseVehicleCount": 50,
+      "lastRequestedDeparture": 88.2,
+      "longDurationDemandExtension": {
+        "applied": false,
+        "mode": "PERIODIC_REPETITION_OF_CALIBRATED_BASE_DEMAND",
+        "repeatCycleCount": 1,
+        "repeatIntervalSeconds": 195.0
+      },
+      "maxActiveVehicles": 46,
+      "meanActiveVehicles": 31.22222222222222,
+      "mobilityValidation": {
+        "errors": [],
+        "fcd": {
+          "firstTimestamp": 0.0,
+          "gatewaySwitchEvents": 18,
+          "lastTimestamp": 179.9,
+          "maximumActiveVehicles": 46,
+          "meanActiveVehicles": 31.22222222222222,
+          "minimumActiveVehicles": 1,
+          "timesteps": 1800,
+          "uniqueObservedVehicles": 50,
+          "vehiclesVisitingBothRsus": 22,
+          "vehiclesVisitingRsu0": 35,
+          "vehiclesVisitingRsu1": 27,
+          "vehiclesWithGatewaySwitch": 18
+        },
+        "logs": {
+          "emergencyBrakingMentions": 0,
+          "errorCount": 0,
+          "errors": [],
+          "teleportMentions": 0,
+          "warningCount": 1,
+          "warnings": [
+            "Warning: Unsafe green phase 0 in tlLogic 'cluster_1443568599_365519573', program '0'. Lane '54033673#2_2' is targeted by 2 'G'-links. (use 'g' instead)"
+          ]
+        },
+        "status": "VALID_SYNTHETIC_MOBILITY",
+        "tripinfo": {
+          "completedTrips": 22,
+          "tripinfoRecords": 50,
+          "unfinishedTrips": 28
+        }
+      },
+      "routeFile": "C:\\Users\\raffa\\IdeaProjects\\maga-core\\tmp\\materialized-literature-scenarios\\final-campaign-v2-local-contention\\G05_resource_policies_repair\\CFG-R-RTT\\104729\\_builder_output\\MaGaLiteratureBasedUrbanStudy\\sumo\\intas_literature_urban_nominal.rou.xml",
+      "routeTemplateCounts": {
+        "BACKGROUND": 6,
+        "BOTH_RSU_NO_SWITCH": 4,
+        "DUAL_RSU_SWITCH": 6,
+        "RSU_0_ONLY": 4,
+        "RSU_1_ONLY": 4
+      },
+      "seed": 104729,
+      "targetMeanActiveVehicles": 30.0,
+      "templates": {
+        "BACKGROUND": [
+          {
+            "destinationEdge": "-379723624#0",
+            "edgeCount": 14,
+            "routeLengthMeters": 1050.01,
+            "sourceEdge": "26471752#0"
+          },
+          {
+            "destinationEdge": "26334127#5",
+            "edgeCount": 14,
+            "routeLengthMeters": 1049.79,
+            "sourceEdge": "-26471752#1"
+          },
+          {
+            "destinationEdge": "-379723624#0",
+            "edgeCount": 15,
+            "routeLengthMeters": 1050.21,
+            "sourceEdge": "-32923867#3"
+          },
+          {
+            "destinationEdge": "31362504#0",
+            "edgeCount": 11,
+            "routeLengthMeters": 1049.75,
+            "sourceEdge": "26334132#0"
+          },
+          {
+            "destinationEdge": "174609517#0",
+            "edgeCount": 11,
+            "routeLengthMeters": 1049.7,
+            "sourceEdge": "172515813"
+          },
+          {
+            "destinationEdge": "32923867#3",
+            "edgeCount": 15,
+            "routeLengthMeters": 1049.62,
+            "sourceEdge": "379723624#0"
+          }
+        ],
+        "BOTH_RSU_NO_SWITCH": [
+          {
+            "destinationEdge": "102818925",
+            "edgeCount": 16,
+            "routeLengthMeters": 1048.4,
+            "sourceEdge": "-266607804#1"
+          },
+          {
+            "destinationEdge": "201969576#0",
+            "edgeCount": 13,
+            "routeLengthMeters": 1047.58,
+            "sourceEdge": "23184274#2"
+          },
+          {
+            "destinationEdge": "379723624#0",
+            "edgeCount": 16,
+            "routeLengthMeters": 1052.61,
+            "sourceEdge": "-201969576#1"
+          },
+          {
+            "destinationEdge": "54033673#2",
+            "edgeCount": 13,
+            "routeLengthMeters": 1052.82,
+            "sourceEdge": "136728351#1"
+          }
+        ],
+        "DUAL_RSU_SWITCH": [
+          {
+            "destinationEdge": "145069354#0",
+            "edgeCount": 12,
+            "routeLengthMeters": 1249.93,
+            "sourceEdge": "172515811#0"
+          },
+          {
+            "destinationEdge": "201969576#2",
+            "edgeCount": 14,
+            "routeLengthMeters": 1249.9,
+            "sourceEdge": "201278218#0"
+          },
+          {
+            "destinationEdge": "26334127#5",
+            "edgeCount": 13,
+            "routeLengthMeters": 1250.16,
+            "sourceEdge": "-102818928#1"
+          },
+          {
+            "destinationEdge": "145069354#0",
+            "edgeCount": 14,
+            "routeLengthMeters": 1250.16,
+            "sourceEdge": "201278215"
+          },
+          {
+            "destinationEdge": "172517198#0",
+            "edgeCount": 13,
+            "routeLengthMeters": 1250.3,
+            "sourceEdge": "156923526#0"
+          },
+          {
+            "destinationEdge": "145069354#0",
+            "edgeCount": 14,
+            "routeLengthMeters": 1249.65,
+            "sourceEdge": "172519650"
+          }
+        ],
+        "RSU_0_ONLY": [
+          {
+            "destinationEdge": "61940355",
+            "edgeCount": 17,
+            "routeLengthMeters": 950.87,
+            "sourceEdge": "-379723624#1"
+          },
+          {
+            "destinationEdge": "26334132#0",
+            "edgeCount": 9,
+            "routeLengthMeters": 948.17,
+            "sourceEdge": "-24495188"
+          },
+          {
+            "destinationEdge": "24495188",
+            "edgeCount": 17,
+            "routeLengthMeters": 952.56,
+            "sourceEdge": "28418763"
+          },
+          {
+            "destinationEdge": "266607804#1",
+            "edgeCount": 14,
+            "routeLengthMeters": 946.16,
+            "sourceEdge": "-61940355"
+          }
+        ],
+        "RSU_1_ONLY": [
+          {
+            "destinationEdge": "145069270#2",
+            "edgeCount": 6,
+            "routeLengthMeters": 232.69,
+            "sourceEdge": "-28418764#0.109"
+          },
+          {
+            "destinationEdge": "156816469",
+            "edgeCount": 5,
+            "routeLengthMeters": 220.15,
+            "sourceEdge": "-28418764#0.109"
+          },
+          {
+            "destinationEdge": "33697953",
+            "edgeCount": 4,
+            "routeLengthMeters": 214.47,
+            "sourceEdge": "-28418764#0.109"
+          },
+          {
+            "destinationEdge": "32124561#4",
+            "edgeCount": 5,
+            "routeLengthMeters": 250.61,
+            "sourceEdge": "-28418764#0.109"
+          }
+        ]
+      },
+      "vTypeIdsWritten": [
+        "default_001"
+      ],
+      "vehicleCount": 50,
+      "vehicleCounts": {
+        "BACKGROUND": 10,
+        "BOTH_RSU_NO_SWITCH": 7,
+        "DUAL_RSU_SWITCH": 21,
+        "RSU_0_ONLY": 7,
+        "RSU_1_ONLY": 5
+      }
+    }
+  },
+  "scenarioConvert": {
+    "available": true,
+    "path": "C:\\Users\\raffa\\IdeaProjects\\maga-core\\tmp\\external-tools\\scenario-convert-25.2\\scenario-convert.bat",
+    "source": "argument"
+  },
+  "scenarioName": "MaGaLiteratureBasedUrbanStudy",
+  "seeds": [
+    104729,
+    130363,
+    155921,
+    181081,
+    207547
+  ],
+  "selectedCandidate": {
+    "candidateId": "candidate_0045",
+    "candidateRsuPositions": [
+      {
+        "x": 213980.44,
+        "y": 450429.42
+      },
+      {
+        "x": 213897.79,
+        "y": 450744.66
+      }
+    ],
+    "gatewaySwitchPotential": true,
+    "mobilityMode": "SYNTHETIC_CALIBRATED_ON_INTAS_SUBNETWORK"
+  },
+  "selectedCandidateId": "candidate_0045",
+  "selectedEdgeIdsFile": "C:\\Users\\raffa\\IdeaProjects\\maga-core\\tools\\intas-literature-scenario\\config\\candidate_0045_edge_ids.txt",
+  "selectedEdgeIdsSha256": "7277bd98129c4f22b5bea32387ded1c5f201ea855019b4e4ddedbff4d2abedb0",
+  "selectedSeed": 104729,
+  "source": {
+    "commit": "0f7951ba01dda8483f0a852f2c3e4ff0d8a1c0ee",
+    "license": {
+      "containsGpl3Text": true,
+      "firstLine": "GNU GENERAL PUBLIC LICENSE",
+      "path": "LICENSE"
+    },
+    "name": "InTAS",
+    "repository": "https://github.com/silaslobo/InTAS",
+    "root": "C:\\Users\\raffa\\IdeaProjects\\external\\InTAS",
+    "sourceFiles": [
+      "scenario/ingolstadt.net.xml"
+    ],
+    "tag": null
+  },
+  "status": "SYNTHETIC_CALIBRATED_SCENARIO_GENERATED",
+  "syntheticMobilityProfile": {
+    "calibrationEvidence": {
+      "intasReferenceMaximumActiveVehicles": 34,
+      "intasReferenceMeanActiveVehicles": 29.52,
+      "intasReferenceMinimumActiveVehicles": 26,
+      "intasReferenceWindowSeconds": {
+        "begin": 14250,
+        "end": 14430
+      },
+      "validatedSyntheticNominalBaseline": {
+        "durationSeconds": 180,
+        "emergencyBrakingMentions": 0,
+        "gatewaySwitchEvents": 17,
+        "maximumActiveVehicles": 46,
+        "meanActiveVehicles": 31.86,
+        "minimumActiveVehicles": 1,
+        "sumoErrors": 0,
+        "teleportMentions": 0,
+        "vehicleCount": 50,
+        "vehiclesVisitingBothRsus": 20,
+        "vehiclesWithGatewaySwitch": 17
+      }
+    },
+    "densityProfiles": {
+      "high_density": {
+        "acceptance": {
+          "maximumMeanActiveVehicles": 65.0,
+          "minimumMeanActiveVehicles": 38.0
+        },
+        "classification": "CONTROLLED_ENGINEERING_VARIANT_NOT_YET_CALIBRATED",
+        "departureIntervalSeconds": 1.1,
+        "families": {
+          "BACKGROUND": {
+            "targetLengthMeters": 1050.0,
+            "templateCount": 8,
+            "vehicleCount": 16
+          },
+          "BOTH_RSU_NO_SWITCH": {
+            "targetLengthMeters": 1050.0,
+            "templateCount": 5,
+            "vehicleCount": 11
+          },
+          "DUAL_RSU_SWITCH": {
+            "targetLengthMeters": 1250.0,
+            "templateCount": 8,
+            "vehicleCount": 34
+          },
+          "RSU_0_ONLY": {
+            "targetLengthMeters": 950.0,
+            "templateCount": 5,
+            "vehicleCount": 11
+          },
+          "RSU_1_ONLY": {
+            "targetLengthMeters": 230.0,
+            "templateCount": 4,
+            "vehicleCount": 8
+          }
+        },
+        "targetMeanActiveVehicles": 50.0
+      },
+      "low_density": {
+        "acceptance": {
+          "maximumMeanActiveVehicles": 24.0,
+          "minimumMeanActiveVehicles": 12.0
+        },
+        "classification": "CONTROLLED_ENGINEERING_VARIANT_NOT_YET_CALIBRATED",
+        "departureIntervalSeconds": 2.8,
+        "families": {
+          "BACKGROUND": {
+            "targetLengthMeters": 1050.0,
+            "templateCount": 4,
+            "vehicleCount": 6
+          },
+          "BOTH_RSU_NO_SWITCH": {
+            "targetLengthMeters": 1050.0,
+            "templateCount": 3,
+            "vehicleCount": 4
+          },
+          "DUAL_RSU_SWITCH": {
+            "targetLengthMeters": 1250.0,
+            "templateCount": 5,
+            "vehicleCount": 12
+          },
+          "RSU_0_ONLY": {
+            "targetLengthMeters": 950.0,
+            "templateCount": 3,
+            "vehicleCount": 4
+          },
+          "RSU_1_ONLY": {
+            "targetLengthMeters": 230.0,
+            "templateCount": 3,
+            "vehicleCount": 3
+          }
+        },
+        "targetMeanActiveVehicles": 18.0
+      },
+      "nominal": {
+        "acceptance": {
+          "maximumMeanActiveVehicles": 36.0,
+          "minimumMeanActiveVehicles": 28.0
+        },
+        "classification": "CALIBRATED_ON_INTAS_CANDIDATE_0045_WINDOW_14250_14430",
+        "departureIntervalSeconds": 1.8,
+        "families": {
+          "BACKGROUND": {
+            "targetLengthMeters": 1050.0,
+            "templateCount": 6,
+            "vehicleCount": 10
+          },
+          "BOTH_RSU_NO_SWITCH": {
+            "targetLengthMeters": 1050.0,
+            "templateCount": 4,
+            "vehicleCount": 7
+          },
+          "DUAL_RSU_SWITCH": {
+            "targetLengthMeters": 1250.0,
+            "templateCount": 6,
+            "vehicleCount": 21
+          },
+          "RSU_0_ONLY": {
+            "targetLengthMeters": 950.0,
+            "templateCount": 4,
+            "vehicleCount": 7
+          },
+          "RSU_1_ONLY": {
+            "targetLengthMeters": 230.0,
+            "templateCount": 4,
+            "vehicleCount": 5
+          }
+        },
+        "targetMeanActiveVehicles": 30.0
+      }
+    },
+    "longDurationDemandExtension": {
+      "calibrationBaseDurationSeconds": 180.0,
+      "classification": "CONTROLLED_ENGINEERING_EXTENSION_VALIDATED_BY_SUMO_DIAGNOSTIC",
+      "mode": "PERIODIC_REPETITION_OF_CALIBRATED_BASE_DEMAND",
+      "repeatIntervalSeconds": 195.0
+    },
+    "mobilityMode": "SYNTHETIC_CALIBRATED_ON_INTAS_SUBNETWORK",
+    "routeCatalog": {
+      "families": [
+        "DUAL_RSU_SWITCH",
+        "BOTH_RSU_NO_SWITCH",
+        "RSU_0_ONLY",
+        "RSU_1_ONLY",
+        "BACKGROUND"
+      ],
+      "maximumRouteLengthMeters": 2200.0,
+      "minimumEdgeCount": 3,
+      "minimumRouteLengthMeters": 180.0
+    },
+    "rsus": [
+      {
+        "coverageRadiusMeters": 250.0,
+        "id": "rsu_0",
+        "projectedX": 213980.44,
+        "projectedY": 450429.42
+      },
+      {
+        "coverageRadiusMeters": 250.0,
+        "id": "rsu_1",
+        "projectedX": 213897.79,
+        "projectedY": 450744.66
+      }
+    ],
+    "scenarioName": "MaGaLiteratureBasedUrbanStudy",
+    "sourceTopology": {
+      "expectedExternalEdgeCount": 155,
+      "expectedExternalJunctionCount": 88,
+      "expectedTrafficLightCount": 8,
+      "name": "InTAS",
+      "networkFile": "scenario/ingolstadt.net.xml",
+      "repository": "https://github.com/silaslobo/InTAS",
+      "selectedEdgeIdsFile": "candidate_0045_edge_ids.txt",
+      "selectedSubnetworkId": "candidate_0045"
+    },
+    "validation": {
+      "knownNonBlockingWarningPrefixes": [
+        "Warning: Unsafe green phase 0 in tlLogic"
+      ],
+      "maximumEmergencyBrakingMentions": 0,
+      "maximumSumoErrors": 0,
+      "maximumTeleportMentions": 0,
+      "minimumGatewaySwitchEvents": 1
+    }
+  },
+  "targets": {
+    "activeVehicleTargets": {
+      "high_density": 50,
+      "low_density": 15,
+      "nominal": 30
+    },
+    "durationsSeconds": {
+      "extended": 600,
+      "nominal": 300,
+      "smoke": 180
+    },
+    "materialization": {
+      "excludeBusSpecificApplications": true,
+      "excludePedestrianApplications": true,
+      "mobilityMode": "SYNTHETIC_CALIBRATED_ON_INTAS_SUBNETWORK",
+      "routeMode": "DETERMINISTIC_SYNTHETIC_PASSENGER_VEHICLES",
+      "syntheticDemandProfile": "synthetic_mobility_profile.json",
+      "topologySource": "InTAS"
+    },
+    "scenarioName": "MaGaLiteratureBasedUrbanStudy",
+    "source": {
+      "name": "InTAS",
+      "repository": "https://github.com/silaslobo/InTAS"
+    },
+    "subscenarioSelection": {
+      "mode": "FIXED_VALIDATED_INTAS_SUBNETWORK",
+      "requirements": {
+        "connectedDrivableGraph": true,
+        "expectedExternalEdgeCount": 155,
+        "expectedExternalJunctionCount": 88,
+        "expectedTrafficLightCount": 8,
+        "nominalRsuCount": 2,
+        "nominalRsuRadiusMeters": 250,
+        "nominalV2vRadiusMeters": 250,
+        "requirePotentialGatewaySwitching": true,
+        "urban": true
+      },
+      "selectedEdgeIdsFile": "candidate_0045_edge_ids.txt",
+      "selectedSubnetworkId": "candidate_0045"
+    },
+    "sumoStepLengthSeconds": 0.1
+  },
+  "textualConfigurationStatus": "GENERATED",
+  "usedVTypeIds": [
+    "default_001"
+  ],
+  "warnings": []
+}
