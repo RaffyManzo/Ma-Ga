@@ -1,0 +1,246 @@
+{
+  "campaignId": "final-campaign-v2-local-contention",
+  "campaignBranch": "testing/final-campaign-v2-local-contention",
+  "frozenCommit": "bf41e5682293a79939af2c53858126ad4b9f2ef0",
+  "scenarioName": "MaGaLiteratureBasedUrbanStudy",
+  "expectedMaterializationCount": 69,
+  "expectedConfigCount": 30,
+  "expectedTestCount": 87,
+  "paths": {
+    "scenarioInstancePlan": "data/docs/testing/final-campaign-v2-local-contention/scenario_instance_plan.csv",
+    "scenarioConfigurationMapping": "data/docs/testing/final-campaign-v2-local-contention/scenario_configuration_mapping.csv",
+    "testIdGroupMapping": "data/docs/testing/final-campaign-v2-local-contention/test_id_group_mapping.csv",
+    "auditSchema": "data/docs/testing/final-campaign-v2-local-contention/audit_bundle_schema.md",
+    "campaignScenarioRoot": "tmp/materialized-literature-scenarios/final-campaign-v2-local-contention",
+    "archiveRoot": "tmp/archive",
+    "auditRoot": "test-audits/final-campaign-v2-local-contention/G00_scenario_preparation_generation",
+    "reproComparison": "test-results/final-campaign-v2-local-contention/G03_reproducibility_duration/repro_materialization_comparison.json",
+    "canonicalScenarioRoot": "data/mosaic-scenarios/MaGaLiteratureBasedUrbanStudy",
+    "canonicalScenarioOutputConfig": "data/mosaic-scenarios/MaGaLiveMagaRuntimeStudy/output/output_config.xml",
+    "canonicalMobilityProfile": "tools/intas-literature-scenario/config/synthetic_mobility_profile.json",
+    "canonicalBuilder": "tools/intas-literature-scenario/build_intas_literature_scenario.py",
+    "canonicalSourceValidator": "tools/intas-literature-scenario/validate_literature_configuration.py",
+    "canonicalMaterializedValidator": "tools/intas-literature-scenario/validate_materialized_literature_scenario.py"
+  },
+  "durationProfiles": {
+    "smoke": {
+      "durationSeconds": 180,
+      "durationLabel": "smoke"
+    },
+    "nominal": {
+      "durationSeconds": 300,
+      "durationLabel": "nominal"
+    },
+    "extended": {
+      "durationSeconds": 600,
+      "durationLabel": "extended"
+    }
+  },
+  "workloadProfiles": {
+    "WL-E": {
+      "arrivalRateTasksPerSecondPerActiveVehicle": 1.0,
+      "LIGHT": 0.75,
+      "MEDIUM": 0.2,
+      "HEAVY": 0.05
+    },
+    "WL-I": {
+      "arrivalRateTasksPerSecondPerActiveVehicle": 1.0,
+      "LIGHT": 0.5,
+      "MEDIUM": 0.35,
+      "HEAVY": 0.15
+    },
+    "WL-S": {
+      "arrivalRateTasksPerSecondPerActiveVehicle": 1.0,
+      "LIGHT": 0.25,
+      "MEDIUM": 0.3,
+      "HEAVY": 0.45
+    },
+    "WL-SPARSE": {
+      "arrivalRateTasksPerSecondPerActiveVehicle": 0.05,
+      "LIGHT": 0.75,
+      "MEDIUM": 0.2,
+      "HEAVY": 0.05
+    },
+    "WL-SMOKE": {
+      "preserveSmokeWrapperBehavior": true,
+      "arrivalRateTasksPerSecondPerActiveVehicle": 0.02,
+      "LIGHT": 0.5,
+      "MEDIUM": 0.35,
+      "HEAVY": 0.15
+    }
+  },
+  "routeFamilies": [
+    "DUAL_RSU_SWITCH",
+    "BOTH_RSU_NO_SWITCH",
+    "RSU_0_ONLY",
+    "RSU_1_ONLY",
+    "BACKGROUND"
+  ],
+  "directRouteProfiles": {
+    "CFG-M-BACKGROUND": {
+      "density": "nominal",
+      "vehicleTotal": 50,
+      "dominantFamily": "BACKGROUND",
+      "classificationFlags": [
+        "DIRECTED_ENGINEERING_TEST_PROFILE",
+        "NOT_LITERATURE_CALIBRATED",
+        "NOT_PART_OF_MAIN_FACTORIAL_RESULTS"
+      ],
+      "counts": {
+        "DUAL_RSU_SWITCH": 5,
+        "BOTH_RSU_NO_SWITCH": 4,
+        "RSU_0_ONLY": 3,
+        "RSU_1_ONLY": 3,
+        "BACKGROUND": 35
+      }
+    },
+    "CFG-M-RSU0": {
+      "density": "nominal",
+      "vehicleTotal": 50,
+      "dominantFamily": "RSU_0_ONLY",
+      "classificationFlags": [
+        "DIRECTED_ENGINEERING_TEST_PROFILE",
+        "NOT_LITERATURE_CALIBRATED",
+        "NOT_PART_OF_MAIN_FACTORIAL_RESULTS"
+      ],
+      "counts": {
+        "DUAL_RSU_SWITCH": 5,
+        "BOTH_RSU_NO_SWITCH": 4,
+        "RSU_0_ONLY": 35,
+        "RSU_1_ONLY": 2,
+        "BACKGROUND": 4
+      }
+    },
+    "CFG-M-RSU1": {
+      "density": "nominal",
+      "vehicleTotal": 50,
+      "dominantFamily": "RSU_1_ONLY",
+      "classificationFlags": [
+        "DIRECTED_ENGINEERING_TEST_PROFILE",
+        "NOT_LITERATURE_CALIBRATED",
+        "NOT_PART_OF_MAIN_FACTORIAL_RESULTS"
+      ],
+      "counts": {
+        "DUAL_RSU_SWITCH": 5,
+        "BOTH_RSU_NO_SWITCH": 4,
+        "RSU_0_ONLY": 2,
+        "RSU_1_ONLY": 35,
+        "BACKGROUND": 4
+      }
+    },
+    "CFG-M-SWITCH": {
+      "density": "nominal",
+      "vehicleTotal": 50,
+      "dominantFamily": "DUAL_RSU_SWITCH",
+      "classificationFlags": [
+        "DIRECTED_ENGINEERING_TEST_PROFILE",
+        "NOT_LITERATURE_CALIBRATED",
+        "NOT_PART_OF_MAIN_FACTORIAL_RESULTS"
+      ],
+      "counts": {
+        "DUAL_RSU_SWITCH": 35,
+        "BOTH_RSU_NO_SWITCH": 5,
+        "RSU_0_ONLY": 3,
+        "RSU_1_ONLY": 3,
+        "BACKGROUND": 4
+      }
+    },
+    "CFG-M-V2V": {
+      "density": "high_density",
+      "vehicleTotal": 80,
+      "dominantFamily": "DUAL_RSU_SWITCH",
+      "classificationFlags": [
+        "DIRECTED_ENGINEERING_TEST_PROFILE",
+        "NOT_LITERATURE_CALIBRATED",
+        "NOT_PART_OF_MAIN_FACTORIAL_RESULTS"
+      ],
+      "counts": {
+        "DUAL_RSU_SWITCH": 32,
+        "BOTH_RSU_NO_SWITCH": 6,
+        "RSU_0_ONLY": 5,
+        "RSU_1_ONLY": 5,
+        "BACKGROUND": 32
+      }
+    },
+    "CFG-R-V2VBW": {
+      "density": "high_density",
+      "vehicleTotal": 80,
+      "dominantFamily": "DUAL_RSU_SWITCH",
+      "classificationFlags": [
+        "DIRECTED_ENGINEERING_TEST_PROFILE",
+        "NOT_LITERATURE_CALIBRATED",
+        "NOT_PART_OF_MAIN_FACTORIAL_RESULTS"
+      ],
+      "counts": {
+        "DUAL_RSU_SWITCH": 32,
+        "BOTH_RSU_NO_SWITCH": 6,
+        "RSU_0_ONLY": 5,
+        "RSU_1_ONLY": 5,
+        "BACKGROUND": 32
+      }
+    }
+  },
+  "baselineResources": {
+    "localCpuCyclesPerSecond": 1000000000.0,
+    "remoteVehicleCpuCyclesPerSecond": 1000000000.0,
+    "edgeCpuCyclesPerSecond": 5000000000.0,
+    "cloudCpuCyclesPerSecond": 100000000000.0,
+    "cellCapacityBitsPerSecond": 49200000.0,
+    "cellRttSeconds": 0.0522,
+    "v2vNominalBandwidthBitsPerSecond": 4700000.0,
+    "v2vSinglehopRadiusMeters": 250.0
+  },
+  "defaultResourceMultipliers": {
+    "localCpu": 1.0,
+    "remoteVehicleCpu": 1.0,
+    "edgeCpu": 1.0,
+    "cloudCpu": 1.0,
+    "cellBandwidth": 1.0,
+    "cellRtt": 1.0,
+    "v2vBandwidth": 1.0,
+    "v2vRange": 1.0
+  },
+  "specialConfigs": {
+    "CFG-G-STALE": {
+      "gaParameterScalingMode": "STATIC",
+      "diagnosticArtificialGaDelayMs": 300,
+      "limitations": []
+    },
+    "CFG-G-ADAPTIVE": {
+      "gaParameterScalingMode": "ADAPTIVE",
+      "diagnosticArtificialGaDelayMs": 0,
+      "manifestClassification": "NON_CANONICAL_PARAMETER_SENSITIVITY",
+      "limitations": [
+        "NON_CANONICAL_PARAMETER_SENSITIVITY",
+        "ADAPTIVE allowed only by campaign validator, not by canonical STATIC checks"
+      ]
+    },
+    "CFG-G-SPARSE": {
+      "gaParameterScalingMode": "STATIC",
+      "diagnosticArtificialGaDelayMs": 0,
+      "limitations": [
+        "EMPTY_TASK_SET is an observational objective and not a guaranteed materialization result"
+      ]
+    }
+  },
+  "pilotMaterializationIds": [
+    "MAT-CFG-SMOKE-104729"
+  ],
+  "reproMaterializationIds": [
+    "MAT-CFG-REPRO-104729-A",
+    "MAT-CFG-REPRO-104729-B"
+  ],
+  "statusValues": [
+    "MATERIALIZED_VALIDATED",
+    "MATERIALIZED_WITH_WARNINGS",
+    "FAILED_MATERIALIZATION",
+    "FAILED_VALIDATION",
+    "BLOCKED"
+  ],
+  "deterministicComparisonExclusions": [
+    "timestamps",
+    "absolute paths",
+    "destination directories",
+    "purely documentary nondeterministic fields"
+  ]
+}
