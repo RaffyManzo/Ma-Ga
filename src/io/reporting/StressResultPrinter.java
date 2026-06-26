@@ -741,27 +741,82 @@ public final class StressResultPrinter {
     private void printLocalWorkloadSummary(
             List<LocalResourceUsageBreakdown> localUsages
     ) {
-        long vehiclesWithLocalWorkload = localUsages
-                .stream()
-                .filter(LocalResourceUsageBreakdown::hasLocalWorkload)
-                .count();
+        List<LocalResourceUsageBreakdown> activeLocalUsages =
+                localUsages.stream()
+                        .filter(LocalResourceUsageBreakdown::hasLocalWorkload)
+                        .toList();
 
-        double maxLocalTime = localUsages
+        long vehiclesWithContention = activeLocalUsages
                 .stream()
-                .mapToDouble(LocalResourceUsageBreakdown::getMaxLocalExecutionTimeSeconds)
+                .filter(LocalResourceUsageBreakdown::hasContention)
+                .count();
+        long vehiclesWithOverflow = activeLocalUsages
+                .stream()
+                .filter(LocalResourceUsageBreakdown::hasCpuViolation)
+                .count();
+        long totalDeadlineViolations = activeLocalUsages
+                .stream()
+                .mapToLong(
+                        LocalResourceUsageBreakdown
+                                ::getDeadlineViolationCount
+                )
+                .sum();
+
+        double maxIndependentLocalTime = activeLocalUsages
+                .stream()
+                .mapToDouble(
+                        LocalResourceUsageBreakdown
+                                ::getMaxIndependentLocalExecutionTimeSeconds
+                )
+                .max()
+                .orElse(0.0);
+        double maxContendedLocalTime = activeLocalUsages
+                .stream()
+                .mapToDouble(
+                        LocalResourceUsageBreakdown
+                                ::getMaxLocalExecutionTimeSeconds
+                )
+                .max()
+                .orElse(0.0);
+        double maxDemandRatio = activeLocalUsages
+                .stream()
+                .mapToDouble(
+                        LocalResourceUsageBreakdown
+                                ::getMaxLocalDemandRatio
+                )
+                .max()
+                .orElse(0.0);
+        double maxContentionDelay = activeLocalUsages
+                .stream()
+                .mapToDouble(
+                        LocalResourceUsageBreakdown
+                                ::getMaxContentionDelaySeconds
+                )
                 .max()
                 .orElse(0.0);
 
         out.println("- vehicles with local workload: "
-                + vehiclesWithLocalWorkload);
-        out.println("- max local execution time contribution: "
-                + formatSeconds(maxLocalTime));
+                + activeLocalUsages.size());
+        out.println("- vehicles with local contention: "
+                + vehiclesWithContention);
+        out.println("- vehicles with local CPU overflow: "
+                + vehiclesWithOverflow);
+        out.println("- local deadline violations: "
+                + totalDeadlineViolations);
+        out.println("- max independent local time: "
+                + formatSeconds(maxIndependentLocalTime));
+        out.println("- max contended local completion: "
+                + formatSeconds(maxContendedLocalTime));
+        out.println("- max local contention delay: "
+                + formatSeconds(maxContentionDelay));
+        out.println("- max local demand ratio: "
+                + format(maxDemandRatio));
 
         List<LocalResourceUsageBreakdown> topLocal =
-                localUsages.stream()
-                        .filter(LocalResourceUsageBreakdown::hasLocalWorkload)
+                activeLocalUsages.stream()
                         .sorted(Comparator.comparingDouble(
-                                LocalResourceUsageBreakdown::getMaxLocalExecutionTimeSeconds
+                                LocalResourceUsageBreakdown
+                                        ::getMaxLocalDemandRatio
                         ).reversed())
                         .toList();
 
@@ -769,10 +824,27 @@ public final class StressResultPrinter {
             out.println("- top local workloads:");
             for (LocalResourceUsageBreakdown local : limit(topLocal)) {
                 out.println("  * " + local.getVehicleId()
+                        + " | tasks=" + local.getLocalTaskCount()
                         + " | localCpuCycles="
                         + format(local.getLocalCpuCycles())
-                        + " | maxLocalTime="
-                        + formatSeconds(local.getMaxLocalExecutionTimeSeconds()));
+                        + " | independentMax="
+                        + formatSeconds(
+                                local.getMaxIndependentLocalExecutionTimeSeconds()
+                        )
+                        + " | contendedMax="
+                        + formatSeconds(
+                                local.getMaxLocalExecutionTimeSeconds()
+                        )
+                        + " | contentionDelayMax="
+                        + formatSeconds(
+                                local.getMaxContentionDelaySeconds()
+                        )
+                        + " | demandRatio="
+                        + format(local.getMaxLocalDemandRatio())
+                        + " | overflowRatio="
+                        + format(local.getCpuOverflowRatio())
+                        + " | deadlineViolations="
+                        + local.getDeadlineViolationCount());
             }
         }
     }

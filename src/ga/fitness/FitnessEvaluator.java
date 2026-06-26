@@ -11,6 +11,9 @@ import ga.fitness.breakdown.GeneEvaluationBreakdown;
 import ga.fitness.breakdown.LinkBandwidthUsageBreakdown;
 import ga.fitness.breakdown.LocalResourceUsageBreakdown;
 import ga.fitness.breakdown.MobilityPenaltyBreakdown;
+import ga.fitness.local.LocalCpuContentionEvaluator;
+import ga.fitness.local.LocalCpuContentionEvaluator.Evaluation;
+import ga.fitness.local.LocalCpuContentionEvaluator.TaskResult;
 import model.bandwidth.BandwidthPoolResolver;
 import model.genetic.Chromosome;
 import model.genetic.Gene;
@@ -61,6 +64,7 @@ public final class FitnessEvaluator {
     private final CoverageEstimator coverageEstimator;
     private final OffloadingTimeModel offloadingTimeModel;
     private final BandwidthPoolResolver bandwidthPoolResolver;
+    private final LocalCpuContentionEvaluator localCpuContentionEvaluator;
 
     public FitnessEvaluator(MaGaConfig config) {
         this(
@@ -88,6 +92,8 @@ public final class FitnessEvaluator {
         );
         this.offloadingTimeModel = new OffloadingTimeModel();
         this.bandwidthPoolResolver = new BandwidthPoolResolver();
+        this.localCpuContentionEvaluator =
+                new LocalCpuContentionEvaluator();
     }
 
     public double evaluate(Chromosome chromosome, SystemSnapshot snapshot) {
@@ -141,6 +147,12 @@ public final class FitnessEvaluator {
                 bandwidthUsageByPool = initializeBandwidthPoolUsage(snapshot);
         Map<String, LocalResourceUsageBreakdown>
                 localUsageByVehicle = initializeLocalUsage(vehicles);
+        Evaluation localContention = localCpuContentionEvaluator.evaluate(
+                tasks,
+                geneByTaskId,
+                candidateById,
+                vehicleById
+        );
 
         List<GeneEvaluationBreakdown> geneBreakdowns = new ArrayList<>();
         double completionTime = 0.0;
@@ -178,7 +190,8 @@ public final class FitnessEvaluator {
                     task,
                     gene,
                     candidate,
-                    sourceVehicle
+                    sourceVehicle,
+                    localContention.getTaskResult(task.getTaskId())
             );
             geneBreakdowns.add(geneBreakdown);
 
@@ -232,10 +245,22 @@ public final class FitnessEvaluator {
             LocalResourceUsageBreakdown localUsage = localUsageByVehicle.get(
                     task.getSourceVehicleId()
             );
-            if (localUsage != null) {
+            if (localUsage != null
+                    && geneBreakdown.getLocalCpuCycles() > EPSILON) {
+                TaskResult taskContention =
+                        localContention.getTaskResult(task.getTaskId());
+                double demandRatio = taskContention == null
+                        ? 0.0
+                        : taskContention.getDemandRatio();
+
                 localUsage.addLocalWorkload(
                         geneBreakdown.getLocalCpuCycles(),
-                        geneBreakdown.getLocalExecutionTimeSeconds()
+                        geneBreakdown
+                                .getIndependentLocalExecutionTimeSeconds(),
+                        geneBreakdown.getLocalExecutionTimeSeconds(),
+                        demandRatio,
+                        taskContention == null
+                                || taskContention.isDeadlineRespected()
                 );
             }
         }
@@ -248,7 +273,8 @@ public final class FitnessEvaluator {
         double resourcePenalty = computeResourcePenalty(
                 cpuUsageByExecutionNode,
                 bandwidthUsageByCandidate,
-                bandwidthUsageByPool
+                bandwidthUsageByPool,
+                localUsageByVehicle
         );
         double totalResourceAndConstraintPenalty =
                 resourcePenalty + constraintPenalty + invalidPenalty;
@@ -301,7 +327,8 @@ public final class FitnessEvaluator {
             TaskInstance task,
             Gene gene,
             NodeCandidate candidate,
-            VehicleSnapshot sourceVehicle
+            VehicleSnapshot sourceVehicle,
+            TaskResult localContention
     ) {
         PenaltyConfig penalties = config.getPenaltyConfig();
         double constraintPenalty = 0.0;
@@ -336,8 +363,15 @@ public final class FitnessEvaluator {
                         * INVALID_SOLUTION_PENALTY;
             }
 
+            double independentLocalTime =
+                    timeBreakdown.getLocalExecutionTimeSeconds();
+            double contendedLocalTime = resolveContendedLocalTime(
+                    localContention,
+                    independentLocalTime
+            );
+            double completionTime = contendedLocalTime;
             double deadlinePenalty = computeDeadlinePenalty(
-                    timeBreakdown.getCompletionTimeSeconds(),
+                    completionTime,
                     task.getDeadlineSeconds(),
                     penalties
             );
@@ -353,19 +387,20 @@ public final class FitnessEvaluator {
                     localCpu,
                     0.0,
                     timeBreakdown.getLocalCpuCycles(),
-                    timeBreakdown.getLocalExecutionTimeSeconds(),
+                    independentLocalTime,
+                    contendedLocalTime,
                     0.0,
                     0.0,
                     0.0,
                     0.0,
                     0.0,
-                    timeBreakdown.getCompletionTimeSeconds(),
+                    completionTime,
                     0.0,
                     0.0,
                     constraintPenalty + deadlinePenalty,
                     task.getDeadlineSeconds(),
                     isDeadlineRespected(
-                            timeBreakdown.getCompletionTimeSeconds(),
+                            completionTime,
                             task.getDeadlineSeconds()
                     ),
                     coverageTimeSeconds,
@@ -401,17 +436,32 @@ public final class FitnessEvaluator {
                         allocatedBandwidth
                 );
 
+        double independentLocalTime =
+                timeBreakdown.getLocalExecutionTimeSeconds();
+        double contendedLocalTime = p >= 1.0 - EPSILON
+                ? 0.0
+                : resolveContendedLocalTime(
+                        localContention,
+                        independentLocalTime
+                );
+        double completionTime = p >= 1.0 - EPSILON
+                ? timeBreakdown.getRemotePartTimeSeconds()
+                : Math.max(
+                        contendedLocalTime,
+                        timeBreakdown.getRemotePartTimeSeconds()
+                );
+
         MobilityPenaltyBreakdown mobilityBreakdown =
                 computeMobilityPenaltyBreakdown(
                         candidate,
                         mobilityLinkMetrics,
-                        timeBreakdown.getCompletionTimeSeconds(),
+                        completionTime,
                         penalties
                 );
 
         double mobilityPenalty = mobilityBreakdown.getTotalMobilityPenalty();
         double deadlinePenalty = computeDeadlinePenalty(
-                timeBreakdown.getCompletionTimeSeconds(),
+                completionTime,
                 task.getDeadlineSeconds(),
                 penalties
         );
@@ -419,8 +469,7 @@ public final class FitnessEvaluator {
                 ? DecisionType.FULL_OFFLOADING
                 : DecisionType.PARTIAL_OFFLOADING;
         boolean coverageSufficient = coverageTimeSeconds > 0.0
-                && coverageTimeSeconds
-                >= timeBreakdown.getCompletionTimeSeconds();
+                && coverageTimeSeconds >= completionTime;
 
         return new GeneEvaluationBreakdown(
                 task.getTaskId(),
@@ -433,25 +482,43 @@ public final class FitnessEvaluator {
                 allocatedCpu,
                 allocatedBandwidth,
                 timeBreakdown.getLocalCpuCycles(),
-                timeBreakdown.getLocalExecutionTimeSeconds(),
+                independentLocalTime,
+                contendedLocalTime,
                 timeBreakdown.getUploadTimeSeconds(),
                 timeBreakdown.getRemoteExecutionTimeSeconds(),
                 timeBreakdown.getDownloadTimeSeconds(),
                 timeBreakdown.getPropagationDelaySeconds(),
                 timeBreakdown.getRemotePartTimeSeconds(),
-                timeBreakdown.getCompletionTimeSeconds(),
+                completionTime,
                 timeBreakdown.getCommunicationLatencySeconds(),
                 mobilityPenalty,
                 constraintPenalty + deadlinePenalty,
                 task.getDeadlineSeconds(),
                 isDeadlineRespected(
-                        timeBreakdown.getCompletionTimeSeconds(),
+                        completionTime,
                         task.getDeadlineSeconds()
                 ),
                 coverageTimeSeconds,
                 coverageSufficient,
                 mobilityBreakdown
         );
+    }
+
+    private double resolveContendedLocalTime(
+            TaskResult localContention,
+            double independentLocalTime
+    ) {
+        if (localContention == null) {
+            return independentLocalTime;
+        }
+
+        double contended = localContention
+                .getContendedCompletionTimeSeconds();
+        if (!Double.isFinite(contended)
+                || contended < independentLocalTime) {
+            return independentLocalTime;
+        }
+        return contended;
     }
 
     private Map<String, ExecutionNodeResourceUsageBreakdown>
@@ -536,7 +603,9 @@ public final class FitnessEvaluator {
             Map<String, LinkBandwidthUsageBreakdown>
                     bandwidthUsageByCandidate,
             Map<String, BandwidthPoolUsageBreakdown>
-                    bandwidthUsageByPool
+                    bandwidthUsageByPool,
+            Map<String, LocalResourceUsageBreakdown>
+                    localUsageByVehicle
     ) {
         PenaltyConfig penalties = config.getPenaltyConfig();
         double totalPenalty = 0.0;
@@ -557,6 +626,12 @@ public final class FitnessEvaluator {
                 : bandwidthUsageByPool.values()) {
             totalPenalty += penalties.getBandwidthOveruseWeight()
                     * usage.getBandwidthOverflowRatio();
+        }
+
+        for (LocalResourceUsageBreakdown usage
+                : localUsageByVehicle.values()) {
+            totalPenalty += penalties.getCpuOveruseWeight()
+                    * usage.getCpuOverflowRatio();
         }
 
         return totalPenalty;

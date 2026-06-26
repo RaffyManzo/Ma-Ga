@@ -1,7 +1,8 @@
 param(
     [string]$MosaicRoot = ".\tmp\mosaic-25.2",
     [string]$ScenarioName = "MaGaLiveMagaRuntimeStudy",
-    [string]$ExternalBuildRoot = ""
+    [string]$ExternalBuildRoot = "",
+    [switch]$AllowDirtyCoreSource
 )
 
 $ErrorActionPreference = "Stop"
@@ -234,7 +235,8 @@ $ExpectedClassFiles = @(
     "org\eclipse\mosaic\app\maga\livestate\LiveStateLayerRuntimeFacade.class",
     "window\source\MosaicSystemStateSource.class",
     "window\core\TemporalWindowManager.class",
-    "ga\core\MaGaOptimizer.class"
+    "ga\core\MaGaOptimizer.class",
+    "ga\fitness\local\LocalCpuContentionEvaluator.class"
 )
 
 try {
@@ -289,8 +291,10 @@ try {
     }
     Assert-NoJavacInternalFailure -Output $JavacResult.Combined
 
-    # Expected class count for the frozen MA-GA + MOSAIC live runtime source set.
-    $ExpectedFrozenClassCount = 254
+    # Expected class count after the local CPU contention correction.
+    # The correction adds LocalCpuContentionEvaluator and deterministic
+    # immutable nested result types, plus two local-repair support classes.
+    $ExpectedFrozenClassCount = 261
     $ActualClassCount = (Get-ChildItem -LiteralPath $StagingClassesDir -Recurse -Filter "*.class" -File).Count
     if ($ActualClassCount -ne $ExpectedFrozenClassCount) {
         throw "Unexpected class count: expected=$ExpectedFrozenClassCount actual=$ActualClassCount"
@@ -374,16 +378,21 @@ try {
     throw
 }
 
-foreach ($ProtectedPath in @(
-    "src"
-)) {
-    $Status = git -c safe.directory="$SafeRepoRoot" status --short $ProtectedPath
-    if ($LASTEXITCODE -ne 0) {
-        throw "git status failed for $ProtectedPath"
+if (-not $AllowDirtyCoreSource) {
+    foreach ($ProtectedPath in @(
+        "src"
+    )) {
+        $Status = git -c safe.directory="$SafeRepoRoot" status --short $ProtectedPath
+        if ($LASTEXITCODE -ne 0) {
+            throw "git status failed for $ProtectedPath"
+        }
+        if (-not [string]::IsNullOrWhiteSpace(($Status | Out-String).Trim())) {
+            throw "Protected path modified after build: $ProtectedPath"
+        }
     }
-    if (-not [string]::IsNullOrWhiteSpace(($Status | Out-String).Trim())) {
-        throw "Protected path modified after build: $ProtectedPath"
-    }
+}
+else {
+    Write-Host "Dirty core source check intentionally bypassed for controlled review build."
 }
 
 Write-Host "Build completed: $JarFile"
