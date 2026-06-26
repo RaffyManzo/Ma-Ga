@@ -1,0 +1,88 @@
+{
+  "status": "PASS",
+  "phase": "G02B_MATRIX_ALIGNMENT",
+  "sourceWorkbookState": "G07_A preliminary cross-phase matrices",
+  "canonicalEvidence": {
+    "bundle": "G02B_CANONICAL_COMPLETE_20260626-095238.zip",
+    "sha256": "0ea3b977193d3aa1a02d524bdf33d6e35f26954810044104395b5359b8a4d184",
+    "auditSha256": "6ee0550a4d9f513fd23f1029aa338ecf5bf4579107c7897e55fd54e06a5576b4",
+    "scientificRuns": 45,
+    "smokeRuns": 4,
+    "perRunRows": 45,
+    "aggregateRows": 162
+  },
+  "outputs": [
+    {
+      "path": "Matrice_test_MA_GA_MOSAIC_SUMO_G02B_allineata.xlsx",
+      "sha256": "a40dc108e8c5838479e9a8cf9fc4d3b1283c8eb0dd4a99b22b45693320e8ac64",
+      "role": "full matrix"
+    },
+    {
+      "path": "Matrice_semplificata_G02B_allineata.xlsx",
+      "sha256": "a30afbef861517665d26307a2f0618656e540831846ac4ec42088e17e0d71f1d",
+      "role": "simplified matrix"
+    }
+  ],
+  "fullWorkbookChanges": {
+    "updatedSheets": [
+      "00_Guida"
+    ],
+    "appendedCatalogTests": [
+      "T-122",
+      "T-123",
+      "T-124",
+      "T-125",
+      "T-126",
+      "T-127",
+      "T-128",
+      "T-129"
+    ],
+    "appendedChecklist": [
+      "C-077",
+      "C-078",
+      "C-079",
+      "C-080",
+      "C-081",
+      "C-082",
+      "C-083",
+      "C-084",
+      "C-085",
+      "C-086",
+      "C-087"
+    ],
+    "appendedLimits": [
+      "L-040",
+      "L-041",
+      "L-042",
+      "L-043",
+      "L-044",
+      "L-045",
+      "L-046",
+      "L-047"
+    ],
+    "appendedSources": [
+      "F-030",
+      "F-031",
+      "F-032",
+      "F-033",
+      "F-034",
+      "F-035"
+    ],
+    "newSheet": "19_Risultati_G02B"
+  },
+  "simplifiedWorkbookChanges": {
+    "updatedSheets": [
+      "00_Dashboard",
+      "03_Storico"
+    ],
+    "newSheet": "11_Risultati_G02B"
+  },
+  "validation": {
+    "formulaErrors": 0,
+    "visualInspection": "PASS",
+    "sheetStructure": "PASS",
+    "historicalRowsPreserved": true
+  },
+  "nextPhase": "G07_FINAL_CROSS_PHASE_AUDIT",
+  "generatedAt": "2026-06-26T10:30:00+02:00"
+}

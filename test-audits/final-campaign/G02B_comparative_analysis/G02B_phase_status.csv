@@ -1,0 +1,10 @@
+﻿phase_id,scope,status,coverage,evidence,note
+G02B-01,Tooling e self-test,PASS,43/43,tmp/g02b-ablation/state/g02b_tooling_self_test.json,Nessun fallimento
+G02B-02,Preparazione smoke,PASS,4/4,g02b_smoke_plan.csv + manifest per-run,Quattro varianti preparate
+G02B-03,Esecuzione smoke,PASS,4/4,registro G02B + validator canonico e di variante,MOSAIC/SUMO eseguito
+G02B-04,Preparazione scientifica,PASS,45/45,g02b_scientific_plan.csv + manifest per-run,3 configurazioni x 5 seed x 3 varianti
+G02B-05,Esecuzione scientifica,PASS,45/45,g02b_paired_per_run.csv,Tutte le run VALIDATED
+G02B-06,Aggregazione paired,PASS,45 per-run / 162 aggregate,g02b_paired_aggregate.csv,15 baseline FULL_MA_GA riusate
+G02B-07,Bundle canonico,PASS,256 ZIP / 255 manifest,G02B_CANONICAL_COMPLETE_20260626-095238.audit.json,0ea3b977193d3aa1a02d524bdf33d6e35f26954810044104395b5359b8a4d184
+G02B-08,Pulizia fixture self-test,PASS,1 directory archiviata,G02B_orphan_result_backup_20260626-095238.zip,16a4a1afe951d1bdef05eacd6a39b910c21670a625401c91070f6f1fed3e96ec
+G02B-09,Allineamento matrici,PASS,2 workbook,Matrice_*_G02B_allineata.xlsx,Storico preservato; nuova sezione G02B

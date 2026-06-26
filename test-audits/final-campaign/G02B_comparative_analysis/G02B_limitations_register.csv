@@ -1,0 +1,9 @@
+﻿limit_id,area,classification,description,reporting_rule
+L-G02B-01,STATISTICA,DESCRITTIVO,La campagna usa 5 seed per configurazione ma non applica test inferenziali o intervalli di confidenza.,Presentare medie/delta paired come evidenza descrittiva.
+L-G02B-02,COMPARABILITA,NON_COMPARABILE,NO_MOBILITY_PENALTY modifica la funzione obiettivo e rinormalizza i pesi; la fitness totale non è confrontabile con FULL_MA_GA.,Confrontare soltanto metriche operative e dichiarare esplicitamente il limite.
+L-G02B-03,INTERPRETAZIONE,SEMPLIFICAZIONE,LOCAL_ONLY riduce il problema decisionale imponendo tutte le assegnazioni locali.,Non presentare runtime/stale inferiori come superiorità dell’algoritmo.
+L-G02B-04,MODELLO_TASK,NOT_IMPLEMENTED,taskCompletionModel resta NOT_IMPLEMENTED: rimozione a deadline non equivale a completamento reale.,Separare stato del prototipo da una valutazione end-to-end del task.
+L-G02B-05,BASELINE,DATI_MANCANTI,"L’archivio G02 non espone strategyApplications, lastAppliedStrategySimulationTimeSeconds e secondsWithoutAppliedStrategyAtEnd.",Lasciare i campi baseline vuoti; non ricostruire valori.
+L-G02B-06,OSSERVABILITA,INFO,Per LOCAL_ONLY la conservazione dello snapshot è garantita dal percorso di codice ma non da un contatore runtime dedicato.,"Trattare il controllo come informativo, non come fallimento."
+L-G02B-07,SCENARIO_SUMO,WARNING_COMUNE,Il warning SUMO sulla unsafe green phase è comune alle varianti e non ha impedito il completamento delle run.,"Documentarlo come limite dello scenario, non come errore G02B."
+L-G02B-08,VALIDITA_ESTERNA,LIMITATA,"I risultati coprono tre configurazioni, cinque seed e run nominali da 300 s.",Evitare generalizzazioni oltre il dominio sperimentale osservato.
