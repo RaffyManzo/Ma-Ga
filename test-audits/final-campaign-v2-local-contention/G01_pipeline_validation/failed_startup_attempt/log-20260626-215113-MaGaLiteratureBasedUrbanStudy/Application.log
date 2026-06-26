@@ -1,0 +1,7 @@
+2026-06-26 21:51:44,909 INFO  UnitSimulator - Sending TrafficLightSubscription: TrafficLightSubscription[trafficLightGroupId=266359531]
+2026-06-26 21:51:44,913 INFO  UnitSimulator - Sending TrafficLightSubscription: TrafficLightSubscription[trafficLightGroupId=290100048]
+2026-06-26 21:51:44,914 INFO  UnitSimulator - Sending TrafficLightSubscription: TrafficLightSubscription[trafficLightGroupId=89129103]
+2026-06-26 21:51:44,915 INFO  UnitSimulator - Sending TrafficLightSubscription: TrafficLightSubscription[trafficLightGroupId=cluster_1443568599_365519573]
+2026-06-26 21:51:44,916 INFO  UnitSimulator - Sending TrafficLightSubscription: TrafficLightSubscription[trafficLightGroupId=cluster_1443568606_1834131515_1834131519_1834131548_1834131550]
+2026-06-26 21:51:44,917 INFO  UnitSimulator - Sending TrafficLightSubscription: TrafficLightSubscription[trafficLightGroupId=cluster_277739062_39732718_89129091_89129092]
+2026-06-26 21:51:44,917 INFO  UnitSimulator - Sending TrafficLightSubscription: TrafficLightSubscription[trafficLightGroupId=gneJ214]

@@ -1,0 +1,99 @@
+2026-06-26 21:51:14,245 INFO  SumoAmbassador - sumoConfig.updateInterval: 100
+2026-06-26 21:51:14,245 INFO  SumoAmbassador - sumoConfig.sumoConfigurationFile: intas_literature_urban.sumocfg
+2026-06-26 21:51:43,940 INFO  SumoVehicleTypesWriter - .\tmp\sumo\mosaic_types.add.xml file successfully written.
+2026-06-26 21:51:43,940 INFO  SumoAmbassador - Start Federate local
+2026-06-26 21:51:43,940 INFO  SumoAmbassador - Directory: .\tmp\sumo
+2026-06-26 21:51:43,956 INFO  SumoAmbassador - Simulation step size is 0.1 sec.
+2026-06-26 21:51:44,038 INFO  SumoAmbassador - Read TraCI server port from SUMO stdout
+2026-06-26 21:51:44,177 INFO  SumoAmbassador - Process sumo: Loading configuration ... done.
+2026-06-26 21:51:44,607 INFO  SumoAmbassador - Process sumo: ***Starting server on port 60508 ***
+2026-06-26 21:51:44,608 INFO  SumoAmbassador - Connect to SUMO TraCI server at localhost:60508
+2026-06-26 21:51:44,621 INFO  SumoAmbassador - Successfully created SUMO TraCI Connection.
+2026-06-26 21:51:44,742 INFO  SumoAmbassador - Process sumo: Loading net-file from 'intas_literature_urban.net.xml' ... done (121ms).
+2026-06-26 21:51:44,787 INFO  SumoAmbassador - Process sumo: Loading additional-files from 'mosaic_types.add.xml' ... done (17ms).
+2026-06-26 21:51:44,788 ERROR SumoAmbassador - Process sumo: Warning: Unsafe green phase 0 in tlLogic 'cluster_1443568599_365519573', program '0'. Lane '54033673#2_2' is targeted by 2 'G'-links. (use 'g' instead)
+2026-06-26 21:51:44,789 INFO  SumoAmbassador - Process sumo: Loading route-files incrementally from 'intas_literature_urban_nominal.rou.xml'
+2026-06-26 21:51:44,790 INFO  SumoAmbassador - Process sumo: Loading done.
+2026-06-26 21:51:44,792 INFO  SumoAmbassador - Process sumo: Simulation version 1.25.0 started with time: 0.00.
+2026-06-26 21:51:44,819 INFO  SumoAmbassador - Current API version of SUMO is 22 (=SUMO 1.25.*)
+2026-06-26 21:51:44,887 INFO  MosaicConformUnitIdTransformer - Assigned unit MOSAIC-ID: "veh_0" to external unit: "synthetic_000"
+2026-06-26 21:51:44,901 INFO  SumoAmbassador - Closing SUMO connection
+2026-06-26 21:51:44,903 INFO  SumoAmbassador - Process sumo: Step #0.00 (1ms ~= 100.00*RT, ~1000.00UPS, TraCI: 90ms, vehicles TOT 1 ACT 1 BUF 0)       
+2026-06-26 21:51:44,903 INFO  SumoAmbassador - Process sumo: Step #0.10 (1ms ~= 100.00*RT, ~1000.00UPS, TraCI: 19ms, vehicles TOT 1 ACT 1 BUF 0)       
+2026-06-26 21:51:44,903 INFO  SumoAmbassador - Process sumo: 
+2026-06-26 21:51:44,903 INFO  SumoAmbassador - Process sumo: Simulation ended at time: 0.10.
+2026-06-26 21:51:44,903 INFO  SumoAmbassador - Process sumo: Reason: TraCI requested termination.
+2026-06-26 21:51:44,903 INFO  SumoAmbassador - Process sumo: Performance:
+2026-06-26 21:51:44,903 INFO  SumoAmbassador - Process sumo:  Duration: 0.13s
+2026-06-26 21:51:44,903 INFO  SumoAmbassador - Process sumo:  TraCI-Duration: 0.09s
+2026-06-26 21:51:44,903 INFO  SumoAmbassador - Process sumo:  Real time factor: 0.757576
+2026-06-26 21:51:44,903 INFO  SumoAmbassador - Process sumo:  UPS: 7.575758
+2026-06-26 21:51:44,903 INFO  SumoAmbassador - Process sumo: Vehicles:
+2026-06-26 21:51:44,903 INFO  SumoAmbassador - Process sumo:  Inserted: 1 (Loaded: 2)
+2026-06-26 21:51:44,904 INFO  SumoAmbassador - Process sumo:  Running: 1
+2026-06-26 21:51:44,904 INFO  SumoAmbassador - Process sumo:  Waiting: 0
+2026-06-26 21:51:44,918 INFO  SumoVehiclesHandler - VehicleRegistration for SUMO vehicle "veh_0" received at simulation time 0 ns (subscribe=true)
+2026-06-26 21:51:44,918 INFO  SumoTrafficLightsHandler - TrafficLightSubscription interaction received at simulation time 0.000,000,000 s: Subscribe to Traffic light group with ID=266359531
+2026-06-26 21:51:44,918 ERROR TraciClientBridge - Close all TraCI streams due to an error
+java.net.SocketException: Socket closed
+	at java.base/sun.nio.ch.NioSocketImpl.ensureOpenAndConnected(NioSocketImpl.java:165)
+	at java.base/sun.nio.ch.NioSocketImpl.beginWrite(NioSocketImpl.java:371)
+	at java.base/sun.nio.ch.NioSocketImpl.implWrite(NioSocketImpl.java:416)
+	at java.base/sun.nio.ch.NioSocketImpl.write(NioSocketImpl.java:445)
+	at java.base/sun.nio.ch.NioSocketImpl$2.write(NioSocketImpl.java:831)
+	at java.base/java.net.Socket$SocketOutputStream.write(Socket.java:1035)
+	at java.base/java.io.DataOutputStream.writeInt(DataOutputStream.java:208)
+	at org.eclipse.mosaic.fed.sumo.bridge.traci.AbstractTraciCommand.sendMessageToTraci(AbstractTraciCommand.java:197)
+	at org.eclipse.mosaic.fed.sumo.bridge.traci.AbstractTraciCommand.execute(AbstractTraciCommand.java:114)
+	at org.eclipse.mosaic.fed.sumo.bridge.traci.TrafficLightSubscribe.execute(TrafficLightSubscribe.java:97)
+	at org.eclipse.mosaic.fed.sumo.bridge.facades.SimulationFacade.subscribeForTrafficLight(SimulationFacade.java:387)
+	at org.eclipse.mosaic.fed.sumo.ambassador.SumoTrafficLightsHandler.handleSubscription(SumoTrafficLightsHandler.java:162)
+	at org.eclipse.mosaic.fed.sumo.ambassador.SumoAmbassador.processInteractionAdvanced(SumoAmbassador.java:506)
+	at org.eclipse.mosaic.fed.sumo.ambassador.SumoAmbassador.processTimeAdvanceGrant(SumoAmbassador.java:598)
+	at org.eclipse.mosaic.rti.api.AbstractFederateAmbassador.advanceTime(AbstractFederateAmbassador.java:110)
+	at org.eclipse.mosaic.rti.time.SequentialTimeManagement.runSimulation(SequentialTimeManagement.java:124)
+	at org.eclipse.mosaic.starter.MosaicSimulation.runSimulation(MosaicSimulation.java:190)
+	at org.eclipse.mosaic.starter.MosaicStarter.execute(MosaicStarter.java:133)
+	at org.eclipse.mosaic.starter.MosaicStarter.main(MosaicStarter.java:75)
+2026-06-26 21:51:44,921 INFO  SumoAmbassador - Closing SUMO connection
+2026-06-26 21:51:44,921 ERROR TraciClientBridge - Close all TraCI streams due to an error
+java.net.SocketException: Socket closed
+	at java.base/sun.nio.ch.NioSocketImpl.ensureOpenAndConnected(NioSocketImpl.java:165)
+	at java.base/sun.nio.ch.NioSocketImpl.beginWrite(NioSocketImpl.java:371)
+	at java.base/sun.nio.ch.NioSocketImpl.implWrite(NioSocketImpl.java:416)
+	at java.base/sun.nio.ch.NioSocketImpl.write(NioSocketImpl.java:445)
+	at java.base/sun.nio.ch.NioSocketImpl$2.write(NioSocketImpl.java:831)
+	at java.base/java.net.Socket$SocketOutputStream.write(Socket.java:1035)
+	at java.base/java.io.DataOutputStream.writeInt(DataOutputStream.java:208)
+	at org.eclipse.mosaic.fed.sumo.bridge.traci.AbstractTraciCommand.sendMessageToTraci(AbstractTraciCommand.java:197)
+	at org.eclipse.mosaic.fed.sumo.bridge.traci.AbstractTraciCommand.execute(AbstractTraciCommand.java:114)
+	at org.eclipse.mosaic.fed.sumo.bridge.traci.SimulationClose.execute(SimulationClose.java:52)
+	at org.eclipse.mosaic.fed.sumo.bridge.TraciClientBridge.close(TraciClientBridge.java:194)
+	at org.eclipse.mosaic.fed.sumo.ambassador.SumoAmbassador.finishSimulation(SumoAmbassador.java:664)
+	at org.eclipse.mosaic.rti.time.AbstractTimeManagement.finishSimulationRun(AbstractTimeManagement.java:164)
+	at org.eclipse.mosaic.starter.MosaicSimulation.runSimulation(MosaicSimulation.java:199)
+	at org.eclipse.mosaic.starter.MosaicStarter.execute(MosaicStarter.java:133)
+	at org.eclipse.mosaic.starter.MosaicStarter.main(MosaicStarter.java:75)
+2026-06-26 21:51:44,922 ERROR TraciClientBridge - Simulation could not be closed properly.
+org.eclipse.mosaic.rti.api.InternalFederateException: Error during executing TraCI command SimulationClose
+	at org.eclipse.mosaic.fed.sumo.bridge.traci.AbstractTraciCommand.sendMessageToTraci(AbstractTraciCommand.java:217)
+	at org.eclipse.mosaic.fed.sumo.bridge.traci.AbstractTraciCommand.execute(AbstractTraciCommand.java:114)
+	at org.eclipse.mosaic.fed.sumo.bridge.traci.SimulationClose.execute(SimulationClose.java:52)
+	at org.eclipse.mosaic.fed.sumo.bridge.TraciClientBridge.close(TraciClientBridge.java:194)
+	at org.eclipse.mosaic.fed.sumo.ambassador.SumoAmbassador.finishSimulation(SumoAmbassador.java:664)
+	at org.eclipse.mosaic.rti.time.AbstractTimeManagement.finishSimulationRun(AbstractTimeManagement.java:164)
+	at org.eclipse.mosaic.starter.MosaicSimulation.runSimulation(MosaicSimulation.java:199)
+	at org.eclipse.mosaic.starter.MosaicStarter.execute(MosaicStarter.java:133)
+	at org.eclipse.mosaic.starter.MosaicStarter.main(MosaicStarter.java:75)
+Caused by: java.net.SocketException: Socket closed
+	at java.base/sun.nio.ch.NioSocketImpl.ensureOpenAndConnected(NioSocketImpl.java:165)
+	at java.base/sun.nio.ch.NioSocketImpl.beginWrite(NioSocketImpl.java:371)
+	at java.base/sun.nio.ch.NioSocketImpl.implWrite(NioSocketImpl.java:416)
+	at java.base/sun.nio.ch.NioSocketImpl.write(NioSocketImpl.java:445)
+	at java.base/sun.nio.ch.NioSocketImpl$2.write(NioSocketImpl.java:831)
+	at java.base/java.net.Socket$SocketOutputStream.write(Socket.java:1035)
+	at java.base/java.io.DataOutputStream.writeInt(DataOutputStream.java:208)
+	at org.eclipse.mosaic.fed.sumo.bridge.traci.AbstractTraciCommand.sendMessageToTraci(AbstractTraciCommand.java:197)
+	... 8 common frames omitted
+2026-06-26 21:51:44,922 INFO  SumoAmbassador - Finished simulation
+2026-06-26 21:51:44,932 INFO  SumoAmbassador - Finished simulation

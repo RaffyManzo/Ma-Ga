@@ -1,0 +1,11 @@
+2026-06-26 21:51:43,052 INFO  CentralNavigationComponent - Initializing CNC-Navigation
+2026-06-26 21:51:43,548 INFO  GraphHopperRouting - nodes: 83, edges: 148
+2026-06-26 21:51:43,585 INFO  LocationIndexTree - location index created in 0.0136875s, size:190, leafs:14, precision:300, depth:2, checksum:199, entries:[4, 4], entriesPerLeaf:13.571428
+2026-06-26 21:51:43,603 INFO  PrepareRoutingSubnetworks - Start marking subnetworks, prepare.min_network_size: 200, threads: 1, nodes: 83, edges: 148, jobs: [car_subnetwork|org.eclipse.mosaic.lib.routing.graphhopper.GraphHopperWeighting@33a55bd8, bike_subnetwork|org.eclipse.mosaic.lib.routing.graphhopper.GraphHopperWeighting@73a8e994], totalMB:114, usedMB:71
+2026-06-26 21:51:43,650 INFO  PrepareRoutingSubnetworks - bike - Found 250 subnetworks (248 single edges and 2 components with more than one edge, total nodes: 296), took: 0.0171371s
+2026-06-26 21:51:43,663 INFO  PrepareRoutingSubnetworks - bike - Marked 249 subnetworks (biggest: 3 edges) -> 1 components(s) remain (smallest: 45, biggest: 45 edges), total marked edges: 102, took: 0.0031365s
+2026-06-26 21:51:43,665 INFO  PrepareRoutingSubnetworks - car - Found 250 subnetworks (248 single edges and 2 components with more than one edge, total nodes: 296), took: 0.0020671s
+2026-06-26 21:51:43,667 INFO  PrepareRoutingSubnetworks - car - Marked 249 subnetworks (biggest: 3 edges) -> 1 components(s) remain (smallest: 45, biggest: 45 edges), total marked edges: 102, took: 5.649E-4s
+2026-06-26 21:51:43,673 INFO  PrepareRoutingSubnetworks - Finished finding and marking subnetworks for 2 jobs, took: 0.0791908s, totalMB:114, usedMB:73
+2026-06-26 21:51:43,676 INFO  CentralNavigationComponent - CNC - Navigation-System initialized
+2026-06-26 21:51:43,686 INFO  CentralNavigationComponent - Sending vehicle routes initialization

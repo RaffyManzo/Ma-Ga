@@ -1,0 +1,53 @@
+2026-06-26 21:51:14,013 INFO  ROOT - Running Eclipse MOSAIC 25.2 on Java JRE v17.0.12 (Oracle Corporation)
+2026-06-26 21:51:14,062 INFO  FederationManagement - Start federation with id 'MaGaLiteratureBasedUrbanStudy'
+2026-06-26 21:51:14,259 INFO  MosaicStarter - Federate sumo: No port given. Using free port: 60508
+2026-06-26 21:51:14,263 INFO  FederationManagement - Add ambassador/federate with id 'application'
+2026-06-26 21:51:14,265 INFO  FederationManagement - Add ambassador/federate with id 'mapping'
+2026-06-26 21:51:14,265 INFO  FederationManagement - Add ambassador/federate with id 'cell'
+2026-06-26 21:51:14,265 INFO  FederationManagement - Add ambassador/federate with id 'sns'
+2026-06-26 21:51:14,266 INFO  FederationManagement - Add ambassador/federate with id 'sumo'
+2026-06-26 21:51:14,267 INFO  FederationManagement - Deploying federate 'sumo' locally in .\tmp\sumo
+2026-06-26 21:51:14,289 INFO  FederationManagement - Starting federate 'sumo' locally in .\tmp\sumo
+2026-06-26 21:51:14,290 INFO  FederationManagement - Add ambassador/federate with id 'output'
+2026-06-26 21:51:14,290 INFO  OutputAmbassador - Initialize configuration of OutputAmbassador
+2026-06-26 21:51:43,047 INFO  OutputAmbassador - Registered output generator 'fileoutput' for messages [LanePropertyChange, TrafficLightRegistration, VehicleRegistration, ServerRegistration, V2xMessageTransmission, TrafficDetectorUpdates, AdHocCommunicationConfiguration, RsuRegistration, VehicleSpeedChange, VehicleUpdates, CellularHandoverUpdates, TrafficSignRegistration, CellularCommunicationConfiguration, V2xMessageReception]. Update interval=5
+2026-06-26 21:51:44,927 INFO  SequentialTimeManagement - Simulation ended after 0s of 180s (0%)
+2026-06-26 21:51:44,928 INFO  SequentialTimeManagement - Started: 2026-06-26 21:51:43
+2026-06-26 21:51:44,928 INFO  SequentialTimeManagement - Ended: 2026-06-26 21:51:44
+2026-06-26 21:51:44,937 INFO  SequentialTimeManagement - Simulation ended after 0s of 180s (0%)
+2026-06-26 21:51:44,939 INFO  SequentialTimeManagement - Duration: 00h 00m 01.100s (RTF: 0.00)
+2026-06-26 21:51:44,939 INFO  SequentialTimeManagement - Started: 2026-06-26 21:51:43
+2026-06-26 21:51:44,939 INFO  SequentialTimeManagement - 
+2026-06-26 21:51:44,939 INFO  SequentialTimeManagement - Ended: 2026-06-26 21:51:44
+2026-06-26 21:51:44,939 INFO  SequentialTimeManagement - Simulation interrupted: -1
+2026-06-26 21:51:44,939 INFO  SequentialTimeManagement - Duration: 00h 00m 01.079s (RTF: 0.00)
+2026-06-26 21:51:44,939 INFO  SequentialTimeManagement - 
+2026-06-26 21:51:44,940 INFO  SequentialTimeManagement - Simulation interrupted: -1
+2026-06-26 21:51:44,947 ERROR FederationManagement - Error while deleting file: .\tmp\sumo\intas_literature_urban.sumocfg
+2026-06-26 21:51:44,947 ERROR FederationManagement - Error while deleting file: .\tmp\sumo\intas_literature_urban_nominal.rou.xml
+2026-06-26 21:51:44,949 ERROR FederationManagement - Error while deleting file: .\tmp\sumo\mosaic_types.add.xml
+2026-06-26 21:51:44,950 ERROR FederationManagement - Error while deleting file: .\tmp\sumo\sumo_config.json
+2026-06-26 21:51:45,153 ERROR MosaicStarter - Stopping simulation due to a critical error.
+org.eclipse.mosaic.rti.api.InternalFederateException: Error during executing TraCI command TrafficLightSubscribe
+	at org.eclipse.mosaic.fed.sumo.bridge.traci.AbstractTraciCommand.sendMessageToTraci(AbstractTraciCommand.java:217)
+	at org.eclipse.mosaic.fed.sumo.bridge.traci.AbstractTraciCommand.execute(AbstractTraciCommand.java:114)
+	at org.eclipse.mosaic.fed.sumo.bridge.traci.TrafficLightSubscribe.execute(TrafficLightSubscribe.java:97)
+	at org.eclipse.mosaic.fed.sumo.bridge.facades.SimulationFacade.subscribeForTrafficLight(SimulationFacade.java:387)
+	at org.eclipse.mosaic.fed.sumo.ambassador.SumoTrafficLightsHandler.handleSubscription(SumoTrafficLightsHandler.java:162)
+	at org.eclipse.mosaic.fed.sumo.ambassador.SumoAmbassador.processInteractionAdvanced(SumoAmbassador.java:506)
+	at org.eclipse.mosaic.fed.sumo.ambassador.SumoAmbassador.processTimeAdvanceGrant(SumoAmbassador.java:598)
+	at org.eclipse.mosaic.rti.api.AbstractFederateAmbassador.advanceTime(AbstractFederateAmbassador.java:110)
+	at org.eclipse.mosaic.rti.time.SequentialTimeManagement.runSimulation(SequentialTimeManagement.java:124)
+	at org.eclipse.mosaic.starter.MosaicSimulation.runSimulation(MosaicSimulation.java:190)
+	at org.eclipse.mosaic.starter.MosaicStarter.execute(MosaicStarter.java:133)
+	at org.eclipse.mosaic.starter.MosaicStarter.main(MosaicStarter.java:75)
+Caused by: java.net.SocketException: Socket closed
+	at java.base/sun.nio.ch.NioSocketImpl.ensureOpenAndConnected(NioSocketImpl.java:165)
+	at java.base/sun.nio.ch.NioSocketImpl.beginWrite(NioSocketImpl.java:371)
+	at java.base/sun.nio.ch.NioSocketImpl.implWrite(NioSocketImpl.java:416)
+	at java.base/sun.nio.ch.NioSocketImpl.write(NioSocketImpl.java:445)
+	at java.base/sun.nio.ch.NioSocketImpl$2.write(NioSocketImpl.java:831)
+	at java.base/java.net.Socket$SocketOutputStream.write(Socket.java:1035)
+	at java.base/java.io.DataOutputStream.writeInt(DataOutputStream.java:208)
+	at org.eclipse.mosaic.fed.sumo.bridge.traci.AbstractTraciCommand.sendMessageToTraci(AbstractTraciCommand.java:197)
+	... 11 common frames omitted

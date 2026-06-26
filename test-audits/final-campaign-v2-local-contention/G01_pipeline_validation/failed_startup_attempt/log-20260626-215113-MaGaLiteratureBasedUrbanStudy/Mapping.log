@@ -1,0 +1,13 @@
+2026-06-26 21:51:43,050 INFO  SpawningFramework - No vehicle spawners defined in mapping config. Only external vehicles will be simulated.
+2026-06-26 21:51:44,904 INFO  MappingAmbassador - Received TL-Interaction
+2026-06-26 21:51:44,905 INFO  MappingAmbassador - Mapping Scenario Vehicle. time=0, name=veh_0, type=default_001, apps=[org.eclipse.mosaic.app.maga.adhocradio.MaGaAdHocRadioDiagnosticApp, org.eclipse.mosaic.app.maga.livestate.MaGaLiveVehicleStateApp, org.eclipse.mosaic.app.maga.livestate.MaGaLiveCellDiagnosticVehicleApp]
+2026-06-26 21:51:44,905 INFO  ServerSpawner - Creating Server: ServerSpawner[applications=[org.eclipse.mosaic.app.maga.liveruntime.MaGaLiveRuntimeCoordinatorApp, org.eclipse.mosaic.app.maga.livestate.MaGaLiveCellDiagnosticServerApp]]
+2026-06-26 21:51:44,906 INFO  RoadSideUnitSpawner - Creating RSU: RoadSideUnitSpawner[position=GeoPoint{lat=48.756753,lon=11.424367,alt=0.00},applications=[]]
+2026-06-26 21:51:44,907 INFO  RoadSideUnitSpawner - Creating RSU: RoadSideUnitSpawner[position=GeoPoint{lat=48.759610,lon=11.423380,alt=0.00},applications=[]]
+2026-06-26 21:51:44,908 INFO  SpawningFramework - Creating Traffic Light Group: name=tl_0,tlGroupId=266359531,apps=[]
+2026-06-26 21:51:44,913 INFO  SpawningFramework - Creating Traffic Light Group: name=tl_1,tlGroupId=290100048,apps=[]
+2026-06-26 21:51:44,913 INFO  SpawningFramework - Creating Traffic Light Group: name=tl_2,tlGroupId=89129103,apps=[]
+2026-06-26 21:51:44,915 INFO  SpawningFramework - Creating Traffic Light Group: name=tl_3,tlGroupId=cluster_1443568599_365519573,apps=[]
+2026-06-26 21:51:44,916 INFO  SpawningFramework - Creating Traffic Light Group: name=tl_4,tlGroupId=cluster_1443568606_1834131515_1834131519_1834131548_1834131550,apps=[]
+2026-06-26 21:51:44,916 INFO  SpawningFramework - Creating Traffic Light Group: name=tl_5,tlGroupId=cluster_277739062_39732718_89129091_89129092,apps=[]
+2026-06-26 21:51:44,917 INFO  SpawningFramework - Creating Traffic Light Group: name=tl_6,tlGroupId=gneJ214,apps=[]

@@ -1,0 +1,14 @@
+﻿test_id,primary_group_id,functionality,situation,status,note
+T-002,G00,Artefatti Java,JAR coerenti con il freeze,PASS,Copertura G01 verificata.
+T-010,G03,Template,Assenza token non risolti,PASS,Copertura G01 verificata.
+T-011,G01,Rete candidate_0045,"155 edge, 88 junction, 8 semafori",PASS,Copertura G01 verificata.
+T-012,G02,Route,Cinque famiglie presenti,PASS,Copertura G01 verificata.
+T-013,G02,Densita,low/nominal/high,PASS,Copertura G01 verificata.
+T-014,G03,Determinismo,Stessi parametri e seed,PASS,Copertura G01 verificata.
+T-015,G01,Database SQLite,Creazione e leggibilita DB,PASS,Copertura G01 verificata.
+T-016,G07,Integrita mobilita,"Errori, teleports, emergency braking",EVIDENCE_PARTIAL,Il validator conferma assenza di errori bloccanti; i contatori SUMO specifici per teleport/emergency braking non sono esposti come campi canonici.
+T-017,G01,Completezza file,"JSON, rete, rotte, DB, mapping",PASS,Copertura G01 verificata.
+T-018,G03,Ripetizione domanda,Cicli ogni 195 s,PASS,Copertura G01 verificata.
+T-020,G01,Scenario MOSAIC,Copia controllata,PASS,Copertura G01 verificata.
+T-021,G01,Federati,application/sumo/sns/output attivi,PASS,Copertura G01 verificata.
+T-035,G05,Traffico controllato,Request/response e direzione,PASS,Copertura G01 verificata.

@@ -1,0 +1,5 @@
+﻿type,severity,description,effect,decision
+LIMIT,INFORMATIONAL,G01 usa una sola run smoke e non supporta inferenze statistiche.,"Valida la pipeline, non sostituisce G02.",ACCEPTED_BY_DESIGN
+OBSERVABILITY,INFORMATIONAL,localRepairApplied non e' un campo serializzato del freeze. G01 verifica la telemetria osservabile della contesa senza richiederlo.,Nessun blocco; il repair sara' analizzato tramite metriche osservabili in G05.,DOCUMENTED
+SUMO_COUNTERS,INFORMATIONAL,Teleport ed emergency braking non sono esposti come contatori canonici nel validator G01.,T-016 classificato EVIDENCE_PARTIAL e demandato all'audit finale G07.,NON_BLOCKING
+INFRASTRUCTURE_STARTUP,RECOVERED,Il tentativo log-20260626-215113-MaGaLiteratureBasedUrbanStudy si e' arrestato a 0 s per watchdog SUMO/MOSAIC prima della creazione delle trace runtime.,Nessun dato algoritmico prodotto; tentativo escluso dalle run valide. Retry eseguito con watchdog 120 s.,RETRY_ONCE_AND_DOCUMENT

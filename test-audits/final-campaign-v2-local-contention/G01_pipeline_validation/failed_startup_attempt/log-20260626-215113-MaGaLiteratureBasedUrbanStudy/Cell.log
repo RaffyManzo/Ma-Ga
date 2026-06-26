@@ -1,0 +1,54 @@
+2026-06-26 21:51:43,700 INFO  CellAmbassador - Start Cell
+2026-06-26 21:51:43,740 INFO  CellAmbassador - Using network config:
+2026-06-26 21:51:43,769 INFO  CellAmbassador - CNetworkProperties[id=globalNetwork,uplink.delay=[delayType: ConstantDelay, delay: 26100000],uplink.capacity=49200000,downlink.unicast.delay=[delayType: ConstantDelay, delay: 26100000],downlink.multicast.delay=[delayType: ConstantDelay, delay: 26100000],downlink.multicast.usableCapacity=0.6,downlink.capacity=49200000]
+2026-06-26 21:51:43,794 INFO  CellAmbassador - Using region config:
+2026-06-26 21:51:43,800 INFO  CellAmbassador - CMobileNetworkProperties[id=region_cell_5g_aveiro_p50,uplink.delay=[delayType: ConstantDelay, delay: 26100000],uplink.capacity=49200000,downlink.unicast.delay=[delayType: ConstantDelay, delay: 26100000],downlink.multicast.delay=[delayType: ConstantDelay, delay: 26100000],downlink.multicast.usableCapacity=0.6,downlink.capacity=49200000], area: GeoRectangle{a=GeoPoint{lat=48.760959,lon=11.416860,alt=0.00},b=GeoPoint{lat=48.751437,lon=11.434124,alt=0.00}}		
+2026-06-26 21:51:43,810 INFO  ChainManager - Initialize ChainManager
+2026-06-26 21:51:43,810 INFO  ChainManager - Adding Module Upstream
+2026-06-26 21:51:43,810 INFO  ChainManager - Adding Module Geocaster
+2026-06-26 21:51:43,811 INFO  ChainManager - Adding Module Downstream
+2026-06-26 21:51:43,820 INFO  CellAmbassador - Finished Initialization, waiting for Interactions...
+2026-06-26 21:51:44,922 INFO  CellAmbassador - FinishSimulation
+2026-06-26 21:51:44,923 INFO  ChainManager - [Upstream] Processed messages: 0
+2026-06-26 21:51:44,923 INFO  ChainManager - [Geocaster] Processed messages: 0
+2026-06-26 21:51:44,923 INFO  ChainManager - [Downstream] Processed messages: 0
+2026-06-26 21:51:44,932 INFO  CellAmbassador - FinishSimulation
+2026-06-26 21:51:44,935 INFO  ChainManager - [Upstream] Processed messages: 0
+2026-06-26 21:51:44,935 INFO  ChainManager - [Geocaster] Processed messages: 0
+2026-06-26 21:51:44,935 INFO  ChainManager - [Downstream] Processed messages: 0
+2026-06-26 21:51:44,936 ERROR PerRegionBandwidthMeasurement - Could not write line
+java.io.IOException: Stream closed
+	at java.base/sun.nio.cs.StreamEncoder.ensureOpen(StreamEncoder.java:51)
+	at java.base/sun.nio.cs.StreamEncoder.flush(StreamEncoder.java:159)
+	at java.base/java.io.OutputStreamWriter.flush(OutputStreamWriter.java:248)
+	at org.eclipse.mosaic.fed.cell.viz.PerRegionBandwidthMeasurement.flushCsv(PerRegionBandwidthMeasurement.java:382)
+	at org.eclipse.mosaic.fed.cell.viz.PerRegionBandwidthMeasurement.updateCsv(PerRegionBandwidthMeasurement.java:363)
+	at org.eclipse.mosaic.fed.cell.viz.PerRegionBandwidthMeasurement.finish(PerRegionBandwidthMeasurement.java:278)
+	at org.eclipse.mosaic.fed.cell.chain.ChainManager.printStatistics(ChainManager.java:295)
+	at org.eclipse.mosaic.fed.cell.ambassador.CellAmbassador.finishSimulation(CellAmbassador.java:205)
+	at org.eclipse.mosaic.rti.time.AbstractTimeManagement.finishSimulationRun(AbstractTimeManagement.java:164)
+	at org.eclipse.mosaic.rti.WatchDogThread.run(WatchDogThread.java:98)
+2026-06-26 21:51:44,937 ERROR PerRegionBandwidthMeasurement - Could not write line
+java.io.IOException: Stream closed
+	at java.base/sun.nio.cs.StreamEncoder.ensureOpen(StreamEncoder.java:51)
+	at java.base/sun.nio.cs.StreamEncoder.flush(StreamEncoder.java:159)
+	at java.base/java.io.OutputStreamWriter.flush(OutputStreamWriter.java:248)
+	at org.eclipse.mosaic.fed.cell.viz.PerRegionBandwidthMeasurement.flushCsv(PerRegionBandwidthMeasurement.java:382)
+	at org.eclipse.mosaic.fed.cell.viz.PerRegionBandwidthMeasurement.updateCsv(PerRegionBandwidthMeasurement.java:363)
+	at org.eclipse.mosaic.fed.cell.viz.PerRegionBandwidthMeasurement.finish(PerRegionBandwidthMeasurement.java:278)
+	at org.eclipse.mosaic.fed.cell.chain.ChainManager.printStatistics(ChainManager.java:295)
+	at org.eclipse.mosaic.fed.cell.ambassador.CellAmbassador.finishSimulation(CellAmbassador.java:205)
+	at org.eclipse.mosaic.rti.time.AbstractTimeManagement.finishSimulationRun(AbstractTimeManagement.java:164)
+	at org.eclipse.mosaic.rti.WatchDogThread.run(WatchDogThread.java:98)
+2026-06-26 21:51:44,937 ERROR PerRegionBandwidthMeasurement - Could not write line
+java.io.IOException: Stream closed
+	at java.base/sun.nio.cs.StreamEncoder.ensureOpen(StreamEncoder.java:51)
+	at java.base/sun.nio.cs.StreamEncoder.flush(StreamEncoder.java:159)
+	at java.base/java.io.OutputStreamWriter.flush(OutputStreamWriter.java:248)
+	at org.eclipse.mosaic.fed.cell.viz.PerRegionBandwidthMeasurement.flushCsv(PerRegionBandwidthMeasurement.java:382)
+	at org.eclipse.mosaic.fed.cell.viz.PerRegionBandwidthMeasurement.updateCsv(PerRegionBandwidthMeasurement.java:363)
+	at org.eclipse.mosaic.fed.cell.viz.PerRegionBandwidthMeasurement.finish(PerRegionBandwidthMeasurement.java:278)
+	at org.eclipse.mosaic.fed.cell.chain.ChainManager.printStatistics(ChainManager.java:295)
+	at org.eclipse.mosaic.fed.cell.ambassador.CellAmbassador.finishSimulation(CellAmbassador.java:205)
+	at org.eclipse.mosaic.rti.time.AbstractTimeManagement.finishSimulationRun(AbstractTimeManagement.java:164)
+	at org.eclipse.mosaic.rti.WatchDogThread.run(WatchDogThread.java:98)
