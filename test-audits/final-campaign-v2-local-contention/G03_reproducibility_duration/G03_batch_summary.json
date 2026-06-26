@@ -1,0 +1,105 @@
+{
+  "schemaVersion": 1,
+  "generatedAt": "2026-06-27T00:21:48.615402+02:00",
+  "campaign": "final-campaign-v2-local-contention",
+  "group": "G03",
+  "status": "PASS",
+  "parentCommit": "0a0d82cbb62bcdb71d64fe5fd247cfa06d400582",
+  "actions": {
+    "planned": 11,
+    "materializationChecks": 2,
+    "mosaicRuns": 9,
+    "mandatoryRunsPass": 8,
+    "optionalStressStatus": "PASS"
+  },
+  "tests": {
+    "T-010": "PASS",
+    "T-014": "PASS",
+    "T-018": "PASS"
+  },
+  "runtimeRepeat": {
+    "schemaVersion": 1,
+    "generatedAt": "2026-06-27T00:21:48.605225+02:00",
+    "status": "PASS",
+    "replicaCount": 3,
+    "sameMaterialization": true,
+    "deterministicFunctionalCounters": true,
+    "counterValues": {
+      "tasksGenerated": [
+        9306
+      ],
+      "tasksActivated": [
+        9306
+      ],
+      "tasksRemovedAtDeadline": [
+        9241
+      ],
+      "tasksPendingAtEnd": [
+        65
+      ],
+      "tasksPendingPeak": [
+        79
+      ],
+      "snapshotRequests": [
+        3000
+      ],
+      "snapshotResolved": [
+        2981
+      ]
+    },
+    "gaRuntimeMeanSecondsByReplica": [
+      0.305776353,
+      0.497619029,
+      0.098761813
+    ],
+    "gaRuntimeMeanCoefficientOfVariationPercent": 66.33323860097754,
+    "interpretation": "I contatori funzionali sono riproducibili. Submitted/applied/stale e runtime possono variare per la temporizzazione wall-clock del worker asincrono."
+  },
+  "extendedDuration": {
+    "schemaVersion": 1,
+    "generatedAt": "2026-06-27T00:21:48.612591+02:00",
+    "status": "PASS",
+    "runCount": 5,
+    "durationSeconds": 600,
+    "seeds": [
+      104729,
+      130363,
+      155921,
+      181081,
+      207547
+    ],
+    "validatorPassCount": 5,
+    "tasksGeneratedTotal": 96337,
+    "gaJobsSubmittedTotal": 159,
+    "gaJobsCompletedTotal": 155,
+    "gaJobsAppliedTotal": 142,
+    "staleResultsTotal": 13,
+    "shutdownInFlightTotal": 4,
+    "maximumSnapshotLagSeconds": 0.0,
+    "runtimeViolationCount": 0,
+    "maximumGaRuntimeSeconds": 37.4097213,
+    "taskCompletionModel": [
+      "NOT_IMPLEMENTED"
+    ],
+    "interpretation": "Le cinque run nominali da 600 s verificano la stabilità su più cicli della domanda."
+  },
+  "reproducibility": {
+    "schemaVersion": 1,
+    "generatedAt": "2026-06-27T00:09:51.164421+02:00",
+    "status": "PASS",
+    "testIds": [
+      "T-010",
+      "T-014"
+    ],
+    "logicalStatus": "LOGICALLY_IDENTICAL",
+    "differentArtifactCount": 0,
+    "source": "test-results/final-campaign-v2-local-contention/G03_reproducibility_duration/repro_materialization_comparison.json",
+    "interpretation": "Le differenze documentali e identificative attese sono escluse dal confronto logico."
+  },
+  "nextGroup": "G04",
+  "limitations": [
+    "taskCompletionModel is NOT_IMPLEMENTED",
+    "CFG-H-S-EXT is an optional stress profile, not a stable operating profile",
+    "wall-clock runtime and asynchronous submitted/applied/stale counts may vary"
+  ]
+}

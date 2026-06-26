@@ -1,0 +1,13 @@
+{
+  "schemaVersion": 1,
+  "generatedAt": "2026-06-27T00:09:51.164421+02:00",
+  "status": "PASS",
+  "testIds": [
+    "T-010",
+    "T-014"
+  ],
+  "logicalStatus": "LOGICALLY_IDENTICAL",
+  "differentArtifactCount": 0,
+  "source": "test-results/final-campaign-v2-local-contention/G03_reproducibility_duration/repro_materialization_comparison.json",
+  "interpretation": "Le differenze documentali e identificative attese sono escluse dal confronto logico."
+}

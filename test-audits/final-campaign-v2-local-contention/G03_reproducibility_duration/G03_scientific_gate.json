@@ -1,0 +1,48 @@
+{
+  "schemaVersion": 1,
+  "generatedAt": "2026-06-27T00:30:01.648848+02:00",
+  "group": "G03",
+  "status": "PASS_G03_SCIENTIFIC_GATE_WITH_RUNTIME_CADENCE_LIMIT",
+  "passed": true,
+  "warnings": 1,
+  "formalVerdict": "PASS_G03_COMPLETE_WITH_RUNTIME_CADENCE_LIMIT_READY_FOR_G04",
+  "checks": [
+    {
+      "id": "MATERIALIZATION-REPRODUCIBILITY",
+      "status": "PASS",
+      "observed": "LOGICALLY_IDENTICAL/0"
+    },
+    {
+      "id": "RUNTIME-FUNCTIONAL-REPEATABILITY",
+      "status": "PASS",
+      "observed": "3/3 repliche con contatori funzionali identici"
+    },
+    {
+      "id": "EXTENDED-DURATION",
+      "status": "PASS",
+      "observed": "5/5 nominal extended e 1/1 stress completate"
+    },
+    {
+      "id": "SNAPSHOT-AND-MODEL-VIOLATIONS",
+      "status": "PASS",
+      "observed": "lag massimo 0; violazioni 0"
+    },
+    {
+      "id": "STRATEGY-TIMELINE-COVERAGE",
+      "status": "WARN_LIMIT",
+      "observed": {
+        "durationSeconds": 600,
+        "runCount": 5,
+        "lastAppliedMinSeconds": 9.8,
+        "lastAppliedMaxSeconds": 28.0,
+        "finalGapMinSeconds": 572.0,
+        "finalGapMaxSeconds": 590.2,
+        "timelineCoverageMinPercent": 1.6333333333333335,
+        "timelineCoverageMaxPercent": 4.666666666666667,
+        "gaJobsSubmittedTotal": 159,
+        "gaJobsAppliedTotal": 142,
+        "maximumGaRuntimeSeconds": 37.4097213
+      }
+    }
+  ]
+}

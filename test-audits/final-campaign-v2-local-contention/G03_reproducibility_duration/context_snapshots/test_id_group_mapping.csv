@@ -1,0 +1,88 @@
+test_id,primary_group_id,primary_group_name,all_group_ids,level,functionality,situation,method,configurations,mandatory,notes
+T-001,G00,scenario preparation and generation,G00;G07,Freeze,Repository,Branch e HEAD congelati,Audit,CFG-PRE-AUDIT,Si,cross-group coverage; primary group owns final evidence index
+T-002,G00,scenario preparation and generation,G00;G01;G07,Freeze,Artefatti Java,JAR coerenti con il freeze,Hash deploy,CFG-SMOKE,Si,cross-group coverage; primary group owns final evidence index
+T-010,G03,reproducibility and duration,G01;G03;G07,Materializer,Template,Assenza token non risolti,Validator,CFG-SMOKE; CFG-REPRO,Si,cross-group coverage; primary group owns final evidence index
+T-011,G01,pipeline validation,G01;G07,Materializer,Rete candidate_0045,"155 edge, 88 junction, 8 semafori",Validator,CFG-SMOKE; tutte,Si,cross-group coverage; primary group owns final evidence index
+T-012,G02,main factorial experiments,G01;G02;G07,Materializer,Route,Cinque famiglie presenti,Audit route,CFG-SMOKE; MAIN,Si,cross-group coverage; primary group owns final evidence index
+T-013,G02,main factorial experiments,G01;G02;G07,Materializer,Densita,low/nominal/high,Run principale,CFG-L-*; CFG-N-*; CFG-H-*,Si,cross-group coverage; primary group owns final evidence index
+T-014,G03,reproducibility and duration,G01;G03;G07,Materializer,Determinismo,Stessi parametri e seed,Doppia materializzazione,CFG-REPRO,Si,cross-group coverage; primary group owns final evidence index
+T-015,G01,pipeline validation,G01;G07,Scenario-Convert,Database SQLite,Creazione e leggibilita DB,Validator,CFG-SMOKE; tutte,Si,cross-group coverage; primary group owns final evidence index
+T-016,G07,final cross-group audit,G01;G07,SUMO,Integrita mobilita,"Errori, teleports, emergency braking",Validator,tutte materializzabili,Si,cross-group coverage; primary group owns final evidence index
+T-017,G01,pipeline validation,G01;G07,Scenario,Completezza file,"JSON, rete, rotte, DB, mapping",Validator,CFG-SMOKE; tutte,Si,cross-group coverage; primary group owns final evidence index
+T-018,G03,reproducibility and duration,G01;G02;G03;G07,Scenario,Ripetizione domanda,Cicli ogni 195 s,Run extended,CFG-N-I-EXT; CFG-H-S-EXT,Si,cross-group coverage; primary group owns final evidence index
+T-020,G01,pipeline validation,G01;G07,Deploy,Scenario MOSAIC,Copia controllata,Deploy validator,CFG-SMOKE; tutte,Si,cross-group coverage; primary group owns final evidence index
+T-021,G01,pipeline validation,G01;G07,MOSAIC,Federati,application/sumo/sns/output attivi,Smoke/run,CFG-SMOKE,Si,cross-group coverage; primary group owns final evidence index
+T-030,G07,final cross-group audit,G07,Live-state,Lifecycle veicoli,JOIN/UPDATE/LEFT,Trace,tutte run,Si,
+T-031,G07,final cross-group audit,G07,Live-state,Lifecycle task,GENERATED/ACTIVE/PENDING/REMOVED_AT_DEADLINE,Trace/summary,tutte run,Si,
+T-032,G02,main factorial experiments,G02,Workload,Poisson seeded,Riproducibilita statistica,Confronto seed,MAIN,Si,
+T-033,G02,main factorial experiments,G02,Workload,Mix task,WL-E / WL-I / WL-S,Campagna principale,MAIN,Si,
+T-034,G06,runtime and temporal policies,G06;G07,Workload,Finestre sparse,Nessun task o quasi,Diagnostica,CFG-G-SPARSE,No,cross-group coverage; primary group owns final evidence index
+T-035,G05,resource policies and repair,G01;G05;G07,CELL,Traffico controllato,Request/response e direzione,Trace,CFG-SMOKE; CFG-R-CELLBW,Si,cross-group coverage; primary group owns final evidence index
+T-036,G07,final cross-group audit,G07,CELL,Bucket causali,SAFE_AFTER_TIMESTAMP,Audit,tutte run,Si,
+T-037,G04,mobility and connectivity,G04;G07,Gateway,Selezione gateway,rsu_0 / rsu_1 / transizione,Test diretti,CFG-M-RSU0; CFG-M-RSU1; CFG-M-SWITCH,Si,cross-group coverage; primary group owns final evidence index
+T-038,G04,mobility and connectivity,G04;G07,Access link,Derivazione,Disponibile / non disponibile,Test diretti,CFG-M-BACKGROUND; CFG-M-RSU0; CFG-M-RSU1,Si,cross-group coverage; primary group owns final evidence index
+T-039,G07,final cross-group audit,G04;G07,Candidati,LOCAL,Sempre disponibile per task valido,Tutte,tutte run,Si,cross-group coverage; primary group owns final evidence index
+T-040,G04,mobility and connectivity,G04;G05;G07,Candidati,VEHICLE,Vicini raggiungibili,Test diretto,CFG-M-V2V; CFG-R-V2VBW,Si,cross-group coverage; primary group owns final evidence index
+T-041,G04,mobility and connectivity,G04;G07,Candidati,EDGE,Gateway attivo,Test diretto,CFG-M-RSU0; CFG-M-RSU1,Si,cross-group coverage; primary group owns final evidence index
+T-042,G04,mobility and connectivity,G04;G07,Candidati,CLOUD,STRICT_GATEWAY,Test diretto,CFG-M-RSU0; CFG-M-RSU1; CFG-M-SWITCH,Si,cross-group coverage; primary group owns final evidence index
+T-043,G07,final cross-group audit,G07,Snapshot,Assemblaggio,"Veicoli, task, candidati, gateway, pool",Validator,tutte run,Si,
+T-044,G07,final cross-group audit,G07,Bridge,Causalita snapshot,snapshot.time <= requested.time,Audit runtime,tutte run,Si,
+T-045,G07,final cross-group audit,G07,Bridge,Snapshot futuri,futureSnapshotViolations,Audit,tutte run,Si,
+T-046,G07,final cross-group audit,G07,Bridge,Pool futuri,futurePoolViolations,Audit,tutte run,Si,
+T-047,G07,final cross-group audit,G07,Bridge,Banda pool valida,NaN/negativa/oltre schema,Audit,tutte run,Si,
+T-050,G06,runtime and temporal policies,G06;G07,Runtime,Single in-flight,Un solo GA in esecuzione,Audit,tutte run,Si,cross-group coverage; primary group owns final evidence index
+T-051,G06,runtime and temporal policies,G06;G07,Runtime,Ciclo job,SUBMITTED/COMPLETED/APPLIED,Trace,tutte run,Si,cross-group coverage; primary group owns final evidence index
+T-052,G06,runtime and temporal policies,G02;G06;G07,Runtime,Stale result,Risultato oltre deltaTMax,Test diretto,CFG-G-STALE; CFG-H-*,Si,cross-group coverage; primary group owns final evidence index
+T-053,G06,runtime and temporal policies,G06;G07,Runtime,Ultima strategia,Keep while running,Test stale,CFG-G-STALE,Si,cross-group coverage; primary group owns final evidence index
+T-054,G06,runtime and temporal policies,G06;G07,Runtime,Fresh reoptimization,Nuovo job dopo timeout,Test stale,CFG-G-STALE,Si,cross-group coverage; primary group owns final evidence index
+T-055,G06,runtime and temporal policies,G06;G07,Runtime,Riallineamento,Stato temporale riallineato al live,Audit,tutte run,Si,cross-group coverage; primary group owns final evidence index
+T-056,G04,mobility and connectivity,G02;G04;G05;G06,Runtime,Applicazione strategia,LOCAL/VEHICLE/EDGE/CLOUD,Tutte,MAIN; MOB; RES,Si,cross-group coverage; primary group owns final evidence index
+T-060,G06,runtime and temporal policies,G06;G07,MA-GA,Stop reason,EMPTY_TASK_SET,Diagnostica/standalone,CFG-G-SPARSE,No,cross-group coverage; primary group owns final evidence index
+T-061,G06,runtime and temporal policies,G06;G07,MA-GA,Popolazione iniziale,Nuova o riusata,Report,tutte run,Si,cross-group coverage; primary group owns final evidence index
+T-062,G06,runtime and temporal policies,G06;G07,MA-GA,Operatori evolutivi,Selection/crossover/mutation/elitism,Inferenza da generazioni,tutte run,Si,cross-group coverage; primary group owns final evidence index
+T-063,G06,runtime and temporal policies,G02;G06,MA-GA,Stop reason,STAGNATION_REACHED,Osservazione,MAIN,Si,cross-group coverage; primary group owns final evidence index
+T-064,G06,runtime and temporal policies,G02;G06;G07,MA-GA,Stop reason,MAX_GENERATIONS_REACHED,Osservazione,CFG-H-S; CFG-G-ADAPTIVE,Si,cross-group coverage; primary group owns final evidence index
+T-065,G04,mobility and connectivity,G02;G04;G05;G07,Decisioni,LOCAL_EXECUTION,p=0 e nodo LOCAL,Diretto,CFG-M-BACKGROUND; MAIN,Si,cross-group coverage; primary group owns final evidence index
+T-066,G05,resource policies and repair,G02;G05,Decisioni,PARTIAL_OFFLOADING,0<p<1,Diretto,MAIN; RES,Si,cross-group coverage; primary group owns final evidence index
+T-067,G05,resource policies and repair,G02;G05;G07,Decisioni,FULL_OFFLOADING,p=1,Osservazione,MAIN; CFG-R-LOCALCPU,No,cross-group coverage; primary group owns final evidence index
+T-068,G05,resource policies and repair,G02;G05,Decisioni,Bucket ratio,"p=0, low, midLow, midHigh, high, p=1",Report,MAIN; RES,Si,cross-group coverage; primary group owns final evidence index
+T-069,G05,resource policies and repair,G02;G05,Policy ratio,Modalita interne,LOCAL/RANDOM/DEADLINE_AWARE/BORDERLINE/MODERATE/AGGRESSIVE/SMALL_STEP,Audit + effetti,MAIN; RES,No,cross-group coverage; primary group owns final evidence index
+T-070,G05,resource policies and repair,G05,Policy risorse,Feasibility,FEASIBLE/BORDERLINE/INFEASIBLE_LOCAL/REMOTE/BOTH,Diagnostica,RES,Si,
+T-071,G05,resource policies and repair,G05;G07,Repair,CPU aggregata,Nodo oltre capacita,Test diretto,CFG-R-EDGECPU; CFG-R-CLOUDCPU,Si,cross-group coverage; primary group owns final evidence index
+T-072,G05,resource policies and repair,G04;G05;G07,Repair,Banda per link,candidateId oltre capacita,Test diretto,CFG-R-CELLBW; CFG-R-V2VBW,Si,cross-group coverage; primary group owns final evidence index
+T-073,G05,resource policies and repair,G04;G05;G07,Repair,Banda per pool,poolId oltre capacita,Test diretto,CFG-R-CELLBW; CFG-R-V2VBW,Si,cross-group coverage; primary group owns final evidence index
+T-074,G04,mobility and connectivity,G04;G05;G07,Repair,Fallback locale,Remoto non sostenibile,Test diretto,CFG-M-BACKGROUND; RES,Si,cross-group coverage; primary group owns final evidence index
+T-075,G02,main factorial experiments,G02;G05;G07,Repair,DEGRADED_BEST_EFFORT,Nessuna alternativa testata rispetta deadline,Stress,CFG-L-S; CFG-N-S; CFG-H-S,Si,cross-group coverage; primary group owns final evidence index
+T-076,G04,mobility and connectivity,G04;G05;G06,Prefilter,Motivi rifiuto,"NO_TASK, INVALID_CPU, INVALID_BW, COVERAGE, LINK, DEADLINE, FALLBACK",Test mirati/audit,MOB; RES; SPARSE,Si,cross-group coverage; primary group owns final evidence index
+T-077,G05,resource policies and repair,G02;G05,Fitness,Penalita risorse,Pres CPU/banda,Report,RES; MAIN,Si,cross-group coverage; primary group owns final evidence index
+T-078,G07,final cross-group audit,G05;G07,Fitness,Componenti,"T, L, Pmob, Pres, J",Report,tutte run,Si,cross-group coverage; primary group owns final evidence index
+T-079,G04,mobility and connectivity,G02;G04,Nodi,Quattro destinazioni,LOCAL/VEHICLE/EDGE/CLOUD,Test multiplo,MAIN; MOB,Si,cross-group coverage; primary group owns final evidence index
+T-080,G04,mobility and connectivity,G02;G04;G05,Deadline,Cause diagnostiche,Tutte le cause enum,Campagna + stress mirati,MAIN; RES; MOB,Si,cross-group coverage; primary group owns final evidence index
+T-090,G04,mobility and connectivity,G04;G07,Mobilita,LOCAL_CONVENTIONAL,Scelta locale,Diretto,CFG-M-BACKGROUND,Si,cross-group coverage; primary group owns final evidence index
+T-091,G04,mobility and connectivity,G04;G07,Mobilita,EDGE_GEOMETRIC,Distanza/raggio RSU,Diretto,CFG-M-RSU0; CFG-M-RSU1,Si,cross-group coverage; primary group owns final evidence index
+T-092,G04,mobility and connectivity,G04;G07,Mobilita,CLOUD_GATEWAY_GEOMETRIC,Cloud via gateway,Diretto,CFG-M-RSU0; CFG-M-SWITCH,Si,cross-group coverage; primary group owns final evidence index
+T-093,G04,mobility and connectivity,G04;G07,Mobilita,V2V_SCALAR_RELATIVE_SPEED,Distanza e velocita relativa scalare,Diretto,CFG-M-V2V,Si,cross-group coverage; primary group owns final evidence index
+T-094,G04,mobility and connectivity,G04;G05;G07,Mobilita,Coverage insufficiente,completion > coverage,Stress mirato,CFG-M-SWITCH; CFG-R-RTT; CFG-R-CELLBW,Si,cross-group coverage; primary group owns final evidence index
+T-095,G04,mobility and connectivity,G04,Mobilita,Link instability,phiLink,Diretto,MOB,Si,
+T-096,G04,mobility and connectivity,G04;G07,Mobilita,Handover risk,phiHo,Diretto,CFG-M-SWITCH,Si,cross-group coverage; primary group owns final evidence index
+T-097,G04,mobility and connectivity,G02;G04,Mobilita,Pmob,Somma pesata,Report,MOB; MAIN,Si,cross-group coverage; primary group owns final evidence index
+T-098,G04,mobility and connectivity,G04;G07,Mobilita,Gateway switch,rsu_0 -> rsu_1 o viceversa,Diretto,CFG-M-SWITCH,Si,cross-group coverage; primary group owns final evidence index
+T-099,G07,final cross-group audit,G04;G07,Mobilita,Legacy cloud placeholder,CLOUD_STABLE_PLACEHOLDER,Audit negativo,tutte run,Si,cross-group coverage; primary group owns final evidence index
+T-110,G04,mobility and connectivity,G02;G04;G05;G06,Temporale,Dinamicita,"Dv, Dt, Dr, Dl, D",Report,MAIN; MOB; RES,Si,cross-group coverage; primary group owns final evidence index
+T-111,G04,mobility and connectivity,G02;G04;G05;G06,Temporale,Livelli,UNKNOWN/STABLE/MODERATE/HIGH,Osservazione,MAIN; MOB; RES,Si,cross-group coverage; primary group owns final evidence index
+T-112,G04,mobility and connectivity,G02;G04;G05;G06,Riuso popolazione,Modalita,FIRST_RUN/WARM_START/PARTIAL_RESTART/COLD_START,Osservazione,MAIN; MOB; RES,Si,cross-group coverage; primary group owns final evidence index
+T-113,G05,resource policies and repair,G02;G05;G06,Riuso popolazione,Correzioni policy,suggested != applied,Report,MAIN; stress,Si,cross-group coverage; primary group owns final evidence index
+T-114,G05,resource policies and repair,G02;G05;G06,Finestra,Azioni,FIRST_RUN/INCREASE/KEEP/DECREASE/CLAMP_TO_BOUNDS,Osservazione,MAIN; stress,Si,cross-group coverage; primary group owns final evidence index
+T-115,G06,runtime and temporal policies,G06;G07,Finestra,Bounds,deltaTMin/deltaTMax,Audit,tutte run,Si,cross-group coverage; primary group owns final evidence index
+T-116,G06,runtime and temporal policies,G02;G06;G07,Finestra,Runtime budget,EXCEEDS_CURRENT_AND_NEXT,Stress,CFG-G-STALE; CFG-H-S,Si,cross-group coverage; primary group owns final evidence index
+T-117,G06,runtime and temporal policies,G06;G07,Trigger,Trigger programmati,FIRST_RUN / SCHEDULED_WINDOW_EXPIRATION,Live,tutte run,Si,cross-group coverage; primary group owns final evidence index
+T-118,G06,runtime and temporal policies,G06;G07,Trigger,Trigger critico,CRITICAL_EVENT,Audit/standalone,-,No,cross-group coverage; primary group owns final evidence index
+T-119,G06,runtime and temporal policies,G06;G07,State source,Sorgente live,MOSAIC_LIVE,Audit,tutte run,Si,cross-group coverage; primary group owns final evidence index
+T-120,G06,runtime and temporal policies,G02;G06,GA scaling,Scaling canonico,STATIC,Campagna principale,MAIN,Si,cross-group coverage; primary group owns final evidence index
+T-121,G06,runtime and temporal policies,G06;G07,GA scaling,Scaling non canonico,ADAPTIVE,Test separato,CFG-G-ADAPTIVE,No,cross-group coverage; primary group owns final evidence index
+T-130,G07,final cross-group audit,G07,Reporting,File run,Tutti i CSV/JSONL/JSON/TXT/MD,Audit,tutte run,Si,
+T-131,G07,final cross-group audit,G07,Reporting,Parsing,CSV/JSON/JSONL validi,Parser/validator,tutte run,Si,
+T-132,G07,final cross-group audit,G07,Reporting,Coerenza contatori,Submitted/completed/applied/stale,Audit,tutte run,Si,
+T-133,G07,final cross-group audit,G07,Reporting,Completion model,NOT_IMPLEMENTED,Audit,tutte run,Si,
+T-134,G07,final cross-group audit,G07,Reporting,Provenienza dati,Configurato/osservato/derivato/ottimizzato,Documentazione,tutte run,Si,
+T-135,G07,final cross-group audit,G07,Reporting,Integrita numerica,"NaN, Infinity, valori negativi illegali",Scan,tutte run,Si,

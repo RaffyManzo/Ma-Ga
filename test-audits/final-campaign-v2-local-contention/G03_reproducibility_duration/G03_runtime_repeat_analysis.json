@@ -1,0 +1,38 @@
+{
+  "schemaVersion": 1,
+  "generatedAt": "2026-06-27T00:21:48.605225+02:00",
+  "status": "PASS",
+  "replicaCount": 3,
+  "sameMaterialization": true,
+  "deterministicFunctionalCounters": true,
+  "counterValues": {
+    "tasksGenerated": [
+      9306
+    ],
+    "tasksActivated": [
+      9306
+    ],
+    "tasksRemovedAtDeadline": [
+      9241
+    ],
+    "tasksPendingAtEnd": [
+      65
+    ],
+    "tasksPendingPeak": [
+      79
+    ],
+    "snapshotRequests": [
+      3000
+    ],
+    "snapshotResolved": [
+      2981
+    ]
+  },
+  "gaRuntimeMeanSecondsByReplica": [
+    0.305776353,
+    0.497619029,
+    0.098761813
+  ],
+  "gaRuntimeMeanCoefficientOfVariationPercent": 66.33323860097754,
+  "interpretation": "I contatori funzionali sono riproducibili. Submitted/applied/stale e runtime possono variare per la temporizzazione wall-clock del worker asincrono."
+}

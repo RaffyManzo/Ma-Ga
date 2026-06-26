@@ -12,11 +12,11 @@
   "generatedAtUtc": "2026-06-26T16:31:47.304242+00:00",
   "legacyResultsImported": false,
   "materializationExecuted": true,
-  "phase": "G02_COMPLETE_READY_FOR_G03",
+  "phase": "G03_COMPLETE_WITH_RUNTIME_CADENCE_LIMIT_READY_FOR_G04",
   "scenarioInstanceCount": 69,
   "schemaVersion": 1,
   "simulationExecuted": true,
-  "lastCompletedGroup": "G02",
+  "lastCompletedGroup": "G03",
   "g01": {
     "verdict": "PASS_G01_COMPLETE_READY_FOR_G02_RUNS",
     "runName": "log-20260626-215940-MaGaLiteratureBasedUrbanStudy",
@@ -52,5 +52,30 @@
     "runtimeJarSha256": "3821c28a6a0898e94f4d5136b8039595d36bcbce0b6ecc3e9406910f9e083068",
     "auditSummary": "data/docs/testing/final-campaign-v2-local-contention/G02_AUDIT_SUMMARY_FOR_RESULTS.md",
     "chapter7EvidenceIndex": "data/docs/testing/final-campaign-v2-local-contention/G02_CHAPTER7_EVIDENCE_INDEX.md"
+  },
+  "g03": {
+    "verdict": "PASS_G03_COMPLETE_WITH_RUNTIME_CADENCE_LIMIT_READY_FOR_G04",
+    "materializationComparisons": 2,
+    "runtimeRepeatabilityRuns": 3,
+    "nominalExtendedRuns": 5,
+    "stressRuns": 1,
+    "validRuns": 9,
+    "validatorPasses": 9,
+    "runtimeViolations": 0,
+    "maximumSnapshotLagSeconds": 0.0,
+    "runtimeCadenceLimitObserved": true,
+    "nominalExtendedLastAppliedRangeSeconds": [
+      9.8,
+      28.0
+    ],
+    "nominalExtendedFinalGapRangeSeconds": [
+      572.0,
+      590.2
+    ],
+    "runtimeJarSha256": "3821c28a6a0898e94f4d5136b8039595d36bcbce0b6ecc3e9406910f9e083068",
+    "auditSummary": "data/docs/testing/final-campaign-v2-local-contention/G03_AUDIT_SUMMARY_FOR_RESULTS.md",
+    "chapter7EvidenceIndex": "data/docs/testing/final-campaign-v2-local-contention/G03_CHAPTER7_EVIDENCE_INDEX.md",
+    "nextGroup": "G04",
+    "cadenceAnalysisOwner": "G06"
   }
 }

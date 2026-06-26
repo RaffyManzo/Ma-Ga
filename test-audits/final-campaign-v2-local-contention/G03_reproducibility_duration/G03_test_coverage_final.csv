@@ -1,0 +1,4 @@
+﻿testId,status,evidence,interpretation
+T-010,PASS,G03_reproducibility_evidence.json,Template e materializzazioni validate.
+T-014,PASS,G03_reproducibility_evidence.json,Confronto normalizzato logicamente identico.
+T-018,PASS_WITH_RUNTIME_CADENCE_LIMIT,G03_extended_duration_analysis.json; G03_runtime_cadence_analysis.json,Cinque run da 600 s concluse e validate; aggiornamento delle strategie non mantenuto fino alla fine della timeline.

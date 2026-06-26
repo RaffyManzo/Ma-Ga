@@ -1,0 +1,42 @@
+{
+  "schemaVersion": 1,
+  "generatedAt": "2026-06-27T00:30:01.533242+02:00",
+  "status": "RUNTIME_CADENCE_LIMIT_OBSERVED",
+  "matrixExpectation": "lastAppliedStrategySimulationTimeSeconds vicino alla durata del run nei profili stabili",
+  "expectationMet": false,
+  "runtimeRepeatability": {
+    "durationSeconds": 300,
+    "lastAppliedMinSeconds": 9.4,
+    "lastAppliedMaxSeconds": 9.6,
+    "finalGapMinSeconds": 290.4,
+    "finalGapMaxSeconds": 290.6,
+    "timelineCoverageMinPercent": 3.1333333333333333,
+    "timelineCoverageMaxPercent": 3.2,
+    "gaRuntimeMeanCoefficientOfVariationPercent": 66.33323860097754
+  },
+  "nominalExtended": {
+    "durationSeconds": 600,
+    "runCount": 5,
+    "lastAppliedMinSeconds": 9.8,
+    "lastAppliedMaxSeconds": 28.0,
+    "finalGapMinSeconds": 572.0,
+    "finalGapMaxSeconds": 590.2,
+    "timelineCoverageMinPercent": 1.6333333333333335,
+    "timelineCoverageMaxPercent": 4.666666666666667,
+    "gaJobsSubmittedTotal": 159,
+    "gaJobsAppliedTotal": 142,
+    "maximumGaRuntimeSeconds": 37.4097213
+  },
+  "highDensityStress": {
+    "durationSeconds": 600,
+    "status": "PASS",
+    "lastAppliedSeconds": 6.9,
+    "finalGapSeconds": 593.1,
+    "timelineCoveragePercent": 1.15,
+    "tasksGenerated": 31599,
+    "tasksPendingPeak": 206
+  },
+  "interpretation": "MOSAIC, workload, snapshot e validator restano stabili per l'intera durata. Il worker MA-GA asincrono non mantiene però aggiornamenti della strategia lungo tutta la timeline simulata con la versione V2 che include la contesa CPU locale.",
+  "ownership": "Il limite è registrato in G03 e dovrà essere analizzato in modo causale nel gruppo G06.",
+  "formalClassification": "PASS_G03_COMPLETE_WITH_RUNTIME_CADENCE_LIMIT_READY_FOR_G04"
+}

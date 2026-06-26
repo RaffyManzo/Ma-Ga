@@ -1,0 +1,4 @@
+﻿testId,status,evidence,notes
+T-010,PASS,G03_reproducibility_evidence.json,Assenza token non risolti e validazione delle due materializzazioni.
+T-014,PASS,G03_reproducibility_evidence.json,Confronto normalizzato LOGICALLY_IDENTICAL.
+T-018,PASS,G03_extended_duration_analysis.json; G03_stress_limit_evidence.json,Cinque run nominali extended obbligatorie PASS. La prova high-density è opzionale.

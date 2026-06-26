@@ -1,0 +1,5 @@
+﻿category,severity,description,decision
+RUNTIME_CADENCE_LIMIT,SCIENTIFIC_LIMIT,"Nelle run nominali da 600 s l'ultima strategia è applicata tra 9,8 e 28,0 s.",G03 chiusa con limite esplicito; analisi causale rinviata a G06.
+RUNTIME_VARIABILITY,OBSERVED,"Il coefficiente di variazione delle medie runtime nelle tre repliche è 66,333239%.","La riproducibilità è attribuita ai contatori funzionali, non ai tempi wall-clock."
+STRESS_PROFILE,INFORMATIONAL,"CFG-H-S-EXT completa 600 s e il validator è PASS, ma l'ultima strategia è applicata a 6,9 s.",La stabilità del simulatore non viene confusa con la continuità decisionale.
+TASK_COMPLETION_MODEL,LIMIT,taskCompletionModel=NOT_IMPLEMENTED.,Non interpretare assegnazioni o rimozioni alla deadline come completamenti reali.

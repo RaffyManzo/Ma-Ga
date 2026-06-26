@@ -1,0 +1,28 @@
+{
+  "schemaVersion": 1,
+  "generatedAt": "2026-06-27T00:21:48.612591+02:00",
+  "status": "PASS",
+  "runCount": 5,
+  "durationSeconds": 600,
+  "seeds": [
+    104729,
+    130363,
+    155921,
+    181081,
+    207547
+  ],
+  "validatorPassCount": 5,
+  "tasksGeneratedTotal": 96337,
+  "gaJobsSubmittedTotal": 159,
+  "gaJobsCompletedTotal": 155,
+  "gaJobsAppliedTotal": 142,
+  "staleResultsTotal": 13,
+  "shutdownInFlightTotal": 4,
+  "maximumSnapshotLagSeconds": 0.0,
+  "runtimeViolationCount": 0,
+  "maximumGaRuntimeSeconds": 37.4097213,
+  "taskCompletionModel": [
+    "NOT_IMPLEMENTED"
+  ],
+  "interpretation": "Le cinque run nominali da 600 s verificano la stabilità su più cicli della domanda."
+}
