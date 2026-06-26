@@ -37,14 +37,28 @@ final class LiveReportingJsonlWriter implements AutoCloseable {
                 reportingDir.resolve("live_discarded_window_records.csv"),
                 StandardCharsets.UTF_8
         );
-        String header = "jobId,windowIndex,snapshotId,snapshotTimeSeconds,submissionSimulationTimeNs,gaRuntimeWallClockSeconds,deltaTMaxSeconds,fitness,localAssignments,vehicleAssignments,edgeAssignments,cloudAssignments,status\n";
+        String header = "jobId,windowIndex,snapshotId,snapshotTimeSeconds,"
+                + "submissionSimulationTimeNs,gaRuntimeWallClockSeconds,"
+                + "deltaTMaxSeconds,fitness,localAssignments,"
+                + "vehicleAssignments,edgeAssignments,cloudAssignments,"
+                + "localTaskPortions,vehiclesWithLocalWorkload,"
+                + "vehiclesWithLocalContention,vehiclesWithLocalCpuOverflow,"
+                + "localDeadlineViolations,"
+                + "maxIndependentLocalExecutionTimeSeconds,"
+                + "maxContendedLocalCompletionTimeSeconds,"
+                + "maxLocalContentionDelaySeconds,maxLocalDemandRatio,"
+                + "maxLocalCpuOverflowRatio,status\n";
         appliedCsvWriter.write(header);
         discardedCsvWriter.write(header);
         appliedCsvWriter.flush();
         discardedCsvWriter.flush();
     }
 
-    void writeEvent(String eventType, LiveGaJobRecord record, long eventSimulationTimeNs) throws IOException {
+    void writeEvent(
+            String eventType,
+            LiveGaJobRecord record,
+            long eventSimulationTimeNs
+    ) throws IOException {
         Map<String, Object> row = new LinkedHashMap<>();
         row.put("eventType", eventType);
         row.put("eventSimulationTimeNs", eventSimulationTimeNs);
@@ -54,14 +68,35 @@ final class LiveReportingJsonlWriter implements AutoCloseable {
         row.put("snapshotId", record.snapshotId);
         row.put("snapshotTimeSeconds", record.snapshotTimeSeconds);
         row.put("finalStatus", record.finalStatus);
-        row.put("timeoutDetectedBeforeCompletion", record.timeoutDetectedBeforeCompletion);
-        row.put("waitCapDetectedWallClockNs", record.waitCapDetectedWallClockNs);
-        row.put("waitCapDetectedSimulationTimeNs", record.waitCapDetectedSimulationTimeNs);
+        row.put(
+                "timeoutDetectedBeforeCompletion",
+                record.timeoutDetectedBeforeCompletion
+        );
+        row.put(
+                "waitCapDetectedWallClockNs",
+                record.waitCapDetectedWallClockNs
+        );
+        row.put(
+                "waitCapDetectedSimulationTimeNs",
+                record.waitCapDetectedSimulationTimeNs
+        );
         row.put("completionWallClockNs", record.completionWallClockNs);
-        row.put("gaRuntimeWallClockSeconds", record.gaRuntimeWallClockSeconds);
-        row.put("deltaTMaxAtSubmissionSeconds", record.deltaTMaxAtSubmissionSeconds);
-        row.put("deltaTMaxFromCompletedStepSeconds", record.deltaTMaxFromCompletedStepSeconds);
-        row.put("deltaTMaxMismatchSeconds", record.deltaTMaxMismatchSeconds);
+        row.put(
+                "gaRuntimeWallClockSeconds",
+                record.gaRuntimeWallClockSeconds
+        );
+        row.put(
+                "deltaTMaxAtSubmissionSeconds",
+                record.deltaTMaxAtSubmissionSeconds
+        );
+        row.put(
+                "deltaTMaxFromCompletedStepSeconds",
+                record.deltaTMaxFromCompletedStepSeconds
+        );
+        row.put(
+                "deltaTMaxMismatchSeconds",
+                record.deltaTMaxMismatchSeconds
+        );
         row.put("errorType", record.errorType);
         row.put("errorMessage", record.errorMessage);
         eventWriter.write(gson.toJson(row));
@@ -75,8 +110,13 @@ final class LiveReportingJsonlWriter implements AutoCloseable {
         stepWriter.flush();
     }
 
-    void writeWindowCsv(LiveWindowCsvRecord record, boolean applied) throws IOException {
-        BufferedWriter writer = applied ? appliedCsvWriter : discardedCsvWriter;
+    void writeWindowCsv(
+            LiveWindowCsvRecord record,
+            boolean applied
+    ) throws IOException {
+        BufferedWriter writer = applied
+                ? appliedCsvWriter
+                : discardedCsvWriter;
         writer.write(record.jobId
                 + "," + record.windowIndex
                 + "," + safe(record.snapshotId)
@@ -89,6 +129,20 @@ final class LiveReportingJsonlWriter implements AutoCloseable {
                 + "," + record.vehicleAssignments
                 + "," + record.edgeAssignments
                 + "," + record.cloudAssignments
+                + "," + record.localTaskPortions
+                + "," + record.vehiclesWithLocalWorkload
+                + "," + record.vehiclesWithLocalContention
+                + "," + record.vehiclesWithLocalCpuOverflow
+                + "," + record.localDeadlineViolations
+                + "," + format(
+                        record.maxIndependentLocalExecutionTimeSeconds
+                )
+                + "," + format(
+                        record.maxContendedLocalCompletionTimeSeconds
+                )
+                + "," + format(record.maxLocalContentionDelaySeconds)
+                + "," + format(record.maxLocalDemandRatio)
+                + "," + format(record.maxLocalCpuOverflowRatio)
                 + "," + record.status
                 + "\n");
         writer.flush();
@@ -125,6 +179,16 @@ final class LiveReportingJsonlWriter implements AutoCloseable {
         final int vehicleAssignments;
         final int edgeAssignments;
         final int cloudAssignments;
+        final int localTaskPortions;
+        final int vehiclesWithLocalWorkload;
+        final int vehiclesWithLocalContention;
+        final int vehiclesWithLocalCpuOverflow;
+        final int localDeadlineViolations;
+        final double maxIndependentLocalExecutionTimeSeconds;
+        final double maxContendedLocalCompletionTimeSeconds;
+        final double maxLocalContentionDelaySeconds;
+        final double maxLocalDemandRatio;
+        final double maxLocalCpuOverflowRatio;
         final String status;
 
         LiveWindowCsvRecord(
@@ -140,6 +204,16 @@ final class LiveReportingJsonlWriter implements AutoCloseable {
                 int vehicleAssignments,
                 int edgeAssignments,
                 int cloudAssignments,
+                int localTaskPortions,
+                int vehiclesWithLocalWorkload,
+                int vehiclesWithLocalContention,
+                int vehiclesWithLocalCpuOverflow,
+                int localDeadlineViolations,
+                double maxIndependentLocalExecutionTimeSeconds,
+                double maxContendedLocalCompletionTimeSeconds,
+                double maxLocalContentionDelaySeconds,
+                double maxLocalDemandRatio,
+                double maxLocalCpuOverflowRatio,
                 String status
         ) {
             this.jobId = jobId;
@@ -154,6 +228,19 @@ final class LiveReportingJsonlWriter implements AutoCloseable {
             this.vehicleAssignments = vehicleAssignments;
             this.edgeAssignments = edgeAssignments;
             this.cloudAssignments = cloudAssignments;
+            this.localTaskPortions = localTaskPortions;
+            this.vehiclesWithLocalWorkload = vehiclesWithLocalWorkload;
+            this.vehiclesWithLocalContention = vehiclesWithLocalContention;
+            this.vehiclesWithLocalCpuOverflow = vehiclesWithLocalCpuOverflow;
+            this.localDeadlineViolations = localDeadlineViolations;
+            this.maxIndependentLocalExecutionTimeSeconds =
+                    maxIndependentLocalExecutionTimeSeconds;
+            this.maxContendedLocalCompletionTimeSeconds =
+                    maxContendedLocalCompletionTimeSeconds;
+            this.maxLocalContentionDelaySeconds =
+                    maxLocalContentionDelaySeconds;
+            this.maxLocalDemandRatio = maxLocalDemandRatio;
+            this.maxLocalCpuOverflowRatio = maxLocalCpuOverflowRatio;
             this.status = status;
         }
     }

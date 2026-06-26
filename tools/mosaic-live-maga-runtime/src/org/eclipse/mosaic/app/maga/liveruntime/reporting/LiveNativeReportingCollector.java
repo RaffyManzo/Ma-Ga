@@ -2,6 +2,7 @@ package org.eclipse.mosaic.app.maga.liveruntime.reporting;
 
 import config.MaGaConfig;
 import ga.fitness.breakdown.GeneEvaluationBreakdown;
+import ga.fitness.breakdown.LocalResourceUsageBreakdown;
 import model.node.NodeType;
 import window.state.TemporalStepResult;
 
@@ -295,7 +296,10 @@ public final class LiveNativeReportingCollector implements AutoCloseable {
         int vehicle = 0;
         int edge = 0;
         int cloud = 0;
-        for (GeneEvaluationBreakdown gene : step.getMaGaResult().getBestEvaluation().getGeneBreakdowns()) {
+        for (GeneEvaluationBreakdown gene : step
+                .getMaGaResult()
+                .getBestEvaluation()
+                .getGeneBreakdowns()) {
             if (gene.getNodeType() == NodeType.LOCAL) {
                 local++;
             } else if (gene.getNodeType() == NodeType.VEHICLE) {
@@ -306,6 +310,59 @@ public final class LiveNativeReportingCollector implements AutoCloseable {
                 cloud++;
             }
         }
+
+        int localTaskPortions = 0;
+        int vehiclesWithLocalWorkload = 0;
+        int vehiclesWithLocalContention = 0;
+        int vehiclesWithLocalCpuOverflow = 0;
+        int localDeadlineViolations = 0;
+        double maxIndependentLocalExecutionTimeSeconds = 0.0;
+        double maxContendedLocalCompletionTimeSeconds = 0.0;
+        double maxLocalContentionDelaySeconds = 0.0;
+        double maxLocalDemandRatio = 0.0;
+        double maxLocalCpuOverflowRatio = 0.0;
+
+        for (LocalResourceUsageBreakdown usage : step
+                .getMaGaResult()
+                .getBestEvaluation()
+                .getLocalResourceUsageBreakdowns()) {
+            if (!usage.hasLocalWorkload()) {
+                continue;
+            }
+
+            vehiclesWithLocalWorkload++;
+            localTaskPortions += usage.getLocalTaskCount();
+            localDeadlineViolations += usage.getDeadlineViolationCount();
+
+            if (usage.hasContention()) {
+                vehiclesWithLocalContention++;
+            }
+            if (usage.hasCpuViolation()) {
+                vehiclesWithLocalCpuOverflow++;
+            }
+
+            maxIndependentLocalExecutionTimeSeconds = Math.max(
+                    maxIndependentLocalExecutionTimeSeconds,
+                    usage.getMaxIndependentLocalExecutionTimeSeconds()
+            );
+            maxContendedLocalCompletionTimeSeconds = Math.max(
+                    maxContendedLocalCompletionTimeSeconds,
+                    usage.getMaxLocalExecutionTimeSeconds()
+            );
+            maxLocalContentionDelaySeconds = Math.max(
+                    maxLocalContentionDelaySeconds,
+                    usage.getMaxContentionDelaySeconds()
+            );
+            maxLocalDemandRatio = Math.max(
+                    maxLocalDemandRatio,
+                    usage.getMaxLocalDemandRatio()
+            );
+            maxLocalCpuOverflowRatio = Math.max(
+                    maxLocalCpuOverflowRatio,
+                    usage.getCpuOverflowRatio()
+            );
+        }
+
         return new LiveReportingSummary.LiveWindowSummary(
                 jobId,
                 step.getWindowIndex(),
@@ -316,6 +373,16 @@ public final class LiveNativeReportingCollector implements AutoCloseable {
                 vehicle,
                 edge,
                 cloud,
+                localTaskPortions,
+                vehiclesWithLocalWorkload,
+                vehiclesWithLocalContention,
+                vehiclesWithLocalCpuOverflow,
+                localDeadlineViolations,
+                maxIndependentLocalExecutionTimeSeconds,
+                maxContendedLocalCompletionTimeSeconds,
+                maxLocalContentionDelaySeconds,
+                maxLocalDemandRatio,
+                maxLocalCpuOverflowRatio,
                 status
         );
     }
@@ -337,6 +404,16 @@ public final class LiveNativeReportingCollector implements AutoCloseable {
                 summary.vehicleAssignments,
                 summary.edgeAssignments,
                 summary.cloudAssignments,
+                summary.localTaskPortions,
+                summary.vehiclesWithLocalWorkload,
+                summary.vehiclesWithLocalContention,
+                summary.vehiclesWithLocalCpuOverflow,
+                summary.localDeadlineViolations,
+                summary.maxIndependentLocalExecutionTimeSeconds,
+                summary.maxContendedLocalCompletionTimeSeconds,
+                summary.maxLocalContentionDelaySeconds,
+                summary.maxLocalDemandRatio,
+                summary.maxLocalCpuOverflowRatio,
                 summary.status
         );
     }

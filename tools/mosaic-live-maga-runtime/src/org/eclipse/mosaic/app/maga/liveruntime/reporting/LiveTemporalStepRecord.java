@@ -2,6 +2,7 @@ package org.eclipse.mosaic.app.maga.liveruntime.reporting;
 
 import ga.fitness.breakdown.EvaluationBreakdown;
 import ga.fitness.breakdown.GeneEvaluationBreakdown;
+import ga.fitness.breakdown.LocalResourceUsageBreakdown;
 import window.state.TemporalStepResult;
 
 import java.util.ArrayList;
@@ -27,6 +28,7 @@ public final class LiveTemporalStepRecord {
     public final int initialPopulationSize;
     public final int finalPopulationSize;
     public final Map<String, Object> fitness;
+    public final Map<String, Object> localContention;
     public final List<Map<String, Object>> genes;
 
     private LiveTemporalStepRecord(
@@ -51,6 +53,7 @@ public final class LiveTemporalStepRecord {
         this.initialPopulationSize = step.getInitialPopulationSize();
         this.finalPopulationSize = step.getFinalPopulationSize();
         this.fitness = fitness(step);
+        this.localContention = localContention(step);
         this.genes = genes(step);
     }
 
@@ -141,6 +144,86 @@ public final class LiveTemporalStepRecord {
         return row;
     }
 
+    private static Map<String, Object> localContention(
+            TemporalStepResult step
+    ) {
+        EvaluationBreakdown evaluation = step
+                .getMaGaResult()
+                .getBestEvaluation();
+
+        int localTaskPortions = 0;
+        int vehiclesWithLocalWorkload = 0;
+        int vehiclesWithLocalContention = 0;
+        int vehiclesWithLocalCpuOverflow = 0;
+        int localDeadlineViolations = 0;
+        double maxIndependentLocalExecutionTimeSeconds = 0.0;
+        double maxContendedLocalCompletionTimeSeconds = 0.0;
+        double maxLocalContentionDelaySeconds = 0.0;
+        double maxLocalDemandRatio = 0.0;
+        double maxLocalCpuOverflowRatio = 0.0;
+
+        for (LocalResourceUsageBreakdown usage
+                : evaluation.getLocalResourceUsageBreakdowns()) {
+            if (!usage.hasLocalWorkload()) {
+                continue;
+            }
+
+            vehiclesWithLocalWorkload++;
+            localTaskPortions += usage.getLocalTaskCount();
+            localDeadlineViolations += usage.getDeadlineViolationCount();
+
+            if (usage.hasContention()) {
+                vehiclesWithLocalContention++;
+            }
+            if (usage.hasCpuViolation()) {
+                vehiclesWithLocalCpuOverflow++;
+            }
+
+            maxIndependentLocalExecutionTimeSeconds = Math.max(
+                    maxIndependentLocalExecutionTimeSeconds,
+                    usage.getMaxIndependentLocalExecutionTimeSeconds()
+            );
+            maxContendedLocalCompletionTimeSeconds = Math.max(
+                    maxContendedLocalCompletionTimeSeconds,
+                    usage.getMaxLocalExecutionTimeSeconds()
+            );
+            maxLocalContentionDelaySeconds = Math.max(
+                    maxLocalContentionDelaySeconds,
+                    usage.getMaxContentionDelaySeconds()
+            );
+            maxLocalDemandRatio = Math.max(
+                    maxLocalDemandRatio,
+                    usage.getMaxLocalDemandRatio()
+            );
+            maxLocalCpuOverflowRatio = Math.max(
+                    maxLocalCpuOverflowRatio,
+                    usage.getCpuOverflowRatio()
+            );
+        }
+
+        Map<String, Object> row = new LinkedHashMap<>();
+        row.put("localTaskPortions", localTaskPortions);
+        row.put("vehiclesWithLocalWorkload", vehiclesWithLocalWorkload);
+        row.put("vehiclesWithLocalContention", vehiclesWithLocalContention);
+        row.put("vehiclesWithLocalCpuOverflow", vehiclesWithLocalCpuOverflow);
+        row.put("localDeadlineViolations", localDeadlineViolations);
+        row.put(
+                "maxIndependentLocalExecutionTimeSeconds",
+                maxIndependentLocalExecutionTimeSeconds
+        );
+        row.put(
+                "maxContendedLocalCompletionTimeSeconds",
+                maxContendedLocalCompletionTimeSeconds
+        );
+        row.put(
+                "maxLocalContentionDelaySeconds",
+                maxLocalContentionDelaySeconds
+        );
+        row.put("maxLocalDemandRatio", maxLocalDemandRatio);
+        row.put("maxLocalCpuOverflowRatio", maxLocalCpuOverflowRatio);
+        return row;
+    }
+
     private static List<Map<String, Object>> genes(TemporalStepResult step) {
         List<Map<String, Object>> rows = new ArrayList<>();
         for (GeneEvaluationBreakdown gene : step.getMaGaResult().getBestEvaluation().getGeneBreakdowns()) {
@@ -161,7 +244,22 @@ public final class LiveTemporalStepRecord {
             row.put("communicationLatencySeconds", gene.getCommunicationLatencySeconds());
             row.put("remoteExecutionTimeSeconds", gene.getRemoteExecutionTimeSeconds());
             row.put("remotePartTimeSeconds", gene.getRemotePartTimeSeconds());
-            row.put("localExecutionTimeSeconds", gene.getLocalExecutionTimeSeconds());
+            row.put(
+                    "independentLocalExecutionTimeSeconds",
+                    gene.getIndependentLocalExecutionTimeSeconds()
+            );
+            row.put(
+                    "contendedLocalCompletionTimeSeconds",
+                    gene.getContendedLocalCompletionTimeSeconds()
+            );
+            row.put(
+                    "localContentionDelaySeconds",
+                    gene.getLocalContentionDelaySeconds()
+            );
+            row.put(
+                    "localExecutionTimeSeconds",
+                    gene.getLocalExecutionTimeSeconds()
+            );
             row.put("deadlineSeconds", gene.getDeadlineSeconds());
             row.put("deadlineRespected", gene.isDeadlineRespected());
             row.put("coverageTimeSeconds", gene.getCoverageTimeSeconds());

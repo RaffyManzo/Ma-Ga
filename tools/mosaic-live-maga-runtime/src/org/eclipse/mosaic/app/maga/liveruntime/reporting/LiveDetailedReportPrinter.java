@@ -32,6 +32,7 @@ final class LiveDetailedReportPrinter {
         liveStale(out, summary);
         liveSnapshotAudit(out, summary);
         liveAssignment(out, summary);
+        liveLocalContention(out, summary);
         liveCell(out, summary);
         liveLimitations(out);
         historicalSections(out, appliedResult, maGaConfig);
@@ -129,6 +130,58 @@ final class LiveDetailedReportPrinter {
         out.println("VEHICLE: " + summary.vehicleAssignments);
         out.println("EDGE: " + summary.edgeAssignments);
         out.println("CLOUD: " + summary.cloudAssignments);
+        out.println();
+    }
+
+    private void liveLocalContention(
+            PrintStream out,
+            LiveReportingSummary summary
+    ) {
+        title(out, "LIVE LOCAL CPU CONTENTION SUMMARY");
+        out.println("local task portions: " + summary.localTaskPortions);
+        out.println(
+                "vehicle-window contention count: "
+                        + summary.localContentionVehicleWindows
+        );
+        out.println(
+                "vehicle-window CPU overflow count: "
+                        + summary.localCpuOverflowVehicleWindows
+        );
+        out.println(
+                "windows with local contention: "
+                        + summary.windowsWithLocalContention
+        );
+        out.println(
+                "windows with local CPU overflow: "
+                        + summary.windowsWithLocalCpuOverflow
+        );
+        out.println(
+                "local deadline violations: "
+                        + summary.localDeadlineViolations
+        );
+        out.println(
+                "max independent local execution time: "
+                        + f(summary.maxIndependentLocalExecutionTimeSeconds)
+                        + " s"
+        );
+        out.println(
+                "max contended local completion time: "
+                        + f(summary.maxContendedLocalCompletionTimeSeconds)
+                        + " s"
+        );
+        out.println(
+                "max local contention delay: "
+                        + f(summary.maxLocalContentionDelaySeconds)
+                        + " s"
+        );
+        out.println(
+                "max local demand ratio: "
+                        + f(summary.maxLocalDemandRatio)
+        );
+        out.println(
+                "max local CPU overflow ratio: "
+                        + f(summary.maxLocalCpuOverflowRatio)
+        );
         out.println();
     }
 

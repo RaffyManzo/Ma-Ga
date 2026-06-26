@@ -86,11 +86,17 @@ public final class LiveNativeDetailedReportingHarness {
         require(countLines(steps) == 2, "step records must include applied and stale results only");
         require(steps.contains("snapshot_applied"), "applied step missing");
         require(steps.contains("snapshot_stale"), "stale step missing");
+        require(steps.contains("\"localContention\""),
+                "local contention block missing from step JSONL");
 
         String appliedCsv = Files.readString(output.resolve("live-reporting/live_applied_window_records.csv"));
         String discardedCsv = Files.readString(output.resolve("live-reporting/live_discarded_window_records.csv"));
         require(appliedCsv.contains("snapshot_applied"), "applied csv missing applied snapshot");
         require(discardedCsv.contains("snapshot_stale"), "discarded csv missing stale snapshot");
+        require(appliedCsv.contains("maxLocalDemandRatio"),
+                "applied CSV local demand ratio header missing");
+        require(appliedCsv.contains("maxLocalCpuOverflowRatio"),
+                "applied CSV local overflow header missing");
 
         String txt = Files.readString(artifacts.getTxt());
         require(txt.contains("LIVE GA JOB SUMMARY"), "live summary section missing");
@@ -100,12 +106,16 @@ public final class LiveNativeDetailedReportingHarness {
         require(txt.contains("populationReusePolicyDescription:"), "txt reuse policy missing");
         require(txt.contains("HISTORICAL CORE REPORT SECTIONS FROM APPLIED LIVE STEPS"), "historical applied-step section missing");
         require(!txt.contains("snapshot_stale | APPLIED"), "stale step must not be reported as applied");
+        require(txt.contains("LIVE LOCAL CPU CONTENTION SUMMARY"),
+                "txt local contention section missing");
 
         String markdown = Files.readString(artifacts.getMarkdown());
         require(markdown.contains("Experimental variant: `FULL_MA_GA`"), "markdown experimental variant missing");
         require(markdown.contains("Effective fitness weights:"), "markdown fitness weights missing");
         require(markdown.contains("Optimization source:"), "markdown optimization source missing");
         require(markdown.contains("Population reuse policy:"), "markdown reuse policy missing");
+        require(markdown.contains("## Local CPU Contention"),
+                "markdown local contention section missing");
 
         String json = Files.readString(artifacts.getJson());
         require(json.contains("\"experimentalVariant\": \"FULL_MA_GA\""), "json experimental variant missing");
@@ -116,6 +126,10 @@ public final class LiveNativeDetailedReportingHarness {
         require(json.contains("\"staleDiscarded\": 1"), "json stale count mismatch");
         require(json.contains("\"failed\": 1"), "json failed count mismatch");
         require(json.contains("\"nullResults\": 1"), "json null count mismatch");
+        require(json.contains("\"maxLocalDemandRatio\""),
+                "json local demand ratio missing");
+        require(json.contains("\"windowsWithLocalContention\""),
+                "json contention window count missing");
 
         System.out.println("PHASE14C3R_REPORTING_HARNESS_PASSED");
     }

@@ -32,6 +32,17 @@ public final class LiveReportingSummary {
     public final int vehicleAssignments;
     public final int edgeAssignments;
     public final int cloudAssignments;
+    public final int localTaskPortions;
+    public final int localContentionVehicleWindows;
+    public final int localCpuOverflowVehicleWindows;
+    public final int windowsWithLocalContention;
+    public final int windowsWithLocalCpuOverflow;
+    public final int localDeadlineViolations;
+    public final double maxIndependentLocalExecutionTimeSeconds;
+    public final double maxContendedLocalCompletionTimeSeconds;
+    public final double maxLocalContentionDelaySeconds;
+    public final double maxLocalDemandRatio;
+    public final double maxLocalCpuOverflowRatio;
     public final Map<String, Object> wallClockTiming;
     public final List<LiveGaJobRecord> jobRecords;
     public final List<LiveWindowSummary> appliedWindowSummaries;
@@ -104,16 +115,72 @@ public final class LiveReportingSummary {
         int vehicle = 0;
         int edge = 0;
         int cloud = 0;
+        int localPortions = 0;
+        int contentionVehicleWindows = 0;
+        int overflowVehicleWindows = 0;
+        int contentionWindows = 0;
+        int overflowWindows = 0;
+        int deadlineViolations = 0;
+        double maxIndependentLocalTime = 0.0;
+        double maxContendedLocalTime = 0.0;
+        double maxContentionDelay = 0.0;
+        double maxDemandRatio = 0.0;
+        double maxOverflowRatio = 0.0;
+
         for (LiveWindowSummary summary : appliedWindowSummaries) {
             local += summary.localAssignments;
             vehicle += summary.vehicleAssignments;
             edge += summary.edgeAssignments;
             cloud += summary.cloudAssignments;
+            localPortions += summary.localTaskPortions;
+            contentionVehicleWindows += summary.vehiclesWithLocalContention;
+            overflowVehicleWindows += summary.vehiclesWithLocalCpuOverflow;
+            deadlineViolations += summary.localDeadlineViolations;
+
+            if (summary.vehiclesWithLocalContention > 0) {
+                contentionWindows++;
+            }
+            if (summary.vehiclesWithLocalCpuOverflow > 0) {
+                overflowWindows++;
+            }
+
+            maxIndependentLocalTime = Math.max(
+                    maxIndependentLocalTime,
+                    summary.maxIndependentLocalExecutionTimeSeconds
+            );
+            maxContendedLocalTime = Math.max(
+                    maxContendedLocalTime,
+                    summary.maxContendedLocalCompletionTimeSeconds
+            );
+            maxContentionDelay = Math.max(
+                    maxContentionDelay,
+                    summary.maxLocalContentionDelaySeconds
+            );
+            maxDemandRatio = Math.max(
+                    maxDemandRatio,
+                    summary.maxLocalDemandRatio
+            );
+            maxOverflowRatio = Math.max(
+                    maxOverflowRatio,
+                    summary.maxLocalCpuOverflowRatio
+            );
         }
+
         this.localAssignments = local;
         this.vehicleAssignments = vehicle;
         this.edgeAssignments = edge;
         this.cloudAssignments = cloud;
+        this.localTaskPortions = localPortions;
+        this.localContentionVehicleWindows = contentionVehicleWindows;
+        this.localCpuOverflowVehicleWindows = overflowVehicleWindows;
+        this.windowsWithLocalContention = contentionWindows;
+        this.windowsWithLocalCpuOverflow = overflowWindows;
+        this.localDeadlineViolations = deadlineViolations;
+        this.maxIndependentLocalExecutionTimeSeconds = maxIndependentLocalTime;
+        this.maxContendedLocalCompletionTimeSeconds = maxContendedLocalTime;
+        this.maxLocalContentionDelaySeconds = maxContentionDelay;
+        this.maxLocalDemandRatio = maxDemandRatio;
+        this.maxLocalCpuOverflowRatio = maxOverflowRatio;
         this.wallClockTiming = timing(records);
     }
 
@@ -217,6 +284,16 @@ public final class LiveReportingSummary {
         public final int vehicleAssignments;
         public final int edgeAssignments;
         public final int cloudAssignments;
+        public final int localTaskPortions;
+        public final int vehiclesWithLocalWorkload;
+        public final int vehiclesWithLocalContention;
+        public final int vehiclesWithLocalCpuOverflow;
+        public final int localDeadlineViolations;
+        public final double maxIndependentLocalExecutionTimeSeconds;
+        public final double maxContendedLocalCompletionTimeSeconds;
+        public final double maxLocalContentionDelaySeconds;
+        public final double maxLocalDemandRatio;
+        public final double maxLocalCpuOverflowRatio;
         public final String status;
 
         public LiveWindowSummary(
@@ -231,6 +308,52 @@ public final class LiveReportingSummary {
                 int cloudAssignments,
                 String status
         ) {
+            this(
+                    jobId,
+                    windowIndex,
+                    snapshotId,
+                    snapshotTimeSeconds,
+                    fitness,
+                    localAssignments,
+                    vehicleAssignments,
+                    edgeAssignments,
+                    cloudAssignments,
+                    0,
+                    0,
+                    0,
+                    0,
+                    0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    status
+            );
+        }
+
+        public LiveWindowSummary(
+                String jobId,
+                int windowIndex,
+                String snapshotId,
+                double snapshotTimeSeconds,
+                double fitness,
+                int localAssignments,
+                int vehicleAssignments,
+                int edgeAssignments,
+                int cloudAssignments,
+                int localTaskPortions,
+                int vehiclesWithLocalWorkload,
+                int vehiclesWithLocalContention,
+                int vehiclesWithLocalCpuOverflow,
+                int localDeadlineViolations,
+                double maxIndependentLocalExecutionTimeSeconds,
+                double maxContendedLocalCompletionTimeSeconds,
+                double maxLocalContentionDelaySeconds,
+                double maxLocalDemandRatio,
+                double maxLocalCpuOverflowRatio,
+                String status
+        ) {
             this.jobId = jobId;
             this.windowIndex = windowIndex;
             this.snapshotId = snapshotId;
@@ -240,6 +363,19 @@ public final class LiveReportingSummary {
             this.vehicleAssignments = vehicleAssignments;
             this.edgeAssignments = edgeAssignments;
             this.cloudAssignments = cloudAssignments;
+            this.localTaskPortions = localTaskPortions;
+            this.vehiclesWithLocalWorkload = vehiclesWithLocalWorkload;
+            this.vehiclesWithLocalContention = vehiclesWithLocalContention;
+            this.vehiclesWithLocalCpuOverflow = vehiclesWithLocalCpuOverflow;
+            this.localDeadlineViolations = localDeadlineViolations;
+            this.maxIndependentLocalExecutionTimeSeconds =
+                    maxIndependentLocalExecutionTimeSeconds;
+            this.maxContendedLocalCompletionTimeSeconds =
+                    maxContendedLocalCompletionTimeSeconds;
+            this.maxLocalContentionDelaySeconds =
+                    maxLocalContentionDelaySeconds;
+            this.maxLocalDemandRatio = maxLocalDemandRatio;
+            this.maxLocalCpuOverflowRatio = maxLocalCpuOverflowRatio;
             this.status = status;
         }
     }

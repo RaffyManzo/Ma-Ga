@@ -57,6 +57,28 @@ public final class LiveDetailedReportWriter {
         builder.append("- Stale discarded jobs: `").append(summary.staleDiscarded).append("`\n");
         builder.append("- Failed jobs: `").append(summary.failed).append("`\n");
         builder.append("- Null step results: `").append(summary.nullResults).append("`\n\n");
+        builder.append("## Local CPU Contention\n\n");
+        builder.append("- Local task portions: `")
+                .append(summary.localTaskPortions).append("`\n");
+        builder.append("- Windows with local contention: `")
+                .append(summary.windowsWithLocalContention).append("`\n");
+        builder.append("- Windows with local CPU overflow: `")
+                .append(summary.windowsWithLocalCpuOverflow).append("`\n");
+        builder.append("- Local deadline violations: `")
+                .append(summary.localDeadlineViolations).append("`\n");
+        builder.append("- Max independent local execution time: `")
+                .append(summary.maxIndependentLocalExecutionTimeSeconds)
+                .append(" s`\n");
+        builder.append("- Max contended local completion time: `")
+                .append(summary.maxContendedLocalCompletionTimeSeconds)
+                .append(" s`\n");
+        builder.append("- Max local contention delay: `")
+                .append(summary.maxLocalContentionDelaySeconds)
+                .append(" s`\n");
+        builder.append("- Max local demand ratio: `")
+                .append(summary.maxLocalDemandRatio).append("`\n");
+        builder.append("- Max local CPU overflow ratio: `")
+                .append(summary.maxLocalCpuOverflowRatio).append("`\n\n");
         builder.append("## Artifacts\n\n");
         for (var entry : summary.artifacts.entrySet()) {
             builder.append("- ").append(entry.getKey()).append(": `")
