@@ -1,0 +1,5 @@
+﻿category,legacy_path,v2_path,rule
+documentation,data/docs/testing/final-campaign,data/docs/testing/final-campaign-v2-local-contention,new isolated versioned control plane
+results,test-results/final-campaign,test-results/final-campaign-v2-local-contention,new isolated results root
+audits,test-audits/final-campaign,test-audits/final-campaign-v2-local-contention,new isolated audit root
+materialized-scenarios,tmp/materialized-literature-scenarios/final-test-campaign,tmp/materialized-literature-scenarios/final-campaign-v2-local-contention,new isolated ignored materialization root
