@@ -1,0 +1,18 @@
+{
+  "schemaVersion": 1,
+  "generatedAt": "2026-06-27T03:33:12.465212+02:00",
+  "actionId": "G02B-COLD_START_NO_REUSE-CFG-N-I-104729",
+  "parentConfigId": "CFG-N-I",
+  "seed": 104729,
+  "sourceScenario": "C:\\Users\\raffa\\IdeaProjects\\maga-core\\tmp\\materialized-literature-scenarios\\final-campaign-v2-local-contention\\G02_main_factorial_experiments\\CFG-N-I\\104729",
+  "derivedScenario": "C:\\Users\\raffa\\IdeaProjects\\maga-core\\tmp\\materialized-literature-scenarios\\final-campaign-v2-local-contention\\G02B_ablation\\COLD_START_NO_REUSE\\CFG-N-I\\104729",
+  "sourceVariant": "FULL_MA_GA",
+  "targetVariant": "COLD_START_NO_REUSE",
+  "changedFiles": [
+    "application/ma_ga_live_runtime_config.json"
+  ],
+  "sourceRuntimeConfigSha256": "64ceec5dd062c9786b82818582e284fa117ec3c095b5a0c941b7e7becd93052b",
+  "derivedRuntimeConfigSha256": "3ae3a477e6be27cd2e4bdb89efda093c649a7f050bb096ea7d71ad801e41a51a",
+  "onlyExperimentalVariantChanged": true,
+  "javaOrCoreModified": false
+}

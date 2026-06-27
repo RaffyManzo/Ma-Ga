@@ -1,0 +1,18 @@
+{
+  "schemaVersion": 1,
+  "generatedAt": "2026-06-27T03:31:08.205710+02:00",
+  "actionId": "G02B-NO_MOBILITY_PENALTY-CFG-H-I-181081",
+  "parentConfigId": "CFG-H-I",
+  "seed": 181081,
+  "sourceScenario": "C:\\Users\\raffa\\IdeaProjects\\maga-core\\tmp\\materialized-literature-scenarios\\final-campaign-v2-local-contention\\G02_main_factorial_experiments\\CFG-H-I\\181081",
+  "derivedScenario": "C:\\Users\\raffa\\IdeaProjects\\maga-core\\tmp\\materialized-literature-scenarios\\final-campaign-v2-local-contention\\G02B_ablation\\NO_MOBILITY_PENALTY\\CFG-H-I\\181081",
+  "sourceVariant": "FULL_MA_GA",
+  "targetVariant": "NO_MOBILITY_PENALTY",
+  "changedFiles": [
+    "application/ma_ga_live_runtime_config.json"
+  ],
+  "sourceRuntimeConfigSha256": "64ceec5dd062c9786b82818582e284fa117ec3c095b5a0c941b7e7becd93052b",
+  "derivedRuntimeConfigSha256": "aa03f12136d5b957e6979a3b50d14ff67fbb1cc6428d518b1298f344c5afc520",
+  "onlyExperimentalVariantChanged": true,
+  "javaOrCoreModified": false
+}

@@ -1,0 +1,7 @@
+﻿id,status,description,expected,observed,evidence
+PACKAGE,PASS,Pacchetto G02B integro,10,10,C:\Users\raffa\Downloads\MA_GA_V2_G02B_FRESH_START_DISK_SAFE\PACKAGE_MANIFEST.csv
+GIT,PASS,Branch sperimentale G02B creato/verificato,experiment/g02b-ablation-v2-local-contention@47583a4b7d417e54e56a54c69e98d9b329600d9b,experiment/g02b-ablation-v2-local-contention@47583a4b7d417e54e56a54c69e98d9b329600d9b,
+JAR,PASS,JAR congelato e varianti G02B verificate,3821c28a6a0898e94f4d5136b8039595d36bcbce0b6ecc3e9406910f9e083068/517007/261,3821c28a6a0898e94f4d5136b8039595d36bcbce0b6ecc3e9406910f9e083068/517007/261,C:\Users\raffa\Downloads\MA_GA_V2_G02B_FRESH_START_DISK_SAFE\payload\runtime_artifact\maga-live-maga-runtime.jar
+BASELINE,PASS,"15 baseline FULL_MA_GA riusate, non rilanciate",15,15,C:\Users\raffa\Downloads\MA_GA_V2_G02B_FRESH_START_DISK_SAFE\payload\G02_per_run_metrics.csv
+SOURCES,PASS,15 materializzazioni G02 sorgenti verificate,15,15,C:\Users\raffa\IdeaProjects\maga-core\tmp\materialized-literature-scenarios\final-campaign-v2-local-contention\G02_main_factorial_experiments
+ANALYSIS,PASS,Invarianti e confronti G02B prodotti,45 new + 15 reused,45 new + 15 reused,C:\Users\raffa\IdeaProjects\maga-core\tmp\final-campaign-v2-execution\G02B_ablation

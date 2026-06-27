@@ -1,0 +1,9 @@
+﻿invariant,status,expected,observed
+RUN_MATRIX,PASS,"45 new runs, 15 per variant","{'LOCAL_ONLY': 15, 'NO_MOBILITY_PENALTY': 15, 'COLD_START_NO_REUSE': 15}"
+BASELINE_REUSE,PASS,15 FULL_MA_GA reused; zero reruns,15 reused; zero reruns
+LOCAL_ONLY_REMOTE_ZERO,PASS,0 remote assignments in 15/15,0
+LOCAL_ONLY_CONTENTION,PASS,contention observed for each config,"{""CFG-N-I"": 2968, ""CFG-N-S"": 2102, ""CFG-H-I"": 3261}"
+NO_MOBILITY_WEIGHT_ZERO,PASS,wM=0 in 15/15,15/15
+COLD_START_NO_REUSE,PASS,no WARM_START/PARTIAL_RESTART,0 forbidden modes
+TASK_COMPARABILITY,PASS,tasksGenerated equal to paired G02 baseline,45/45
+HARD_ORACLES,PASS,zero runtime/snapshot violations,45/45

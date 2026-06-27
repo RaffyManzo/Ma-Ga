@@ -12,11 +12,11 @@
   "generatedAtUtc": "2026-06-26T16:31:47.304242+00:00",
   "legacyResultsImported": false,
   "materializationExecuted": true,
-  "phase": "G06_COMPLETE_WITH_TEMPORAL_CADENCE_AND_OBSERVABILITY_LIMITS_READY_FOR_G02B",
+  "phase": "G02B_COMPLETE_READY_FOR_G07",
   "scenarioInstanceCount": 69,
   "schemaVersion": 1,
   "simulationExecuted": true,
-  "lastCompletedGroup": "G06",
+  "lastCompletedGroup": "G02B",
   "g01": {
     "verdict": "PASS_G01_COMPLETE_READY_FOR_G02_RUNS",
     "runName": "log-20260626-215940-MaGaLiteratureBasedUrbanStudy",
@@ -163,5 +163,20 @@
     "taskCompletionModel": "NOT_IMPLEMENTED",
     "runtimeJarSha256": "3821c28a6a0898e94f4d5136b8039595d36bcbce0b6ecc3e9406910f9e083068",
     "nextGroup": "G02B"
+  },
+  "g02b": {
+    "verdict": "PASS_G02B_COMPLETE_WITH_STRONG_LOCAL_ONLY_EFFECT_AND_LIMITED_MARGINAL_EFFECTS_READY_FOR_G07",
+    "newRuns": 45,
+    "reusedBaselines": 15,
+    "comparisonRuns": 60,
+    "testStatusCounts": {
+      "PASS": 7,
+      "PASS_CON_LIMITAZIONE": 1,
+      "EVIDENZA_PARZIALE": 2,
+      "NON_OSSERVATO": 0,
+      "FAIL": 0
+    },
+    "nextGroup": "G07",
+    "taskCompletionModel": "NOT_IMPLEMENTED"
   }
 }

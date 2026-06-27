@@ -1,0 +1,11 @@
+﻿testId,name,status,reason,limit
+G02B-A01,Completezza della matrice,PASS,"45/45 nuove run valide, 15 per variante, con 45 directory MOSAIC distinte.",
+G02B-A02,Comparabilità con la baseline,PASS,Le 15 baseline FULL_MA_GA sono riusate senza rilancio e tasksGenerated coincide in 45/45 confronti.,
+G02B-A03,Oracoli tecnici e temporali,PASS,"Validator PASS 45/45, accounting coerente, snapshot lag e violazioni runtime pari a zero.",
+G02B-A04,Attivazione LOCAL_ONLY,PASS,Le 15 run LOCAL_ONLY producono zero assegnazioni remote e usano la sorgente locale.,
+G02B-A05,Effetto LOCAL_ONLY,PASS_CON_LIMITAZIONE,"LOCAL_ONLY riduce runtime e stale in 15/15 coppie, ma porta contesa locale in circa il 95% delle finestre applicate e migliaia di violazioni locali.",I conteggi assoluti sono amplificati dalle molte più strategie applicate; taskCompletionModel resta NOT_IMPLEMENTED.
+G02B-A06,Attivazione NO_MOBILITY_PENALTY,PASS,Il peso mobility-aware effettivo è wM=0 in 15/15 run; i pesi residui sono normalizzati.,
+G02B-A07,Contributo prestazionale della penalità di mobilità,EVIDENZA_PARZIALE,"Le differenze rispetto a FULL_MA_GA sono piccole e non coerenti tra seed per runtime, stale e quota remota.",La copertura decisionale ridotta e il numero basso di assegnazioni applicate limitano l'inferenza.
+G02B-A08,Attivazione COLD_START_NO_REUSE,PASS,In 15/15 run non compaiono WARM_START o PARTIAL_RESTART.,
+G02B-A09,Contributo prestazionale del riuso,EVIDENZA_PARZIALE,"Senza riuso il runtime medio cresce da 0,2448 s a 0,2977 s e lo stale medio da 6,93% a 7,46%, ma gli effetti appaiati non sono uniformi.",Il vantaggio del riuso non è dimostrato in modo robusto sulle 15 coppie selezionate.
+G02B-A10,Reporting e provenienza,PASS,"Risultati, analisi, configurazioni, manifest e report sono presenti e parsabili per 45/45 run.",

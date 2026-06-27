@@ -1,0 +1,77 @@
+﻿{
+    "status":  "LITERATURE_SMOKE_TEST_PASSED",
+    "runName":  "log-20260627-032546-MaGaLiteratureBasedUrbanStudy",
+    "scenarioName":  "MaGaLiteratureBasedUrbanStudy",
+    "simulationCompleted":  true,
+    "configuredCellProfileLoaded":  true,
+    "nativeDetailedReportWritten":  true,
+    "taskCountersSource":  "LIVE_MAGA_RUNTIME_COORDINATOR_TICK",
+    "taskCompletionModel":  "NOT_IMPLEMENTED",
+    "gaParameterScalingMode":  "STATIC",
+    "gaRuntimeMeanSeconds":  0.052151974,
+    "gaRuntimeMedianSeconds":  0.0010867,
+    "gaRuntimeP95Seconds":  0.1369418,
+    "gaRuntimeMaxSeconds":  1.2221596,
+    "staleRatioPercent":  3.703704,
+    "staleSequenceCount":  1,
+    "longestConsecutiveStaleSequence":  1,
+    "maximumAbsoluteSnapshotLagSeconds":  0,
+    "nonZeroLagWindowCount":  0,
+    "lastAppliedStrategySimulationTimeSeconds":  7,
+    "secondsWithoutAppliedStrategyAtEnd":  293,
+    "tasksGeneratedCumulative":  9322,
+    "tasksActivatedCumulative":  9322,
+    "tasksRemovedAtDeadlineCumulative":  9212,
+    "tasksPendingAtEnd":  110,
+    "tasksPendingPeak":  122,
+    "tasksGenerated":  9322,
+    "tasksActivated":  9322,
+    "snapshotRequests":  3000,
+    "snapshotResolved":  2981,
+    "gaJobsSubmitted":  28,
+    "gaJobsCompleted":  27,
+    "strategyApplications":  26,
+    "localAssignments":  4,
+    "vehicleAssignments":  0,
+    "edgeAssignments":  0,
+    "cloudAssignments":  1,
+    "parallelGaViolations":  0,
+    "futureSnapshotViolations":  0,
+    "futurePoolViolations":  0,
+    "invalidPoolBandwidthViolations":  0,
+    "deltaTMaxMismatchViolations":  0,
+    "artifacts":  {
+                      "gaJobEventsJsonl":  {
+                                               "path":  "C:\\Users\\raffa\\IdeaProjects\\maga-core\\tmp\\mosaic-25.2\\logs\\log-20260627-032546-MaGaLiteratureBasedUrbanStudy\\live-maga-runtime\\live-reporting\\live_ga_job_events.jsonl",
+                                               "exists":  true,
+                                               "nonEmpty":  true
+                                           },
+                      "temporalStepRecordsJsonl":  {
+                                                       "path":  "C:\\Users\\raffa\\IdeaProjects\\maga-core\\tmp\\mosaic-25.2\\logs\\log-20260627-032546-MaGaLiteratureBasedUrbanStudy\\live-maga-runtime\\live-reporting\\live_temporal_step_records.jsonl",
+                                                       "exists":  true,
+                                                       "nonEmpty":  true
+                                                   },
+                      "detailedReportTxt":  {
+                                                "path":  "C:\\Users\\raffa\\IdeaProjects\\maga-core\\tmp\\mosaic-25.2\\logs\\log-20260627-032546-MaGaLiteratureBasedUrbanStudy\\live-maga-runtime\\live-reporting\\live_detailed_execution_report.txt",
+                                                "exists":  true,
+                                                "nonEmpty":  true
+                                            },
+                      "detailedReportMarkdown":  {
+                                                     "path":  "C:\\Users\\raffa\\IdeaProjects\\maga-core\\tmp\\mosaic-25.2\\logs\\log-20260627-032546-MaGaLiteratureBasedUrbanStudy\\live-maga-runtime\\live-reporting\\live_detailed_execution_report.md",
+                                                     "exists":  true,
+                                                     "nonEmpty":  true
+                                                 },
+                      "detailedReportJson":  {
+                                                 "path":  "C:\\Users\\raffa\\IdeaProjects\\maga-core\\tmp\\mosaic-25.2\\logs\\log-20260627-032546-MaGaLiteratureBasedUrbanStudy\\live-maga-runtime\\live-reporting\\live_detailed_execution_report.json",
+                                                 "exists":  true,
+                                                 "nonEmpty":  true
+                                             }
+                  },
+    "detailedReportJsonValid":  true,
+    "warnings":  [
+
+                 ],
+    "errors":  [
+
+               ]
+}

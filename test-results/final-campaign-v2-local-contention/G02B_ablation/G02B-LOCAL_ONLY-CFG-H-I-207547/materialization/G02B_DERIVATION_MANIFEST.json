@@ -1,0 +1,18 @@
+{
+  "schemaVersion": 1,
+  "generatedAt": "2026-06-27T03:19:58.813621+02:00",
+  "actionId": "G02B-LOCAL_ONLY-CFG-H-I-207547",
+  "parentConfigId": "CFG-H-I",
+  "seed": 207547,
+  "sourceScenario": "C:\\Users\\raffa\\IdeaProjects\\maga-core\\tmp\\materialized-literature-scenarios\\final-campaign-v2-local-contention\\G02_main_factorial_experiments\\CFG-H-I\\207547",
+  "derivedScenario": "C:\\Users\\raffa\\IdeaProjects\\maga-core\\tmp\\materialized-literature-scenarios\\final-campaign-v2-local-contention\\G02B_ablation\\LOCAL_ONLY\\CFG-H-I\\207547",
+  "sourceVariant": "FULL_MA_GA",
+  "targetVariant": "LOCAL_ONLY",
+  "changedFiles": [
+    "application/ma_ga_live_runtime_config.json"
+  ],
+  "sourceRuntimeConfigSha256": "64ceec5dd062c9786b82818582e284fa117ec3c095b5a0c941b7e7becd93052b",
+  "derivedRuntimeConfigSha256": "0cbf847de3d0449dc1b26c6afd4fec2a1679ef260241a10f15cb2ef91eef18bc",
+  "onlyExperimentalVariantChanged": true,
+  "javaOrCoreModified": false
+}

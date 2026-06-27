@@ -1,0 +1,20 @@
+{
+  "schemaVersion": 1,
+  "verdict": "PASS_G02B_COMPLETE_WITH_STRONG_LOCAL_ONLY_EFFECT_AND_LIMITED_MARGINAL_EFFECTS_READY_FOR_G07",
+  "passed": true,
+  "runCountNew": 45,
+  "baselineCountReused": 15,
+  "comparisonCount": 60,
+  "testStatusCounts": {
+    "PASS": 7,
+    "PASS_CON_LIMITAZIONE": 1,
+    "EVIDENZA_PARZIALE": 2
+  },
+  "hardOracleViolations": 0,
+  "taskCompletionModel": "NOT_IMPLEMENTED",
+  "mainFindings": {
+    "localOnly": "Search-space reduction makes the GA faster and eliminates stale in the observed runs, but forces severe local contention.",
+    "noMobilityPenalty": "Variant activation is proven; a robust aggregate performance effect is not observed.",
+    "coldStartNoReuse": "Reuse removal is proven; mean runtime/stale increase slightly, but paired effects are inconsistent."
+  }
+}

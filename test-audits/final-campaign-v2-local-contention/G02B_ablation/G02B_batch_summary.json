@@ -1,0 +1,36 @@
+{
+  "schemaVersion": 1,
+  "generatedAt": "2026-06-27T03:45:27.158715+02:00",
+  "verdict": "PASS_G02B_RUNS_READY_FOR_FORMAL_ABLATION_AUDIT",
+  "branch": "experiment/g02b-ablation-v2-local-contention",
+  "parentCommit": "47583a4b7d417e54e56a54c69e98d9b329600d9b",
+  "newRunCount": 45,
+  "reusedBaselineCount": 15,
+  "comparisonRunCount": 60,
+  "variantCounts": {
+    "LOCAL_ONLY": 15,
+    "NO_MOBILITY_PENALTY": 15,
+    "COLD_START_NO_REUSE": 15
+  },
+  "canonicalConfigurations": [
+    "CFG-N-I",
+    "CFG-N-S",
+    "CFG-H-I"
+  ],
+  "seeds": [
+    104729,
+    130363,
+    155921,
+    181081,
+    207547
+  ],
+  "durationSecondsPerRun": 300,
+  "hardOracleViolations": 0,
+  "localOnlyRemoteAssignments": 0,
+  "noMobilityPenaltyWeightZeroRuns": 15,
+  "coldStartForbiddenReuseModes": 0,
+  "tasksMatchedBaselineRuns": 45,
+  "taskCompletionModel": "NOT_IMPLEMENTED",
+  "formalAblationAuditPending": true,
+  "nextStep": "Upload bundle, classify ablation results, close G02B, then execute G07."
+}
