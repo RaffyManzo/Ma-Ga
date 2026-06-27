@@ -12,11 +12,11 @@
   "generatedAtUtc": "2026-06-26T16:31:47.304242+00:00",
   "legacyResultsImported": false,
   "materializationExecuted": true,
-  "phase": "G05_COMPLETE_WITH_REPAIR_OBSERVABILITY_LIMITS_READY_FOR_G06",
+  "phase": "G06_COMPLETE_WITH_TEMPORAL_CADENCE_AND_OBSERVABILITY_LIMITS_READY_FOR_G02B",
   "scenarioInstanceCount": 69,
   "schemaVersion": 1,
   "simulationExecuted": true,
-  "lastCompletedGroup": "G05",
+  "lastCompletedGroup": "G06",
   "g01": {
     "verdict": "PASS_G01_COMPLETE_READY_FOR_G02_RUNS",
     "runName": "log-20260626-215940-MaGaLiteratureBasedUrbanStudy",
@@ -132,5 +132,36 @@
     "auditSummary": "data/docs/testing/final-campaign-v2-local-contention/G05_AUDIT_SUMMARY_FOR_RESULTS.md",
     "chapter7EvidenceIndex": "data/docs/testing/final-campaign-v2-local-contention/G05_CHAPTER7_EVIDENCE_INDEX.md",
     "nextGroup": "G06"
+  },
+  "g06": {
+    "verdict": "PASS_G06_COMPLETE_WITH_TEMPORAL_CADENCE_AND_OBSERVABILITY_LIMITS_READY_FOR_G02B",
+    "validRuns": 6,
+    "canonicalRuns": 3,
+    "supplementaryRuns": 3,
+    "primaryTests": 19,
+    "supplementaryTests": 8,
+    "testStatusCounts": {
+      "PASS": 12,
+      "PASS_CON_LIMITAZIONE": 5,
+      "NON_OSSERVATO": 1,
+      "EVIDENZA_PARZIALE": 1
+    },
+    "supplementaryStatusCounts": {
+      "PASS": 5,
+      "EVIDENZA_PARZIALE": 1,
+      "NON_OSSERVATO": 1,
+      "PASS_CON_LIMITAZIONE": 1
+    },
+    "staleCausalFinding": "15/15 stale exceed deltaTMax; 0/677 applied exceed it",
+    "delayDoseResponsePercent": {
+      "0ms": 9.677419,
+      "100ms": 42.857143,
+      "300ms": 100.0,
+      "300msReplica": 100.0
+    },
+    "runtimeCadenceLimitConfirmed": true,
+    "taskCompletionModel": "NOT_IMPLEMENTED",
+    "runtimeJarSha256": "3821c28a6a0898e94f4d5136b8039595d36bcbce0b6ecc3e9406910f9e083068",
+    "nextGroup": "G02B"
   }
 }

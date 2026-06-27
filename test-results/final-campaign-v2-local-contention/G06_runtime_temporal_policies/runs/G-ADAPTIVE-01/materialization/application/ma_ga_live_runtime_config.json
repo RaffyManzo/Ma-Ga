@@ -1,0 +1,20 @@
+{
+  "configuredGaRuntimeEstimateSeconds": 0.01,
+  "configuredMaxWindowSeconds": 0.2,
+  "coordinatorTickIntervalMs": 100,
+  "deltaTMaxComparisonEpsilonSeconds": 1e-09,
+  "diagnosticArtificialGaDelayMs": 0,
+  "discardLateResult": true,
+  "freshReoptimizationAfterTimeout": true,
+  "gaParameterScalingMode": "ADAPTIVE",
+  "gaPollingIntervalMs": 50,
+  "initialOptimizationDelayMs": 1000,
+  "keepLastAppliedStrategyWhileRunning": true,
+  "nativeLiveDetailedReportPrintToConsole": false,
+  "nativeLiveDetailedReportingEnabled": true,
+  "publishedSnapshotCopyLimit": 32,
+  "runtimeTraceEnabled": true,
+  "scenarioName": "MaGaLiteratureBasedUrbanStudy",
+  "singleInFlightGaOnly": true,
+  "temporalInitialWindowSeconds": 1.0
+}

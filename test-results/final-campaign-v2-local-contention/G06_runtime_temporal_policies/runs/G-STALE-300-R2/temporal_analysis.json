@@ -1,0 +1,159 @@
+{
+  "schemaVersion": 1,
+  "generatedAt": "2026-06-27T01:54:41.331203+02:00",
+  "action": {
+    "id": "G-STALE-300-R2",
+    "config": "CFG-G-STALE",
+    "rel": "CFG-G-STALE/104729",
+    "dur": 180,
+    "density": "nominal",
+    "workload": "WL-I",
+    "delay": 300,
+    "mode": "REPEAT",
+    "purpose": "FORCED_STALE_REPEAT"
+  },
+  "result": {
+    "schemaVersion": 1,
+    "generatedAt": "2026-06-27T01:54:41.331203+02:00",
+    "actionId": "G-STALE-300-R2",
+    "configId": "CFG-G-STALE",
+    "seed": 104729,
+    "durationSeconds": 180,
+    "density": "nominal",
+    "workload": "WL-I",
+    "purpose": "FORCED_STALE_REPEAT",
+    "scenarioMode": "REPEAT",
+    "artificialDelayMs": 300,
+    "status": "PASS_WITH_EXPECTED_ZERO_APPLICATION_VALIDATOR_REJECTION",
+    "runName": "log-20260627-015359-MaGaLiteratureBasedUrbanStudy",
+    "runDirectory": "C:\\Users\\raffa\\IdeaProjects\\maga-core\\tmp\\mosaic-25.2\\logs\\log-20260627-015359-MaGaLiteratureBasedUrbanStudy",
+    "validatorStatus": "LITERATURE_SMOKE_TEST_FAILED",
+    "validatorErrors": [
+      "strategyApplications <= 0"
+    ],
+    "validatorCompatibility": "EXPECTED_ZERO_APPLICATION_REJECTION",
+    "runtimeTicksObserved": 1800,
+    "gaParameterScalingMode": "STATIC",
+    "tasksGenerated": 5640,
+    "tasksPendingPeak": 79,
+    "snapshotRequests": 1800,
+    "snapshotResolved": 1781,
+    "gaJobsSubmitted": 4,
+    "gaJobsCompleted": 3,
+    "gaJobsApplied": 0,
+    "staleResults": 3,
+    "shutdownInFlight": 1,
+    "gaJobAccountingConsistent": true,
+    "staleRatioPercent": 100.0,
+    "staleSequenceCount": 1,
+    "longestConsecutiveStaleSequence": 3,
+    "gaRuntimeMeanSeconds": 1.114100967,
+    "gaRuntimeMedianSeconds": 0.4681456,
+    "gaRuntimeP95Seconds": 2.5376684,
+    "gaRuntimeMaxSeconds": 2.5376684,
+    "maximumAbsoluteSnapshotLagSeconds": 0.0,
+    "runtimeViolationCount": 0,
+    "strategyApplications": 0,
+    "lastAppliedStrategySimulationTimeSeconds": 0.0,
+    "secondsWithoutAppliedStrategyAtEnd": 180.0,
+    "taskCompletionModel": "NOT_IMPLEMENTED",
+    "runtimeJarSha256": "3821c28a6a0898e94f4d5136b8039595d36bcbce0b6ecc3e9406910f9e083068",
+    "jobCount": 4,
+    "lifecycleCompleteCount": 0,
+    "lifecycleIncompleteCount": 4,
+    "staleAfterPriorAppliedCount": 0,
+    "freshAppliedAfterStaleCount": 0,
+    "maxConcurrentGaJobs": 1,
+    "boundsViolationCount": 0,
+    "reuseCorrectionCount": 0,
+    "suggestedAppliedReuseMismatchCount": 0,
+    "exceedsCurrentAndNextCount": 0,
+    "waitCapCount": 4,
+    "staleOverrunCount": 3,
+    "stopReasonCounts": {
+      "EMPTY_TASK_SET": 1,
+      "STAGNATION_REACHED": 2
+    },
+    "triggerCounts": {
+      "FIRST_RUN": 3
+    },
+    "windowActionCounts": {
+      "FIRST_RUN": 3
+    },
+    "reuseModeCounts": {
+      "FIRST_RUN": 3
+    },
+    "dynamicityLevelCounts": {
+      "UNKNOWN": 3
+    },
+    "adaptiveScalingObservations": {}
+  },
+  "temporal": {
+    "recordCount": 3,
+    "statusCounts": {
+      "STALE_DISCARDED": 3
+    },
+    "triggerCounts": {
+      "FIRST_RUN": 3
+    },
+    "reuseModeCounts": {
+      "FIRST_RUN": 3
+    },
+    "dynamicityLevelCounts": {
+      "UNKNOWN": 3
+    },
+    "windowActionCounts": {
+      "FIRST_RUN": 3
+    },
+    "stopReasonCounts": {
+      "EMPTY_TASK_SET": 1,
+      "STAGNATION_REACHED": 2
+    },
+    "boundsViolationCount": 0,
+    "reuseCorrectionCount": 0,
+    "suggestedAppliedReuseMismatchCount": 0,
+    "firstRecordTimeSeconds": 2.0,
+    "lastRecordTimeSeconds": 19.4,
+    "firstAppliedRecordTimeSeconds": null,
+    "lastAppliedRecordTimeSeconds": 0.0,
+    "secondsWithoutAppliedRecordAtEnd": 180.0,
+    "initialPopulationUnique": [
+      40
+    ],
+    "finalPopulationUnique": [
+      1,
+      40
+    ],
+    "generationsUnique": [
+      0,
+      33,
+      34
+    ],
+    "adaptiveScalingObservations": {},
+    "runtimeObserved": {
+      "count": 3,
+      "min": 0.0014692,
+      "mean": 0.6222022333333334,
+      "max": 1.7517168
+    }
+  },
+  "jobs": {
+    "jobCount": 4,
+    "lifecycleCompleteCount": 0,
+    "lifecycleIncompleteCount": 4,
+    "staleAfterPriorAppliedCount": 0,
+    "freshAppliedAfterStaleCount": 0,
+    "maxConcurrentGaJobs": 1
+  },
+  "overrun": {
+    "rowCount": 7,
+    "runtimeStateCounts": {
+      "WAIT_CAP_REACHED": 4,
+      "STALE_RESULT_DISCARDED": 3
+    },
+    "waitCapCount": 4,
+    "staleDiscardCount": 3,
+    "exceedsCurrentAndNextCount": 0,
+    "maxDeltaMismatch": 0.0
+  }
+}

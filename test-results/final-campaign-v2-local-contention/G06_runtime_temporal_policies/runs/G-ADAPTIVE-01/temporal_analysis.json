@@ -1,0 +1,177 @@
+{
+  "schemaVersion": 1,
+  "generatedAt": "2026-06-27T02:14:08.089021+02:00",
+  "action": {
+    "id": "G-ADAPTIVE-01",
+    "config": "CFG-G-ADAPTIVE",
+    "rel": "CFG-G-ADAPTIVE/104729",
+    "dur": 300,
+    "density": "high_density",
+    "workload": "WL-S",
+    "delay": 0,
+    "mode": "CANONICAL",
+    "purpose": "ADAPTIVE_SCALING"
+  },
+  "result": {
+    "schemaVersion": 1,
+    "generatedAt": "2026-06-27T02:14:08.089021+02:00",
+    "actionId": "G-ADAPTIVE-01",
+    "configId": "CFG-G-ADAPTIVE",
+    "seed": 104729,
+    "durationSeconds": 300,
+    "density": "high_density",
+    "workload": "WL-S",
+    "purpose": "ADAPTIVE_SCALING",
+    "scenarioMode": "CANONICAL",
+    "artificialDelayMs": 0,
+    "status": "PASS_WITH_EXPECTED_ADAPTIVE_VALIDATOR_COMPATIBILITY_LIMIT",
+    "runName": "log-20260627-021248-MaGaLiteratureBasedUrbanStudy",
+    "runDirectory": "C:\\Users\\raffa\\IdeaProjects\\maga-core\\tmp\\mosaic-25.2\\logs\\log-20260627-021248-MaGaLiteratureBasedUrbanStudy",
+    "validatorStatus": "LITERATURE_SMOKE_TEST_FAILED",
+    "validatorErrors": [
+      "gaParameterScalingMode must be STATIC"
+    ],
+    "validatorCompatibility": "EXPECTED_NON_CANONICAL_ADAPTIVE_REJECTION",
+    "runtimeTicksObserved": 3000,
+    "gaParameterScalingMode": "ADAPTIVE",
+    "tasksGenerated": 15117,
+    "tasksPendingPeak": 199,
+    "snapshotRequests": 3000,
+    "snapshotResolved": 2988,
+    "gaJobsSubmitted": 31,
+    "gaJobsCompleted": 30,
+    "gaJobsApplied": 29,
+    "staleResults": 1,
+    "shutdownInFlight": 1,
+    "gaJobAccountingConsistent": true,
+    "staleRatioPercent": 3.333333,
+    "staleSequenceCount": 1,
+    "longestConsecutiveStaleSequence": 1,
+    "gaRuntimeMeanSeconds": 0.016283417,
+    "gaRuntimeMedianSeconds": 0.0009494,
+    "gaRuntimeP95Seconds": 0.0181076,
+    "gaRuntimeMaxSeconds": 0.4347263,
+    "maximumAbsoluteSnapshotLagSeconds": 0.0,
+    "runtimeViolationCount": 0,
+    "strategyApplications": 29,
+    "lastAppliedStrategySimulationTimeSeconds": 6.9,
+    "secondsWithoutAppliedStrategyAtEnd": 293.1,
+    "taskCompletionModel": "NOT_IMPLEMENTED",
+    "runtimeJarSha256": "3821c28a6a0898e94f4d5136b8039595d36bcbce0b6ecc3e9406910f9e083068",
+    "jobCount": 31,
+    "lifecycleCompleteCount": 29,
+    "lifecycleIncompleteCount": 2,
+    "staleAfterPriorAppliedCount": 1,
+    "freshAppliedAfterStaleCount": 0,
+    "maxConcurrentGaJobs": 1,
+    "boundsViolationCount": 0,
+    "reuseCorrectionCount": 0,
+    "suggestedAppliedReuseMismatchCount": 0,
+    "exceedsCurrentAndNextCount": 0,
+    "waitCapCount": 2,
+    "staleOverrunCount": 1,
+    "stopReasonCounts": {
+      "EMPTY_TASK_SET": 29,
+      "STAGNATION_REACHED": 1
+    },
+    "triggerCounts": {
+      "FIRST_RUN": 1,
+      "SCHEDULED_WINDOW_EXPIRATION": 29
+    },
+    "windowActionCounts": {
+      "FIRST_RUN": 1,
+      "CLAMP_TO_BOUNDS": 29
+    },
+    "reuseModeCounts": {
+      "FIRST_RUN": 1,
+      "WARM_START": 28,
+      "PARTIAL_RESTART": 1
+    },
+    "dynamicityLevelCounts": {
+      "UNKNOWN": 1,
+      "STABLE": 28,
+      "MODERATE": 1
+    },
+    "adaptiveScalingObservations": {
+      "GENERATIONS_VARY": true,
+      "FINAL_POPULATION_VARIES": true
+    }
+  },
+  "temporal": {
+    "recordCount": 30,
+    "statusCounts": {
+      "APPLIED": 29,
+      "STALE_DISCARDED": 1
+    },
+    "triggerCounts": {
+      "FIRST_RUN": 1,
+      "SCHEDULED_WINDOW_EXPIRATION": 29
+    },
+    "reuseModeCounts": {
+      "FIRST_RUN": 1,
+      "WARM_START": 28,
+      "PARTIAL_RESTART": 1
+    },
+    "dynamicityLevelCounts": {
+      "UNKNOWN": 1,
+      "STABLE": 28,
+      "MODERATE": 1
+    },
+    "windowActionCounts": {
+      "FIRST_RUN": 1,
+      "CLAMP_TO_BOUNDS": 29
+    },
+    "stopReasonCounts": {
+      "EMPTY_TASK_SET": 29,
+      "STAGNATION_REACHED": 1
+    },
+    "boundsViolationCount": 0,
+    "reuseCorrectionCount": 0,
+    "suggestedAppliedReuseMismatchCount": 0,
+    "firstRecordTimeSeconds": 1.3,
+    "lastRecordTimeSeconds": 7.1,
+    "firstAppliedRecordTimeSeconds": 1.3,
+    "lastAppliedRecordTimeSeconds": 6.9,
+    "secondsWithoutAppliedRecordAtEnd": 293.1,
+    "initialPopulationUnique": [
+      40
+    ],
+    "finalPopulationUnique": [
+      1,
+      51
+    ],
+    "generationsUnique": [
+      0,
+      95
+    ],
+    "adaptiveScalingObservations": {
+      "GENERATIONS_VARY": true,
+      "FINAL_POPULATION_VARIES": true
+    },
+    "runtimeObserved": {
+      "count": 30,
+      "min": 1.88e-05,
+      "mean": 0.011515336666666666,
+      "max": 0.3434917
+    }
+  },
+  "jobs": {
+    "jobCount": 31,
+    "lifecycleCompleteCount": 29,
+    "lifecycleIncompleteCount": 2,
+    "staleAfterPriorAppliedCount": 1,
+    "freshAppliedAfterStaleCount": 0,
+    "maxConcurrentGaJobs": 1
+  },
+  "overrun": {
+    "rowCount": 3,
+    "runtimeStateCounts": {
+      "WAIT_CAP_REACHED": 2,
+      "STALE_RESULT_DISCARDED": 1
+    },
+    "waitCapCount": 2,
+    "staleDiscardCount": 1,
+    "exceedsCurrentAndNextCount": 0,
+    "maxDeltaMismatch": 0.0
+  }
+}

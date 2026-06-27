@@ -1,0 +1,9 @@
+﻿testId,status,reason,name
+S06-01,PASS,"Stale ratio 9,677% -> 42,857% -> 100% con 0/100/300 ms.",Delay dose-response
+S06-02,PASS,Le due run a 300 ms producono stale ratio 100% e zero applicazioni.,Forced-stale reproducibility
+S06-03,EVIDENZA_PARZIALE,"Accounting completo, ma 15 stale seguono un percorso timeout senza COMPLETED_WITHIN_BOUND e 5 job terminano in-flight.",Job lifecycle completeness
+S06-04,PASS,Massimo un job GA concorrente in tutte le run.,Single in-flight
+S06-05,PASS,Sette stale seguono una precedente strategia applicata.,Stale after prior strategy
+S06-06,NON_OSSERVATO,"Le nuove ottimizzazioni sono richieste e inviate, ma nessuna produce una strategia applicata dopo lo stale.",Fresh applied after stale
+S06-07,PASS,Zero violazioni dei bound in tutte le run.,Window bounds
+S06-08,PASS_CON_LIMITAZIONE,Generazioni e popolazione finale variano in ADAPTIVE; resta il limite di compatibilità del validator STATIC.,Adaptive scaling variation

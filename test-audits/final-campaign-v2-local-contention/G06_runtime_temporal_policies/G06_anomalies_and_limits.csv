@@ -1,0 +1,9 @@
+﻿category,severity,description,decision
+TEMPORAL_CADENCE,IMPORTANT_LIMIT,"La run sparse copre 180 s, ma adaptive e workload non banali applicano l'ultima strategia entro 6,9-14,7 s.",Il completamento della simulazione non equivale a copertura decisionale.
+STALE_CAUSALITY,ROOT_CAUSE_IDENTIFIED,15/15 stale superano deltaTMax; 0/677 applied lo superano.,Il ritardo wall-clock rispetto all'avanzamento simulato è la causa misurata degli stale.
+DOSE_RESPONSE,OBSERVED,"Stale ratio 9,677% a 0 ms, 42,857% a 100 ms e 100% a 300 ms in due repliche.",Relazione causale sostenuta.
+FRESH_REOPTIMIZATION,OBSERVABILITY_LIMIT,"15 richieste fresh e 15 submission, ma nessuna strategia fresh applicata dopo uno stale.",T-054 PASS sul nuovo job; S06-06 NON_OSSERVATO sulla successiva applicazione.
+EXCEEDS_CURRENT_AND_NEXT,NON_OBSERVED,Lo stato EXCEEDS_CURRENT_AND_NEXT non compare.,T-116 NON_OSSERVATO.
+CRITICAL_EVENT,PARTIAL_EVIDENCE,"Percorso presente nel sorgente, non osservato live.",T-118 EVIDENZA_PARZIALE.
+ADAPTIVE_VALIDATOR,COMPATIBILITY_LIMIT,"La run ADAPTIVE è valida, ma il validator canonico assume STATIC.",T-121 PASS_CON_LIMITAZIONE.
+TASK_COMPLETION_MODEL,MODEL_LIMIT,taskCompletionModel=NOT_IMPLEMENTED.,Non interpretare le assegnazioni come completamenti reali.

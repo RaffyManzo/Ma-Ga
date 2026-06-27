@@ -1,0 +1,13 @@
+{
+  "termCounts": {
+    "critical_event": 124,
+    "crossover": 10,
+    "selection": 4,
+    "elitism": 3,
+    "mutation": 4,
+    "scheduled_trigger": 7,
+    "stale": 49,
+    "last_strategy": 17
+  },
+  "matchedLineCount": 218
+}

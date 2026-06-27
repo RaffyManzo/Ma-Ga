@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "generatedAt": "2026-06-27T02:27:20.927316+02:00",
+  "totalJobs": 697,
+  "appliedJobs": 677,
+  "staleJobs": 15,
+  "shutdownInFlightJobs": 5,
+  "staleRuntimeExceedsBoundCount": 15,
+  "appliedRuntimeExceedsBoundCount": 0,
+  "staleWaitCapCount": 15,
+  "staleFreshReoptimizationCount": 15,
+  "eventCounts": {
+    "SUBMITTED": 697,
+    "COMPLETED_WITHIN_BOUND": 677,
+    "APPLIED": 677,
+    "WAIT_CAP_REACHED": 20,
+    "STALE_DISCARDED": 15,
+    "FRESH_REOPTIMIZATION_REQUESTED": 15,
+    "SHUTDOWN_IN_FLIGHT": 5
+  },
+  "cause": "A stale result occurs when wall-clock GA runtime exceeds deltaTMax while simulated time keeps advancing."
+}

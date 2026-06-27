@@ -1,0 +1,81 @@
+{
+  "schemaVersion": 1,
+  "classification": "EXPECTED_NON_CANONICAL_ADAPTIVE_VALIDATOR_REJECTION",
+  "originalValidation": {
+    "status": "LITERATURE_SMOKE_TEST_FAILED",
+    "runName": "log-20260627-021248-MaGaLiteratureBasedUrbanStudy",
+    "scenarioName": "MaGaLiteratureBasedUrbanStudy",
+    "simulationCompleted": true,
+    "configuredCellProfileLoaded": true,
+    "nativeDetailedReportWritten": true,
+    "taskCountersSource": "LIVE_MAGA_RUNTIME_COORDINATOR_TICK",
+    "taskCompletionModel": "NOT_IMPLEMENTED",
+    "gaParameterScalingMode": "ADAPTIVE",
+    "gaRuntimeMeanSeconds": 0.016283417,
+    "gaRuntimeMedianSeconds": 0.0009494,
+    "gaRuntimeP95Seconds": 0.0181076,
+    "gaRuntimeMaxSeconds": 0.4347263,
+    "staleRatioPercent": 3.333333,
+    "staleSequenceCount": 1,
+    "longestConsecutiveStaleSequence": 1,
+    "maximumAbsoluteSnapshotLagSeconds": 0,
+    "nonZeroLagWindowCount": 0,
+    "lastAppliedStrategySimulationTimeSeconds": 6.9,
+    "secondsWithoutAppliedStrategyAtEnd": 293.1,
+    "tasksGeneratedCumulative": 15117,
+    "tasksActivatedCumulative": 15117,
+    "tasksRemovedAtDeadlineCumulative": 14928,
+    "tasksPendingAtEnd": 189,
+    "tasksPendingPeak": 199,
+    "tasksGenerated": 15117,
+    "tasksActivated": 15117,
+    "snapshotRequests": 3000,
+    "snapshotResolved": 2988,
+    "gaJobsSubmitted": 31,
+    "gaJobsCompleted": 30,
+    "strategyApplications": 29,
+    "localAssignments": 0,
+    "vehicleAssignments": 0,
+    "edgeAssignments": 0,
+    "cloudAssignments": 0,
+    "parallelGaViolations": 0,
+    "futureSnapshotViolations": 0,
+    "futurePoolViolations": 0,
+    "invalidPoolBandwidthViolations": 0,
+    "deltaTMaxMismatchViolations": 0,
+    "artifacts": {
+      "gaJobEventsJsonl": {
+        "path": "C:\\Users\\raffa\\IdeaProjects\\maga-core\\tmp\\mosaic-25.2\\logs\\log-20260627-021248-MaGaLiteratureBasedUrbanStudy\\live-maga-runtime\\live-reporting\\live_ga_job_events.jsonl",
+        "exists": true,
+        "nonEmpty": true
+      },
+      "temporalStepRecordsJsonl": {
+        "path": "C:\\Users\\raffa\\IdeaProjects\\maga-core\\tmp\\mosaic-25.2\\logs\\log-20260627-021248-MaGaLiteratureBasedUrbanStudy\\live-maga-runtime\\live-reporting\\live_temporal_step_records.jsonl",
+        "exists": true,
+        "nonEmpty": true
+      },
+      "detailedReportTxt": {
+        "path": "C:\\Users\\raffa\\IdeaProjects\\maga-core\\tmp\\mosaic-25.2\\logs\\log-20260627-021248-MaGaLiteratureBasedUrbanStudy\\live-maga-runtime\\live-reporting\\live_detailed_execution_report.txt",
+        "exists": true,
+        "nonEmpty": true
+      },
+      "detailedReportMarkdown": {
+        "path": "C:\\Users\\raffa\\IdeaProjects\\maga-core\\tmp\\mosaic-25.2\\logs\\log-20260627-021248-MaGaLiteratureBasedUrbanStudy\\live-maga-runtime\\live-reporting\\live_detailed_execution_report.md",
+        "exists": true,
+        "nonEmpty": true
+      },
+      "detailedReportJson": {
+        "path": "C:\\Users\\raffa\\IdeaProjects\\maga-core\\tmp\\mosaic-25.2\\logs\\log-20260627-021248-MaGaLiteratureBasedUrbanStudy\\live-maga-runtime\\live-reporting\\live_detailed_execution_report.json",
+        "exists": true,
+        "nonEmpty": true
+      }
+    },
+    "detailedReportJsonValid": true,
+    "warnings": [],
+    "errors": [
+      "gaParameterScalingMode must be STATIC"
+    ]
+  },
+  "hardRuntimeGatesRecheckedByOriginalParser": true,
+  "javaOrCoreModified": false
+}

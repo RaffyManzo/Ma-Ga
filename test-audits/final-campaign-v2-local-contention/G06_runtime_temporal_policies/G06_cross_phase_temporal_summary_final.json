@@ -1,0 +1,58 @@
+{
+  "fileCount": 18,
+  "recordCount": 1216,
+  "statusCounts": {
+    "APPLIED": 1171,
+    "STALE_DISCARDED": 45
+  },
+  "triggerCounts": {
+    "FIRST_RUN": 24,
+    "SCHEDULED_WINDOW_EXPIRATION": 1192
+  },
+  "reuseModeCounts": {
+    "FIRST_RUN": 24,
+    "WARM_START": 912,
+    "PARTIAL_RESTART": 268,
+    "COLD_START": 12
+  },
+  "dynamicityLevelCounts": {
+    "UNKNOWN": 24,
+    "STABLE": 912,
+    "MODERATE": 278,
+    "HIGH": 2
+  },
+  "windowActionCounts": {
+    "FIRST_RUN": 24,
+    "CLAMP_TO_BOUNDS": 1191,
+    "KEEP": 1
+  },
+  "stopReasonCounts": {
+    "EMPTY_TASK_SET": 967,
+    "STAGNATION_REACHED": 246,
+    "MAX_GENERATIONS_REACHED": 3
+  },
+  "windowBoundsViolationCount": 0,
+  "maxGenerationsEvidence": [
+    {
+      "path": "test-results/final-campaign-v2-local-contention/G04_mobility_connectivity/runs/M-V2V-01/runtime/live-reporting/live_temporal_step_records.jsonl",
+      "jobId": "live_ga_job_000027",
+      "snapshotTimeSeconds": 9.2,
+      "finalStatus": "STALE_DISCARDED",
+      "generationsExecuted": 100
+    },
+    {
+      "path": "test-results/final-campaign-v2-local-contention/G05_resource_policies_repair/runs/R-CLOUDCPU-01/runtime/live-reporting/live_temporal_step_records.jsonl",
+      "jobId": "live_ga_job_000028",
+      "snapshotTimeSeconds": 10.1,
+      "finalStatus": "STALE_DISCARDED",
+      "generationsExecuted": 100
+    },
+    {
+      "path": "test-results/final-campaign-v2-local-contention/G05_resource_policies_repair/runs/R-RTT-01/runtime/live-reporting/live_temporal_step_records.jsonl",
+      "jobId": "live_ga_job_000031",
+      "snapshotTimeSeconds": 45.8,
+      "finalStatus": "STALE_DISCARDED",
+      "generationsExecuted": 100
+    }
+  ]
+}

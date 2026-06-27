@@ -1,0 +1,21 @@
+{
+  "campaignId": "final-campaign-v2-local-contention",
+  "databaseChecksum": "cbd14630737b22f5cb3fedc07d8be24c9994a505a3fb34a485cf8e981e07cd97",
+  "databasePath": "tmp/materialized-literature-scenarios/final-campaign-v2-local-contention/G06_runtime_temporal_policies/CFG-G-SPARSE/104729/application/intas_literature_urban.db",
+  "databaseSizeBytes": 172032,
+  "density": "low_density",
+  "durationProfile": "smoke",
+  "gaParameterScalingMode": "STATIC",
+  "materializationId": "MAT-CFG-G-SPARSE-104729",
+  "materializerVersion": {
+    "builderSha256": "32421e979cce7844e5fa70c8b9160b565f969aea860f9c9ce9965a0adce6d3d6",
+    "campaignOrchestratorSha256": "3d78c92e686b2ea3492a0be35f3b9681edda7e481a8f0e1ca151055ba6de60f2",
+    "campaignValidatorSha256": "e24775e6a56c06d1596dfec9bfda3a45a60fa00ffc7fef34e063e5368fab42de"
+  },
+  "mobilityMode": "SYNTHETIC_CALIBRATED_ON_INTAS_SUBNETWORK",
+  "networkChecksum": "764eae147f3072fdfb2c1a38668983e6851c016332201d29741e2c8dff41e019",
+  "routeChecksum": "2d915389824ac73232b30e9226623cc6c42fb788654217bedd2d3d6ba4cc90da",
+  "scenarioName": "MaGaLiteratureBasedUrbanStudy",
+  "seed": 104729,
+  "selectedCandidateId": "candidate_0045"
+}

@@ -1,0 +1,32 @@
+﻿{
+    "schemaVersion":  1,
+    "generatedAt":  "2026-06-27T02:12:47.8766104+02:00",
+    "sourceScenario":  "C:\\Users\\raffa\\IdeaProjects\\maga-core\\tmp\\materialized-literature-scenarios\\final-campaign-v2-local-contention\\G06_runtime_temporal_policies\\CFG-G-ADAPTIVE\\104729",
+    "stagingScenario":  "C:\\Users\\raffa\\IdeaProjects\\maga-core\\tmp\\final-campaign-v2-execution\\G06_runtime_temporal_policies\\adaptive-deploy-staging",
+    "targetScenario":  "C:\\Users\\raffa\\IdeaProjects\\maga-core\\tmp\\mosaic-25.2\\scenarios\\MaGaLiteratureBasedUrbanStudy",
+    "deploymentValidatorCompatibility":  "Temporary STATIC metadata used only during deploy validation",
+    "runtimeModeExecuted":  "ADAPTIVE",
+    "durationExecuted":  "300s",
+    "sourceFileCount":  27,
+    "stagingFileCount":  27,
+    "sourceAdaptiveFileCount":  5,
+    "stagingFilesChanged":  [
+                                "C:\\Users\\raffa\\IdeaProjects\\maga-core\\tmp\\final-campaign-v2-execution\\G06_runtime_temporal_policies\\adaptive-deploy-staging\\final_campaign_manifest.json",
+                                "C:\\Users\\raffa\\IdeaProjects\\maga-core\\tmp\\final-campaign-v2-execution\\G06_runtime_temporal_policies\\adaptive-deploy-staging\\materialization_manifest.json",
+                                "C:\\Users\\raffa\\IdeaProjects\\maga-core\\tmp\\final-campaign-v2-execution\\G06_runtime_temporal_policies\\adaptive-deploy-staging\\application\\ma_ga_live_runtime_config.json",
+                                "C:\\Users\\raffa\\IdeaProjects\\maga-core\\tmp\\final-campaign-v2-execution\\G06_runtime_temporal_policies\\adaptive-deploy-staging\\reports\\intas_literature_materialization_report.json",
+                                "C:\\Users\\raffa\\IdeaProjects\\maga-core\\tmp\\final-campaign-v2-execution\\G06_runtime_temporal_policies\\adaptive-deploy-staging\\reports\\materialized_literature_scenario_validation.json"
+                            ],
+    "targetStaticFileCount":  5,
+    "targetFilesRestored":  [
+                                "C:\\Users\\raffa\\IdeaProjects\\maga-core\\tmp\\mosaic-25.2\\scenarios\\MaGaLiteratureBasedUrbanStudy\\final_campaign_manifest.json",
+                                "C:\\Users\\raffa\\IdeaProjects\\maga-core\\tmp\\mosaic-25.2\\scenarios\\MaGaLiteratureBasedUrbanStudy\\materialization_manifest.json",
+                                "C:\\Users\\raffa\\IdeaProjects\\maga-core\\tmp\\mosaic-25.2\\scenarios\\MaGaLiteratureBasedUrbanStudy\\application\\ma_ga_live_runtime_config.json",
+                                "C:\\Users\\raffa\\IdeaProjects\\maga-core\\tmp\\mosaic-25.2\\scenarios\\MaGaLiteratureBasedUrbanStudy\\reports\\intas_literature_materialization_report.json",
+                                "C:\\Users\\raffa\\IdeaProjects\\maga-core\\tmp\\mosaic-25.2\\scenarios\\MaGaLiteratureBasedUrbanStudy\\reports\\materialized_literature_scenario_validation.json"
+                            ],
+    "targetAdaptiveFileCount":  5,
+    "sourceRuntimeConfigSha256":  "4dc2c747dc18b45c66edeb3789b22b349e84a7ffac5c4a592ca9a0329373d475",
+    "targetRuntimeConfigSha256":  "4dc2c747dc18b45c66edeb3789b22b349e84a7ffac5c4a592ca9a0329373d475",
+    "javaOrCoreModified":  false
+}

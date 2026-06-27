@@ -1,0 +1,219 @@
+﻿term,file,line,text
+critical_event,src/app/AdaptiveWindowMain.java,14,import window.event.StaticCriticalEventDetector;
+critical_event,src/app/AdaptiveWindowMain.java,66,"StaticCriticalEventDetector.empty(),"
+crossover,src/config/ga/GeneticAlgorithmConfig.java,10,* - probabilità di crossover;
+crossover,src/ga/core/MaGaOptimizer.java,104,"* globale, necessario anche dopo il crossover.</p>"
+selection,src/ga/core/MaGaOptimizer.java,164,Chromosome parentA = selectionOperator.select(population);
+selection,src/ga/core/MaGaOptimizer.java,165,Chromosome parentB = selectionOperator.select(population);
+crossover,src/ga/core/MaGaOptimizer.java,169,"child = crossoverOperator.crossover(parentA, parentB);"
+crossover,src/ga/operators/CrossoverOperator.java,12,* Operatore di crossover.
+crossover,src/ga/operators/CrossoverOperator.java,14,* <p>Combina due cromosomi tramite single-point crossover. I geni prima del
+crossover,src/ga/operators/CrossoverOperator.java,23,* Costruisce l'operatore di crossover.
+crossover,src/ga/operators/CrossoverOperator.java,32,* Applica single-point crossover tra due genitori.
+crossover,src/ga/operators/CrossoverOperator.java,38,"public Chromosome crossover(Chromosome parentA, Chromosome parentB) {"
+elitism,src/ga/operators/ElitismOperator.java,33,List<Chromosome> elite = new ArrayList<>();
+elitism,src/ga/operators/ElitismOperator.java,36,elite.add(copyChromosome(sorted.get(i)));
+elitism,src/ga/operators/ElitismOperator.java,39,return elite;
+mutation,src/ga/operators/MutationOperator.java,71,public Chromosome mutate(
+mutation,src/ga/operators/MutationOperator.java,156,ResourceAllocationDecision allocation = resourceAllocationPolicy.mutate(
+crossover,src/ga/operators/RepairOperator.java,50,"* crossover, mutazione o fitness del Genetic Algorithm.</p>"
+crossover,src/ga/operators/RepairOperator.java,136,* aggregati CPU e banda sull'intero cromosoma: il crossover può infatti
+mutation,src/ga/operators/ResourceAllocationPolicy.java,166,public ResourceAllocationDecision mutate(
+selection,src/ga/operators/SelectionOperator.java,12,* <p>Implementa una tournament selection per un problema di minimizzazione:
+selection,src/ga/operators/SelectionOperator.java,43,public Chromosome select(List<Chromosome> population) {
+critical_event,src/io/reporting/DeepTemporalWindowDiagnosticPrinter.java,138,"out.println(""Critical-event windows: "" + result.countCriticalEventSteps());"
+mutation,src/io/reporting/DeepTemporalWindowDiagnosticPrinter.java,521,"out.println(""- Check initialization, mutation and repair of offloadingRatio before changing the fitness."");"
+critical_event,src/io/reporting/DeepTemporalWindowDiagnosticPrinter.java,551,if (step.wasTriggeredByCriticalEvent()) {
+critical_event,src/io/reporting/DeepTemporalWindowDiagnosticPrinter.java,552,"return ""CRITICAL_EVENT"";"
+critical_event,src/window/core/TemporalWindowManager.java,11,import window.event.CriticalEventDetector;
+critical_event,src/window/core/TemporalWindowManager.java,48,private final CriticalEventDetector criticalEventDetector;
+critical_event,src/window/core/TemporalWindowManager.java,57,"CriticalEventDetector criticalEventDetector,"
+critical_event,src/window/core/TemporalWindowManager.java,71,"criticalEventDetector,"
+critical_event,src/window/core/TemporalWindowManager.java,83,"CriticalEventDetector criticalEventDetector,"
+critical_event,src/window/core/TemporalWindowManager.java,97,"criticalEventDetector,"
+critical_event,src/window/core/TemporalWindowManager.java,110,"CriticalEventDetector criticalEventDetector,"
+critical_event,src/window/core/TemporalWindowManager.java,138,this.criticalEventDetector = Objects.requireNonNull(
+critical_event,src/window/core/TemporalWindowManager.java,139,"criticalEventDetector,"
+critical_event,src/window/core/TemporalWindowManager.java,140,"""criticalEventDetector must not be null."""
+critical_event,src/window/core/TemporalWindowManager.java,228,effectiveTrigger.isCriticalEventTrigger()
+critical_event,src/window/core/TemporalWindowManager.java,280,return criticalEventDetector
+critical_event,src/window/core/TemporalWindowManager.java,281,".findNextCriticalEvent(currentTimeSeconds, scheduledTimeSeconds)"
+critical_event,src/window/core/TemporalWindowManager.java,282,.map(ReoptimizationTrigger::criticalEvent)
+critical_event,src/window/event/CriticalEvent.java,17,"* <p>Un {@code CriticalEvent} non è uno snapshot, non contiene lo stato completo"
+critical_event,src/window/event/CriticalEvent.java,24,* {@link ReoptimizationTrigger} di tipo {@link TriggerReason#CRITICAL_EVENT}.</p>
+critical_event,src/window/event/CriticalEvent.java,26,public final class CriticalEvent {
+critical_event,src/window/event/CriticalEvent.java,41,private final CriticalEventType type;
+critical_event,src/window/event/CriticalEvent.java,46,private final CriticalEventSeverity severity;
+critical_event,src/window/event/CriticalEvent.java,84,*     <li>{@link CriticalEventType#VEHICLE_LEFT}: {@code affectedVehicleId};</li>
+critical_event,src/window/event/CriticalEvent.java,85,*     <li>{@link CriticalEventType#TASK_ARRIVAL}: {@code affectedTaskId};</li>
+critical_event,src/window/event/CriticalEvent.java,86,*     <li>{@link CriticalEventType#LINK_DEGRADED}: {@code affectedCandidateId};</li>
+critical_event,src/window/event/CriticalEvent.java,87,*     <li>{@link CriticalEventType#NODE_RESOURCE_DROP}: {@code affectedExecutionNodeId}.</li>
+critical_event,src/window/event/CriticalEvent.java,100,public CriticalEvent(
+critical_event,src/window/event/CriticalEvent.java,103,"CriticalEventType type,"
+critical_event,src/window/event/CriticalEvent.java,104,"CriticalEventSeverity severity,"
+critical_event,src/window/event/CriticalEvent.java,142,"* <p>Utile per eventi come {@link CriticalEventType#VEHICLE_JOINED},"
+critical_event,src/window/event/CriticalEvent.java,143,"* {@link CriticalEventType#VEHICLE_LEFT}, {@link CriticalEventType#COVERAGE_RISK}"
+critical_event,src/window/event/CriticalEvent.java,144,* o {@link CriticalEventType#HANDOVER_RISK}.</p>
+critical_event,src/window/event/CriticalEvent.java,148,public static CriticalEvent forVehicle(
+critical_event,src/window/event/CriticalEvent.java,151,"CriticalEventType type,"
+critical_event,src/window/event/CriticalEvent.java,152,"CriticalEventSeverity severity,"
+critical_event,src/window/event/CriticalEvent.java,156,return new CriticalEvent(
+critical_event,src/window/event/CriticalEvent.java,172,"* <p>Utile per eventi come {@link CriticalEventType#TASK_ARRIVAL},"
+critical_event,src/window/event/CriticalEvent.java,173,* {@link CriticalEventType#TASK_REMOVED} o
+critical_event,src/window/event/CriticalEvent.java,174,* {@link CriticalEventType#DEADLINE_RISK}.</p>
+critical_event,src/window/event/CriticalEvent.java,178,public static CriticalEvent forTask(
+critical_event,src/window/event/CriticalEvent.java,181,"CriticalEventType type,"
+critical_event,src/window/event/CriticalEvent.java,182,"CriticalEventSeverity severity,"
+critical_event,src/window/event/CriticalEvent.java,186,return new CriticalEvent(
+critical_event,src/window/event/CriticalEvent.java,202,"* <p>Utile per eventi come {@link CriticalEventType#LINK_DEGRADED},"
+critical_event,src/window/event/CriticalEvent.java,203,* {@link CriticalEventType#LINK_LOST} o
+critical_event,src/window/event/CriticalEvent.java,204,* {@link CriticalEventType#COVERAGE_RISK} quando il rischio è riferito a
+critical_event,src/window/event/CriticalEvent.java,209,public static CriticalEvent forCandidate(
+critical_event,src/window/event/CriticalEvent.java,212,"CriticalEventType type,"
+critical_event,src/window/event/CriticalEvent.java,213,"CriticalEventSeverity severity,"
+critical_event,src/window/event/CriticalEvent.java,217,return new CriticalEvent(
+critical_event,src/window/event/CriticalEvent.java,234,* <p>Utile per eventi come {@link CriticalEventType#NODE_RESOURCE_DROP} o
+critical_event,src/window/event/CriticalEvent.java,235,* {@link CriticalEventType#NODE_RESOURCE_RECOVERY}.</p>
+critical_event,src/window/event/CriticalEvent.java,239,public static CriticalEvent forExecutionNode(
+critical_event,src/window/event/CriticalEvent.java,242,"CriticalEventType type,"
+critical_event,src/window/event/CriticalEvent.java,243,"CriticalEventSeverity severity,"
+critical_event,src/window/event/CriticalEvent.java,247,return new CriticalEvent(
+critical_event,src/window/event/CriticalEvent.java,277,public CriticalEventType getType() {
+critical_event,src/window/event/CriticalEvent.java,284,public CriticalEventSeverity getSeverity() {
+critical_event,src/window/event/CriticalEvent.java,413,"return ""CriticalEvent{"""
+critical_event,src/window/event/CriticalEventDetector.java,11,* anticipata e il trigger diventa di tipo {@link TriggerReason#CRITICAL_EVENT}.</p>
+critical_event,src/window/event/CriticalEventDetector.java,18,public interface CriticalEventDetector {
+critical_event,src/window/event/CriticalEventDetector.java,32,Optional<CriticalEvent> findNextCriticalEvent(
+critical_event,src/window/event/CriticalEventSeverity.java,14,public enum CriticalEventSeverity {
+critical_event,src/window/event/CriticalEventType.java,20,public enum CriticalEventType {
+critical_event,src/window/event/StaticCriticalEventDetector.java,10,* Implementazione statica di {@link CriticalEventDetector} basata su una lista
+critical_event,src/window/event/StaticCriticalEventDetector.java,20,* {@link CriticalEvent#shouldTriggerReoptimization()}.</p>
+critical_event,src/window/event/StaticCriticalEventDetector.java,22,public final class StaticCriticalEventDetector implements CriticalEventDetector {
+critical_event,src/window/event/StaticCriticalEventDetector.java,27,private final List<CriticalEvent> events;
+critical_event,src/window/event/StaticCriticalEventDetector.java,38,public StaticCriticalEventDetector(List<CriticalEvent> events) {
+critical_event,src/window/event/StaticCriticalEventDetector.java,43,List<CriticalEvent> copiedEvents = new ArrayList<>();
+critical_event,src/window/event/StaticCriticalEventDetector.java,45,for (CriticalEvent event : events) {
+critical_event,src/window/event/StaticCriticalEventDetector.java,55,Comparator.comparingDouble(CriticalEvent::getEventTimeSeconds)
+critical_event,src/window/event/StaticCriticalEventDetector.java,69,public static StaticCriticalEventDetector empty() {
+critical_event,src/window/event/StaticCriticalEventDetector.java,70,return new StaticCriticalEventDetector(Collections.emptyList());
+critical_event,src/window/event/StaticCriticalEventDetector.java,86,public Optional<CriticalEvent> findNextCriticalEvent(
+critical_event,src/window/event/StaticCriticalEventDetector.java,92,for (CriticalEvent event : events) {
+critical_event,src/window/event/StaticCriticalEventDetector.java,114,public List<CriticalEvent> getEvents() {
+critical_event,src/window/population/PopulationReuseDecisionPolicy.java,102,boolean criticalEventTrigger
+critical_event,src/window/population/PopulationReuseDecisionPolicy.java,154,if (criticalEventTrigger) {
+critical_event,src/window/state/TemporalStepResult.java,294,public boolean wasTriggeredByCriticalEvent() {
+critical_event,src/window/state/TemporalStepResult.java,295,return trigger.isCriticalEventTrigger();
+critical_event,src/window/state/TemporalWindowResult.java,125,public long countCriticalEventSteps() {
+critical_event,src/window/state/TemporalWindowResult.java,127,.filter(TemporalStepResult::wasTriggeredByCriticalEvent)
+critical_event,src/window/state/TemporalWindowResult.java,173,"+ "", criticalEventSteps="" + countCriticalEventSteps()"
+critical_event,src/window/trigger/ReoptimizationTrigger.java,3,import window.event.CriticalEvent;
+critical_event,src/window/trigger/ReoptimizationTrigger.java,18,"* <p>Nel caso di {@link TriggerReason#CRITICAL_EVENT}, il trigger conserva"
+critical_event,src/window/trigger/ReoptimizationTrigger.java,38,* {@link TriggerReason#CRITICAL_EVENT}; negli altri casi deve essere
+critical_event,src/window/trigger/ReoptimizationTrigger.java,41,private final CriticalEvent criticalEvent;
+critical_event,src/window/trigger/ReoptimizationTrigger.java,49,"*     <li>se {@code reason == CRITICAL_EVENT}, {@code criticalEvent} deve essere valorizzato;</li>"
+critical_event,src/window/trigger/ReoptimizationTrigger.java,50,"*     <li>se {@code reason != CRITICAL_EVENT}, {@code criticalEvent} deve essere {@code null}.</li>"
+critical_event,src/window/trigger/ReoptimizationTrigger.java,58,"* @param criticalEvent evento critico associato, solo per trigger critici"
+critical_event,src/window/trigger/ReoptimizationTrigger.java,63,CriticalEvent criticalEvent
+critical_event,src/window/trigger/ReoptimizationTrigger.java,79,"validateCriticalEventConsistency(reason, criticalEvent);"
+critical_event,src/window/trigger/ReoptimizationTrigger.java,80,this.criticalEvent = criticalEvent;
+scheduled_trigger,src/window/trigger/ReoptimizationTrigger.java,112,* @return trigger con motivo {@link TriggerReason#SCHEDULED_WINDOW_EXPIRATION}
+scheduled_trigger,src/window/trigger/ReoptimizationTrigger.java,119,"TriggerReason.SCHEDULED_WINDOW_EXPIRATION,"
+critical_event,src/window/trigger/ReoptimizationTrigger.java,136,* @param criticalEvent evento che causa la riesecuzione
+critical_event,src/window/trigger/ReoptimizationTrigger.java,137,* @return trigger con motivo {@link TriggerReason#CRITICAL_EVENT}
+critical_event,src/window/trigger/ReoptimizationTrigger.java,139,public static ReoptimizationTrigger criticalEvent(
+critical_event,src/window/trigger/ReoptimizationTrigger.java,140,CriticalEvent criticalEvent
+critical_event,src/window/trigger/ReoptimizationTrigger.java,143,"criticalEvent,"
+critical_event,src/window/trigger/ReoptimizationTrigger.java,144,"""criticalEvent must not be null."""
+critical_event,src/window/trigger/ReoptimizationTrigger.java,148,"criticalEvent.getEventTimeSeconds(),"
+critical_event,src/window/trigger/ReoptimizationTrigger.java,149,"TriggerReason.CRITICAL_EVENT,"
+critical_event,src/window/trigger/ReoptimizationTrigger.java,150,criticalEvent
+critical_event,src/window/trigger/ReoptimizationTrigger.java,171,public CriticalEvent getCriticalEvent() {
+critical_event,src/window/trigger/ReoptimizationTrigger.java,172,return criticalEvent;
+critical_event,src/window/trigger/ReoptimizationTrigger.java,178,* @return {@code true} se {@link #getReason()} è {@link TriggerReason#CRITICAL_EVENT}
+critical_event,src/window/trigger/ReoptimizationTrigger.java,180,public boolean isCriticalEventTrigger() {
+critical_event,src/window/trigger/ReoptimizationTrigger.java,181,return reason == TriggerReason.CRITICAL_EVENT;
+scheduled_trigger,src/window/trigger/ReoptimizationTrigger.java,190,return reason == TriggerReason.SCHEDULED_WINDOW_EXPIRATION;
+critical_event,src/window/trigger/ReoptimizationTrigger.java,203,* Controlla la coerenza tra reason e criticalEvent.
+critical_event,src/window/trigger/ReoptimizationTrigger.java,209,private static void validateCriticalEventConsistency(
+critical_event,src/window/trigger/ReoptimizationTrigger.java,211,CriticalEvent criticalEvent
+critical_event,src/window/trigger/ReoptimizationTrigger.java,213,if (reason == TriggerReason.CRITICAL_EVENT && criticalEvent == null) {
+critical_event,src/window/trigger/ReoptimizationTrigger.java,215,"""criticalEvent must not be null when reason is CRITICAL_EVENT."""
+critical_event,src/window/trigger/ReoptimizationTrigger.java,219,if (reason != TriggerReason.CRITICAL_EVENT && criticalEvent != null) {
+critical_event,src/window/trigger/ReoptimizationTrigger.java,221,"""criticalEvent must be null when reason is not CRITICAL_EVENT."""
+critical_event,src/window/trigger/ReoptimizationTrigger.java,247,"+ "", criticalEvent="" + criticalEvent"
+scheduled_trigger,src/window/trigger/TriggerReason.java,35,"SCHEDULED_WINDOW_EXPIRATION,"
+critical_event,src/window/trigger/TriggerReason.java,44,CRITICAL_EVENT;
+critical_event,src/window/trigger/TriggerReason.java,49,* @return {@code true} solo per {@link #CRITICAL_EVENT}
+critical_event,src/window/trigger/TriggerReason.java,52,return this == CRITICAL_EVENT;
+scheduled_trigger,src/window/trigger/TriggerReason.java,58,* @return {@code true} solo per {@link #SCHEDULED_WINDOW_EXPIRATION}
+scheduled_trigger,src/window/trigger/TriggerReason.java,61,return this == SCHEDULED_WINDOW_EXPIRATION;
+stale,tools/mosaic-live-maga-runtime/src/org/eclipse/mosaic/app/maga/liveruntime/LiveGaCompletion.java,102,boolean isStale() {
+last_strategy,tools/mosaic-live-maga-runtime/src/org/eclipse/mosaic/app/maga/liveruntime/LiveGaExecutionCoordinator.java,35,private boolean lastAppliedStrategyPreservedWhileRunning;
+stale,tools/mosaic-live-maga-runtime/src/org/eclipse/mosaic/app/maga/liveruntime/LiveGaExecutionCoordinator.java,39,private int gaJobsDiscardedAsStale;
+stale,tools/mosaic-live-maga-runtime/src/org/eclipse/mosaic/app/maga/liveruntime/LiveGaExecutionCoordinator.java,43,private boolean staleResultDiscardedObserved;
+last_strategy,tools/mosaic-live-maga-runtime/src/org/eclipse/mosaic/app/maga/liveruntime/LiveGaExecutionCoordinator.java,70,if (strategyApplier.hasLastAppliedStrategy()) {
+last_strategy,tools/mosaic-live-maga-runtime/src/org/eclipse/mosaic/app/maga/liveruntime/LiveGaExecutionCoordinator.java,71,lastAppliedStrategyPreservedWhileRunning = true;
+scheduled_trigger,tools/mosaic-live-maga-runtime/src/org/eclipse/mosaic/app/maga/liveruntime/LiveGaExecutionCoordinator.java,110,"return ""SCHEDULED_WINDOW_EXPIRATION"";"
+stale,tools/mosaic-live-maga-runtime/src/org/eclipse/mosaic/app/maga/liveruntime/LiveGaExecutionCoordinator.java,288,if (completion.isStale()) {
+stale,tools/mosaic-live-maga-runtime/src/org/eclipse/mosaic/app/maga/liveruntime/LiveGaExecutionCoordinator.java,289,"markStale(simulationTimeNs, completion);"
+stale,tools/mosaic-live-maga-runtime/src/org/eclipse/mosaic/app/maga/liveruntime/LiveGaExecutionCoordinator.java,356,"private void markStale(long simulationTimeNs, LiveGaCompletion completion) throws IOException {"
+stale,tools/mosaic-live-maga-runtime/src/org/eclipse/mosaic/app/maga/liveruntime/LiveGaExecutionCoordinator.java,398,staleResultDiscardedObserved = true;
+stale,tools/mosaic-live-maga-runtime/src/org/eclipse/mosaic/app/maga/liveruntime/LiveGaExecutionCoordinator.java,399,gaJobsDiscardedAsStale++;
+stale,tools/mosaic-live-maga-runtime/src/org/eclipse/mosaic/app/maga/liveruntime/LiveGaExecutionCoordinator.java,401,reportingCollector.recordStaleDiscarded(
+stale,tools/mosaic-live-maga-runtime/src/org/eclipse/mosaic/app/maga/liveruntime/LiveGaExecutionCoordinator.java,411,runtimeState = LiveGaExecutionState.STALE_RESULT_DISCARDED;
+last_strategy,tools/mosaic-live-maga-runtime/src/org/eclipse/mosaic/app/maga/liveruntime/LiveGaExecutionCoordinator.java,576,LiveAppliedStrategy strategy = strategyApplier.getLastAppliedStrategy();
+stale,tools/mosaic-live-maga-runtime/src/org/eclipse/mosaic/app/maga/liveruntime/LiveGaExecutionCoordinator.java,592,int getGaJobsDiscardedAsStale() {
+stale,tools/mosaic-live-maga-runtime/src/org/eclipse/mosaic/app/maga/liveruntime/LiveGaExecutionCoordinator.java,593,return gaJobsDiscardedAsStale;
+last_strategy,tools/mosaic-live-maga-runtime/src/org/eclipse/mosaic/app/maga/liveruntime/LiveGaExecutionCoordinator.java,600,boolean isLastAppliedStrategyPreservedWhileRunning() {
+last_strategy,tools/mosaic-live-maga-runtime/src/org/eclipse/mosaic/app/maga/liveruntime/LiveGaExecutionCoordinator.java,601,return lastAppliedStrategyPreservedWhileRunning;
+stale,tools/mosaic-live-maga-runtime/src/org/eclipse/mosaic/app/maga/liveruntime/LiveGaExecutionCoordinator.java,608,boolean isStaleResultDiscardedObserved() {
+stale,tools/mosaic-live-maga-runtime/src/org/eclipse/mosaic/app/maga/liveruntime/LiveGaExecutionCoordinator.java,609,return staleResultDiscardedObserved;
+stale,tools/mosaic-live-maga-runtime/src/org/eclipse/mosaic/app/maga/liveruntime/LiveGaExecutionState.java,9,"STALE_RESULT_DISCARDED,"
+stale,tools/mosaic-live-maga-runtime/src/org/eclipse/mosaic/app/maga/liveruntime/LiveRuntimeTraceWriter.java,60,"runtimeTraceWriter.write(""profile,simulationTimeNs,windowIndex,runtimeState,triggerType,snapshotId,snapshotTimeSeconds,taskCount,candidateCount,gaSubmitted,gaCompleted,gaRuntimeWallClockSeconds,deltaTMaxSeconds,resultApplied,resultDiscardedAsStale,lastAppliedStrategySnapshotId,error,deltaTMaxAtSubmissionSeconds,deltaTMaxFromCompletedStepSeconds,deltaTMaxMismatchSeconds,wallClockDeadlineNs,timeoutD"
+last_strategy,tools/mosaic-live-maga-runtime/src/org/eclipse/mosaic/app/maga/liveruntime/LiveRuntimeTraceWriter.java,60,"runtimeTraceWriter.write(""profile,simulationTimeNs,windowIndex,runtimeState,triggerType,snapshotId,snapshotTimeSeconds,taskCount,candidateCount,gaSubmitted,gaCompleted,gaRuntimeWallClockSeconds,deltaTMaxSeconds,resultApplied,resultDiscardedAsStale,lastAppliedStrategySnapshotId,error,deltaTMaxAtSubmissionSeconds,deltaTMaxFromCompletedStepSeconds,deltaTMaxMismatchSeconds,wallClockDeadlineNs,timeoutD"
+stale,tools/mosaic-live-maga-runtime/src/org/eclipse/mosaic/app/maga/liveruntime/LiveRuntimeTraceWriter.java,63,"overrunTraceWriter.write(""profile,simulationTimeNs,windowIndex,runtimeState,snapshotId,gaRuntimeWallClockSeconds,deltaTMaxSeconds,resultDiscardedAsStale,deltaTMaxAtSubmissionSeconds,deltaTMaxFromCompletedStepSeconds,deltaTMaxMismatchSeconds,wallClockDeadlineNs,timeoutDetectedBeforeCompletion,waitCapDetectedWallClockNs,waitCapDetectedSimulationTimeNs\n"");"
+stale,tools/mosaic-live-maga-runtime/src/org/eclipse/mosaic/app/maga/liveruntime/LiveRuntimeTraceWriter.java,118,"boolean stale,"
+stale,tools/mosaic-live-maga-runtime/src/org/eclipse/mosaic/app/maga/liveruntime/LiveRuntimeTraceWriter.java,136,"stale,"
+stale,tools/mosaic-live-maga-runtime/src/org/eclipse/mosaic/app/maga/liveruntime/LiveRuntimeTraceWriter.java,157,"boolean stale,"
+stale,tools/mosaic-live-maga-runtime/src/org/eclipse/mosaic/app/maga/liveruntime/LiveRuntimeTraceWriter.java,176,"+ "","" + stale"
+stale,tools/mosaic-live-maga-runtime/src/org/eclipse/mosaic/app/maga/liveruntime/LiveRuntimeTraceWriter.java,213,boolean stale
+stale,tools/mosaic-live-maga-runtime/src/org/eclipse/mosaic/app/maga/liveruntime/LiveRuntimeTraceWriter.java,222,"stale,"
+stale,tools/mosaic-live-maga-runtime/src/org/eclipse/mosaic/app/maga/liveruntime/LiveRuntimeTraceWriter.java,234,"boolean stale,"
+stale,tools/mosaic-live-maga-runtime/src/org/eclipse/mosaic/app/maga/liveruntime/LiveRuntimeTraceWriter.java,244,"+ "","" + stale"
+last_strategy,tools/mosaic-live-maga-runtime/src/org/eclipse/mosaic/app/maga/liveruntime/LiveStrategyApplier.java,14,private LiveAppliedStrategy lastAppliedStrategy;
+last_strategy,tools/mosaic-live-maga-runtime/src/org/eclipse/mosaic/app/maga/liveruntime/LiveStrategyApplier.java,47,lastAppliedStrategy = new LiveAppliedStrategy(
+last_strategy,tools/mosaic-live-maga-runtime/src/org/eclipse/mosaic/app/maga/liveruntime/LiveStrategyApplier.java,61,return lastAppliedStrategy;
+last_strategy,tools/mosaic-live-maga-runtime/src/org/eclipse/mosaic/app/maga/liveruntime/LiveStrategyApplier.java,64,LiveAppliedStrategy getLastAppliedStrategy() {
+last_strategy,tools/mosaic-live-maga-runtime/src/org/eclipse/mosaic/app/maga/liveruntime/LiveStrategyApplier.java,65,return lastAppliedStrategy;
+last_strategy,tools/mosaic-live-maga-runtime/src/org/eclipse/mosaic/app/maga/liveruntime/LiveStrategyApplier.java,68,boolean hasLastAppliedStrategy() {
+last_strategy,tools/mosaic-live-maga-runtime/src/org/eclipse/mosaic/app/maga/liveruntime/LiveStrategyApplier.java,69,return lastAppliedStrategy != null;
+last_strategy,tools/mosaic-live-maga-runtime/src/org/eclipse/mosaic/app/maga/liveruntime/MaGaLiveRuntimeConfig.java,24,boolean keepLastAppliedStrategyWhileRunning;
+last_strategy,tools/mosaic-live-maga-runtime/src/org/eclipse/mosaic/app/maga/liveruntime/MaGaLiveRuntimeConfig.java,157,if (!keepLastAppliedStrategyWhileRunning) {
+last_strategy,tools/mosaic-live-maga-runtime/src/org/eclipse/mosaic/app/maga/liveruntime/MaGaLiveRuntimeConfig.java,158,"throw new IllegalArgumentException(source + "": keepLastAppliedStrategyWhileRunning must be true for Phase 13D"");"
+critical_event,tools/mosaic-live-maga-runtime/src/org/eclipse/mosaic/app/maga/liveruntime/MaGaLiveRuntimeCoordinatorApp.java,15,import window.event.CriticalEventDetector;
+critical_event,tools/mosaic-live-maga-runtime/src/org/eclipse/mosaic/app/maga/liveruntime/MaGaLiveRuntimeCoordinatorApp.java,99,CriticalEventDetector criticalEventDetector =
+critical_event,tools/mosaic-live-maga-runtime/src/org/eclipse/mosaic/app/maga/liveruntime/MaGaLiveRuntimeCoordinatorApp.java,107,"criticalEventDetector,"
+stale,tools/mosaic-live-maga-runtime/src/org/eclipse/mosaic/app/maga/liveruntime/MaGaLiveRuntimeCoordinatorApp.java,173,"+ ""|gaJobsDiscardedAsStale="" + executionCoordinator.getGaJobsDiscardedAsStale()"
+stale,tools/mosaic-live-maga-runtime/src/org/eclipse/mosaic/app/maga/liveruntime/MaGaLiveRuntimeCoordinatorApp.java,197,"+ ""|staleDiscardedSteps="" + reportingCollector.getStaleDiscardedStepCount()"
+stale,tools/mosaic-live-maga-runtime/src/org/eclipse/mosaic/app/maga/liveruntime/MaGaLiveRuntimeCoordinatorApp.java,235,"+ ""|gaJobsDiscardedAsStale="" + executionCoordinator.getGaJobsDiscardedAsStale()"
+stale,tools/mosaic-live-maga-runtime/src/org/eclipse/mosaic/app/maga/liveruntime/reporting/LiveDetailedReportPrinter.java,32,"liveStale(out, summary);"
+stale,tools/mosaic-live-maga-runtime/src/org/eclipse/mosaic/app/maga/liveruntime/reporting/LiveDetailedReportPrinter.java,60,"out.println(""stale discarded: "" + summary.staleDiscarded);"
+stale,tools/mosaic-live-maga-runtime/src/org/eclipse/mosaic/app/maga/liveruntime/reporting/LiveDetailedReportPrinter.java,103,"private void liveStale(PrintStream out, LiveReportingSummary summary) {"
+stale,tools/mosaic-live-maga-runtime/src/org/eclipse/mosaic/app/maga/liveruntime/reporting/LiveDetailedReportPrinter.java,104,"title(out, ""LIVE STALE RESULT SUMMARY"");"
+stale,tools/mosaic-live-maga-runtime/src/org/eclipse/mosaic/app/maga/liveruntime/reporting/LiveDetailedReportPrinter.java,107,"if (""STALE_DISCARDED"".equals(record.finalStatus)) {"
+stale,tools/mosaic-live-maga-runtime/src/org/eclipse/mosaic/app/maga/liveruntime/reporting/LiveDetailedReportWriter.java,57,"builder.append(""- Stale discarded jobs: `"").append(summary.staleDiscarded).append(""`\n"");"
+stale,tools/mosaic-live-maga-runtime/src/org/eclipse/mosaic/app/maga/liveruntime/reporting/LiveNativeReportingCollector.java,18,"public static final String STATUS_STALE_DISCARDED = ""STALE_DISCARDED"";"
+stale,tools/mosaic-live-maga-runtime/src/org/eclipse/mosaic/app/maga/liveruntime/reporting/LiveNativeReportingCollector.java,36,private final List<TemporalStepResult> staleDiscardedSteps = new ArrayList<>();
+stale,tools/mosaic-live-maga-runtime/src/org/eclipse/mosaic/app/maga/liveruntime/reporting/LiveNativeReportingCollector.java,144,public synchronized void recordStaleDiscarded(
+stale,tools/mosaic-live-maga-runtime/src/org/eclipse/mosaic/app/maga/liveruntime/reporting/LiveNativeReportingCollector.java,154,record.finalStatus = STATUS_STALE_DISCARDED;
+stale,tools/mosaic-live-maga-runtime/src/org/eclipse/mosaic/app/maga/liveruntime/reporting/LiveNativeReportingCollector.java,159,staleDiscardedSteps.add(step);
+stale,tools/mosaic-live-maga-runtime/src/org/eclipse/mosaic/app/maga/liveruntime/reporting/LiveNativeReportingCollector.java,160,"LiveReportingSummary.LiveWindowSummary summary = windowSummary(jobId, step, STATUS_STALE_DISCARDED);"
+stale,tools/mosaic-live-maga-runtime/src/org/eclipse/mosaic/app/maga/liveruntime/reporting/LiveNativeReportingCollector.java,162,"incrementalWriter.writeStep(LiveTemporalStepRecord.from(jobId, STATUS_STALE_DISCARDED, step));"
+stale,tools/mosaic-live-maga-runtime/src/org/eclipse/mosaic/app/maga/liveruntime/reporting/LiveNativeReportingCollector.java,164,"incrementalWriter.writeEvent(""STALE_DISCARDED"", record, simulationTimeNs);"
+stale,tools/mosaic-live-maga-runtime/src/org/eclipse/mosaic/app/maga/liveruntime/reporting/LiveNativeReportingCollector.java,247,public synchronized int getStaleDiscardedStepCount() {
+stale,tools/mosaic-live-maga-runtime/src/org/eclipse/mosaic/app/maga/liveruntime/reporting/LiveNativeReportingCollector.java,248,return staleDiscardedSteps.size();
+stale,tools/mosaic-live-maga-runtime/src/org/eclipse/mosaic/app/maga/liveruntime/reporting/LiveReportingSummary.java,27,public final int staleDiscarded;
+stale,tools/mosaic-live-maga-runtime/src/org/eclipse/mosaic/app/maga/liveruntime/reporting/LiveReportingSummary.java,86,int staleCount = 0;
+stale,tools/mosaic-live-maga-runtime/src/org/eclipse/mosaic/app/maga/liveruntime/reporting/LiveReportingSummary.java,96,"} else if (""STALE_DISCARDED"".equals(record.finalStatus)) {"
+stale,tools/mosaic-live-maga-runtime/src/org/eclipse/mosaic/app/maga/liveruntime/reporting/LiveReportingSummary.java,97,staleCount++;
+stale,tools/mosaic-live-maga-runtime/src/org/eclipse/mosaic/app/maga/liveruntime/reporting/LiveReportingSummary.java,109,this.staleDiscarded = staleCount;

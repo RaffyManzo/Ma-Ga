@@ -1,0 +1,70 @@
+{
+  "snapshotId": "live_runtime_snapshot_t_1900000000",
+  "timeSeconds": 1.9,
+  "vehicles": [
+    {
+      "vehicleId": "veh_0",
+      "x": 214374.43702773037,
+      "y": 450279.49133266695,
+      "speed": 13.57666422088178,
+      "localCpu": 1.0E9
+    },
+    {
+      "vehicleId": "veh_1",
+      "x": 214521.6671925684,
+      "y": 450348.05906482384,
+      "speed": 14.362387057263037,
+      "localCpu": 1.0E9
+    }
+  ],
+  "tasks": [],
+  "candidateNodes": [
+    {
+      "candidateId": "local_for_veh_0",
+      "sourceVehicleId": "veh_0",
+      "executionNodeId": "veh_0",
+      "type": "LOCAL",
+      "availableCpu": 1.0E9,
+      "availableBandwidth": 0.0,
+      "baseLatencySeconds": 0.0
+    },
+    {
+      "candidateId": "local_for_veh_1",
+      "sourceVehicleId": "veh_1",
+      "executionNodeId": "veh_1",
+      "type": "LOCAL",
+      "availableCpu": 1.0E9,
+      "availableBandwidth": 0.0,
+      "baseLatencySeconds": 0.0
+    },
+    {
+      "candidateId": "vehicle_veh_1_for_veh_0",
+      "sourceVehicleId": "veh_0",
+      "executionNodeId": "veh_1",
+      "type": "VEHICLE",
+      "availableCpu": 1.0E9,
+      "availableBandwidth": 4700000.0,
+      "baseLatencySeconds": 0.002,
+      "bandwidthPoolId": "direct_v2v_pool__veh_0__veh_1"
+    },
+    {
+      "candidateId": "vehicle_veh_0_for_veh_1",
+      "sourceVehicleId": "veh_1",
+      "executionNodeId": "veh_0",
+      "type": "VEHICLE",
+      "availableCpu": 1.0E9,
+      "availableBandwidth": 4700000.0,
+      "baseLatencySeconds": 0.002,
+      "bandwidthPoolId": "direct_v2v_pool__veh_0__veh_1"
+    }
+  ],
+  "accessGateways": [],
+  "accessLinks": [],
+  "bandwidthPools": [
+    {
+      "poolId": "direct_v2v_pool__veh_0__veh_1",
+      "poolType": "DIRECT_V2V",
+      "availableBandwidth": 4700000.0
+    }
+  ]
+}

@@ -1,0 +1,36 @@
+{
+  "fileCount": 18,
+  "recordCount": 1216,
+  "statusCounts": {
+    "APPLIED": 1171,
+    "STALE_DISCARDED": 45
+  },
+  "triggerCounts": {
+    "FIRST_RUN": 24,
+    "SCHEDULED_WINDOW_EXPIRATION": 1192
+  },
+  "dynamicityLevelCounts": {
+    "UNKNOWN": 24,
+    "STABLE": 912,
+    "MODERATE": 278,
+    "HIGH": 2
+  },
+  "reuseModeCounts": {
+    "FIRST_RUN": 24,
+    "WARM_START": 912,
+    "PARTIAL_RESTART": 268,
+    "COLD_START": 12
+  },
+  "windowActionCounts": {
+    "FIRST_RUN": 24,
+    "CLAMP_TO_BOUNDS": 1191,
+    "KEEP": 1
+  },
+  "stopReasonCounts": {
+    "EMPTY_TASK_SET": 967,
+    "STAGNATION_REACHED": 246,
+    "MAX_GENERATIONS_REACHED": 3
+  },
+  "reuseCorrectionCount": 10,
+  "windowBoundsViolationCount": 0
+}

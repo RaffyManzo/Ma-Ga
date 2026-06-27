@@ -1,0 +1,5 @@
+profile,simulationTimeNs,windowIndex,snapshotId,fitness,localAssignments,vehicleAssignments,edgeAssignments,cloudAssignments
+diagnostic-overrun,4500000000,0,live_runtime_snapshot_t_2000000000,0.000000000,0,0,0,0
+diagnostic-overrun,6300000000,1,live_runtime_snapshot_t_4500000000,0.000000000,0,0,0,0
+diagnostic-overrun,9200000000,2,live_runtime_snapshot_t_6300000000,0.000000000,0,0,0,0
+diagnostic-overrun,18100000000,3,live_runtime_snapshot_t_14700000000,1.330000000,7,0,0,0

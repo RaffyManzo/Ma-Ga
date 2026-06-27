@@ -1,0 +1,9 @@
+﻿id,name,status,observed
+S06-01,Delay dose-response,OBSERVED,"{'G-STALE-CONTROL-0': (0, 9.677419, 28), 'G-STALE-MID-100': (100, 42.857143, 4), 'G-STALE-300': (300, 100.0, 0), 'G-STALE-300-R2': (300, 100.0, 0)}"
+S06-02,Forced-stale reproducibility,OBSERVED,"{'run1': (100.0, 0), 'run2': (100.0, 0)}"
+S06-03,Job lifecycle completeness,INCOMPLETE,"{'G-SPARSE-01': 0, 'G-ADAPTIVE-01': 2, 'G-STALE-CONTROL-0': 4, 'G-STALE-MID-100': 4, 'G-STALE-300': 6, 'G-STALE-300-R2': 4}"
+S06-04,Single in-flight,OBSERVED,"{'G-SPARSE-01': 1, 'G-ADAPTIVE-01': 1, 'G-STALE-CONTROL-0': 1, 'G-STALE-MID-100': 1, 'G-STALE-300': 1, 'G-STALE-300-R2': 1}"
+S06-05,Stale after prior strategy,OBSERVED,"{'G-SPARSE-01': 0, 'G-ADAPTIVE-01': 1, 'G-STALE-CONTROL-0': 3, 'G-STALE-MID-100': 3, 'G-STALE-300': 0, 'G-STALE-300-R2': 0}"
+S06-06,Fresh reoptimization after stale,NOT_OBSERVED,"{'G-SPARSE-01': 0, 'G-ADAPTIVE-01': 0, 'G-STALE-CONTROL-0': 0, 'G-STALE-MID-100': 0, 'G-STALE-300': 0, 'G-STALE-300-R2': 0}"
+S06-07,Window bounds,OBSERVED,"{'G-SPARSE-01': 0, 'G-ADAPTIVE-01': 0, 'G-STALE-CONTROL-0': 0, 'G-STALE-MID-100': 0, 'G-STALE-300': 0, 'G-STALE-300-R2': 0}"
+S06-08,Adaptive scaling variation,OBSERVED,"{'GENERATIONS_VARY': True, 'FINAL_POPULATION_VARIES': True}"

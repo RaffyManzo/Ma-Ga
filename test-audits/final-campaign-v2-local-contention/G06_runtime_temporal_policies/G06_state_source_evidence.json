@@ -1,0 +1,32 @@
+{
+  "G-SPARSE-01": {
+    "sourceMode": "MOSAIC_LIVE",
+    "bridgeDescription": "LIVE_CAUSAL_MOSAIC_SNAPSHOT_BRIDGE",
+    "optimizationSourceDescription": "LIVE_CAUSAL_MOSAIC_SNAPSHOT_BRIDGE"
+  },
+  "G-ADAPTIVE-01": {
+    "sourceMode": "MOSAIC_LIVE",
+    "bridgeDescription": "LIVE_CAUSAL_MOSAIC_SNAPSHOT_BRIDGE",
+    "optimizationSourceDescription": "LIVE_CAUSAL_MOSAIC_SNAPSHOT_BRIDGE"
+  },
+  "G-STALE-CONTROL-0": {
+    "sourceMode": "MOSAIC_LIVE",
+    "bridgeDescription": "LIVE_CAUSAL_MOSAIC_SNAPSHOT_BRIDGE",
+    "optimizationSourceDescription": "LIVE_CAUSAL_MOSAIC_SNAPSHOT_BRIDGE"
+  },
+  "G-STALE-MID-100": {
+    "sourceMode": "MOSAIC_LIVE",
+    "bridgeDescription": "LIVE_CAUSAL_MOSAIC_SNAPSHOT_BRIDGE",
+    "optimizationSourceDescription": "LIVE_CAUSAL_MOSAIC_SNAPSHOT_BRIDGE"
+  },
+  "G-STALE-300": {
+    "sourceMode": "MOSAIC_LIVE",
+    "bridgeDescription": "LIVE_CAUSAL_MOSAIC_SNAPSHOT_BRIDGE",
+    "optimizationSourceDescription": "LIVE_CAUSAL_MOSAIC_SNAPSHOT_BRIDGE"
+  },
+  "G-STALE-300-R2": {
+    "sourceMode": "MOSAIC_LIVE",
+    "bridgeDescription": "LIVE_CAUSAL_MOSAIC_SNAPSHOT_BRIDGE",
+    "optimizationSourceDescription": "LIVE_CAUSAL_MOSAIC_SNAPSHOT_BRIDGE"
+  }
+}

@@ -1,0 +1,20 @@
+﻿testId,status,reason,limit
+T-034,PASS,La run sparse mantiene 616 strategie applicate fino a 180 s e osserva 473 finestre EMPTY_TASK_SET.,
+T-050,PASS,In tutte le sei run il massimo numero di job GA concorrenti è 1.,
+T-051,PASS_CON_LIMITAZIONE,"Sono osservati 677 cicli SUBMITTED-COMPLETED_WITHIN_BOUND-APPLIED, 15 percorsi timeout-stale e accounting completo.",Cinque job restano SHUTDOWN_IN_FLIGHT e il percorso stale non usa l'evento COMPLETED_WITHIN_BOUND.
+T-052,PASS,"Sono osservati 15 risultati stale. Tutti superano deltaTMax, raggiungono WAIT_CAP e vengono scartati.",
+T-053,PASS_CON_LIMITAZIONE,Sette risultati stale seguono almeno una strategia applicata e il sorgente conserva esplicitamente lastAppliedStrategy.,Il trace non serializza a ogni tick l'identità della strategia rimasta attiva durante il calcolo.
+T-054,PASS,Ogni stale genera FRESH_REOPTIMIZATION_REQUESTED e un nuovo job con trigger omonimo: 15 richieste e 15 nuove submission.,
+T-055,PASS,"Snapshot lag, future snapshot violations e deltaTMax mismatch restano pari a zero.",
+T-060,PASS,EMPTY_TASK_SET è osservato 473 volte nella run sparse e 967 volte nell'audit temporale cross-phase.,
+T-061,PASS,"Sono osservati FIRST_RUN, WARM_START, PARTIAL_RESTART e COLD_START, con popolazioni nuove e riusate.",
+T-062,PASS_CON_LIMITAZIONE,"Selection, crossover, mutation ed elitism sono presenti nel core e le run osservano molte generazioni.",Gli operatori non sono serializzati individualmente per ogni generazione nel runtime live.
+T-063,PASS,STAGNATION_REACHED è osservato nelle run G06 e 246 volte nell'audit cross-phase.,
+T-064,PASS_CON_LIMITAZIONE,MAX_GENERATIONS_REACHED è osservato tre volte nelle evidenze cross-phase.,I tre casi appartengono a risultati stale e non alla nuova run adaptive applicata.
+T-115,PASS,Nessuna delle sei run e nessuno dei 1.216 record cross-phase viola deltaTMin o deltaTMax.,
+T-116,NON_OSSERVATO,"WAIT_CAP_REACHED e STALE_RESULT_DISCARDED sono osservati, ma EXCEEDS_CURRENT_AND_NEXT non compare.",Il caso specifico richiesto non è stato attivato nelle run disponibili.
+T-117,PASS,FIRST_RUN e SCHEDULED_WINDOW_EXPIRATION sono osservati nel live e nell'audit cross-phase.,
+T-118,EVIDENZA_PARZIALE,Il percorso CRITICAL_EVENT è presente nel sorgente e nei componenti del TemporalWindowManager.,Nessuna run live della campagna forza o osserva il trigger CRITICAL_EVENT.
+T-119,PASS,Tutte le sei run dichiarano sourceMode=MOSAIC_LIVE e LIVE_CAUSAL_MOSAIC_SNAPSHOT_BRIDGE.,
+T-120,PASS,Le cinque run canoniche e di controllo non adaptive usano gaParameterScalingMode=STATIC.,
+T-121,PASS_CON_LIMITAZIONE,"La run recuperata copre 300 s, 3.000 tick, modalità ADAPTIVE e variazioni di generazioni e popolazione finale.",Il validator canonico conserva ancora l'assunzione STATIC e classifica ADAPTIVE come non canonico.
