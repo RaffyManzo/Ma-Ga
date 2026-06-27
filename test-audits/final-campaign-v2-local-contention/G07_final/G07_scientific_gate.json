@@ -1,0 +1,39 @@
+{
+  "schemaVersion": 1,
+  "verdict": "PASS_G07_FINAL_AUDIT_COMPLETE_WITH_DOCUMENTED_OBSERVABILITY_AND_COMPLETION_LIMITS_READY_FOR_RESULTS_ANALYSIS_AND_CHAPTER_7_REWRITE",
+  "passed": true,
+  "testCount": 18,
+  "testStatusCounts": {
+    "EVIDENZA_PARZIALE": 2,
+    "PASS": 15,
+    "PASS_CON_LIMITAZIONE": 1
+  },
+  "campaignTotals": {
+    "runCount": 117,
+    "simulatedSeconds": 34860,
+    "tasksGenerated": 1223256,
+    "tasksActivated": 1223256,
+    "tasksRemovedAtDeadline": 1214390,
+    "tasksPendingAtEnd": 8866,
+    "gaJobsSubmitted": 12718,
+    "gaJobsCompleted": 12630,
+    "gaJobsApplied": 12363,
+    "gaJobsDiscardedAsStale": 267,
+    "shutdownInFlight": 88,
+    "localAssignments": 462043,
+    "vehicleAssignments": 122,
+    "edgeAssignments": 8,
+    "cloudAssignments": 59,
+    "simulatedMinutes": 581.0,
+    "simulatedHours": 9.683333333333334,
+    "gaAccountingExpected": 12718,
+    "gaAccountingConsistent": true,
+    "taskLifecycleExpected": 1223256,
+    "taskLifecycleConsistent": true
+  },
+  "blockingFailures": 0,
+  "newSimulationsRequired": 0,
+  "javaOrCoreModified": false,
+  "taskCompletionModel": "NOT_IMPLEMENTED",
+  "chapter7EvidenceStatus": "READY_FOR_SHARED_RESULTS_ANALYSIS_BEFORE_REWRITE"
+}

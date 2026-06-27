@@ -1,0 +1,2 @@
+﻿scope,submitted,completed,applied,stale,shutdownInFlight,submittedExpected,accountingConsistent,tasksGenerated,tasksActivated,tasksRemovedAtDeadline,tasksPendingAtEnd,taskLifecycleExpected,taskLifecycleConsistent
+CAMPAIGN_TOTAL,12718,12630,12363,267,88,12718,True,1223256,1223256,1214390,8866,1223256,True

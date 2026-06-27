@@ -1,0 +1,9 @@
+﻿limitId,scope,severity,description,consequence
+L-G07-01,SUMO,LOW,"Teleport ed emergency braking sono ricavati da menzioni nei log, non da contatori canonici uniformi del validator.","L'integrità della mobilità è sostenuta, ma non va presentata come prova esaustiva di assenza di ogni anomalia SUMO."
+L-G07-02,Vehicle lifecycle,LOW,Nessun evento LEFT è stato osservato negli snapshot pubblicati conservati.,JOIN e UPDATE sono dimostrati; LEFT resta non osservato nella finestra di evidenza.
+L-G07-03,Task completion,HIGH,taskCompletionModel = NOT_IMPLEMENTED.,"Non si possono affermare completamenti end-to-end, throughput applicativo o latenze finali realmente consumate."
+L-G07-04,Temporal coverage,HIGH,Le varianti MA-GA complete possono perdere copertura decisionale quando il runtime supera deltaTMax.,Le statistiche sulle assegnazioni applicate descrivono solo le finestre effettivamente applicate.
+L-G07-05,G02B LOCAL_ONLY,MEDIUM,LOCAL_ONLY applica molte più finestre rispetto alla baseline.,I conteggi assoluti devono essere accompagnati da indicatori normalizzati per finestra o applicazione.
+L-G07-06,G02B mobility penalty,MEDIUM,NO_MOBILITY_PENALTY azzera wM e normalizza i pesi residui.,L'ablazione non mantiene numericamente invariati tutti gli altri coefficienti della fitness.
+L-G07-07,G02B marginal effects,MEDIUM,Gli effetti di penalità di mobilità e riuso non sono uniformi tra i 15 confronti appaiati.,"I risultati vanno presentati come evidenza parziale, non come vantaggio causale definitivo."
+L-G07-08,Reporting evolution,LOW,G03 usa un profilo di reporting precedente ai JSONL temporali introdotti nelle fasi successive.,La completezza è valutata rispetto allo schema disponibile in quella fase.

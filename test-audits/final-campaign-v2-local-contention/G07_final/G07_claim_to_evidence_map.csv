@@ -1,0 +1,9 @@
+﻿claimId,claim,classification,evidence,writingRule
+C-G07-01,L'integrazione MOSAIC-SUMO e il runtime MA-GA hanno eseguito 117 run valide.,SUPPORTED,G07_run_registry.csv; G07_cross_phase_counts.csv,Riportare anche la durata simulata complessiva.
+C-G07-02,La causalità snapshot/pool è rispettata nelle tracce controllate.,SUPPORTED,"T-036, T-044, T-045, T-046, T-047",Usare il termine 'nelle tracce osservate'.
+C-G07-03,Il lifecycle dei task è contabilmente coerente.,SUPPORTED,T-031; G07_counter_consistency.csv,Non confondere rimozione alla deadline con completamento.
+C-G07-04,Il sistema scarta correttamente le decisioni stale.,SUPPORTED,G06 causal audit; T-132,Separare correttezza del controllo da capacità di recupero.
+C-G07-05,LOCAL_ONLY è computazionalmente più semplice ma produce forte contesa locale.,SUPPORTED_WITH_LIMIT,G02B final audit,Normalizzare per numero di strategie applicate.
+C-G07-06,La penalità di mobilità migliora sempre le prestazioni.,NOT_SUPPORTED,G02B-A07,Non inserire questa affermazione.
+C-G07-07,Il riuso della popolazione migliora sempre runtime e stale.,NOT_SUPPORTED,G02B-A09,Parlare di tendenza media e risultato non uniforme.
+C-G07-08,Il prototipo dimostra il completamento end-to-end dei task.,NOT_SUPPORTED,T-133,Esplicitamente vietato dal limite del modello.
