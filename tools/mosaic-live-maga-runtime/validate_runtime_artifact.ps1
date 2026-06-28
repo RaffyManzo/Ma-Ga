@@ -27,7 +27,7 @@ $ExpectedClasses = @(
     "org/eclipse/mosaic/app/maga/liveruntime/LiveStaleReason.class",
     "org/eclipse/mosaic/app/maga/liveruntime/LiveAssignmentDecision.class",
     "org/eclipse/mosaic/app/maga/liveruntime/reporting/LiveStaleStrategyWriter.class",
-    "org/eclipse/mosaic/app/maga/liveruntime/reporting/LiveStaleStrategyWriter$1.class"
+    'org/eclipse/mosaic/app/maga/liveruntime/reporting/LiveStaleStrategyWriter$1.class'
 )
 
 function Resolve-MaybeRelative {
