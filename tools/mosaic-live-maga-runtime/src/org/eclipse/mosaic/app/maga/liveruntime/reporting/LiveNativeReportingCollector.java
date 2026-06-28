@@ -4,6 +4,7 @@ import config.MaGaConfig;
 import ga.fitness.breakdown.GeneEvaluationBreakdown;
 import ga.fitness.breakdown.LocalResourceUsageBreakdown;
 import model.node.NodeType;
+import org.eclipse.mosaic.app.maga.liveruntime.LiveStaleReason;
 import window.state.TemporalStepResult;
 
 import java.io.IOException;
@@ -19,6 +20,15 @@ public final class LiveNativeReportingCollector implements AutoCloseable {
     public static final String STATUS_FAILED = "FAILED";
     public static final String STATUS_NULL_STEP_RESULT = "NULL_STEP_RESULT";
     public static final String STATUS_SHUTDOWN_IN_FLIGHT = "SHUTDOWN_IN_FLIGHT";
+
+    public static final String CLASSIFICATION_APPLIED_FRESH =
+            "APPLIED_WITHIN_BUDGET_AND_FRESH";
+    public static final String CLASSIFICATION_STALE_WALL_CLOCK =
+            "STALE_WALL_CLOCK";
+    public static final String CLASSIFICATION_STALE_SIMULATION_AGE =
+            "STALE_SIMULATION_AGE";
+    public static final String CLASSIFICATION_STALE_BOTH =
+            "STALE_WALL_CLOCK_AND_SIMULATION_AGE";
 
     private final String scenarioName;
     private final String profile;
@@ -126,28 +136,55 @@ public final class LiveNativeReportingCollector implements AutoCloseable {
             double adaptiveDeltaTMaxUpdatedSeconds,
             String adaptiveDeltaTMaxFallbackReason
     ) throws IOException {
+        recordSubmitted(
+                jobId, windowIndex, triggerType, submissionSimulationTimeNs,
+                submissionWallClockNs, snapshotId, snapshotTimeSeconds, taskCount,
+                candidateCount, deltaTMaxAtSubmissionSeconds,
+                deltaTMaxAtSubmissionSeconds, deltaTMaxAtSubmissionSeconds,
+                wallClockDeadlineNs, deltaTMaxMode, adaptiveDeltaTMaxEstimateSeconds,
+                adaptiveDeltaTMaxSampleCount, adaptiveDeltaTMaxP95Seconds,
+                adaptiveDeltaTMaxTargetSeconds, adaptiveDeltaTMaxClampedSeconds,
+                adaptiveDeltaTMaxPreviousSeconds, adaptiveDeltaTMaxUpdatedSeconds,
+                adaptiveDeltaTMaxFallbackReason
+        );
+    }
+
+    public synchronized void recordSubmitted(
+            String jobId,
+            int windowIndex,
+            String triggerType,
+            long submissionSimulationTimeNs,
+            long submissionWallClockNs,
+            String snapshotId,
+            double snapshotTimeSeconds,
+            int taskCount,
+            int candidateCount,
+            double temporalMaximumAtSubmissionSeconds,
+            double gaWallClockBudgetAtSubmissionSeconds,
+            double maxSnapshotAgeSimulationSeconds,
+            long wallClockDeadlineNs,
+            String deltaTMaxMode,
+            double adaptiveDeltaTMaxEstimateSeconds,
+            int adaptiveDeltaTMaxSampleCount,
+            double adaptiveDeltaTMaxP95Seconds,
+            double adaptiveDeltaTMaxTargetSeconds,
+            double adaptiveDeltaTMaxClampedSeconds,
+            double adaptiveDeltaTMaxPreviousSeconds,
+            double adaptiveDeltaTMaxUpdatedSeconds,
+            String adaptiveDeltaTMaxFallbackReason
+    ) throws IOException {
         LiveGaJobRecord record = new LiveGaJobRecord(
-                jobId,
-                windowIndex,
-                triggerType,
-                submissionSimulationTimeNs,
-                submissionWallClockNs,
-                snapshotId,
-                snapshotTimeSeconds,
-                taskCount,
-                candidateCount,
-                deltaTMaxAtSubmissionSeconds,
-                wallClockDeadlineNs
+                jobId, windowIndex, triggerType, submissionSimulationTimeNs,
+                submissionWallClockNs, snapshotId, snapshotTimeSeconds, taskCount,
+                candidateCount, temporalMaximumAtSubmissionSeconds,
+                gaWallClockBudgetAtSubmissionSeconds,
+                maxSnapshotAgeSimulationSeconds, wallClockDeadlineNs
         );
         record.applySubmissionDeltaTMaxTelemetry(
-                deltaTMaxMode,
-                adaptiveDeltaTMaxEstimateSeconds,
-                adaptiveDeltaTMaxSampleCount,
-                adaptiveDeltaTMaxP95Seconds,
-                adaptiveDeltaTMaxTargetSeconds,
-                adaptiveDeltaTMaxClampedSeconds,
-                adaptiveDeltaTMaxPreviousSeconds,
-                adaptiveDeltaTMaxUpdatedSeconds,
+                deltaTMaxMode, adaptiveDeltaTMaxEstimateSeconds,
+                adaptiveDeltaTMaxSampleCount, adaptiveDeltaTMaxP95Seconds,
+                adaptiveDeltaTMaxTargetSeconds, adaptiveDeltaTMaxClampedSeconds,
+                adaptiveDeltaTMaxPreviousSeconds, adaptiveDeltaTMaxUpdatedSeconds,
                 adaptiveDeltaTMaxFallbackReason
         );
         recordsByJobId.put(jobId, record);
@@ -215,9 +252,17 @@ public final class LiveNativeReportingCollector implements AutoCloseable {
         LiveGaJobRecord record = require(jobId);
         record.finalStatus = STATUS_APPLIED;
         record.appliedAtSimulationTimeNs = appliedAtSimulationTimeNs;
-        record.appliedSnapshotAgeSimulationSeconds =
+        record.appliedSnapshotAgeSimulationSeconds = Math.max(
+                0.0,
                 (appliedAtSimulationTimeNs / 1000000000.0)
-                        - record.snapshotTimeSeconds;
+                        - record.snapshotTimeSeconds
+        );
+        record.applyFinalClassification(
+                CLASSIFICATION_APPLIED_FRESH,
+                LiveStaleReason.NONE.name(),
+                appliedAtSimulationTimeNs,
+                record.appliedSnapshotAgeSimulationSeconds
+        );
         appliedSteps.add(step);
         LiveReportingSummary.LiveWindowSummary summary = windowSummary(jobId, step, STATUS_APPLIED);
         appliedWindowSummaries.add(summary);
@@ -235,16 +280,45 @@ public final class LiveNativeReportingCollector implements AutoCloseable {
             double deltaTMaxFromCompletedStepSeconds,
             double deltaTMaxMismatchSeconds
     ) throws IOException {
+        recordStaleDiscarded(
+                jobId, step, simulationTimeNs, completionWallClockNs,
+                wallClockRuntimeSeconds, deltaTMaxFromCompletedStepSeconds,
+                deltaTMaxMismatchSeconds, LiveStaleReason.WALL_CLOCK
+        );
+    }
+
+    public synchronized void recordStaleDiscarded(
+            String jobId,
+            TemporalStepResult step,
+            long simulationTimeNs,
+            long completionWallClockNs,
+            double wallClockRuntimeSeconds,
+            double deltaTMaxFromCompletedStepSeconds,
+            double deltaTMaxMismatchSeconds,
+            LiveStaleReason staleReason
+    ) throws IOException {
         LiveGaJobRecord record = require(jobId);
+        LiveStaleReason reason = staleReason == null
+                ? LiveStaleReason.WALL_CLOCK : staleReason;
         record.finalStatus = STATUS_STALE_DISCARDED;
         record.completionWallClockNs = completionWallClockNs;
         record.gaRuntimeWallClockSeconds = wallClockRuntimeSeconds;
         record.deltaTMaxFromCompletedStepSeconds = deltaTMaxFromCompletedStepSeconds;
         record.deltaTMaxMismatchSeconds = deltaTMaxMismatchSeconds;
+        double snapshotAge = Math.max(
+                0.0, simulationTimeNs / 1000000000.0 - record.snapshotTimeSeconds
+        );
+        record.applyFinalClassification(
+                classificationFor(reason), reason.name(), simulationTimeNs, snapshotAge
+        );
         staleDiscardedSteps.add(step);
-        LiveReportingSummary.LiveWindowSummary summary = windowSummary(jobId, step, STATUS_STALE_DISCARDED);
+        LiveReportingSummary.LiveWindowSummary summary = windowSummary(
+                jobId, step, STATUS_STALE_DISCARDED
+        );
         discardedWindowSummaries.add(summary);
-        incrementalWriter.writeStep(LiveTemporalStepRecord.from(jobId, STATUS_STALE_DISCARDED, step));
+        incrementalWriter.writeStep(
+                LiveTemporalStepRecord.from(jobId, STATUS_STALE_DISCARDED, step)
+        );
         incrementalWriter.writeWindowCsv(csv(record, summary), false);
         incrementalWriter.writeEvent("STALE_DISCARDED", record, simulationTimeNs);
     }
@@ -262,6 +336,10 @@ public final class LiveNativeReportingCollector implements AutoCloseable {
         record.gaRuntimeWallClockSeconds = wallClockRuntimeSeconds;
         record.errorType = error == null ? "" : error.getClass().getName();
         record.errorMessage = error == null ? "" : String.valueOf(error.getMessage());
+        record.applyFinalClassification(
+                STATUS_FAILED, LiveStaleReason.NONE.name(), simulationTimeNs,
+                Math.max(0.0, simulationTimeNs / 1000000000.0 - record.snapshotTimeSeconds)
+        );
         incrementalWriter.writeEvent("FAILED", record, simulationTimeNs);
     }
 
@@ -275,6 +353,11 @@ public final class LiveNativeReportingCollector implements AutoCloseable {
         record.finalStatus = STATUS_NULL_STEP_RESULT;
         record.completionWallClockNs = completionWallClockNs;
         record.gaRuntimeWallClockSeconds = wallClockRuntimeSeconds;
+        record.applyFinalClassification(
+                STATUS_NULL_STEP_RESULT, LiveStaleReason.NONE.name(),
+                simulationTimeNs,
+                Math.max(0.0, simulationTimeNs / 1000000000.0 - record.snapshotTimeSeconds)
+        );
         incrementalWriter.writeEvent("NULL_STEP_RESULT", record, simulationTimeNs);
     }
 
@@ -295,6 +378,11 @@ public final class LiveNativeReportingCollector implements AutoCloseable {
             record.finalStatus = STATUS_SHUTDOWN_IN_FLIGHT;
         }
         record.completionWallClockNs = wallClockNs;
+        record.applyFinalClassification(
+                STATUS_SHUTDOWN_IN_FLIGHT, LiveStaleReason.NONE.name(),
+                simulationTimeNs,
+                Math.max(0.0, simulationTimeNs / 1000000000.0 - record.snapshotTimeSeconds)
+        );
         incrementalWriter.writeEvent("SHUTDOWN_IN_FLIGHT", record, simulationTimeNs);
     }
 
@@ -527,6 +615,26 @@ public final class LiveNativeReportingCollector implements AutoCloseable {
                 record.postCompletionAdaptiveDeltaTMaxPreviousBeforeUpdateSeconds,
                 record.postCompletionAdaptiveDeltaTMaxUpdatedForNextSubmissionSeconds,
                 record.postCompletionAdaptiveDeltaTMaxFallbackReason
+        ).withCanonical(
+                record.finalClassification,
+                record.staleReason,
+                record.gaWallClockBudgetAtSubmissionSeconds,
+                record.temporalMaximumAtSubmissionSeconds,
+                record.maxSnapshotAgeSimulationSeconds,
+                record.snapshotAgeAtClassificationSeconds
         );
+    }
+
+    private static String classificationFor(LiveStaleReason reason) {
+        if (reason == LiveStaleReason.WALL_CLOCK) {
+            return CLASSIFICATION_STALE_WALL_CLOCK;
+        }
+        if (reason == LiveStaleReason.SIMULATION_AGE) {
+            return CLASSIFICATION_STALE_SIMULATION_AGE;
+        }
+        if (reason == LiveStaleReason.WALL_CLOCK_AND_SIMULATION_AGE) {
+            return CLASSIFICATION_STALE_BOTH;
+        }
+        return CLASSIFICATION_APPLIED_FRESH;
     }
 }

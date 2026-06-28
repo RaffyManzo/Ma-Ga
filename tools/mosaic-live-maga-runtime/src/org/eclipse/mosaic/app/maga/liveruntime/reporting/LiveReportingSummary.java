@@ -25,6 +25,10 @@ public final class LiveReportingSummary {
     public final int completed;
     public final int applied;
     public final int staleDiscarded;
+    public final int staleWallClock;
+    public final int staleSimulationAge;
+    public final int staleWallClockAndSimulationAge;
+    public final Map<String, Integer> finalClassificationCounts;
     public final int failed;
     public final int nullResults;
     public final int shutdownInFlight;
@@ -85,10 +89,20 @@ public final class LiveReportingSummary {
         int completedCount = 0;
         int appliedCount = 0;
         int staleCount = 0;
+        int staleWallClockCount = 0;
+        int staleSimulationAgeCount = 0;
+        int staleBothCount = 0;
         int failedCount = 0;
         int nullCount = 0;
         int shutdownCount = 0;
+        Map<String, Integer> classificationCounts = new LinkedHashMap<>();
         for (LiveGaJobRecord record : records) {
+            String classification = record.finalClassification == null
+                    || record.finalClassification.isBlank()
+                    ? record.finalStatus : record.finalClassification;
+            if (classification != null && !classification.isBlank()) {
+                classificationCounts.merge(classification, 1, Integer::sum);
+            }
             if (record.completionWallClockNs > 0L) {
                 completedCount++;
             }
@@ -96,6 +110,14 @@ public final class LiveReportingSummary {
                 appliedCount++;
             } else if ("STALE_DISCARDED".equals(record.finalStatus)) {
                 staleCount++;
+                if ("STALE_WALL_CLOCK".equals(record.finalClassification)) {
+                    staleWallClockCount++;
+                } else if ("STALE_SIMULATION_AGE".equals(record.finalClassification)) {
+                    staleSimulationAgeCount++;
+                } else if ("STALE_WALL_CLOCK_AND_SIMULATION_AGE"
+                        .equals(record.finalClassification)) {
+                    staleBothCount++;
+                }
             } else if ("FAILED".equals(record.finalStatus)) {
                 failedCount++;
             } else if ("NULL_STEP_RESULT".equals(record.finalStatus)) {
@@ -108,6 +130,10 @@ public final class LiveReportingSummary {
         this.completed = completedCount;
         this.applied = appliedCount;
         this.staleDiscarded = staleCount;
+        this.staleWallClock = staleWallClockCount;
+        this.staleSimulationAge = staleSimulationAgeCount;
+        this.staleWallClockAndSimulationAge = staleBothCount;
+        this.finalClassificationCounts = Map.copyOf(classificationCounts);
         this.failed = failedCount;
         this.nullResults = nullCount;
         this.shutdownInFlight = shutdownCount;
@@ -208,6 +234,11 @@ public final class LiveReportingSummary {
         artifacts.put("stepRecordsJsonl", reportingDir.resolve("live_temporal_step_records.jsonl").toString());
         artifacts.put("appliedCsv", reportingDir.resolve("live_applied_window_records.csv").toString());
         artifacts.put("discardedCsv", reportingDir.resolve("live_discarded_window_records.csv").toString());
+        artifacts.put("staleAssignmentDecisionsCsv", reportingDir.resolve("live_stale_assignment_decisions.csv").toString());
+        artifacts.put("staleAssignmentDistributionCsv", reportingDir.resolve("live_stale_assignment_distribution.csv").toString());
+        artifacts.put("staleVsActiveCsv", reportingDir.resolve("live_stale_vs_active_strategy.csv").toString());
+        artifacts.put("staleVsActiveTransitionMatrixCsv", reportingDir.resolve("live_stale_vs_active_transition_matrix.csv").toString());
+        artifacts.put("staleStrategySummaryJsonl", reportingDir.resolve("live_stale_strategy_summary.jsonl").toString());
         artifacts.put("txt", reportingDir.resolve("live_detailed_execution_report.txt").toString());
         artifacts.put("markdown", reportingDir.resolve("live_detailed_execution_report.md").toString());
         artifacts.put("json", reportingDir.resolve("live_detailed_execution_report.json").toString());

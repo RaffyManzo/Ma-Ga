@@ -55,6 +55,11 @@ public final class LiveDetailedReportWriter {
         builder.append("- Submitted jobs: `").append(summary.submitted).append("`\n");
         builder.append("- Applied jobs: `").append(summary.applied).append("`\n");
         builder.append("- Stale discarded jobs: `").append(summary.staleDiscarded).append("`\n");
+        builder.append("  - wall-clock: `").append(summary.staleWallClock).append("`\n");
+        builder.append("  - simulation age: `").append(summary.staleSimulationAge).append("`\n");
+        builder.append("  - both: `").append(summary.staleWallClockAndSimulationAge).append("`\n");
+        builder.append("- Final classifications: `")
+                .append(summary.finalClassificationCounts).append("`\n");
         builder.append("- Failed jobs: `").append(summary.failed).append("`\n");
         builder.append("- Null step results: `").append(summary.nullResults).append("`\n");
         builder.append("- Shutdown in-flight jobs: `")

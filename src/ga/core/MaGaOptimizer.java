@@ -92,7 +92,7 @@ public final class MaGaOptimizer {
 
     /** Esegue il MA-GA e restituisce il risultato completo. */
     public MaGaResult optimizeDetailed(SystemSnapshot snapshot) {
-        return optimizeDetailed(snapshot, null);
+        return optimizeDetailed(snapshot, null, GaExecutionBudget.unlimited());
     }
 
     /**
@@ -107,7 +107,26 @@ public final class MaGaOptimizer {
             SystemSnapshot snapshot,
             List<Chromosome> initialPopulation
     ) {
+        return optimizeDetailed(
+                snapshot,
+                initialPopulation,
+                GaExecutionBudget.unlimited()
+        );
+    }
+
+    /**
+     * Esegue il MA-GA con arresto cooperativo a budget.
+     */
+    public MaGaResult optimizeDetailed(
+            SystemSnapshot snapshot,
+            List<Chromosome> initialPopulation,
+            GaExecutionBudget executionBudget
+    ) {
         Objects.requireNonNull(snapshot, "snapshot must not be null.");
+        Objects.requireNonNull(
+                executionBudget,
+                "executionBudget must not be null."
+        );
         this.gaConfig = config.resolveGeneticAlgorithmConfig(snapshot);
         validateSnapshot(snapshot);
 
@@ -149,61 +168,76 @@ public final class MaGaOptimizer {
         int generationsExecuted = 0;
         StopReason stopReason = StopReason.MAX_GENERATIONS_REACHED;
 
-        for (int generation = 1;
-                generation <= gaConfig.getMaxGenerations();
-                generation++) {
-            List<Chromosome> nextPopulation = new ArrayList<>();
-            nextPopulation.addAll(
-                    elitismOperator.selectElite(
-                            population,
-                            gaConfig.getElitismCount()
-                    )
-            );
-
-            while (nextPopulation.size() < gaConfig.getPopulationSize()) {
-                Chromosome parentA = selectionOperator.select(population);
-                Chromosome parentB = selectionOperator.select(population);
-
-                Chromosome child;
-                if (shouldApplyCrossover()) {
-                    child = crossoverOperator.crossover(parentA, parentB);
-                } else {
-                    child = crossoverOperator.copyChromosome(parentA);
+        if (executionBudget.isExhausted()) {
+            stopReason = StopReason.TIME_BUDGET_BEST_SO_FAR;
+        } else {
+            generationLoop:
+            for (int generation = 1;
+                    generation <= gaConfig.getMaxGenerations();
+                    generation++) {
+                if (executionBudget.isExhausted()) {
+                    stopReason = StopReason.TIME_BUDGET_BEST_SO_FAR;
+                    break;
                 }
 
-                MutationResult mutationResult = mutationOperator.mutateDetailed(
-                        child,
-                        snapshot,
-                        gaConfig.getMutationRate()
+                List<Chromosome> nextPopulation = new ArrayList<>();
+                nextPopulation.addAll(
+                        elitismOperator.selectElite(
+                                population,
+                                gaConfig.getElitismCount()
+                        )
                 );
-                child = repairOperator.repairChromosomeIncremental(
-                        mutationResult.getChromosome(),
-                        snapshot,
-                        mutationResult.getMutatedTaskIds()
+
+                while (nextPopulation.size() < gaConfig.getPopulationSize()) {
+                    if (executionBudget.isExhausted()) {
+                        stopReason = StopReason.TIME_BUDGET_BEST_SO_FAR;
+                        break generationLoop;
+                    }
+
+                    Chromosome parentA = selectionOperator.select(population);
+                    Chromosome parentB = selectionOperator.select(population);
+
+                    Chromosome child;
+                    if (shouldApplyCrossover()) {
+                        child = crossoverOperator.crossover(parentA, parentB);
+                    } else {
+                        child = crossoverOperator.copyChromosome(parentA);
+                    }
+
+                    MutationResult mutationResult = mutationOperator.mutateDetailed(
+                            child,
+                            snapshot,
+                            gaConfig.getMutationRate()
+                    );
+                    child = repairOperator.repairChromosomeIncremental(
+                            mutationResult.getChromosome(),
+                            snapshot,
+                            mutationResult.getMutatedTaskIds()
+                    );
+                    child.setFitness(fitnessEvaluator.evaluate(child, snapshot));
+                    nextPopulation.add(child);
+                }
+
+                population = nextPopulation;
+                generationsExecuted = generation;
+                GenerationStat generationStat = computeGenerationStat(
+                        generation,
+                        population
                 );
-                child.setFitness(fitnessEvaluator.evaluate(child, snapshot));
-                nextPopulation.add(child);
-            }
+                generationHistory.add(generationStat);
 
-            population = nextPopulation;
-            generationsExecuted = generation;
-            GenerationStat generationStat = computeGenerationStat(
-                    generation,
-                    population
-            );
-            generationHistory.add(generationStat);
+                Chromosome generationBest = findBest(population);
+                if (hasImproved(generationBest, bestOverall)) {
+                    bestOverall = copyChromosome(generationBest);
+                    stallCounter = 0;
+                } else {
+                    stallCounter++;
+                }
 
-            Chromosome generationBest = findBest(population);
-            if (hasImproved(generationBest, bestOverall)) {
-                bestOverall = copyChromosome(generationBest);
-                stallCounter = 0;
-            } else {
-                stallCounter++;
-            }
-
-            if (stallCounter >= gaConfig.getStallGenerations()) {
-                stopReason = StopReason.STAGNATION_REACHED;
-                break;
+                if (stallCounter >= gaConfig.getStallGenerations()) {
+                    stopReason = StopReason.STAGNATION_REACHED;
+                    break;
+                }
             }
         }
 

@@ -22,6 +22,17 @@ public enum TemporalMinimumBoundMode {
     CONFIGURED_GA_ESTIMATE,
 
     /**
+     * Usa la stima operativa già trasportata da
+     * {@code TemporalOperationalMetrics}.
+     *
+     * <p>Questa modalità è usata dal runtime live V3-C: lo stesso estimatore
+     * robusto alimenta sia il termine {@code T_GA_est(k)} di DeltaT_min sia
+     * il budget wall-clock cooperativo del GA, mantenendo distinti i domini
+     * temporali.</p>
+     */
+    OPERATIONAL_GA_ESTIMATE,
+
+    /**
      * Usa il tempo osservato dell'ultima esecuzione del GA.
      *
      * <p>È utile quando si vuole valutare il comportamento operativo reale

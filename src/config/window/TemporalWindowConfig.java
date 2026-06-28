@@ -322,6 +322,42 @@ public final class TemporalWindowConfig {
         );
     }
 
+    /**
+     * Configurazione live V3-C con domini temporali separati.
+     *
+     * <p>DeltaT_min usa la stima GA operativa fornita dal runtime, mentre
+     * DeltaT_max resta aderente alla formalizzazione e deriva dal tempo di
+     * copertura di riferimento. Il massimo configurato è usato soltanto come
+     * fallback quando la copertura non è disponibile. Il budget wall-clock
+     * non viene trasportato come override di DeltaT_max.</p>
+     */
+    public static TemporalWindowConfig liveRuntimeFreshnessAware(
+            double initialWindowSeconds,
+            double configuredGaRuntimeEstimateSeconds,
+            double configuredMaxWindowSeconds
+    ) {
+        return new TemporalWindowConfig(
+                initialWindowSeconds,
+                0.0,
+                0.25,
+                0.65,
+                0.40,
+                0.25,
+                0.25,
+                0.25,
+                0.25,
+                0.60,
+                1.0,
+                1.0,
+                1.0E-6,
+                DEFAULT_STRATEGY_APPLICATION_SECONDS,
+                configuredGaRuntimeEstimateSeconds,
+                configuredMaxWindowSeconds,
+                TemporalMinimumBoundMode.OPERATIONAL_GA_ESTIMATE,
+                TemporalMaximumBoundMode.COVERAGE_ADAPTIVE
+        );
+    }
+
     public static TemporalWindowConfig liveRuntimeDeltaTMaxOverride(
             double initialWindowSeconds,
             double configuredGaRuntimeEstimateSeconds,

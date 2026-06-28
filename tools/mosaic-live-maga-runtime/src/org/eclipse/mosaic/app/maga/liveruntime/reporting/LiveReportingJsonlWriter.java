@@ -47,7 +47,11 @@ final class LiveReportingJsonlWriter implements AutoCloseable {
                 + "maxIndependentLocalExecutionTimeSeconds,"
                 + "maxContendedLocalCompletionTimeSeconds,"
                 + "maxLocalContentionDelaySeconds,maxLocalDemandRatio,"
-                + "maxLocalCpuOverflowRatio,status,deltaTMaxMode,"
+                + "maxLocalCpuOverflowRatio,status,finalClassification,staleReason,"
+                + "gaWallClockBudgetAtSubmissionSeconds,"
+                + "temporalMaximumAtSubmissionSeconds,"
+                + "maxSnapshotAgeSimulationSeconds,"
+                + "snapshotAgeAtClassificationSeconds,deltaTMaxMode,"
                 + "adaptiveDeltaTMaxEstimateSeconds,"
                 + "adaptiveDeltaTMaxSampleCount,"
                 + "adaptiveDeltaTMaxP95Seconds,"
@@ -94,6 +98,28 @@ final class LiveReportingJsonlWriter implements AutoCloseable {
         row.put("snapshotId", record.snapshotId);
         row.put("snapshotTimeSeconds", record.snapshotTimeSeconds);
         row.put("finalStatus", record.finalStatus);
+        row.put("finalClassification", record.finalClassification);
+        row.put("staleReason", record.staleReason);
+        row.put(
+                "gaWallClockBudgetAtSubmissionSeconds",
+                record.gaWallClockBudgetAtSubmissionSeconds
+        );
+        row.put(
+                "temporalMaximumAtSubmissionSeconds",
+                record.temporalMaximumAtSubmissionSeconds
+        );
+        row.put(
+                "maxSnapshotAgeSimulationSeconds",
+                record.maxSnapshotAgeSimulationSeconds
+        );
+        row.put(
+                "classificationSimulationTimeNs",
+                record.classificationSimulationTimeNs
+        );
+        row.put(
+                "snapshotAgeAtClassificationSeconds",
+                record.snapshotAgeAtClassificationSeconds
+        );
         row.put(
                 "appliedAtSimulationTimeNs",
                 record.appliedAtSimulationTimeNs
@@ -283,6 +309,12 @@ final class LiveReportingJsonlWriter implements AutoCloseable {
                 + "," + format(record.maxLocalDemandRatio)
                 + "," + format(record.maxLocalCpuOverflowRatio)
                 + "," + record.status
+                + "," + safe(record.finalClassification)
+                + "," + safe(record.staleReason)
+                + "," + format(record.gaWallClockBudgetAtSubmissionSeconds)
+                + "," + format(record.temporalMaximumAtSubmissionSeconds)
+                + "," + format(record.maxSnapshotAgeSimulationSeconds)
+                + "," + format(record.snapshotAgeAtClassificationSeconds)
                 + "," + safe(record.deltaTMaxMode)
                 + "," + format(record.adaptiveDeltaTMaxEstimateSeconds)
                 + "," + record.adaptiveDeltaTMaxSampleCount
@@ -356,6 +388,12 @@ final class LiveReportingJsonlWriter implements AutoCloseable {
         final double maxLocalDemandRatio;
         final double maxLocalCpuOverflowRatio;
         final String status;
+        String finalClassification = "";
+        String staleReason = "NONE";
+        double gaWallClockBudgetAtSubmissionSeconds;
+        double temporalMaximumAtSubmissionSeconds;
+        double maxSnapshotAgeSimulationSeconds;
+        double snapshotAgeAtClassificationSeconds;
         final String deltaTMaxMode;
         final double adaptiveDeltaTMaxEstimateSeconds;
         final int adaptiveDeltaTMaxSampleCount;
@@ -592,6 +630,28 @@ final class LiveReportingJsonlWriter implements AutoCloseable {
                     postCompletionAdaptiveDeltaTMaxUpdatedForNextSubmissionSeconds;
             this.postCompletionAdaptiveDeltaTMaxFallbackReason =
                     postCompletionAdaptiveDeltaTMaxFallbackReason;
+        }
+
+        LiveWindowCsvRecord withCanonical(
+                String finalClassification,
+                String staleReason,
+                double gaWallClockBudgetAtSubmissionSeconds,
+                double temporalMaximumAtSubmissionSeconds,
+                double maxSnapshotAgeSimulationSeconds,
+                double snapshotAgeAtClassificationSeconds
+        ) {
+            this.finalClassification = finalClassification == null
+                    ? "" : finalClassification;
+            this.staleReason = staleReason == null ? "NONE" : staleReason;
+            this.gaWallClockBudgetAtSubmissionSeconds =
+                    gaWallClockBudgetAtSubmissionSeconds;
+            this.temporalMaximumAtSubmissionSeconds =
+                    temporalMaximumAtSubmissionSeconds;
+            this.maxSnapshotAgeSimulationSeconds =
+                    maxSnapshotAgeSimulationSeconds;
+            this.snapshotAgeAtClassificationSeconds =
+                    snapshotAgeAtClassificationSeconds;
+            return this;
         }
     }
 }

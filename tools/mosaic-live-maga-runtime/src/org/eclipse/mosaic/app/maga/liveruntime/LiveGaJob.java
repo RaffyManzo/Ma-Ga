@@ -11,24 +11,45 @@ final class LiveGaJob {
     private final String triggerType;
     private final SystemSnapshot snapshot;
     private final TemporalWindowState stateAtSubmission;
-    private final double deltaTMaxAtSubmissionSeconds;
+    private final double temporalMaximumAtSubmissionSeconds;
+    private final double gaWallClockBudgetAtSubmissionSeconds;
+    private final double maxSnapshotAgeSimulationSeconds;
+    private final long cooperativeStopDeadlineNs;
     private final long wallClockDeadlineNs;
-    private final LiveAdaptiveDeltaTMaxEstimator.Snapshot deltaTMaxSnapshotAtSubmission;
+    private final LiveAdaptiveDeltaTMaxEstimator.Snapshot estimatorSnapshotAtSubmission;
     private boolean timeoutDetectedBeforeCompletion;
     private long waitCapDetectedWallClockNs;
     private long waitCapDetectedSimulationTimeNs;
 
     LiveGaJob(
-            String jobId,
-            int windowIndex,
-            long submissionSimulationTimeNs,
-            long submissionWallClockNs,
-            String triggerType,
-            SystemSnapshot snapshot,
+            String jobId, int windowIndex, long submissionSimulationTimeNs,
+            long submissionWallClockNs, String triggerType, SystemSnapshot snapshot,
             TemporalWindowState stateAtSubmission,
-            double deltaTMaxAtSubmissionSeconds,
+            double temporalMaximumAtSubmissionSeconds,
+            double gaWallClockBudgetAtSubmissionSeconds,
+            double maxSnapshotAgeSimulationSeconds,
             long wallClockDeadlineNs,
-            LiveAdaptiveDeltaTMaxEstimator.Snapshot deltaTMaxSnapshotAtSubmission
+            LiveAdaptiveDeltaTMaxEstimator.Snapshot estimatorSnapshotAtSubmission
+    ) {
+        this(jobId, windowIndex, submissionSimulationTimeNs, submissionWallClockNs,
+                triggerType, snapshot, stateAtSubmission,
+                temporalMaximumAtSubmissionSeconds,
+                gaWallClockBudgetAtSubmissionSeconds,
+                maxSnapshotAgeSimulationSeconds,
+                wallClockDeadlineNs, wallClockDeadlineNs,
+                estimatorSnapshotAtSubmission);
+    }
+
+    LiveGaJob(
+            String jobId, int windowIndex, long submissionSimulationTimeNs,
+            long submissionWallClockNs, String triggerType, SystemSnapshot snapshot,
+            TemporalWindowState stateAtSubmission,
+            double temporalMaximumAtSubmissionSeconds,
+            double gaWallClockBudgetAtSubmissionSeconds,
+            double maxSnapshotAgeSimulationSeconds,
+            long cooperativeStopDeadlineNs,
+            long wallClockDeadlineNs,
+            LiveAdaptiveDeltaTMaxEstimator.Snapshot estimatorSnapshotAtSubmission
     ) {
         this.jobId = jobId;
         this.windowIndex = windowIndex;
@@ -37,65 +58,51 @@ final class LiveGaJob {
         this.triggerType = triggerType;
         this.snapshot = snapshot;
         this.stateAtSubmission = stateAtSubmission;
-        this.deltaTMaxAtSubmissionSeconds = deltaTMaxAtSubmissionSeconds;
+        this.temporalMaximumAtSubmissionSeconds = temporalMaximumAtSubmissionSeconds;
+        this.gaWallClockBudgetAtSubmissionSeconds = gaWallClockBudgetAtSubmissionSeconds;
+        this.maxSnapshotAgeSimulationSeconds = maxSnapshotAgeSimulationSeconds;
+        this.cooperativeStopDeadlineNs = cooperativeStopDeadlineNs;
         this.wallClockDeadlineNs = wallClockDeadlineNs;
-        this.deltaTMaxSnapshotAtSubmission = deltaTMaxSnapshotAtSubmission;
+        this.estimatorSnapshotAtSubmission = estimatorSnapshotAtSubmission;
     }
 
-    String getJobId() {
-        return jobId;
+    /** Legacy constructor: V3-B treated the same number as both limits. */
+    LiveGaJob(
+            String jobId, int windowIndex, long submissionSimulationTimeNs,
+            long submissionWallClockNs, String triggerType, SystemSnapshot snapshot,
+            TemporalWindowState stateAtSubmission, double deltaTMaxAtSubmissionSeconds,
+            long wallClockDeadlineNs,
+            LiveAdaptiveDeltaTMaxEstimator.Snapshot deltaTMaxSnapshotAtSubmission
+    ) {
+        this(jobId, windowIndex, submissionSimulationTimeNs, submissionWallClockNs,
+                triggerType, snapshot, stateAtSubmission,
+                deltaTMaxAtSubmissionSeconds, deltaTMaxAtSubmissionSeconds,
+                deltaTMaxAtSubmissionSeconds, wallClockDeadlineNs,
+                deltaTMaxSnapshotAtSubmission);
     }
 
-    int getWindowIndex() {
-        return windowIndex;
-    }
-
-    long getSubmissionSimulationTimeNs() {
-        return submissionSimulationTimeNs;
-    }
-
-    long getSubmissionWallClockNs() {
-        return submissionWallClockNs;
-    }
-
-    String getTriggerType() {
-        return triggerType;
-    }
-
-    SystemSnapshot getSnapshot() {
-        return snapshot;
-    }
-
-    TemporalWindowState getStateAtSubmission() {
-        return stateAtSubmission;
-    }
-
-    double getDeltaTMaxAtSubmissionSeconds() {
-        return deltaTMaxAtSubmissionSeconds;
-    }
-
-    long getWallClockDeadlineNs() {
-        return wallClockDeadlineNs;
-    }
-
+    String getJobId() { return jobId; }
+    int getWindowIndex() { return windowIndex; }
+    long getSubmissionSimulationTimeNs() { return submissionSimulationTimeNs; }
+    long getSubmissionWallClockNs() { return submissionWallClockNs; }
+    String getTriggerType() { return triggerType; }
+    SystemSnapshot getSnapshot() { return snapshot; }
+    TemporalWindowState getStateAtSubmission() { return stateAtSubmission; }
+    double getTemporalMaximumAtSubmissionSeconds() { return temporalMaximumAtSubmissionSeconds; }
+    double getGaWallClockBudgetAtSubmissionSeconds() { return gaWallClockBudgetAtSubmissionSeconds; }
+    double getMaxSnapshotAgeSimulationSeconds() { return maxSnapshotAgeSimulationSeconds; }
+    double getDeltaTMaxAtSubmissionSeconds() { return temporalMaximumAtSubmissionSeconds; }
+    long getCooperativeStopDeadlineNs() { return cooperativeStopDeadlineNs; }
+    long getWallClockDeadlineNs() { return wallClockDeadlineNs; }
     LiveAdaptiveDeltaTMaxEstimator.Snapshot getDeltaTMaxSnapshotAtSubmission() {
-        return deltaTMaxSnapshotAtSubmission;
+        return estimatorSnapshotAtSubmission;
     }
-
-    boolean isTimeoutDetectedBeforeCompletion() {
-        return timeoutDetectedBeforeCompletion;
-    }
-
-    long getWaitCapDetectedWallClockNs() {
-        return waitCapDetectedWallClockNs;
-    }
-
-    long getWaitCapDetectedSimulationTimeNs() {
-        return waitCapDetectedSimulationTimeNs;
-    }
+    boolean isTimeoutDetectedBeforeCompletion() { return timeoutDetectedBeforeCompletion; }
+    long getWaitCapDetectedWallClockNs() { return waitCapDetectedWallClockNs; }
+    long getWaitCapDetectedSimulationTimeNs() { return waitCapDetectedSimulationTimeNs; }
 
     boolean detectTimeoutIfDeadlineReached(long wallClockNowNs, long simulationTimeNs) {
-        if (timeoutDetectedBeforeCompletion || wallClockNowNs < wallClockDeadlineNs) {
+        if (timeoutDetectedBeforeCompletion || wallClockNowNs <= wallClockDeadlineNs) {
             return false;
         }
         timeoutDetectedBeforeCompletion = true;

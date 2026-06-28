@@ -12,9 +12,20 @@
   "temporalInitialWindowSeconds": 1.0,
   "configuredGaRuntimeEstimateSeconds": 0.01,
   "configuredMaxWindowSeconds": 0.2,
-  "deltaTMaxComparisonEpsilonSeconds": 1.0E-9,
+  "deltaTMaxComparisonEpsilonSeconds": 1e-09,
   "publishedSnapshotCopyLimit": 32,
   "nativeLiveDetailedReportingEnabled": true,
   "nativeLiveDetailedReportPrintToConsole": false,
-  "gaParameterScalingMode": "STATIC"
+  "gaParameterScalingMode": "STATIC",
+  "gaWallClockBudgetMode": "CONFIGURED_STATIC",
+  "configuredInitialGaWallClockBudgetSeconds": 0.2,
+  "adaptiveGaWallClockBudgetMinimumSeconds": 0.1,
+  "adaptiveGaWallClockBudgetMaximumSeconds": 1.5,
+  "adaptiveGaWallClockBudgetHistorySize": 20,
+  "adaptiveGaWallClockBudgetWarmupSamples": 3,
+  "adaptiveGaWallClockBudgetSafetyMarginSeconds": 0.1,
+  "adaptiveGaWallClockBudgetMaximumStepUpSeconds": 0.25,
+  "adaptiveGaWallClockBudgetMaximumStepDownSeconds": 0.1,
+  "maxSnapshotAgeSimulationSeconds": 2.0,
+  "cooperativeGaBudgetStopEnabled": true
 }

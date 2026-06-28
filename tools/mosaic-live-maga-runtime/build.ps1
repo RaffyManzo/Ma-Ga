@@ -236,7 +236,12 @@ $ExpectedClassFiles = @(
     "window\source\MosaicSystemStateSource.class",
     "window\core\TemporalWindowManager.class",
     "ga\core\MaGaOptimizer.class",
-    "ga\fitness\local\LocalCpuContentionEvaluator.class"
+    "ga\core\GaExecutionBudget.class",
+    "ga\fitness\local\LocalCpuContentionEvaluator.class",
+    "org\eclipse\mosaic\app\maga\liveruntime\LiveStaleReason.class",
+    "org\eclipse\mosaic\app\maga\liveruntime\LiveAssignmentDecision.class",
+    "org\eclipse\mosaic\app\maga\liveruntime\reporting\LiveStaleStrategyWriter.class",
+    "org\eclipse\mosaic\app\maga\liveruntime\reporting\LiveStaleStrategyWriter`$1.class"
 )
 
 try {
@@ -291,10 +296,10 @@ try {
     }
     Assert-NoJavacInternalFailure -Output $JavacResult.Combined
 
-    # Expected class count after the local CPU contention correction,
-    # the V3-B opt-in live adaptive deltaTMax estimator, and the explicit
-    # BoundConflictException introduced by the V3-B correction.
-    $ExpectedFrozenClassCount = 268
+    # Expected class count after V3-C adds the cooperative GA budget,
+    # explicit stale reasons, full assignment snapshots, and stale-strategy
+    # reporting. Fitness, repair, chromosome and genetic operators are unchanged.
+    $ExpectedFrozenClassCount = 273
     $ActualClassCount = (Get-ChildItem -LiteralPath $StagingClassesDir -Recurse -Filter "*.class" -File).Count
     if ($ActualClassCount -ne $ExpectedFrozenClassCount) {
         throw "Unexpected class count: expected=$ExpectedFrozenClassCount actual=$ActualClassCount"

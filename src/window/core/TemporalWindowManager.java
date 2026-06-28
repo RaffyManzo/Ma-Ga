@@ -2,6 +2,7 @@ package window.core;
 
 import config.mobility.MobilityConfig;
 import config.window.TemporalWindowConfig;
+import ga.core.GaExecutionBudget;
 import ga.core.MaGaOptimizer;
 import ga.core.MaGaResult;
 import model.genetic.Chromosome;
@@ -193,7 +194,18 @@ public final class TemporalWindowManager {
     }
 
     public TemporalStepResult executeNextStepOrNull(TemporalWindowState state) {
+        return executeNextStepOrNull(state, GaExecutionBudget.unlimited());
+    }
+
+    public TemporalStepResult executeNextStepOrNull(
+            TemporalWindowState state,
+            GaExecutionBudget executionBudget
+    ) {
         Objects.requireNonNull(state, "state must not be null.");
+        Objects.requireNonNull(
+                executionBudget,
+                "executionBudget must not be null."
+        );
 
         ReoptimizationTrigger plannedTrigger = resolveTrigger(state);
         double requestedObservationTimeSeconds = computeObservationTime(plannedTrigger);
@@ -247,7 +259,8 @@ public final class TemporalWindowManager {
         long startNs = System.nanoTime();
         MaGaResult maGaResult = optimizer.optimizeDetailed(
                 optimizationSnapshot,
-                initialPopulation
+                initialPopulation,
+                executionBudget
         );
         long elapsedNs = System.nanoTime() - startNs;
         TemporalOperationalMetrics observedMetrics = observedOperationalMetrics(elapsedNs);

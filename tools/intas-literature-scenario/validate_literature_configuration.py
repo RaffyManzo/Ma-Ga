@@ -275,6 +275,77 @@ def validate(scenario_root: Path) -> dict[str, Any]:
     assert_equal("gaParameterScalingMode", runtime.get("gaParameterScalingMode"), "STATIC", errors)
     assert_equal("nativeLiveDetailedReportingEnabled", runtime.get("nativeLiveDetailedReportingEnabled"), True, errors)
     assert_equal("nativeLiveDetailedReportPrintToConsole", runtime.get("nativeLiveDetailedReportPrintToConsole"), False, errors)
+    assert_equal("gaWallClockBudgetMode", runtime.get("gaWallClockBudgetMode"), "CONFIGURED_STATIC", errors)
+    assert_close(
+        "configuredInitialGaWallClockBudgetSeconds",
+        runtime.get("configuredInitialGaWallClockBudgetSeconds"),
+        0.2,
+        errors,
+    )
+    assert_close(
+        "adaptiveGaWallClockBudgetMinimumSeconds",
+        runtime.get("adaptiveGaWallClockBudgetMinimumSeconds"),
+        0.1,
+        errors,
+    )
+    assert_close(
+        "adaptiveGaWallClockBudgetMaximumSeconds",
+        runtime.get("adaptiveGaWallClockBudgetMaximumSeconds"),
+        1.5,
+        errors,
+    )
+    assert_equal(
+        "adaptiveGaWallClockBudgetHistorySize",
+        runtime.get("adaptiveGaWallClockBudgetHistorySize"),
+        20,
+        errors,
+    )
+    assert_equal(
+        "adaptiveGaWallClockBudgetWarmupSamples",
+        runtime.get("adaptiveGaWallClockBudgetWarmupSamples"),
+        3,
+        errors,
+    )
+    assert_close(
+        "adaptiveGaWallClockBudgetSafetyMarginSeconds",
+        runtime.get("adaptiveGaWallClockBudgetSafetyMarginSeconds"),
+        0.1,
+        errors,
+    )
+    assert_close(
+        "adaptiveGaWallClockBudgetMaximumStepUpSeconds",
+        runtime.get("adaptiveGaWallClockBudgetMaximumStepUpSeconds"),
+        0.25,
+        errors,
+    )
+    assert_close(
+        "adaptiveGaWallClockBudgetMaximumStepDownSeconds",
+        runtime.get("adaptiveGaWallClockBudgetMaximumStepDownSeconds"),
+        0.1,
+        errors,
+    )
+    assert_close(
+        "maxSnapshotAgeSimulationSeconds",
+        runtime.get("maxSnapshotAgeSimulationSeconds"),
+        2.0,
+        errors,
+    )
+    assert_equal(
+        "cooperativeGaBudgetStopEnabled",
+        runtime.get("cooperativeGaBudgetStopEnabled"),
+        True,
+        errors,
+    )
+    legacy_runtime_fields = sorted(
+        field for field in runtime
+        if field == "deltaTMaxMode" or field.startswith("adaptiveDeltaTMax")
+        or field == "configuredInitialDeltaTMaxSeconds"
+    )
+    if legacy_runtime_fields:
+        errors.append(
+            "Generated V3-C runtime config must use canonical wall-clock budget fields; "
+            f"legacy fields found: {legacy_runtime_fields}"
+        )
 
     metadata = docs["metadata"]
     metadata_text = json.dumps(metadata, sort_keys=True)

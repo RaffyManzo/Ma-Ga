@@ -10,7 +10,12 @@ public final class LiveGaJobRecord {
     public final double snapshotTimeSeconds;
     public final int taskCount;
     public final int candidateCount;
+
+    /** Legacy V3-B alias retained for compatibility. */
     public final double deltaTMaxAtSubmissionSeconds;
+    public final double temporalMaximumAtSubmissionSeconds;
+    public final double gaWallClockBudgetAtSubmissionSeconds;
+    public final double maxSnapshotAgeSimulationSeconds;
     public final long wallClockDeadlineNs;
 
     public boolean timeoutDetectedBeforeCompletion;
@@ -47,12 +52,19 @@ public final class LiveGaJobRecord {
     public double postCompletionAdaptiveDeltaTMaxPreviousBeforeUpdateSeconds;
     public double postCompletionAdaptiveDeltaTMaxUpdatedForNextSubmissionSeconds;
     public String postCompletionAdaptiveDeltaTMaxFallbackReason = "";
+
+    /** Legacy coarse status retained for compatibility. */
     public String finalStatus = "";
+    public String finalClassification = "";
+    public String staleReason = "NONE";
+    public long classificationSimulationTimeNs;
+    public double snapshotAgeAtClassificationSeconds;
     public long appliedAtSimulationTimeNs;
     public double appliedSnapshotAgeSimulationSeconds;
     public String errorType = "";
     public String errorMessage = "";
 
+    /** Legacy constructor: V3-B treated one value as both temporal and wall-clock limit. */
     public LiveGaJobRecord(
             String jobId,
             int windowIndex,
@@ -66,6 +78,38 @@ public final class LiveGaJobRecord {
             double deltaTMaxAtSubmissionSeconds,
             long wallClockDeadlineNs
     ) {
+        this(
+                jobId,
+                windowIndex,
+                triggerType,
+                submissionSimulationTimeNs,
+                submissionWallClockNs,
+                snapshotId,
+                snapshotTimeSeconds,
+                taskCount,
+                candidateCount,
+                deltaTMaxAtSubmissionSeconds,
+                deltaTMaxAtSubmissionSeconds,
+                deltaTMaxAtSubmissionSeconds,
+                wallClockDeadlineNs
+        );
+    }
+
+    public LiveGaJobRecord(
+            String jobId,
+            int windowIndex,
+            String triggerType,
+            long submissionSimulationTimeNs,
+            long submissionWallClockNs,
+            String snapshotId,
+            double snapshotTimeSeconds,
+            int taskCount,
+            int candidateCount,
+            double temporalMaximumAtSubmissionSeconds,
+            double gaWallClockBudgetAtSubmissionSeconds,
+            double maxSnapshotAgeSimulationSeconds,
+            long wallClockDeadlineNs
+    ) {
         this.jobId = jobId;
         this.windowIndex = windowIndex;
         this.triggerType = triggerType;
@@ -75,17 +119,20 @@ public final class LiveGaJobRecord {
         this.snapshotTimeSeconds = snapshotTimeSeconds;
         this.taskCount = taskCount;
         this.candidateCount = candidateCount;
-        this.deltaTMaxAtSubmissionSeconds = deltaTMaxAtSubmissionSeconds;
+        this.temporalMaximumAtSubmissionSeconds = temporalMaximumAtSubmissionSeconds;
+        this.gaWallClockBudgetAtSubmissionSeconds = gaWallClockBudgetAtSubmissionSeconds;
+        this.maxSnapshotAgeSimulationSeconds = maxSnapshotAgeSimulationSeconds;
+        this.deltaTMaxAtSubmissionSeconds = temporalMaximumAtSubmissionSeconds;
         this.wallClockDeadlineNs = wallClockDeadlineNs;
         applySubmissionDeltaTMaxTelemetry(
                 "CONFIGURED_STATIC",
-                deltaTMaxAtSubmissionSeconds,
+                gaWallClockBudgetAtSubmissionSeconds,
                 0,
                 0.0,
-                deltaTMaxAtSubmissionSeconds,
-                deltaTMaxAtSubmissionSeconds,
-                deltaTMaxAtSubmissionSeconds,
-                deltaTMaxAtSubmissionSeconds,
+                gaWallClockBudgetAtSubmissionSeconds,
+                gaWallClockBudgetAtSubmissionSeconds,
+                gaWallClockBudgetAtSubmissionSeconds,
+                gaWallClockBudgetAtSubmissionSeconds,
                 "CONFIGURED_STATIC"
         );
     }
@@ -101,26 +148,16 @@ public final class LiveGaJobRecord {
             double adaptiveDeltaTMaxUpdatedSeconds,
             String adaptiveDeltaTMaxFallbackReason
     ) {
-        this.submissionAdaptiveDeltaTMaxMode =
-                deltaTMaxMode == null ? "" : deltaTMaxMode;
-        this.submissionAdaptiveDeltaTMaxEstimateSeconds =
-                adaptiveDeltaTMaxEstimateSeconds;
-        this.submissionAdaptiveDeltaTMaxSampleCount =
-                adaptiveDeltaTMaxSampleCount;
-        this.submissionAdaptiveDeltaTMaxP95Seconds =
-                adaptiveDeltaTMaxP95Seconds;
-        this.submissionAdaptiveDeltaTMaxTargetSeconds =
-                adaptiveDeltaTMaxTargetSeconds;
-        this.submissionAdaptiveDeltaTMaxClampedSeconds =
-                adaptiveDeltaTMaxClampedSeconds;
-        this.submissionAdaptiveDeltaTMaxPreviousSeconds =
-                adaptiveDeltaTMaxPreviousSeconds;
-        this.submissionAdaptiveDeltaTMaxSelectedSeconds =
-                adaptiveDeltaTMaxUpdatedSeconds;
-        this.submissionAdaptiveDeltaTMaxFallbackReason =
-                adaptiveDeltaTMaxFallbackReason == null
-                        ? ""
-                        : adaptiveDeltaTMaxFallbackReason;
+        this.submissionAdaptiveDeltaTMaxMode = deltaTMaxMode == null ? "" : deltaTMaxMode;
+        this.submissionAdaptiveDeltaTMaxEstimateSeconds = adaptiveDeltaTMaxEstimateSeconds;
+        this.submissionAdaptiveDeltaTMaxSampleCount = adaptiveDeltaTMaxSampleCount;
+        this.submissionAdaptiveDeltaTMaxP95Seconds = adaptiveDeltaTMaxP95Seconds;
+        this.submissionAdaptiveDeltaTMaxTargetSeconds = adaptiveDeltaTMaxTargetSeconds;
+        this.submissionAdaptiveDeltaTMaxClampedSeconds = adaptiveDeltaTMaxClampedSeconds;
+        this.submissionAdaptiveDeltaTMaxPreviousSeconds = adaptiveDeltaTMaxPreviousSeconds;
+        this.submissionAdaptiveDeltaTMaxSelectedSeconds = adaptiveDeltaTMaxUpdatedSeconds;
+        this.submissionAdaptiveDeltaTMaxFallbackReason = adaptiveDeltaTMaxFallbackReason == null
+                ? "" : adaptiveDeltaTMaxFallbackReason;
 
         this.deltaTMaxMode = this.submissionAdaptiveDeltaTMaxMode;
         this.adaptiveDeltaTMaxEstimateSeconds = adaptiveDeltaTMaxEstimateSeconds;
@@ -130,10 +167,8 @@ public final class LiveGaJobRecord {
         this.adaptiveDeltaTMaxClampedSeconds = adaptiveDeltaTMaxClampedSeconds;
         this.adaptiveDeltaTMaxPreviousSeconds = adaptiveDeltaTMaxPreviousSeconds;
         this.adaptiveDeltaTMaxUpdatedSeconds = adaptiveDeltaTMaxUpdatedSeconds;
-        this.adaptiveDeltaTMaxFallbackReason =
-                adaptiveDeltaTMaxFallbackReason == null
-                        ? ""
-                        : adaptiveDeltaTMaxFallbackReason;
+        this.adaptiveDeltaTMaxFallbackReason = adaptiveDeltaTMaxFallbackReason == null
+                ? "" : adaptiveDeltaTMaxFallbackReason;
     }
 
     public void applyPostCompletionDeltaTMaxTelemetry(
@@ -148,22 +183,26 @@ public final class LiveGaJobRecord {
             String fallbackReason
     ) {
         this.postCompletionAdaptiveDeltaTMaxSampleAccepted = sampleAccepted;
-        this.postCompletionAdaptiveDeltaTMaxSampleRuntimeSeconds =
-                sampleRuntimeSeconds;
-        this.postCompletionAdaptiveDeltaTMaxSampleCountAfterCompletion =
-                sampleCountAfterCompletion;
-        this.postCompletionAdaptiveDeltaTMaxP95AfterCompletionSeconds =
-                p95AfterCompletionSeconds;
-        this.postCompletionAdaptiveDeltaTMaxTargetAfterCompletionSeconds =
-                targetAfterCompletionSeconds;
-        this.postCompletionAdaptiveDeltaTMaxClampedAfterCompletionSeconds =
-                clampedAfterCompletionSeconds;
-        this.postCompletionAdaptiveDeltaTMaxPreviousBeforeUpdateSeconds =
-                previousBeforeUpdateSeconds;
-        this.postCompletionAdaptiveDeltaTMaxUpdatedForNextSubmissionSeconds =
-                updatedForNextSubmissionSeconds;
-        this.postCompletionAdaptiveDeltaTMaxFallbackReason =
-                fallbackReason == null ? "" : fallbackReason;
+        this.postCompletionAdaptiveDeltaTMaxSampleRuntimeSeconds = sampleRuntimeSeconds;
+        this.postCompletionAdaptiveDeltaTMaxSampleCountAfterCompletion = sampleCountAfterCompletion;
+        this.postCompletionAdaptiveDeltaTMaxP95AfterCompletionSeconds = p95AfterCompletionSeconds;
+        this.postCompletionAdaptiveDeltaTMaxTargetAfterCompletionSeconds = targetAfterCompletionSeconds;
+        this.postCompletionAdaptiveDeltaTMaxClampedAfterCompletionSeconds = clampedAfterCompletionSeconds;
+        this.postCompletionAdaptiveDeltaTMaxPreviousBeforeUpdateSeconds = previousBeforeUpdateSeconds;
+        this.postCompletionAdaptiveDeltaTMaxUpdatedForNextSubmissionSeconds = updatedForNextSubmissionSeconds;
+        this.postCompletionAdaptiveDeltaTMaxFallbackReason = fallbackReason == null ? "" : fallbackReason;
+    }
+
+    public void applyFinalClassification(
+            String finalClassification,
+            String staleReason,
+            long classificationSimulationTimeNs,
+            double snapshotAgeAtClassificationSeconds
+    ) {
+        this.finalClassification = finalClassification == null ? "" : finalClassification;
+        this.staleReason = staleReason == null || staleReason.isBlank() ? "NONE" : staleReason;
+        this.classificationSimulationTimeNs = classificationSimulationTimeNs;
+        this.snapshotAgeAtClassificationSeconds = snapshotAgeAtClassificationSeconds;
     }
 
     LiveGaJobRecord copy() {
@@ -177,7 +216,9 @@ public final class LiveGaJobRecord {
                 snapshotTimeSeconds,
                 taskCount,
                 candidateCount,
-                deltaTMaxAtSubmissionSeconds,
+                temporalMaximumAtSubmissionSeconds,
+                gaWallClockBudgetAtSubmissionSeconds,
+                maxSnapshotAgeSimulationSeconds,
                 wallClockDeadlineNs
         );
         copy.timeoutDetectedBeforeCompletion = timeoutDetectedBeforeCompletion;
@@ -210,9 +251,14 @@ public final class LiveGaJobRecord {
                 postCompletionAdaptiveDeltaTMaxFallbackReason
         );
         copy.finalStatus = finalStatus;
+        copy.applyFinalClassification(
+                finalClassification,
+                staleReason,
+                classificationSimulationTimeNs,
+                snapshotAgeAtClassificationSeconds
+        );
         copy.appliedAtSimulationTimeNs = appliedAtSimulationTimeNs;
-        copy.appliedSnapshotAgeSimulationSeconds =
-                appliedSnapshotAgeSimulationSeconds;
+        copy.appliedSnapshotAgeSimulationSeconds = appliedSnapshotAgeSimulationSeconds;
         copy.errorType = errorType;
         copy.errorMessage = errorMessage;
         return copy;

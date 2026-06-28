@@ -7,6 +7,7 @@ import ga.core.MaGaOptimizer;
 import org.eclipse.mosaic.app.maga.livestate.LiveStateLayerRuntimeFacade;
 import org.eclipse.mosaic.app.maga.liveruntime.reporting.LiveDetailedReportWriter;
 import org.eclipse.mosaic.app.maga.liveruntime.reporting.LiveNativeReportingCollector;
+import org.eclipse.mosaic.app.maga.liveruntime.reporting.LiveStaleStrategyWriter;
 import org.eclipse.mosaic.fed.application.app.AbstractApplication;
 import org.eclipse.mosaic.fed.application.app.api.os.ServerOperatingSystem;
 import org.eclipse.mosaic.lib.util.scheduling.Event;
@@ -37,6 +38,7 @@ public class MaGaLiveRuntimeCoordinatorApp extends AbstractApplication<ServerOpe
     private LiveStrategyApplier strategyApplier;
     private LiveRuntimeTraceWriter traceWriter;
     private LiveNativeReportingCollector reportingCollector;
+    private LiveStaleStrategyWriter staleStrategyWriter;
     private LiveGaExecutionCoordinator executionCoordinator;
     private MaGaConfig maGaConfig;
     private Path runDirectory;
@@ -55,26 +57,20 @@ public class MaGaLiveRuntimeCoordinatorApp extends AbstractApplication<ServerOpe
         strategyApplier = new LiveStrategyApplier();
 
         LiveAdaptiveDeltaTMaxEstimator.Config adaptiveDeltaTMaxConfig =
-                runtimeConfig.getDeltaTMaxMode() == LiveDeltaTMaxMode.LIVE_ADAPTIVE
-                        ? runtimeConfig.getAdaptiveDeltaTMaxConfig()
+                runtimeConfig.getGaWallClockBudgetMode()
+                        == LiveDeltaTMaxMode.LIVE_ADAPTIVE
+                        ? runtimeConfig.getAdaptiveGaWallClockBudgetConfig()
                         : null;
         TemporalWindowConfig temporalConfig =
-                runtimeConfig.getDeltaTMaxMode() == LiveDeltaTMaxMode.LIVE_ADAPTIVE
-                        ? TemporalWindowConfig.liveRuntimeDeltaTMaxOverride(
-                        runtimeConfig.getTemporalInitialWindowSeconds(),
-                        runtimeConfig.getConfiguredGaRuntimeEstimateSeconds(),
-                        adaptiveDeltaTMaxConfig.getAdaptiveMaximumSeconds()
-                )
-                        : TemporalWindowConfig.configuredBoundsForReplay(
+                TemporalWindowConfig.liveRuntimeFreshnessAware(
                         runtimeConfig.getTemporalInitialWindowSeconds(),
                         runtimeConfig.getConfiguredGaRuntimeEstimateSeconds(),
                         runtimeConfig.getConfiguredMaxWindowSeconds()
                 );
         LiveAdaptiveDeltaTMaxEstimator adaptiveDeltaTMaxEstimator =
-                runtimeConfig.getDeltaTMaxMode() == LiveDeltaTMaxMode.LIVE_ADAPTIVE
-                        ? new LiveAdaptiveDeltaTMaxEstimator(
-                        adaptiveDeltaTMaxConfig
-                )
+                runtimeConfig.getGaWallClockBudgetMode()
+                        == LiveDeltaTMaxMode.LIVE_ADAPTIVE
+                        ? new LiveAdaptiveDeltaTMaxEstimator(adaptiveDeltaTMaxConfig)
                         : null;
         GaParameterScalingMode scalingMode = runtimeConfig.getGaParameterScalingMode();
         maGaConfig = experimentalVariant.applyTo(MaGaConfig.defaultConfig(scalingMode));
@@ -104,6 +100,10 @@ public class MaGaLiveRuntimeCoordinatorApp extends AbstractApplication<ServerOpe
                         stateFacade.runtimeAccountingSource()
                 );
             }
+            Path staleReportingDir = reportingCollector == null
+                    ? traceWriter.getOutputDir()
+                    : reportingCollector.getReportingDir();
+            staleStrategyWriter = new LiveStaleStrategyWriter(staleReportingDir);
         } catch (IOException e) {
             throw new IllegalStateException("Unable to open live MA-GA runtime traces", e);
         }
@@ -129,8 +129,11 @@ public class MaGaLiveRuntimeCoordinatorApp extends AbstractApplication<ServerOpe
                 new LiveGaOverrunDeadlinePolicy(
                         temporalConfig,
                         maGaConfig.getMobilityConfig(),
-                        runtimeConfig.getDeltaTMaxMode(),
-                        adaptiveDeltaTMaxEstimator
+                        runtimeConfig.getGaWallClockBudgetMode(),
+                        adaptiveDeltaTMaxEstimator,
+                        runtimeConfig.getConfiguredInitialGaWallClockBudgetSeconds(),
+                        runtimeConfig.getMaxSnapshotAgeSimulationSeconds(),
+                        runtimeConfig.getCooperativeGaFinalizationReserveSeconds()
                 );
         executionCoordinator = new LiveGaExecutionCoordinator(
                 runtimeConfig,
@@ -139,7 +142,8 @@ public class MaGaLiveRuntimeCoordinatorApp extends AbstractApplication<ServerOpe
                 strategyApplier,
                 traceWriter,
                 deadlinePolicy,
-                reportingCollector
+                reportingCollector,
+                staleStrategyWriter
         );
 
         getLog().infoSimTime(
@@ -149,7 +153,7 @@ public class MaGaLiveRuntimeCoordinatorApp extends AbstractApplication<ServerOpe
                         + "|profile=" + runtimeConfig.profileName()
                         + "|experimentalVariant=" + experimentalVariant
                         + "|gaParameterScalingMode=" + scalingMode
-                        + "|deltaTMaxMode=" + runtimeConfig.getDeltaTMaxMode()
+                        + "|gaWallClockBudgetMode=" + runtimeConfig.getGaWallClockBudgetMode()
                         + "|bridgeDescription=" + bridge.getDescription()
                         + "|optimizationSourceDescription=" + systemStateSource.getDescription()
                         + "|sourceMode=" + systemStateSource.getMode()
@@ -227,6 +231,15 @@ public class MaGaLiveRuntimeCoordinatorApp extends AbstractApplication<ServerOpe
         } catch (IOException e) {
             throw new IllegalStateException("Unable to finish live MA-GA runtime coordinator", e);
         } finally {
+            if (staleStrategyWriter != null) {
+                try {
+                    staleStrategyWriter.close();
+                } catch (IOException e) {
+                    throw new IllegalStateException(
+                            "Unable to close V3-C stale strategy reporting", e
+                    );
+                }
+            }
             if (reportingCollector != null) {
                 try {
                     reportingCollector.close();
@@ -249,7 +262,7 @@ public class MaGaLiveRuntimeCoordinatorApp extends AbstractApplication<ServerOpe
                         + "|profile=" + runtimeConfig.profileName()
                         + "|experimentalVariant=" + runtimeConfig.getExperimentalVariant()
                         + "|gaParameterScalingMode=" + runtimeConfig.getGaParameterScalingMode()
-                        + "|deltaTMaxMode=" + runtimeConfig.getDeltaTMaxMode()
+                        + "|gaWallClockBudgetMode=" + runtimeConfig.getGaWallClockBudgetMode()
                         + "|snapshotsRequested=" + bridge.getSnapshotsRequested()
                         + "|snapshotsResolved=" + bridge.getSnapshotsResolved()
                         + "|snapshotEmptyResponses=" + bridge.getEmptyResponses()

@@ -1,12 +1,10 @@
 package org.eclipse.mosaic.app.maga.liveruntime;
 
-import model.genetic.Chromosome;
-import model.genetic.Gene;
-import model.node.NodeCandidate;
+import ga.fitness.breakdown.GeneEvaluationBreakdown;
 import model.node.NodeType;
 import window.state.TemporalStepResult;
 
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 final class LiveStrategyApplier {
@@ -19,39 +17,25 @@ final class LiveStrategyApplier {
     private int cloudAssignments;
 
     LiveAppliedStrategy apply(TemporalStepResult stepResult, long simulationTimeNs) {
-        Map<String, NodeType> candidateTypes = new HashMap<>();
-        for (NodeCandidate candidate : stepResult.getSnapshot().getCandidateNodes()) {
-            candidateTypes.put(candidate.getCandidateId(), candidate.getType());
-        }
-
-        int local = 0;
-        int vehicle = 0;
-        int edge = 0;
-        int cloud = 0;
-        Chromosome chromosome = stepResult.getMaGaResult().getBestChromosome();
-        if (chromosome != null && chromosome.getGenes() != null) {
-            for (Gene gene : chromosome.getGenes()) {
-                NodeType type = candidateTypes.get(gene.getSelectedCandidateId());
-                if (type == NodeType.LOCAL) {
-                    local++;
-                } else if (type == NodeType.VEHICLE) {
-                    vehicle++;
-                } else if (type == NodeType.EDGE) {
-                    edge++;
-                } else if (type == NodeType.CLOUD) {
-                    cloud++;
-                }
-            }
+        Map<String, LiveAssignmentDecision> decisions = new LinkedHashMap<>();
+        int local = 0, vehicle = 0, edge = 0, cloud = 0;
+        for (GeneEvaluationBreakdown gene : stepResult
+                .getMaGaResult().getBestEvaluation().getGeneBreakdowns()) {
+            LiveAssignmentDecision decision = LiveAssignmentDecision.from(gene);
+            decisions.put(decision.getTaskId(), decision);
+            NodeType type = decision.getNodeType();
+            if (type == NodeType.LOCAL) { local++; }
+            else if (type == NodeType.VEHICLE) { vehicle++; }
+            else if (type == NodeType.EDGE) { edge++; }
+            else if (type == NodeType.CLOUD) { cloud++; }
         }
 
         lastAppliedStrategy = new LiveAppliedStrategy(
                 simulationTimeNs,
                 stepResult.getSnapshot().getSnapshotId(),
+                stepResult.getSnapshot().getTimeSeconds(),
                 stepResult.getMaGaResult().getFinalBestFitness(),
-                local,
-                vehicle,
-                edge,
-                cloud
+                decisions, local, vehicle, edge, cloud
         );
         strategyApplications++;
         localAssignments += local;
@@ -61,31 +45,11 @@ final class LiveStrategyApplier {
         return lastAppliedStrategy;
     }
 
-    LiveAppliedStrategy getLastAppliedStrategy() {
-        return lastAppliedStrategy;
-    }
-
-    boolean hasLastAppliedStrategy() {
-        return lastAppliedStrategy != null;
-    }
-
-    int getStrategyApplications() {
-        return strategyApplications;
-    }
-
-    int getLocalAssignments() {
-        return localAssignments;
-    }
-
-    int getVehicleAssignments() {
-        return vehicleAssignments;
-    }
-
-    int getEdgeAssignments() {
-        return edgeAssignments;
-    }
-
-    int getCloudAssignments() {
-        return cloudAssignments;
-    }
+    LiveAppliedStrategy getLastAppliedStrategy() { return lastAppliedStrategy; }
+    boolean hasLastAppliedStrategy() { return lastAppliedStrategy != null; }
+    int getStrategyApplications() { return strategyApplications; }
+    int getLocalAssignments() { return localAssignments; }
+    int getVehicleAssignments() { return vehicleAssignments; }
+    int getEdgeAssignments() { return edgeAssignments; }
+    int getCloudAssignments() { return cloudAssignments; }
 }

@@ -127,6 +127,10 @@ public final class TemporalWindowBoundsCalculator {
                     operationalMetrics.getObservedGaRuntimeSeconds()
             );
         }
+        if (config.getMinimumBoundMode()
+                == TemporalMinimumBoundMode.OPERATIONAL_GA_ESTIMATE) {
+            return operationalMetrics;
+        }
 
         return operationalMetrics.withGaRuntimeEstimateSeconds(
                 config.getDefaultGaRuntimeEstimateSeconds()

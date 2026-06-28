@@ -5,6 +5,13 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+/**
+ * Estimatore robusto del budget wall-clock del GA.
+ *
+ * <p>Il nome della classe è mantenuto per compatibilità con V3-B. In V3-C il
+ * valore stimato non rappresenta più DeltaT_max: alimenta il termine
+ * T_GA_est di DeltaT_min e il budget cooperativo wall-clock.</p>
+ */
 final class LiveAdaptiveDeltaTMaxEstimator {
 
     static final String FALLBACK_CONFIGURED_STATIC = "CONFIGURED_STATIC";
@@ -12,6 +19,7 @@ final class LiveAdaptiveDeltaTMaxEstimator {
     static final String FALLBACK_WARMUP = "WARMUP";
     static final String FALLBACK_LIVE_ADAPTIVE = "LIVE_ADAPTIVE";
     static final String FALLBACK_INVALID_SAMPLE_EXCLUDED = "INVALID_SAMPLE_EXCLUDED";
+    static final String FALLBACK_ZERO_TASK_SAMPLE_EXCLUDED = "ZERO_TASK_SAMPLE_EXCLUDED";
     static final String FALLBACK_BOUND_CONFLICT = "BOUND_CONFLICT";
 
     private final Config config;
@@ -20,67 +28,77 @@ final class LiveAdaptiveDeltaTMaxEstimator {
     private Snapshot lastSnapshot;
 
     LiveAdaptiveDeltaTMaxEstimator(Config config) {
+        if (config == null) {
+            throw new IllegalArgumentException("config must not be null.");
+        }
         this.config = config;
         this.currentEstimateSeconds = config.getConfiguredInitialDeltaTMaxSeconds();
         this.lastSnapshot = Snapshot.liveAdaptive(
-                currentEstimateSeconds,
-                0,
-                0.0,
-                0.0,
-                currentEstimateSeconds,
-                currentEstimateSeconds,
-                currentEstimateSeconds,
-                FALLBACK_NO_SAMPLES
+                currentEstimateSeconds, 0, 0.0, 0.0,
+                currentEstimateSeconds, currentEstimateSeconds,
+                currentEstimateSeconds, FALLBACK_NO_SAMPLES
         );
     }
 
+    /** Canonical V3-C API: no temporal-window lower bound is mixed in. */
+    synchronized Snapshot estimateForSubmission() {
+        return estimateForSubmissionInternal(config.getAdaptiveMinimumSeconds());
+    }
+
+    /** Legacy V3-B API retained for old harnesses. */
     synchronized Snapshot estimateForSubmission(double deltaTMinSeconds) {
-        double lowerBound = lowerBound(deltaTMinSeconds);
+        validateFiniteAndNonNegative("deltaTMinSeconds", deltaTMinSeconds);
+        return estimateForSubmissionInternal(Math.max(
+                config.getAdaptiveMinimumSeconds(), deltaTMinSeconds
+        ));
+    }
+
+    private Snapshot estimateForSubmissionInternal(double lowerBound) {
+        validateBounds(lowerBound);
         double previous = clamp(currentEstimateSeconds, lowerBound);
         double p95 = history.isEmpty() ? 0.0 : nearestRankP95(history);
-        double target = history.isEmpty()
-                ? 0.0
-                : p95 + config.getSafetyMarginSeconds();
-        String reason = fallbackReasonForCurrentHistory();
-
+        double target = history.isEmpty() ? 0.0 : p95 + config.getSafetyMarginSeconds();
         currentEstimateSeconds = previous;
         lastSnapshot = Snapshot.liveAdaptive(
-                previous,
-                history.size(),
-                p95,
-                target,
-                previous,
-                previous,
-                previous,
-                reason
+                previous, history.size(), p95, target,
+                previous, previous, previous, fallbackReasonForCurrentHistory()
         );
         return lastSnapshot;
     }
 
+    /** Canonical V3-C API. Zero-task jobs never contaminate the history. */
+    synchronized Snapshot recordCompletedRuntime(double runtimeSeconds, int taskCount) {
+        double lowerBound = config.getAdaptiveMinimumSeconds();
+        validateBounds(lowerBound);
+        double previous = clamp(currentEstimateSeconds, lowerBound);
+
+        if (taskCount <= 0) {
+            return rejected(previous, runtimeSeconds, FALLBACK_ZERO_TASK_SAMPLE_EXCLUDED);
+        }
+        if (!isValidSample(runtimeSeconds)) {
+            return rejected(previous, runtimeSeconds, FALLBACK_INVALID_SAMPLE_EXCLUDED);
+        }
+        return accept(runtimeSeconds, previous, lowerBound);
+    }
+
+    /** Legacy V3-B API retained for compatibility. */
     synchronized Snapshot recordCompletedRuntime(
             double runtimeSeconds,
             double deltaTMinSeconds
     ) {
-        double lowerBound = lowerBound(deltaTMinSeconds);
+        validateFiniteAndNonNegative("deltaTMinSeconds", deltaTMinSeconds);
+        double lowerBound = Math.max(
+                config.getAdaptiveMinimumSeconds(), deltaTMinSeconds
+        );
+        validateBounds(lowerBound);
         double previous = clamp(currentEstimateSeconds, lowerBound);
-
         if (!isValidSample(runtimeSeconds)) {
-            currentEstimateSeconds = previous;
-            lastSnapshot = Snapshot.liveAdaptive(
-                    previous,
-                    history.size(),
-                    history.isEmpty() ? 0.0 : nearestRankP95(history),
-                    0.0,
-                    previous,
-                    previous,
-                    previous,
-                    FALLBACK_INVALID_SAMPLE_EXCLUDED,
-                    false,
-                    runtimeSeconds
-            );
-            return lastSnapshot;
+            return rejected(previous, runtimeSeconds, FALLBACK_INVALID_SAMPLE_EXCLUDED);
         }
+        return accept(runtimeSeconds, previous, lowerBound);
+    }
 
+    private Snapshot accept(double runtimeSeconds, double previous, double lowerBound) {
         history.addLast(runtimeSeconds);
         while (history.size() > config.getHistorySize()) {
             history.removeFirst();
@@ -107,27 +125,25 @@ final class LiveAdaptiveDeltaTMaxEstimator {
 
         currentEstimateSeconds = updated;
         lastSnapshot = Snapshot.liveAdaptive(
-                updated,
-                history.size(),
-                p95,
-                target,
-                raw,
-                previous,
-                updated,
-                reason,
-                true,
-                runtimeSeconds
+                updated, history.size(), p95, target, raw,
+                previous, updated, reason, true, runtimeSeconds
         );
         return lastSnapshot;
     }
 
-    synchronized Snapshot getLastSnapshot() {
+    private Snapshot rejected(double previous, double runtimeSeconds, String reason) {
+        currentEstimateSeconds = previous;
+        double p95 = history.isEmpty() ? 0.0 : nearestRankP95(history);
+        lastSnapshot = Snapshot.liveAdaptive(
+                previous, history.size(), p95,
+                history.isEmpty() ? 0.0 : p95 + config.getSafetyMarginSeconds(),
+                previous, previous, previous, reason, false, runtimeSeconds
+        );
         return lastSnapshot;
     }
 
-    synchronized int getSampleCount() {
-        return history.size();
-    }
+    synchronized Snapshot getLastSnapshot() { return lastSnapshot; }
+    synchronized int getSampleCount() { return history.size(); }
 
     static boolean isValidSample(double value) {
         return Double.isFinite(value) && value > 0.0;
@@ -136,45 +152,33 @@ final class LiveAdaptiveDeltaTMaxEstimator {
     static double nearestRankP95(Iterable<Double> samples) {
         List<Double> values = new ArrayList<>();
         for (double sample : samples) {
-            if (isValidSample(sample)) {
-                values.add(sample);
-            }
+            if (isValidSample(sample)) { values.add(sample); }
         }
         if (values.isEmpty()) {
-            throw new IllegalArgumentException("nearest-rank P95 requires at least one valid sample.");
+            throw new IllegalArgumentException(
+                    "nearest-rank P95 requires at least one valid sample."
+            );
         }
         Collections.sort(values);
         int rank = (int) Math.ceil(0.95 * values.size());
-        int index = Math.max(0, Math.min(values.size() - 1, rank - 1));
-        return values.get(index);
+        return values.get(Math.max(0, Math.min(values.size() - 1, rank - 1)));
     }
 
     private String fallbackReasonForCurrentHistory() {
-        if (history.isEmpty()) {
-            return FALLBACK_NO_SAMPLES;
-        }
-        if (history.size() < config.getWarmupSamples()) {
-            return FALLBACK_WARMUP;
-        }
+        if (history.isEmpty()) { return FALLBACK_NO_SAMPLES; }
+        if (history.size() < config.getWarmupSamples()) { return FALLBACK_WARMUP; }
         return FALLBACK_LIVE_ADAPTIVE;
     }
 
-    private double lowerBound(double deltaTMinSeconds) {
-        validateFiniteAndNonNegative("deltaTMinSeconds", deltaTMinSeconds);
-        double lowerBound = Math.max(
-                deltaTMinSeconds,
-                config.getAdaptiveMinimumSeconds()
-        );
+    private void validateBounds(double lowerBound) {
         if (lowerBound > config.getAdaptiveMaximumSeconds()) {
             throw new BoundConflictException(
                     "BOUND_CONFLICT: effective minimum exceeds adaptive maximum"
-                            + " | deltaTMinSeconds=" + deltaTMinSeconds
-                            + " | adaptiveMinimumSeconds=" + config.getAdaptiveMinimumSeconds()
                             + " | effectiveMinimumSeconds=" + lowerBound
-                            + " | adaptiveMaximumSeconds=" + config.getAdaptiveMaximumSeconds()
+                            + " | adaptiveMaximumSeconds="
+                            + config.getAdaptiveMaximumSeconds()
             );
         }
-        return lowerBound;
     }
 
     private double clamp(double value, double lowerBound) {
@@ -182,18 +186,13 @@ final class LiveAdaptiveDeltaTMaxEstimator {
     }
 
     private static double clamp(double value, double lowerBound, double upperBound) {
-        if (!Double.isFinite(value)) {
-            return lowerBound;
-        }
+        if (!Double.isFinite(value)) { return lowerBound; }
         return Math.max(lowerBound, Math.min(upperBound, value));
     }
 
     private static void validateFiniteAndNonNegative(String fieldName, double value) {
-        if (!Double.isFinite(value)) {
-            throw new IllegalArgumentException(fieldName + " must be finite.");
-        }
-        if (value < 0.0) {
-            throw new IllegalArgumentException(fieldName + " must be >= 0.");
+        if (!Double.isFinite(value) || value < 0.0) {
+            throw new IllegalArgumentException(fieldName + " must be finite and >= 0.");
         }
     }
 
@@ -217,54 +216,28 @@ final class LiveAdaptiveDeltaTMaxEstimator {
                 double maximumStepUpSeconds,
                 double maximumStepDownSeconds
         ) {
-            validatePositive(
-                    "configuredInitialDeltaTMaxSeconds",
-                    configuredInitialDeltaTMaxSeconds
-            );
-            validateFiniteAndNonNegative(
-                    "adaptiveMinimumSeconds",
-                    adaptiveMinimumSeconds
-            );
-            validatePositive(
-                    "adaptiveMaximumSeconds",
-                    adaptiveMaximumSeconds
-            );
+            validatePositive("configuredInitialDeltaTMaxSeconds", configuredInitialDeltaTMaxSeconds);
+            validateFiniteAndNonNegative("adaptiveMinimumSeconds", adaptiveMinimumSeconds);
+            validatePositive("adaptiveMaximumSeconds", adaptiveMaximumSeconds);
             if (adaptiveMinimumSeconds > adaptiveMaximumSeconds) {
-                throw new IllegalArgumentException(
-                        "BOUND_CONFLICT: adaptiveMinimumSeconds exceeds adaptiveMaximumSeconds"
-                                + " | adaptiveMinimumSeconds="
-                                + adaptiveMinimumSeconds
-                                + " | adaptiveMaximumSeconds="
-                                + adaptiveMaximumSeconds
-                );
+                throw new IllegalArgumentException("BOUND_CONFLICT: adaptive minimum exceeds maximum.");
             }
-            if (configuredInitialDeltaTMaxSeconds < adaptiveMinimumSeconds) {
+            if (configuredInitialDeltaTMaxSeconds < adaptiveMinimumSeconds
+                    || configuredInitialDeltaTMaxSeconds > adaptiveMaximumSeconds) {
                 throw new IllegalArgumentException(
-                        "configuredInitialDeltaTMaxSeconds must be >= adaptiveMinimumSeconds."
-                );
-            }
-            if (configuredInitialDeltaTMaxSeconds > adaptiveMaximumSeconds) {
-                throw new IllegalArgumentException(
-                        "configuredInitialDeltaTMaxSeconds must be <= adaptiveMaximumSeconds."
+                        "configured initial estimate must be inside adaptive bounds."
                 );
             }
             if (historySize < 1) {
                 throw new IllegalArgumentException("historySize must be >= 1.");
             }
             if (warmupSamples < 1 || warmupSamples > historySize) {
-                throw new IllegalArgumentException(
-                        "warmupSamples must be in [1, historySize]."
-                );
+                throw new IllegalArgumentException("warmupSamples must be in [1, historySize].");
             }
-            validateFiniteAndNonNegative(
-                    "safetyMarginSeconds",
-                    safetyMarginSeconds
-            );
+            validateFiniteAndNonNegative("safetyMarginSeconds", safetyMarginSeconds);
             validatePositive("maximumStepUpSeconds", maximumStepUpSeconds);
             validatePositive("maximumStepDownSeconds", maximumStepDownSeconds);
-
-            this.configuredInitialDeltaTMaxSeconds =
-                    configuredInitialDeltaTMaxSeconds;
+            this.configuredInitialDeltaTMaxSeconds = configuredInitialDeltaTMaxSeconds;
             this.adaptiveMinimumSeconds = adaptiveMinimumSeconds;
             this.adaptiveMaximumSeconds = adaptiveMaximumSeconds;
             this.historySize = historySize;
@@ -274,52 +247,24 @@ final class LiveAdaptiveDeltaTMaxEstimator {
             this.maximumStepDownSeconds = maximumStepDownSeconds;
         }
 
-        double getConfiguredInitialDeltaTMaxSeconds() {
-            return configuredInitialDeltaTMaxSeconds;
-        }
-
-        double getAdaptiveMinimumSeconds() {
-            return adaptiveMinimumSeconds;
-        }
-
-        double getAdaptiveMaximumSeconds() {
-            return adaptiveMaximumSeconds;
-        }
-
-        int getHistorySize() {
-            return historySize;
-        }
-
-        int getWarmupSamples() {
-            return warmupSamples;
-        }
-
-        double getSafetyMarginSeconds() {
-            return safetyMarginSeconds;
-        }
-
-        double getMaximumStepUpSeconds() {
-            return maximumStepUpSeconds;
-        }
-
-        double getMaximumStepDownSeconds() {
-            return maximumStepDownSeconds;
-        }
+        double getConfiguredInitialDeltaTMaxSeconds() { return configuredInitialDeltaTMaxSeconds; }
+        double getAdaptiveMinimumSeconds() { return adaptiveMinimumSeconds; }
+        double getAdaptiveMaximumSeconds() { return adaptiveMaximumSeconds; }
+        int getHistorySize() { return historySize; }
+        int getWarmupSamples() { return warmupSamples; }
+        double getSafetyMarginSeconds() { return safetyMarginSeconds; }
+        double getMaximumStepUpSeconds() { return maximumStepUpSeconds; }
+        double getMaximumStepDownSeconds() { return maximumStepDownSeconds; }
 
         private static void validatePositive(String fieldName, double value) {
-            if (!Double.isFinite(value)) {
-                throw new IllegalArgumentException(fieldName + " must be finite.");
-            }
-            if (value <= 0.0) {
-                throw new IllegalArgumentException(fieldName + " must be > 0.");
+            if (!Double.isFinite(value) || value <= 0.0) {
+                throw new IllegalArgumentException(fieldName + " must be finite and > 0.");
             }
         }
     }
 
     static final class BoundConflictException extends IllegalStateException {
-        BoundConflictException(String message) {
-            super(message);
-        }
+        BoundConflictException(String message) { super(message); }
     }
 
     static final class Snapshot {
@@ -336,17 +281,10 @@ final class LiveAdaptiveDeltaTMaxEstimator {
         private final double sampleRuntimeSeconds;
 
         private Snapshot(
-                LiveDeltaTMaxMode mode,
-                double estimateSeconds,
-                int sampleCount,
-                double p95Seconds,
-                double targetSeconds,
-                double clampedSeconds,
-                double previousSeconds,
-                double updatedSeconds,
-                String fallbackReason,
-                boolean sampleAccepted,
-                double sampleRuntimeSeconds
+                LiveDeltaTMaxMode mode, double estimateSeconds, int sampleCount,
+                double p95Seconds, double targetSeconds, double clampedSeconds,
+                double previousSeconds, double updatedSeconds, String fallbackReason,
+                boolean sampleAccepted, double sampleRuntimeSeconds
         ) {
             this.mode = mode;
             this.estimateSeconds = estimateSeconds;
@@ -361,119 +299,51 @@ final class LiveAdaptiveDeltaTMaxEstimator {
             this.sampleRuntimeSeconds = sampleRuntimeSeconds;
         }
 
-        static Snapshot configuredStatic(double deltaTMaxSeconds) {
+        static Snapshot configuredStatic(double seconds) {
             return new Snapshot(
-                    LiveDeltaTMaxMode.CONFIGURED_STATIC,
-                    deltaTMaxSeconds,
-                    0,
-                    0.0,
-                    deltaTMaxSeconds,
-                    deltaTMaxSeconds,
-                    deltaTMaxSeconds,
-                    deltaTMaxSeconds,
-                    FALLBACK_CONFIGURED_STATIC,
-                    false,
-                    0.0
+                    LiveDeltaTMaxMode.CONFIGURED_STATIC, seconds, 0, 0.0,
+                    seconds, seconds, seconds, seconds,
+                    FALLBACK_CONFIGURED_STATIC, false, 0.0
             );
         }
 
         static Snapshot liveAdaptive(
-                double estimateSeconds,
-                int sampleCount,
-                double p95Seconds,
-                double targetSeconds,
-                double clampedSeconds,
-                double previousSeconds,
-                double updatedSeconds,
-                String fallbackReason
+                double estimateSeconds, int sampleCount, double p95Seconds,
+                double targetSeconds, double clampedSeconds, double previousSeconds,
+                double updatedSeconds, String fallbackReason
         ) {
             return liveAdaptive(
-                    estimateSeconds,
-                    sampleCount,
-                    p95Seconds,
-                    targetSeconds,
-                    clampedSeconds,
-                    previousSeconds,
-                    updatedSeconds,
-                    fallbackReason,
-                    false,
-                    0.0
+                    estimateSeconds, sampleCount, p95Seconds, targetSeconds,
+                    clampedSeconds, previousSeconds, updatedSeconds,
+                    fallbackReason, false, 0.0
             );
         }
 
         static Snapshot liveAdaptive(
-                double estimateSeconds,
-                int sampleCount,
-                double p95Seconds,
-                double targetSeconds,
-                double clampedSeconds,
-                double previousSeconds,
-                double updatedSeconds,
-                String fallbackReason,
-                boolean sampleAccepted,
-                double sampleRuntimeSeconds
+                double estimateSeconds, int sampleCount, double p95Seconds,
+                double targetSeconds, double clampedSeconds, double previousSeconds,
+                double updatedSeconds, String fallbackReason,
+                boolean sampleAccepted, double sampleRuntimeSeconds
         ) {
             return new Snapshot(
-                    LiveDeltaTMaxMode.LIVE_ADAPTIVE,
-                    estimateSeconds,
-                    sampleCount,
-                    p95Seconds,
-                    targetSeconds,
-                    clampedSeconds,
-                    previousSeconds,
-                    updatedSeconds,
-                    fallbackReason,
-                    sampleAccepted,
+                    LiveDeltaTMaxMode.LIVE_ADAPTIVE, estimateSeconds, sampleCount,
+                    p95Seconds, targetSeconds, clampedSeconds, previousSeconds,
+                    updatedSeconds, fallbackReason, sampleAccepted,
                     sampleRuntimeSeconds
             );
         }
 
-        LiveDeltaTMaxMode getMode() {
-            return mode;
-        }
-
-        boolean isLiveAdaptive() {
-            return mode == LiveDeltaTMaxMode.LIVE_ADAPTIVE;
-        }
-
-        double getEstimateSeconds() {
-            return estimateSeconds;
-        }
-
-        int getSampleCount() {
-            return sampleCount;
-        }
-
-        double getP95Seconds() {
-            return p95Seconds;
-        }
-
-        double getTargetSeconds() {
-            return targetSeconds;
-        }
-
-        double getClampedSeconds() {
-            return clampedSeconds;
-        }
-
-        double getPreviousSeconds() {
-            return previousSeconds;
-        }
-
-        double getUpdatedSeconds() {
-            return updatedSeconds;
-        }
-
-        String getFallbackReason() {
-            return fallbackReason;
-        }
-
-        boolean isSampleAccepted() {
-            return sampleAccepted;
-        }
-
-        double getSampleRuntimeSeconds() {
-            return sampleRuntimeSeconds;
-        }
+        LiveDeltaTMaxMode getMode() { return mode; }
+        boolean isLiveAdaptive() { return mode == LiveDeltaTMaxMode.LIVE_ADAPTIVE; }
+        double getEstimateSeconds() { return estimateSeconds; }
+        int getSampleCount() { return sampleCount; }
+        double getP95Seconds() { return p95Seconds; }
+        double getTargetSeconds() { return targetSeconds; }
+        double getClampedSeconds() { return clampedSeconds; }
+        double getPreviousSeconds() { return previousSeconds; }
+        double getUpdatedSeconds() { return updatedSeconds; }
+        String getFallbackReason() { return fallbackReason; }
+        boolean isSampleAccepted() { return sampleAccepted; }
+        double getSampleRuntimeSeconds() { return sampleRuntimeSeconds; }
     }
 }

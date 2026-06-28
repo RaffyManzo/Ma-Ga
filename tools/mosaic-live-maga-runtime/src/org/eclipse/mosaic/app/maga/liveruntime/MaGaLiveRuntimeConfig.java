@@ -10,13 +10,11 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.util.Locale;
 
+/** Runtime configuration with V3-C temporal-domain separation. */
 public final class MaGaLiveRuntimeConfig {
 
     static final String CONFIG_FILE_NAME = "ma_ga_live_runtime_config.json";
     private static final long NANOSECONDS_PER_MILLISECOND = 1_000_000L;
-    private static final double CONFIGURED_REPLAY_DATA_COLLECTION_DELAY_SECONDS = 0.0;
-    private static final double CONFIGURED_REPLAY_STRATEGY_APPLICATION_SECONDS = 0.05;
-    private static final double CONFIGURED_REPLAY_EPSILON_SECONDS = 1.0E-6;
 
     String scenarioName;
     long coordinatorTickIntervalMs;
@@ -37,6 +35,21 @@ public final class MaGaLiveRuntimeConfig {
     boolean nativeLiveDetailedReportPrintToConsole;
     String gaParameterScalingMode;
     String experimentalVariant;
+
+    // Canonical V3-C names.
+    String gaWallClockBudgetMode;
+    Double configuredInitialGaWallClockBudgetSeconds;
+    Double adaptiveGaWallClockBudgetMinimumSeconds;
+    Double adaptiveGaWallClockBudgetMaximumSeconds;
+    Integer adaptiveGaWallClockBudgetHistorySize;
+    Integer adaptiveGaWallClockBudgetWarmupSamples;
+    Double adaptiveGaWallClockBudgetSafetyMarginSeconds;
+    Double adaptiveGaWallClockBudgetMaximumStepUpSeconds;
+    Double adaptiveGaWallClockBudgetMaximumStepDownSeconds;
+    Double maxSnapshotAgeSimulationSeconds;
+    Boolean cooperativeGaBudgetStopEnabled;
+
+    // V3-B aliases, accepted only for backward compatibility.
     String deltaTMaxMode;
     Double configuredInitialDeltaTMaxSeconds;
     Double adaptiveDeltaTMaxMinimumSeconds;
@@ -53,138 +66,104 @@ public final class MaGaLiveRuntimeConfig {
         }
         File configFile = new File(configurationPath, CONFIG_FILE_NAME);
         if (!configFile.isFile()) {
-            throw new IllegalArgumentException("Missing live runtime config: " + configFile.getAbsolutePath());
+            throw new IllegalArgumentException(
+                    "Missing live runtime config: " + configFile.getAbsolutePath()
+            );
         }
         try {
-            String json = new String(Files.readAllBytes(configFile.toPath()), StandardCharsets.UTF_8);
-            MaGaLiveRuntimeConfig config = new Gson().fromJson(json, MaGaLiveRuntimeConfig.class);
+            String json = new String(
+                    Files.readAllBytes(configFile.toPath()), StandardCharsets.UTF_8
+            );
+            MaGaLiveRuntimeConfig config = new Gson().fromJson(
+                    json, MaGaLiveRuntimeConfig.class
+            );
             config.validate(configFile);
             return config;
         } catch (IOException e) {
-            throw new IllegalArgumentException("Unable to read " + configFile.getAbsolutePath(), e);
+            throw new IllegalArgumentException(
+                    "Unable to read " + configFile.getAbsolutePath(), e
+            );
         } catch (JsonSyntaxException e) {
-            throw new IllegalArgumentException("Invalid JSON in " + configFile.getAbsolutePath(), e);
+            throw new IllegalArgumentException(
+                    "Invalid JSON in " + configFile.getAbsolutePath(), e
+            );
         }
     }
 
     public long getCoordinatorTickIntervalNs() {
         return coordinatorTickIntervalMs * NANOSECONDS_PER_MILLISECOND;
     }
-
     public long getInitialOptimizationDelayNs() {
         return initialOptimizationDelayMs * NANOSECONDS_PER_MILLISECOND;
     }
-
-    public long getDiagnosticArtificialGaDelayMs() {
-        return diagnosticArtificialGaDelayMs;
+    public long getDiagnosticArtificialGaDelayMs() { return diagnosticArtificialGaDelayMs; }
+    public double getTemporalInitialWindowSeconds() { return temporalInitialWindowSeconds; }
+    public double getConfiguredGaRuntimeEstimateSeconds() { return configuredGaRuntimeEstimateSeconds; }
+    public double getConfiguredMaxWindowSeconds() { return configuredMaxWindowSeconds; }
+    public double getDeltaTMaxComparisonEpsilonSeconds() { return deltaTMaxComparisonEpsilonSeconds; }
+    public int getPublishedSnapshotCopyLimit() { return publishedSnapshotCopyLimit; }
+    public boolean isNativeLiveDetailedReportingEnabled() { return nativeLiveDetailedReportingEnabled; }
+    public boolean isNativeLiveDetailedReportPrintToConsole() { return nativeLiveDetailedReportPrintToConsole; }
+    public boolean isCooperativeGaBudgetStopEnabled() { return cooperativeGaBudgetStopEnabled; }
+    public double getMaxSnapshotAgeSimulationSeconds() { return maxSnapshotAgeSimulationSeconds; }
+    public double getConfiguredInitialGaWallClockBudgetSeconds() {
+        return configuredInitialGaWallClockBudgetSeconds;
     }
-
-    public double getTemporalInitialWindowSeconds() {
-        return temporalInitialWindowSeconds;
+    /**
+     * Reserve used to stop the cooperative search before the hard wall-clock
+     * deadline, leaving the configured safety margin for final repair,
+     * detailed evaluation and result publication.
+     */
+    public double getCooperativeGaFinalizationReserveSeconds() {
+        return adaptiveGaWallClockBudgetSafetyMarginSeconds;
     }
-
-    public double getConfiguredGaRuntimeEstimateSeconds() {
-        return configuredGaRuntimeEstimateSeconds;
-    }
-
-    public double getConfiguredMaxWindowSeconds() {
-        return configuredMaxWindowSeconds;
-    }
-
-    public double getDeltaTMaxComparisonEpsilonSeconds() {
-        return deltaTMaxComparisonEpsilonSeconds;
-    }
-
-    public int getPublishedSnapshotCopyLimit() {
-        return publishedSnapshotCopyLimit;
-    }
-
-    public boolean isNativeLiveDetailedReportingEnabled() {
-        return nativeLiveDetailedReportingEnabled;
-    }
-
-    public boolean isNativeLiveDetailedReportPrintToConsole() {
-        return nativeLiveDetailedReportPrintToConsole;
-    }
-
     public GaParameterScalingMode getGaParameterScalingMode() {
         return GaParameterScalingMode.valueOf(gaParameterScalingMode);
     }
-
     public MaGaExperimentalVariant getExperimentalVariant() {
         return MaGaExperimentalVariant.parse(experimentalVariant, null);
     }
-
-    public LiveDeltaTMaxMode getDeltaTMaxMode() {
-        return LiveDeltaTMaxMode.valueOf(deltaTMaxMode);
+    public LiveDeltaTMaxMode getGaWallClockBudgetMode() {
+        return LiveDeltaTMaxMode.valueOf(gaWallClockBudgetMode);
     }
+    /** Legacy getter. */
+    public LiveDeltaTMaxMode getDeltaTMaxMode() { return getGaWallClockBudgetMode(); }
 
-    public LiveAdaptiveDeltaTMaxEstimator.Config getAdaptiveDeltaTMaxConfig() {
-        if (getDeltaTMaxMode() != LiveDeltaTMaxMode.LIVE_ADAPTIVE) {
+    public LiveAdaptiveDeltaTMaxEstimator.Config getAdaptiveGaWallClockBudgetConfig() {
+        if (getGaWallClockBudgetMode() != LiveDeltaTMaxMode.LIVE_ADAPTIVE) {
             throw new IllegalStateException(
-                    "Adaptive deltaTMax config is only available in LIVE_ADAPTIVE mode."
+                    "Adaptive wall-clock budget config requires LIVE_ADAPTIVE mode."
             );
         }
         return new LiveAdaptiveDeltaTMaxEstimator.Config(
-                configuredInitialDeltaTMaxSeconds,
-                adaptiveDeltaTMaxMinimumSeconds,
-                adaptiveDeltaTMaxMaximumSeconds,
-                adaptiveDeltaTMaxHistorySize,
-                adaptiveDeltaTMaxWarmupSamples,
-                adaptiveDeltaTMaxSafetyMarginSeconds,
-                adaptiveDeltaTMaxMaximumStepUpSeconds,
-                adaptiveDeltaTMaxMaximumStepDownSeconds
+                configuredInitialGaWallClockBudgetSeconds,
+                adaptiveGaWallClockBudgetMinimumSeconds,
+                adaptiveGaWallClockBudgetMaximumSeconds,
+                adaptiveGaWallClockBudgetHistorySize,
+                adaptiveGaWallClockBudgetWarmupSamples,
+                adaptiveGaWallClockBudgetSafetyMarginSeconds,
+                adaptiveGaWallClockBudgetMaximumStepUpSeconds,
+                adaptiveGaWallClockBudgetMaximumStepDownSeconds
         );
+    }
+    /** Legacy getter. */
+    public LiveAdaptiveDeltaTMaxEstimator.Config getAdaptiveDeltaTMaxConfig() {
+        return getAdaptiveGaWallClockBudgetConfig();
     }
 
     public String getScenarioName() {
         return scenarioName == null || scenarioName.isBlank()
-                ? "MaGaLiveMagaRuntimeStudy"
-                : scenarioName;
+                ? "MaGaLiveMagaRuntimeStudy" : scenarioName;
     }
-
     public String profileName() {
         return diagnosticArtificialGaDelayMs > 0 ? "diagnostic-overrun" : "normal";
     }
 
     private void validate(File configFile) {
         String source = configFile.getAbsolutePath();
-        if (scenarioName == null || scenarioName.isBlank()) {
-            scenarioName = "MaGaLiveMagaRuntimeStudy";
-        }
-        if (scenarioName.contains("..")
-                || scenarioName.contains("\\")
-                || scenarioName.contains("/")
-                || !scenarioName.matches("^[A-Za-z0-9_.-]+$")) {
-            throw new IllegalArgumentException(source + ": scenarioName is invalid");
-        }
-        if (gaParameterScalingMode == null || gaParameterScalingMode.isBlank()) {
-            gaParameterScalingMode = GaParameterScalingMode.ADAPTIVE.name();
-        } else {
-            String normalized = gaParameterScalingMode.trim().toUpperCase(Locale.ROOT);
-            try {
-                gaParameterScalingMode = GaParameterScalingMode.valueOf(normalized).name();
-            } catch (IllegalArgumentException e) {
-                throw new IllegalArgumentException(
-                        source + ": gaParameterScalingMode must be STATIC or ADAPTIVE",
-                        e
-                );
-            }
-        }
-        if (deltaTMaxMode == null || deltaTMaxMode.isBlank()) {
-            deltaTMaxMode = LiveDeltaTMaxMode.CONFIGURED_STATIC.name();
-        } else {
-            String normalized = deltaTMaxMode.trim().toUpperCase(Locale.ROOT);
-            try {
-                deltaTMaxMode = LiveDeltaTMaxMode.valueOf(normalized).name();
-            } catch (IllegalArgumentException e) {
-                throw new IllegalArgumentException(
-                        source + ": deltaTMaxMode must be CONFIGURED_STATIC or LIVE_ADAPTIVE",
-                        e
-                );
-            }
-        }
-        experimentalVariant = MaGaExperimentalVariant.parse(experimentalVariant, source).name();
+        normalizeCore(source);
+        normalizeV3CAliases(source);
+
         requirePositive(coordinatorTickIntervalMs, "coordinatorTickIntervalMs", source);
         requirePositive(initialOptimizationDelayMs, "initialOptimizationDelayMs", source);
         requirePositive(gaPollingIntervalMs, "gaPollingIntervalMs", source);
@@ -192,137 +171,189 @@ public final class MaGaLiveRuntimeConfig {
         requirePositive(configuredGaRuntimeEstimateSeconds, "configuredGaRuntimeEstimateSeconds", source);
         requirePositive(configuredMaxWindowSeconds, "configuredMaxWindowSeconds", source);
         requirePositive(deltaTMaxComparisonEpsilonSeconds, "deltaTMaxComparisonEpsilonSeconds", source);
+        requirePositive(maxSnapshotAgeSimulationSeconds, "maxSnapshotAgeSimulationSeconds", source);
+        requirePositive(configuredInitialGaWallClockBudgetSeconds,
+                "configuredInitialGaWallClockBudgetSeconds", source);
+        requireFiniteAndNonNegative(adaptiveGaWallClockBudgetSafetyMarginSeconds,
+                "adaptiveGaWallClockBudgetSafetyMarginSeconds", source);
+
         if (publishedSnapshotCopyLimit < 1) {
-            throw new IllegalArgumentException(source + ": publishedSnapshotCopyLimit must be >= 1");
+            throw new IllegalArgumentException(
+                    source + ": publishedSnapshotCopyLimit must be >= 1"
+            );
         }
-        if (!singleInFlightGaOnly) {
-            throw new IllegalArgumentException(source + ": singleInFlightGaOnly must be true for Phase 13D");
-        }
-        if (!discardLateResult) {
-            throw new IllegalArgumentException(source + ": discardLateResult must be true for Phase 13D");
-        }
-        if (!keepLastAppliedStrategyWhileRunning) {
-            throw new IllegalArgumentException(source + ": keepLastAppliedStrategyWhileRunning must be true for Phase 13D");
-        }
-        if (!freshReoptimizationAfterTimeout) {
-            throw new IllegalArgumentException(source + ": freshReoptimizationAfterTimeout must be true for Phase 13D");
+        if (!singleInFlightGaOnly || !discardLateResult
+                || !keepLastAppliedStrategyWhileRunning
+                || !freshReoptimizationAfterTimeout) {
+            throw new IllegalArgumentException(
+                    source + ": V3-C requires single-flight, stale discard, "
+                            + "strategy preservation and fresh reoptimization."
+            );
         }
         if (diagnosticArtificialGaDelayMs < 0) {
-            throw new IllegalArgumentException(source + ": diagnosticArtificialGaDelayMs must be >= 0");
+            throw new IllegalArgumentException(
+                    source + ": diagnosticArtificialGaDelayMs must be >= 0"
+            );
         }
-        if (getDeltaTMaxMode() == LiveDeltaTMaxMode.LIVE_ADAPTIVE) {
-            validateAdaptiveDeltaTMaxConfig(source);
+        if (getGaWallClockBudgetMode() == LiveDeltaTMaxMode.LIVE_ADAPTIVE) {
+            validateAdaptiveBudget(source);
         }
     }
 
-    private void validateAdaptiveDeltaTMaxConfig(String source) {
-        requirePresent(configuredInitialDeltaTMaxSeconds,
-                "configuredInitialDeltaTMaxSeconds", source);
-        requirePresent(adaptiveDeltaTMaxMinimumSeconds,
-                "adaptiveDeltaTMaxMinimumSeconds", source);
-        requirePresent(adaptiveDeltaTMaxMaximumSeconds,
-                "adaptiveDeltaTMaxMaximumSeconds", source);
-        requirePresent(adaptiveDeltaTMaxHistorySize,
-                "adaptiveDeltaTMaxHistorySize", source);
-        requirePresent(adaptiveDeltaTMaxWarmupSamples,
-                "adaptiveDeltaTMaxWarmupSamples", source);
-        requirePresent(adaptiveDeltaTMaxSafetyMarginSeconds,
-                "adaptiveDeltaTMaxSafetyMarginSeconds", source);
-        requirePresent(adaptiveDeltaTMaxMaximumStepUpSeconds,
-                "adaptiveDeltaTMaxMaximumStepUpSeconds", source);
-        requirePresent(adaptiveDeltaTMaxMaximumStepDownSeconds,
-                "adaptiveDeltaTMaxMaximumStepDownSeconds", source);
-
-        requirePositive(configuredInitialDeltaTMaxSeconds,
-                "configuredInitialDeltaTMaxSeconds", source);
-        requireFiniteAndNonNegative(adaptiveDeltaTMaxMinimumSeconds,
-                "adaptiveDeltaTMaxMinimumSeconds", source);
-        requirePositive(adaptiveDeltaTMaxMaximumSeconds,
-                "adaptiveDeltaTMaxMaximumSeconds", source);
-        requireFiniteAndNonNegative(adaptiveDeltaTMaxSafetyMarginSeconds,
-                "adaptiveDeltaTMaxSafetyMarginSeconds", source);
-        requirePositive(adaptiveDeltaTMaxMaximumStepUpSeconds,
-                "adaptiveDeltaTMaxMaximumStepUpSeconds", source);
-        requirePositive(adaptiveDeltaTMaxMaximumStepDownSeconds,
-                "adaptiveDeltaTMaxMaximumStepDownSeconds", source);
-
-        if (adaptiveDeltaTMaxHistorySize < 1) {
-            throw new IllegalArgumentException(
-                    source + ": adaptiveDeltaTMaxHistorySize must be >= 1"
-            );
+    private void normalizeCore(String source) {
+        if (scenarioName == null || scenarioName.isBlank()) {
+            scenarioName = "MaGaLiveMagaRuntimeStudy";
         }
-        if (adaptiveDeltaTMaxWarmupSamples < 1
-                || adaptiveDeltaTMaxWarmupSamples > adaptiveDeltaTMaxHistorySize) {
-            throw new IllegalArgumentException(
-                    source + ": adaptiveDeltaTMaxWarmupSamples must be in [1, adaptiveDeltaTMaxHistorySize]"
-            );
+        if (scenarioName.contains("..") || scenarioName.contains("\\")
+                || scenarioName.contains("/")
+                || !scenarioName.matches("^[A-Za-z0-9_.-]+$")) {
+            throw new IllegalArgumentException(source + ": scenarioName is invalid");
         }
-        if (adaptiveDeltaTMaxMinimumSeconds > adaptiveDeltaTMaxMaximumSeconds) {
-            throw new IllegalArgumentException(
-                    source
-                            + ": BOUND_CONFLICT adaptiveDeltaTMaxMinimumSeconds exceeds adaptiveDeltaTMaxMaximumSeconds"
-                            + " | adaptiveDeltaTMaxMinimumSeconds="
-                            + adaptiveDeltaTMaxMinimumSeconds
-                            + " | adaptiveDeltaTMaxMaximumSeconds="
-                            + adaptiveDeltaTMaxMaximumSeconds
-            );
-        }
-        if (configuredInitialDeltaTMaxSeconds < adaptiveDeltaTMaxMinimumSeconds) {
-            throw new IllegalArgumentException(
-                    source + ": configuredInitialDeltaTMaxSeconds must be >= adaptiveDeltaTMaxMinimumSeconds"
-            );
-        }
-        if (configuredInitialDeltaTMaxSeconds > adaptiveDeltaTMaxMaximumSeconds) {
-            throw new IllegalArgumentException(
-                    source + ": configuredInitialDeltaTMaxSeconds must be <= adaptiveDeltaTMaxMaximumSeconds"
-            );
-        }
-        double configuredTemporalMinimumSeconds =
-                CONFIGURED_REPLAY_DATA_COLLECTION_DELAY_SECONDS
-                        + configuredGaRuntimeEstimateSeconds
-                        + CONFIGURED_REPLAY_STRATEGY_APPLICATION_SECONDS
-                        + CONFIGURED_REPLAY_EPSILON_SECONDS;
-        double effectiveMinimumSeconds = Math.max(
-                configuredTemporalMinimumSeconds,
-                adaptiveDeltaTMaxMinimumSeconds
+        gaParameterScalingMode = normalizeEnum(
+                gaParameterScalingMode, GaParameterScalingMode.ADAPTIVE.name(),
+                source, "gaParameterScalingMode", "STATIC or ADAPTIVE"
         );
-        if (effectiveMinimumSeconds > adaptiveDeltaTMaxMaximumSeconds) {
+        experimentalVariant = MaGaExperimentalVariant.parse(
+                experimentalVariant, source
+        ).name();
+    }
+
+    private void normalizeV3CAliases(String source) {
+        if (gaWallClockBudgetMode == null || gaWallClockBudgetMode.isBlank()) {
+            gaWallClockBudgetMode = deltaTMaxMode;
+        }
+        gaWallClockBudgetMode = normalizeEnum(
+                gaWallClockBudgetMode, LiveDeltaTMaxMode.CONFIGURED_STATIC.name(),
+                source, "gaWallClockBudgetMode", "CONFIGURED_STATIC or LIVE_ADAPTIVE"
+        );
+
+        configuredInitialGaWallClockBudgetSeconds = firstNonNull(
+                configuredInitialGaWallClockBudgetSeconds,
+                configuredInitialDeltaTMaxSeconds,
+                configuredGaRuntimeEstimateSeconds
+        );
+        adaptiveGaWallClockBudgetMinimumSeconds = firstNonNull(
+                adaptiveGaWallClockBudgetMinimumSeconds,
+                adaptiveDeltaTMaxMinimumSeconds,
+                0.10
+        );
+        adaptiveGaWallClockBudgetMaximumSeconds = firstNonNull(
+                adaptiveGaWallClockBudgetMaximumSeconds,
+                adaptiveDeltaTMaxMaximumSeconds,
+                1.50
+        );
+        adaptiveGaWallClockBudgetHistorySize = firstNonNull(
+                adaptiveGaWallClockBudgetHistorySize,
+                adaptiveDeltaTMaxHistorySize,
+                20
+        );
+        adaptiveGaWallClockBudgetWarmupSamples = firstNonNull(
+                adaptiveGaWallClockBudgetWarmupSamples,
+                adaptiveDeltaTMaxWarmupSamples,
+                3
+        );
+        adaptiveGaWallClockBudgetSafetyMarginSeconds = firstNonNull(
+                adaptiveGaWallClockBudgetSafetyMarginSeconds,
+                adaptiveDeltaTMaxSafetyMarginSeconds,
+                0.10
+        );
+        adaptiveGaWallClockBudgetMaximumStepUpSeconds = firstNonNull(
+                adaptiveGaWallClockBudgetMaximumStepUpSeconds,
+                adaptiveDeltaTMaxMaximumStepUpSeconds,
+                0.25
+        );
+        adaptiveGaWallClockBudgetMaximumStepDownSeconds = firstNonNull(
+                adaptiveGaWallClockBudgetMaximumStepDownSeconds,
+                adaptiveDeltaTMaxMaximumStepDownSeconds,
+                0.10
+        );
+        if (maxSnapshotAgeSimulationSeconds == null) {
+            maxSnapshotAgeSimulationSeconds = configuredMaxWindowSeconds;
+        }
+        if (cooperativeGaBudgetStopEnabled == null) {
+            cooperativeGaBudgetStopEnabled = Boolean.TRUE;
+        }
+    }
+
+    private void validateAdaptiveBudget(String source) {
+        requireFiniteAndNonNegative(adaptiveGaWallClockBudgetMinimumSeconds,
+                "adaptiveGaWallClockBudgetMinimumSeconds", source);
+        requirePositive(adaptiveGaWallClockBudgetMaximumSeconds,
+                "adaptiveGaWallClockBudgetMaximumSeconds", source);
+        requireFiniteAndNonNegative(adaptiveGaWallClockBudgetSafetyMarginSeconds,
+                "adaptiveGaWallClockBudgetSafetyMarginSeconds", source);
+        requirePositive(adaptiveGaWallClockBudgetMaximumStepUpSeconds,
+                "adaptiveGaWallClockBudgetMaximumStepUpSeconds", source);
+        requirePositive(adaptiveGaWallClockBudgetMaximumStepDownSeconds,
+                "adaptiveGaWallClockBudgetMaximumStepDownSeconds", source);
+        if (adaptiveGaWallClockBudgetHistorySize < 1) {
             throw new IllegalArgumentException(
-                    source
-                            + ": BOUND_CONFLICT effective minimum exceeds adaptive maximum"
-                            + " | configuredTemporalMinimumSeconds="
-                            + configuredTemporalMinimumSeconds
-                            + " | adaptiveDeltaTMaxMinimumSeconds="
-                            + adaptiveDeltaTMaxMinimumSeconds
-                            + " | effectiveMinimumSeconds="
-                            + effectiveMinimumSeconds
-                            + " | adaptiveDeltaTMaxMaximumSeconds="
-                            + adaptiveDeltaTMaxMaximumSeconds
+                    source + ": adaptiveGaWallClockBudgetHistorySize must be >= 1"
+            );
+        }
+        if (adaptiveGaWallClockBudgetWarmupSamples < 1
+                || adaptiveGaWallClockBudgetWarmupSamples
+                > adaptiveGaWallClockBudgetHistorySize) {
+            throw new IllegalArgumentException(
+                    source + ": adaptiveGaWallClockBudgetWarmupSamples out of range"
+            );
+        }
+        if (adaptiveGaWallClockBudgetMinimumSeconds
+                > adaptiveGaWallClockBudgetMaximumSeconds) {
+            throw new IllegalArgumentException(
+                    source + ": adaptive wall-clock minimum exceeds maximum"
+            );
+        }
+        if (configuredInitialGaWallClockBudgetSeconds
+                < adaptiveGaWallClockBudgetMinimumSeconds
+                || configuredInitialGaWallClockBudgetSeconds
+                > adaptiveGaWallClockBudgetMaximumSeconds) {
+            throw new IllegalArgumentException(
+                    source + ": configured initial wall-clock budget outside adaptive bounds"
             );
         }
     }
 
-    private static void requirePresent(Object value, String field, String source) {
-        if (value == null) {
-            throw new IllegalArgumentException(source + ": " + field + " is required when deltaTMaxMode is LIVE_ADAPTIVE");
+    private static String normalizeEnum(
+            String value, String defaultValue, String source,
+            String field, String allowed
+    ) {
+        String normalized = value == null || value.isBlank()
+                ? defaultValue : value.trim().toUpperCase(Locale.ROOT);
+        try {
+            if ("gaParameterScalingMode".equals(field)) {
+                return GaParameterScalingMode.valueOf(normalized).name();
+            }
+            return LiveDeltaTMaxMode.valueOf(normalized).name();
+        } catch (IllegalArgumentException e) {
+            throw new IllegalArgumentException(
+                    source + ": " + field + " must be " + allowed, e
+            );
         }
     }
 
+    private static <T> T firstNonNull(T first, T second, T fallback) {
+        return first != null ? first : (second != null ? second : fallback);
+    }
     private static void requirePositive(long value, String field, String source) {
         if (value <= 0) {
             throw new IllegalArgumentException(source + ": " + field + " must be > 0");
         }
     }
-
     private static void requirePositive(double value, String field, String source) {
         if (!Double.isFinite(value) || value <= 0.0) {
-            throw new IllegalArgumentException(source + ": " + field + " must be finite and > 0");
+            throw new IllegalArgumentException(
+                    source + ": " + field + " must be finite and > 0"
+            );
         }
     }
-
-    private static void requireFiniteAndNonNegative(double value, String field, String source) {
+    private static void requireFiniteAndNonNegative(
+            double value, String field, String source
+    ) {
         if (!Double.isFinite(value) || value < 0.0) {
-            throw new IllegalArgumentException(source + ": " + field + " must be finite and >= 0");
+            throw new IllegalArgumentException(
+                    source + ": " + field + " must be finite and >= 0"
+            );
         }
     }
 }

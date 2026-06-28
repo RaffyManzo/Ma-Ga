@@ -58,6 +58,10 @@ final class LiveDetailedReportPrinter {
         out.println("completed: " + summary.completed);
         out.println("applied: " + summary.applied);
         out.println("stale discarded: " + summary.staleDiscarded);
+        out.println("  stale wall-clock: " + summary.staleWallClock);
+        out.println("  stale simulation age: " + summary.staleSimulationAge);
+        out.println("  stale both: " + summary.staleWallClockAndSimulationAge);
+        out.println("final classifications: " + summary.finalClassificationCounts);
         out.println("failed: " + summary.failed);
         out.println("null results: " + summary.nullResults);
         out.println("shutdown in-flight: " + summary.shutdownInFlight);
@@ -73,12 +77,17 @@ final class LiveDetailedReportPrinter {
         out.println("p95: " + format(summary.wallClockTiming.get("p95")));
         out.println("max: " + format(summary.wallClockTiming.get("max")));
         out.println();
-        out.println("jobId | status | runtime | deltaTMaxAtSubmission | timeoutBeforeCompletion | mismatch");
+        out.println("jobId | legacyStatus | finalClassification | staleReason | runtime | gaWallClockBudget | temporalMaximum | freshnessCap | snapshotAgeAtClassification | timeoutBeforeCompletion | mismatch");
         for (LiveGaJobRecord record : summary.jobRecords) {
             out.println(record.jobId
                     + " | " + blank(record.finalStatus)
+                    + " | " + blank(record.finalClassification)
+                    + " | " + blank(record.staleReason)
                     + " | " + f(record.gaRuntimeWallClockSeconds)
-                    + " | " + f(record.deltaTMaxAtSubmissionSeconds)
+                    + " | " + f(record.gaWallClockBudgetAtSubmissionSeconds)
+                    + " | " + f(record.temporalMaximumAtSubmissionSeconds)
+                    + " | " + f(record.maxSnapshotAgeSimulationSeconds)
+                    + " | " + f(record.snapshotAgeAtClassificationSeconds)
                     + " | " + record.timeoutDetectedBeforeCompletion
                     + " | " + f(record.deltaTMaxMismatchSeconds));
         }
@@ -141,7 +150,7 @@ final class LiveDetailedReportPrinter {
                                         record
                                                 .appliedSnapshotAgeSimulationSeconds
                                 )
-                                + " | APPLIED"
+                                + " | " + record.finalClassification
                 );
             }
         }
@@ -150,10 +159,17 @@ final class LiveDetailedReportPrinter {
     }
     private void liveStale(PrintStream out, LiveReportingSummary summary) {
         title(out, "LIVE STALE RESULT SUMMARY");
-        out.println("jobId | waitCapSimulationTimeNs | waitCapWallClockNs | completionWallClockNs | freshReoptimization");
+        out.println("jobId | finalClassification | staleReason | runtime | gaWallClockBudget | temporalMaximum | freshnessCap | snapshotAgeAtClassification | waitCapSimulationTimeNs | waitCapWallClockNs | completionWallClockNs | freshReoptimization");
         for (LiveGaJobRecord record : summary.jobRecords) {
             if ("STALE_DISCARDED".equals(record.finalStatus)) {
                 out.println(record.jobId
+                        + " | " + record.finalClassification
+                        + " | " + record.staleReason
+                        + " | " + f(record.gaRuntimeWallClockSeconds)
+                        + " | " + f(record.gaWallClockBudgetAtSubmissionSeconds)
+                        + " | " + f(record.temporalMaximumAtSubmissionSeconds)
+                        + " | " + f(record.maxSnapshotAgeSimulationSeconds)
+                        + " | " + f(record.snapshotAgeAtClassificationSeconds)
                         + " | " + record.waitCapDetectedSimulationTimeNs
                         + " | " + record.waitCapDetectedWallClockNs
                         + " | " + record.completionWallClockNs

@@ -20,6 +20,12 @@ public enum StopReason {
     /**
      * L'algoritmo si è fermato perché la fitness non migliorava più.
      */
-    STAGNATION_REACHED
+    STAGNATION_REACHED,
+
+    /**
+     * Il budget operativo è stato raggiunto. Viene restituito il migliore
+     * individuo interamente costruito, riparato e valutato fino a quel punto.
+     */
+    TIME_BUDGET_BEST_SO_FAR
 }
 
