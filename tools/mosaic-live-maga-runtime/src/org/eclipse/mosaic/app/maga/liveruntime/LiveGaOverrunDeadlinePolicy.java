@@ -128,10 +128,10 @@ final class LiveGaOverrunDeadlinePolicy {
                 state.getCurrentWindowDurationSeconds()
         );
         double temporalMaximumSeconds = bounds.getMaximumWindowSeconds();
-        double freshnessCapSeconds = Math.min(
-                configuredMaxSnapshotAgeSimulationSeconds,
-                temporalMaximumSeconds
-        );
+        // Snapshot freshness is an independent simulation-time constraint.
+        // DeltaT_max controls the temporal window, not result validity.
+        double freshnessCapSeconds =
+                configuredMaxSnapshotAgeSimulationSeconds;
         long deadlineNs = submissionWallClockNs
                 + Math.round(wallClockBudgetSeconds * NANOSECONDS_PER_SECOND);
         double effectiveReserveSeconds = Math.min(

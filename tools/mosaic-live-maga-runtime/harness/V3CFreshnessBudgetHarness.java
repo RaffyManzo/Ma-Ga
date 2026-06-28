@@ -40,6 +40,7 @@ public final class V3CFreshnessBudgetHarness {
         Files.createDirectories(outputRoot);
         testEstimatorExcludesZeroTaskAndUsesTwentySampleP95();
         testTemporalAndWallClockDomainsAreSeparated();
+        testFreshnessCapIsIndependentFromTemporalMaximum();
         testDistinctStaleReasons();
         testWallClockBoundarySemantics();
         testCooperativeBestSoFar();
@@ -102,6 +103,61 @@ public final class V3CFreshnessBudgetHarness {
                 == deadline.getGaWallClockBudgetAtSubmissionSeconds(),
                 "same robust estimate feeds DeltaT_min");
     }
+
+    private static void testFreshnessCapIsIndependentFromTemporalMaximum() {
+        TemporalWindowConfig temporal = TemporalWindowConfig.liveRuntimeFreshnessAware(
+                1.0, 0.10, 8.0
+        );
+        LiveGaOverrunDeadlinePolicy policy = new LiveGaOverrunDeadlinePolicy(
+                temporal,
+                MaGaConfig.defaultConfig(GaParameterScalingMode.STATIC)
+                        .getMobilityConfig(),
+                LiveDeltaTMaxMode.CONFIGURED_STATIC,
+                null,
+                0.40,
+                2.0,
+                0.10
+        );
+        TemporalWindowState state = TemporalWindowState.initial(
+                0.0, 1.0, policy.initialOperationalMetrics()
+        );
+        SystemSnapshot sourceSnapshot = snapshot("freshness-independent", 1.0);
+        var deadline = policy.computeDeadline(sourceSnapshot, state, 0L);
+
+        requireClose(deadline.getTemporalMaximumAtSubmissionSeconds(), 1.0,
+                "temporal maximum remains one second");
+        requireClose(deadline.getMaxSnapshotAgeSimulationSeconds(), 2.0,
+                "configured freshness cap remains independent");
+
+        LiveGaJob job = new LiveGaJob(
+                "freshness-independent", 0, 1_000_000_000L, 0L, "HARNESS",
+                sourceSnapshot, state,
+                deadline.getTemporalMaximumAtSubmissionSeconds(),
+                deadline.getGaWallClockBudgetAtSubmissionSeconds(),
+                deadline.getMaxSnapshotAgeSimulationSeconds(),
+                deadline.getCooperativeStopDeadlineNs(),
+                deadline.getWallClockDeadlineNs(),
+                deadline.getDeltaTMaxSnapshot()
+        );
+        LiveGaCompletion completion = LiveGaCompletion.success(
+                job, null, 100_000_000L, 0.10
+        );
+
+        require(completion.snapshotAgeAtSimulationTime(2_500_000_000L)
+                        > deadline.getTemporalMaximumAtSubmissionSeconds(),
+                "test age exceeds temporal maximum");
+        require(completion.snapshotAgeAtSimulationTime(2_500_000_000L)
+                        < deadline.getMaxSnapshotAgeSimulationSeconds(),
+                "test age remains below freshness cap");
+        require(completion.classify(2_500_000_000L) == LiveStaleReason.NONE,
+                "age between temporal maximum and freshness cap remains fresh");
+        require(completion.classify(3_000_000_000L) == LiveStaleReason.NONE,
+                "age exactly equal to freshness cap remains admissible");
+        require(completion.classify(3_100_000_000L)
+                        == LiveStaleReason.SIMULATION_AGE,
+                "age above configured freshness cap is stale");
+    }
+
 
     private static void testDistinctStaleReasons() {
         LiveAdaptiveDeltaTMaxEstimator.Snapshot estimate =
@@ -273,7 +329,7 @@ public final class V3CFreshnessBudgetHarness {
                     "canonical-job", 0, "HARNESS", 1_000_000_000L, 0L,
                     snapshot.getSnapshotId(), snapshot.getTimeSeconds(),
                     snapshot.getTasks().size(), snapshot.getCandidateNodes().size(),
-                    1.0, 0.2, 0.5, 200_000_000L,
+                    1.0, 0.2, 2.0, 200_000_000L,
                     "LIVE_ADAPTIVE", 0.2, 3, 0.18, 0.2,
                     0.2, 0.2, 0.2, "NONE"
             );
@@ -300,6 +356,8 @@ public final class V3CFreshnessBudgetHarness {
                 "main event reporting exposes temporal maximum");
         require(events.contains("maxSnapshotAgeSimulationSeconds"),
                 "main event reporting exposes freshness cap");
+        require(events.contains("\"maxSnapshotAgeSimulationSeconds\":2.0"),
+                "main event reporting preserves configured freshness cap");
         require(events.contains("snapshotAgeAtClassificationSeconds"),
                 "main event reporting exposes classification age");
         require(discarded.contains("finalClassification"),

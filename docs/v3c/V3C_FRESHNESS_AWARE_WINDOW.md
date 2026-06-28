@@ -104,3 +104,24 @@ cromosoma o operatori genetici.
   e il flag esplicito `activeStrategyPresent`.
 - Il budget wall-clock è inclusivo: un completamento esattamente uguale al
   limite è ammissibile; soltanto il superamento effettivo è stale.
+
+## R3: indipendenza del freshness cap
+
+La revisione R3 corregge la relazione tra `DeltaT_max` e il limite di
+freschezza. Il valore `maxSnapshotAgeSimulationSeconds` viene ora usato
+direttamente e non viene ridotto tramite il minimo con
+`temporalMaximumAtSubmissionSeconds`.
+
+Le due grandezze hanno scopi diversi:
+
+- `DeltaT_max` delimita la durata della finestra temporale;
+- il freshness cap stabilisce l'età massima del dato sulla quale una strategia
+  può ancora essere applicata.
+
+Di conseguenza, un risultato con età simulata superiore a `DeltaT_max` ma
+minore o uguale al freshness cap rimane ammissibile, purché non superi anche
+il budget wall-clock. Soltanto un'età strettamente superiore al freshness cap
+determina `SIMULATION_AGE`.
+
+La R3 non introduce pacing e non modifica fitness, repair, cromosoma,
+operatori genetici, estimatore adattivo o strategia attiva.
