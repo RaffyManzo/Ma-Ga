@@ -1,0 +1,58 @@
+﻿{
+    "schemaVersion":  "1.0",
+    "status":  "PASS_IMPLEMENTATION_VALIDATED_WITH_PACING_LIMIT",
+    "branch":  "experiment/v3c-freshness-aware-window",
+    "head":  "3053294386f99e1955e9308e232b5c8230f33ed7",
+    "runtimeJar":  {
+                       "path":  "C:\\Users\\raffa\\IdeaProjects\\maga-core-v3b-deltatmax\\tools\\mosaic-live-maga-runtime\\out\\maga-live-maga-runtime.jar",
+                       "sizeBytes":  557911,
+                       "sha256":  "8645EE981E5D4696BFB6EEE8A2F2AC9F4F16B73E72C67AFFFD26B9BDB844EC36"
+                   },
+    "validation":  {
+                       "build":  true,
+                       "freshnessHarness":  true,
+                       "reportingRegression":  true,
+                       "localContentionRegression":  true,
+                       "g02bRegression":  true,
+                       "telemetryRegression":  true
+                   },
+    "preR3Pilot":  {
+                       "completed":  true,
+                       "pacing":  false,
+                       "jobs":  47,
+                       "applied":  24,
+                       "stale":  23,
+                       "finalPerformanceEvidence":  false
+                   },
+    "postR3PilotExecuted":  false,
+    "futureWork":  "Dedicated pacing branch",
+    "evidence":  [
+                     {
+                         "Id":  "R2",
+                         "Path":  "C:\\Users\\raffa\\IdeaProjects\\maga-core-v3b-deltatmax\\tmp\\v3c-r2-harness-validation-20260629-005658-RECOVERED.zip",
+                         "SizeBytes":  93266,
+                         "SHA256":  "1A96748B3A61695CDA232E7CB52EE4D56AA96B9048E3345D0DDAE89707D97FC1"
+                     },
+                     {
+                         "Id":  "R3",
+                         "Path":  "C:\\Users\\raffa\\IdeaProjects\\maga-core-v3b-deltatmax\\tmp\\v3c-r3-review-20260629-012907.zip",
+                         "SizeBytes":  49081,
+                         "SHA256":  "81A98C62D1C3524F8988154C6DC673AA95706E0194381B983FF27FD9A66B071C"
+                     },
+                     {
+                         "Id":  "VALIDATOR",
+                         "Path":  "C:\\Users\\raffa\\IdeaProjects\\maga-core-v3b-deltatmax\\tmp\\v3c-validator-fix-20260629-011227.zip",
+                         "SizeBytes":  2913,
+                         "SHA256":  "89CC4060F17C9672D3847992A63730EDD443ECA657BD5E5FA0F524C316F302E5"
+                     },
+                     {
+                         "Id":  "PILOT",
+                         "Path":  "C:\\Users\\raffa\\IdeaProjects\\maga-core-v3b-deltatmax\\tmp\\v3c-freshness-aware-window\\micro-pilots\\audit-20260629-011552-V3C-PILOT-N-I-ADAPTIVE-104729.zip",
+                         "SizeBytes":  3234083,
+                         "SHA256":  "9F3D299578CC594B7898A6222C88957EEEF1FFFF19A167A4355B42C92648AF17"
+                     }
+                 ],
+    "generatedAtUtc":  "2026-06-28T23:38:19.3058432Z",
+    "commitCreated":  false,
+    "pushExecuted":  false
+}
