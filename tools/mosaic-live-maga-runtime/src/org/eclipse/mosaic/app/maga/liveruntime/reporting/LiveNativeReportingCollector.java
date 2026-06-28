@@ -215,6 +215,9 @@ public final class LiveNativeReportingCollector implements AutoCloseable {
         LiveGaJobRecord record = require(jobId);
         record.finalStatus = STATUS_APPLIED;
         record.appliedAtSimulationTimeNs = appliedAtSimulationTimeNs;
+        record.appliedSnapshotAgeSimulationSeconds =
+                (appliedAtSimulationTimeNs / 1000000000.0)
+                        - record.snapshotTimeSeconds;
         appliedSteps.add(step);
         LiveReportingSummary.LiveWindowSummary summary = windowSummary(jobId, step, STATUS_APPLIED);
         appliedWindowSummaries.add(summary);

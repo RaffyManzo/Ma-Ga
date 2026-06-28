@@ -44,6 +44,7 @@ public final class LiveReportingSummary {
     public final double maxLocalDemandRatio;
     public final double maxLocalCpuOverflowRatio;
     public final Map<String, Object> wallClockTiming;
+    public final Map<String, Object> appliedSnapshotAgeSimulation;
     public final List<LiveGaJobRecord> jobRecords;
     public final List<LiveWindowSummary> appliedWindowSummaries;
     public final List<LiveWindowSummary> discardedWindowSummaries;
@@ -182,6 +183,8 @@ public final class LiveReportingSummary {
         this.maxLocalDemandRatio = maxDemandRatio;
         this.maxLocalCpuOverflowRatio = maxOverflowRatio;
         this.wallClockTiming = timing(records);
+        this.appliedSnapshotAgeSimulation =
+                appliedSnapshotAgeSimulation(records);
     }
 
     static LiveReportingSummary from(
@@ -248,6 +251,38 @@ public final class LiveReportingSummary {
         row.put("count", values.size());
         row.put("min", values.isEmpty() ? null : values.get(0));
         row.put("max", values.isEmpty() ? null : values.get(values.size() - 1));
+        row.put("mean", mean(values));
+        row.put("median", percentile(values, 0.50));
+        row.put("p95", percentile(values, 0.95));
+        return row;
+    }
+
+    private static Map<String, Object> appliedSnapshotAgeSimulation(
+            List<LiveGaJobRecord> records
+    ) {
+        List<Double> values = new ArrayList<>();
+
+        for (LiveGaJobRecord record : records) {
+            if (!"APPLIED".equals(record.finalStatus)) {
+                continue;
+            }
+
+            double value = record.appliedSnapshotAgeSimulationSeconds;
+
+            if (Double.isFinite(value)) {
+                values.add(value);
+            }
+        }
+
+        values.sort(Comparator.naturalOrder());
+
+        Map<String, Object> row = new LinkedHashMap<>();
+        row.put("count", values.size());
+        row.put("min", values.isEmpty() ? null : values.get(0));
+        row.put(
+                "max",
+                values.isEmpty() ? null : values.get(values.size() - 1)
+        );
         row.put("mean", mean(values));
         row.put("median", percentile(values, 0.50));
         row.put("p95", percentile(values, 0.95));

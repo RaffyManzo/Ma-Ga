@@ -87,19 +87,67 @@ final class LiveDetailedReportPrinter {
 
     private void liveApplication(PrintStream out, LiveReportingSummary summary) {
         title(out, "LIVE RESULT APPLICATION SUMMARY");
-        out.println("jobId | window | completedSnapshot | appliedAtSimulationTimeNs | status");
+        out.println(
+                "applied snapshot age count: "
+                        + summary.appliedSnapshotAgeSimulation.get("count")
+        );
+        out.println(
+                "applied snapshot age min: "
+                        + format(
+                                summary.appliedSnapshotAgeSimulation.get("min")
+                        )
+        );
+        out.println(
+                "applied snapshot age mean: "
+                        + format(
+                                summary.appliedSnapshotAgeSimulation.get("mean")
+                        )
+        );
+        out.println(
+                "applied snapshot age median: "
+                        + format(
+                                summary.appliedSnapshotAgeSimulation.get("median")
+                        )
+        );
+        out.println(
+                "applied snapshot age p95: "
+                        + format(
+                                summary.appliedSnapshotAgeSimulation.get("p95")
+                        )
+        );
+        out.println(
+                "applied snapshot age max: "
+                        + format(
+                                summary.appliedSnapshotAgeSimulation.get("max")
+                        )
+        );
+        out.println();
+        out.println(
+                "jobId | window | completedSnapshot | snapshotTimeSeconds"
+                        + " | appliedAtSimulationTimeNs"
+                        + " | appliedSnapshotAgeSimulationSeconds | status"
+        );
+
         for (LiveGaJobRecord record : summary.jobRecords) {
             if ("APPLIED".equals(record.finalStatus)) {
-                out.println(record.jobId
-                        + " | " + record.windowIndex
-                        + " | " + record.snapshotId
-                        + " | " + record.appliedAtSimulationTimeNs
-                        + " | APPLIED");
+                out.println(
+                        record.jobId
+                                + " | " + record.windowIndex
+                                + " | " + record.snapshotId
+                                + " | " + f(record.snapshotTimeSeconds)
+                                + " | " + record.appliedAtSimulationTimeNs
+                                + " | "
+                                + f(
+                                        record
+                                                .appliedSnapshotAgeSimulationSeconds
+                                )
+                                + " | APPLIED"
+                );
             }
         }
+
         out.println();
     }
-
     private void liveStale(PrintStream out, LiveReportingSummary summary) {
         title(out, "LIVE STALE RESULT SUMMARY");
         out.println("jobId | waitCapSimulationTimeNs | waitCapWallClockNs | completionWallClockNs | freshReoptimization");

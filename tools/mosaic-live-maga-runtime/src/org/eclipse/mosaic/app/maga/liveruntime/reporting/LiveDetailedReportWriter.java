@@ -56,7 +56,28 @@ public final class LiveDetailedReportWriter {
         builder.append("- Applied jobs: `").append(summary.applied).append("`\n");
         builder.append("- Stale discarded jobs: `").append(summary.staleDiscarded).append("`\n");
         builder.append("- Failed jobs: `").append(summary.failed).append("`\n");
-        builder.append("- Null step results: `").append(summary.nullResults).append("`\n\n");
+        builder.append("- Null step results: `").append(summary.nullResults).append("`\n");
+        builder.append("- Shutdown in-flight jobs: `")
+                .append(summary.shutdownInFlight).append("`\n\n");
+        builder.append("## Applied Snapshot Age\n\n");
+        builder.append("- count: `")
+                .append(summary.appliedSnapshotAgeSimulation.get("count"))
+                .append("`\n");
+        builder.append("- min: `")
+                .append(summary.appliedSnapshotAgeSimulation.get("min"))
+                .append(" s`\n");
+        builder.append("- mean: `")
+                .append(summary.appliedSnapshotAgeSimulation.get("mean"))
+                .append(" s`\n");
+        builder.append("- median: `")
+                .append(summary.appliedSnapshotAgeSimulation.get("median"))
+                .append(" s`\n");
+        builder.append("- p95: `")
+                .append(summary.appliedSnapshotAgeSimulation.get("p95"))
+                .append(" s`\n");
+        builder.append("- max: `")
+                .append(summary.appliedSnapshotAgeSimulation.get("max"))
+                .append(" s`\n\n");
         builder.append("## Local CPU Contention\n\n");
         builder.append("- Local task portions: `")
                 .append(summary.localTaskPortions).append("`\n");

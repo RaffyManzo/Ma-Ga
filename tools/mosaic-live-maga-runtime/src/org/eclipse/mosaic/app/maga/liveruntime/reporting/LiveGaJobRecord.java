@@ -49,6 +49,7 @@ public final class LiveGaJobRecord {
     public String postCompletionAdaptiveDeltaTMaxFallbackReason = "";
     public String finalStatus = "";
     public long appliedAtSimulationTimeNs;
+    public double appliedSnapshotAgeSimulationSeconds;
     public String errorType = "";
     public String errorMessage = "";
 
@@ -210,6 +211,8 @@ public final class LiveGaJobRecord {
         );
         copy.finalStatus = finalStatus;
         copy.appliedAtSimulationTimeNs = appliedAtSimulationTimeNs;
+        copy.appliedSnapshotAgeSimulationSeconds =
+                appliedSnapshotAgeSimulationSeconds;
         copy.errorType = errorType;
         copy.errorMessage = errorMessage;
         return copy;

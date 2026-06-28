@@ -95,6 +95,14 @@ final class LiveReportingJsonlWriter implements AutoCloseable {
         row.put("snapshotTimeSeconds", record.snapshotTimeSeconds);
         row.put("finalStatus", record.finalStatus);
         row.put(
+                "appliedAtSimulationTimeNs",
+                record.appliedAtSimulationTimeNs
+        );
+        row.put(
+                "appliedSnapshotAgeSimulationSeconds",
+                record.appliedSnapshotAgeSimulationSeconds
+        );
+        row.put(
                 "timeoutDetectedBeforeCompletion",
                 record.timeoutDetectedBeforeCompletion
         );
