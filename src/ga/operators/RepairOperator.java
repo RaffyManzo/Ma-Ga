@@ -71,6 +71,15 @@ public final class RepairOperator {
      * successivi restano limitati ai task effettivamente modificati.</p>
      */
     private static final int MAX_REPAIR_PASSES = 3;
+    /**
+     * Verifica differenziale usata esclusivamente dagli harness V3-A.
+     * Quando attiva, ogni scelta incrementale viene confrontata con il
+     * percorso completo originale.
+     */
+    private static final boolean VERIFY_LOCAL_CONTENTION_DELTA =
+        Boolean.getBoolean("maga.repair.verifyLocalContentionDelta");
+
+    private static final double LOCAL_CONTENTION_INVALID_METRIC = 1.0E18;
 
     private final CpuAggregateRepairOperator cpuAggregateRepairOperator;
     private final BandwidthAggregateRepairOperator bandwidthAggregateRepairOperator;
@@ -317,8 +326,186 @@ public final class RepairOperator {
         );
     }
 
-    private LocalContentionReplacement
-    findBestLocalContentionReplacement(
+        /**
+     * Cerca la migliore sostituzione usando una rivalutazione delta della
+     * sola coda EDF del veicolo sorgente interessato.
+     *
+     * Lo spazio delle opzioni, i controlli deadline, i comparatori e i
+     * tie-break restano identici alla baseline.
+     */
+    private LocalContentionReplacement findBestLocalContentionReplacement(
+        Chromosome chromosome,
+        Evaluation evaluation,
+        SnapshotRepairContext context,
+        DeadlineRepairCatalog catalog
+    ) {
+        Map<String, Gene> geneByTaskId = indexGenes(chromosome);
+        LocalContentionReplacement best = null;
+
+        int currentViolatingVehicles = countViolatingVehicles(evaluation);
+        int currentDeadlineViolations = countDeadlineViolations(evaluation);
+        double currentMaxOverflow = maximumOverflowRatio(evaluation);
+        double currentTotalOverflow = totalOverflowRatio(evaluation);
+        double currentMaxDemand = evaluation.getMaximumDemandRatio();
+
+        for (VehicleResult vehicle
+            : evaluation.getVehicleResults().values()) {
+            if (!vehicle.hasCpuOverflow()
+                && !vehicle.hasDeadlineViolations()) {
+                continue;
+            }
+
+            LocalContentionDeltaEvaluator deltaEvaluator =
+                new LocalContentionDeltaEvaluator(evaluation, vehicle);
+
+            for (TaskResult localTask : vehicle.getTaskResults()) {
+                TaskInstance task = context.getTaskById(
+                    localTask.getTaskId()
+                );
+                Gene currentGene = geneByTaskId.get(
+                    localTask.getTaskId()
+                );
+                VehicleSnapshot sourceVehicle = context.getVehicleById(
+                    localTask.getVehicleId()
+                );
+
+                if (task == null
+                    || currentGene == null
+                    || sourceVehicle == null) {
+                    continue;
+                }
+
+                double currentLocalCycles =
+                    localTask.getLocalCpuCycles();
+
+                for (NodeCandidate candidate
+                    : context.getCandidatesForTask(task)) {
+                    if (candidate == null
+                        || candidate.getType() == NodeType.LOCAL) {
+                        continue;
+                    }
+
+                    double preferredRatio =
+                        candidate.getCandidateId().equals(
+                            currentGene.getSelectedCandidateId()
+                        )
+                            ? currentGene.getOffloadingRatio()
+                            : MIN_REMOTE_OFFLOADING_RATIO;
+
+                    List<Double> ratios = new ArrayList<>(
+                        catalog.buildRatioCandidates(
+                            task,
+                            candidate,
+                            sourceVehicle,
+                            preferredRatio
+                        )
+                    );
+                    ratios.sort(Double::compareTo);
+
+                    for (double ratio : ratios) {
+                        Gene replacement;
+                        try {
+                            DeadlineRepairProfile profile =
+                                catalog.getProfile(
+                                    task,
+                                    candidate,
+                                    sourceVehicle,
+                                    ratio
+                                );
+                            replacement =
+                                profile.getMinimalFeasibleGene();
+                        } catch (IllegalArgumentException ignored) {
+                            replacement = null;
+                        }
+
+                        if (replacement == null) {
+                            continue;
+                        }
+
+                        double replacementLocalCycles =
+                            computeLocalCpuCycles(
+                                task,
+                                replacement,
+                                candidate
+                            );
+                        double reduction =
+                            currentLocalCycles
+                                - replacementLocalCycles;
+
+                        if (reduction <= EPSILON) {
+                            continue;
+                        }
+
+                        DeadlineEvaluation deadlineEvaluation =
+                            deadlineConstraintEvaluator.evaluate(
+                                replacement,
+                                task,
+                                context
+                            );
+                        if (!deadlineEvaluation.isAdmissible()) {
+                            continue;
+                        }
+
+                        LocalContentionMetrics after =
+                            deltaEvaluator.evaluateReplacement(
+                                task.getTaskId(),
+                                replacementLocalCycles
+                            );
+
+                        if (!isStrictContentionImprovement(
+                            after.getViolatingVehicleCount(),
+                            after.getDeadlineViolationCount(),
+                            after.getMaxOverflowRatio(),
+                            after.getTotalOverflowRatio(),
+                            after.getMaxDemandRatio(),
+                            currentViolatingVehicles,
+                            currentDeadlineViolations,
+                            currentMaxOverflow,
+                            currentTotalOverflow,
+                            currentMaxDemand
+                        )) {
+                            continue;
+                        }
+
+                        LocalContentionReplacement option =
+                            new LocalContentionReplacement(
+                                task.getTaskId(),
+                                candidate.getCandidateId(),
+                                replacement,
+                                reduction,
+                                replacement.getOffloadingRatio(),
+                                deadlineEvaluation
+                                    .getCompletionTimeSeconds(),
+                                after.getViolatingVehicleCount(),
+                                after.getDeadlineViolationCount(),
+                                after.getMaxOverflowRatio(),
+                                after.getTotalOverflowRatio(),
+                                after.getMaxDemandRatio()
+                            );
+
+                        if (isBetterContentionReplacement(option, best)) {
+                            best = option;
+                        }
+                    }
+                }
+            }
+        }
+
+        if (VERIFY_LOCAL_CONTENTION_DELTA) {
+            LocalContentionReplacement reference =
+                findBestLocalContentionReplacementReference(
+                    chromosome,
+                    evaluation,
+                    context,
+                    catalog
+                );
+            assertEquivalentLocalContentionReplacement(best, reference);
+        }
+
+        return best;
+    }
+private LocalContentionReplacement
+    findBestLocalContentionReplacementReference(
             Chromosome chromosome,
             Evaluation evaluation,
             SnapshotRepairContext context,
@@ -490,7 +677,125 @@ public final class RepairOperator {
         return best;
     }
 
-    private boolean isStrictContentionImprovement(
+        /**
+     * Confronta il risultato delta con la valutazione completa originale.
+     * Viene eseguito soltanto quando la relativa system property ÃƒÆ’Ã‚Â¨ attiva.
+     */
+    private void assertEquivalentLocalContentionReplacement(
+        LocalContentionReplacement optimized,
+        LocalContentionReplacement reference
+    ) {
+        if (optimized == null || reference == null) {
+            if (optimized != reference) {
+                throw new IllegalStateException(
+                    "V3-A local-contention delta mismatch: "
+                        + "one replacement is null."
+                );
+            }
+            return;
+        }
+
+        Gene optimizedGene = optimized.getReplacementGene();
+        Gene referenceGene = reference.getReplacementGene();
+
+        boolean sameDecision =
+            optimized.getTaskId().equals(reference.getTaskId())
+                && optimized.getCandidateId().equals(
+                    reference.getCandidateId()
+                )
+                && optimizedGene.getTaskId().equals(
+                    referenceGene.getTaskId()
+                )
+                && optimizedGene.getSelectedCandidateId().equals(
+                    referenceGene.getSelectedCandidateId()
+                )
+                && sameContentionMetric(
+                    optimizedGene.getOffloadingRatio(),
+                    referenceGene.getOffloadingRatio()
+                )
+                && sameContentionMetric(
+                    optimizedGene.getAllocatedCpu(),
+                    referenceGene.getAllocatedCpu()
+                )
+                && sameContentionMetric(
+                    optimizedGene.getAllocatedBandwidth(),
+                    referenceGene.getAllocatedBandwidth()
+                );
+
+        boolean sameMetrics =
+            optimized.getViolatingVehicleCount()
+                == reference.getViolatingVehicleCount()
+                && optimized.getDeadlineViolationCount()
+                    == reference.getDeadlineViolationCount()
+                && sameContentionMetric(
+                    optimized.getMaxOverflowRatio(),
+                    reference.getMaxOverflowRatio()
+                )
+                && sameContentionMetric(
+                    optimized.getTotalOverflowRatio(),
+                    reference.getTotalOverflowRatio()
+                )
+                && sameContentionMetric(
+                    optimized.getMaxDemandRatio(),
+                    reference.getMaxDemandRatio()
+                );
+
+        if (!sameDecision || !sameMetrics) {
+            throw new IllegalStateException(
+                "V3-A local-contention delta mismatch. "
+                    + "optimized="
+                    + describeLocalContentionReplacement(optimized)
+                    + ", reference="
+                    + describeLocalContentionReplacement(reference)
+            );
+        }
+    }
+
+    private boolean sameContentionMetric(double left, double right) {
+        if (Double.doubleToLongBits(left)
+            == Double.doubleToLongBits(right)) {
+            return true;
+        }
+        if (!Double.isFinite(left) || !Double.isFinite(right)) {
+            return false;
+        }
+        double scale = Math.max(
+            1.0,
+            Math.max(Math.abs(left), Math.abs(right))
+        );
+        return Math.abs(left - right) <= EPSILON * scale;
+    }
+
+    private String describeLocalContentionReplacement(
+        LocalContentionReplacement replacement
+    ) {
+        if (replacement == null) {
+            return "null";
+        }
+        Gene gene = replacement.getReplacementGene();
+        return "{task="
+            + replacement.getTaskId()
+            + ", candidate="
+            + replacement.getCandidateId()
+            + ", ratio="
+            + gene.getOffloadingRatio()
+            + ", cpu="
+            + gene.getAllocatedCpu()
+            + ", bandwidth="
+            + gene.getAllocatedBandwidth()
+            + ", violatingVehicles="
+            + replacement.getViolatingVehicleCount()
+            + ", deadlineViolations="
+            + replacement.getDeadlineViolationCount()
+            + ", maxOverflow="
+            + replacement.getMaxOverflowRatio()
+            + ", totalOverflow="
+            + replacement.getTotalOverflowRatio()
+            + ", maxDemand="
+            + replacement.getMaxDemandRatio()
+            + "}";
+    }
+private boolean isStrictContentionImprovement(
             int candidateViolatingVehicles,
             int candidateDeadlineViolations,
             double candidateMaxOverflow,
@@ -1508,7 +1813,201 @@ public final class RepairOperator {
         }
         return Math.max(min, Math.min(max, value));
     }
-    private static final class LocalContentionReplacement {
+        /**
+     * Metriche aggregate sufficienti ai comparatori del repair.
+     */
+    private static final class LocalContentionMetrics {
+        private final int violatingVehicleCount;
+        private final int deadlineViolationCount;
+        private final double maxOverflowRatio;
+        private final double totalOverflowRatio;
+        private final double maxDemandRatio;
+
+        private LocalContentionMetrics(
+            int violatingVehicleCount,
+            int deadlineViolationCount,
+            double maxOverflowRatio,
+            double totalOverflowRatio,
+            double maxDemandRatio
+        ) {
+            this.violatingVehicleCount = violatingVehicleCount;
+            this.deadlineViolationCount = deadlineViolationCount;
+            this.maxOverflowRatio = maxOverflowRatio;
+            this.totalOverflowRatio = totalOverflowRatio;
+            this.maxDemandRatio = maxDemandRatio;
+        }
+
+        private int getViolatingVehicleCount() {
+            return violatingVehicleCount;
+        }
+
+        private int getDeadlineViolationCount() {
+            return deadlineViolationCount;
+        }
+
+        private double getMaxOverflowRatio() {
+            return maxOverflowRatio;
+        }
+
+        private double getTotalOverflowRatio() {
+            return totalOverflowRatio;
+        }
+
+        private double getMaxDemandRatio() {
+            return maxDemandRatio;
+        }
+    }
+
+    /**
+     * Rivaluta una sostituzione modificando soltanto la coda EDF del
+     * veicolo sorgente coinvolto.
+     */
+    private static final class LocalContentionDeltaEvaluator {
+        private final Evaluation baseline;
+        private final VehicleResult affectedVehicle;
+
+        private LocalContentionDeltaEvaluator(
+            Evaluation baseline,
+            VehicleResult affectedVehicle
+        ) {
+            this.baseline = Objects.requireNonNull(
+                baseline,
+                "baseline must not be null."
+            );
+            this.affectedVehicle = Objects.requireNonNull(
+                affectedVehicle,
+                "affectedVehicle must not be null."
+            );
+        }
+
+        private LocalContentionMetrics evaluateReplacement(
+            String taskId,
+            double replacementLocalCycles
+        ) {
+            double localCpu = affectedVehicle.getLocalCpu();
+            double cumulativeCycles = 0.0;
+            double affectedMaxDemand = 0.0;
+            int affectedDeadlineViolations = 0;
+
+            for (TaskResult task
+                : affectedVehicle.getTaskResults()) {
+                double localCycles =
+                    task.getTaskId().equals(taskId)
+                        ? normalizeLocalCycles(replacementLocalCycles)
+                        : task.getLocalCpuCycles();
+
+                if (localCycles <= EPSILON) {
+                    continue;
+                }
+
+                cumulativeCycles += localCycles;
+
+                double contendedTime = safeContentionDivide(
+                    cumulativeCycles,
+                    localCpu
+                );
+                double deadline = task.getDeadlineSeconds();
+                double demandRatio =
+                    !Double.isFinite(deadline)
+                        || deadline <= EPSILON
+                            ? 0.0
+                            : safeContentionDivide(
+                                cumulativeCycles,
+                                localCpu * deadline
+                            );
+
+                boolean deadlineRespected =
+                    deadline <= 0.0
+                        || contendedTime <= deadline + EPSILON;
+                if (!deadlineRespected) {
+                    affectedDeadlineViolations++;
+                }
+
+                affectedMaxDemand = Math.max(
+                    affectedMaxDemand,
+                    demandRatio
+                );
+            }
+
+            double affectedOverflow = Math.max(
+                0.0,
+                affectedMaxDemand - 1.0
+            );
+
+            int violatingVehicleCount = 0;
+            int deadlineViolationCount = 0;
+            double maxOverflowRatio = 0.0;
+            double totalOverflowRatio = 0.0;
+            double maxDemandRatio = 0.0;
+
+            for (VehicleResult vehicle
+                : baseline.getVehicleResults().values()) {
+                boolean affected =
+                    affectedVehicle.getVehicleId().equals(
+                        vehicle.getVehicleId()
+                    );
+
+                double overflow = affected
+                    ? affectedOverflow
+                    : vehicle.getCpuOverflowRatio();
+                int violations = affected
+                    ? affectedDeadlineViolations
+                    : vehicle.getDeadlineViolationCount();
+                double demand = affected
+                    ? affectedMaxDemand
+                    : vehicle.getMaxDemandRatio();
+
+                if (overflow > EPSILON || violations > 0) {
+                    violatingVehicleCount++;
+                }
+                deadlineViolationCount += violations;
+                maxOverflowRatio = Math.max(
+                    maxOverflowRatio,
+                    overflow
+                );
+                totalOverflowRatio += overflow;
+                maxDemandRatio = Math.max(
+                    maxDemandRatio,
+                    demand
+                );
+            }
+
+            return new LocalContentionMetrics(
+                violatingVehicleCount,
+                deadlineViolationCount,
+                maxOverflowRatio,
+                totalOverflowRatio,
+                maxDemandRatio
+            );
+        }
+
+        private static double normalizeLocalCycles(double value) {
+            if (!Double.isFinite(value) || value < 0.0) {
+                return 0.0;
+            }
+            return value;
+        }
+
+        private static double safeContentionDivide(
+            double numerator,
+            double denominator
+        ) {
+            if (!Double.isFinite(numerator)
+                || !Double.isFinite(denominator)
+                || denominator <= EPSILON) {
+                return LOCAL_CONTENTION_INVALID_METRIC;
+            }
+            double value = numerator / denominator;
+            if (!Double.isFinite(value)) {
+                return LOCAL_CONTENTION_INVALID_METRIC;
+            }
+            return Math.min(
+                value,
+                LOCAL_CONTENTION_INVALID_METRIC
+            );
+        }
+    }
+private static final class LocalContentionReplacement {
         private final String taskId;
         private final String candidateId;
         private final Gene replacementGene;
