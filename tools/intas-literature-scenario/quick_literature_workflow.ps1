@@ -8,6 +8,8 @@ param(
     [ValidateSet("smoke", "nominal", "extended")]
     [string]$DurationProfile = "smoke",
     [int]$Seed = 104729,
+    [ValidateRange(0.0, 1000000.0)]
+    [double]$RealtimeBrakeFactor = 0.0,
     [switch]$ForceRebuild,
     [switch]$PrintDetailedLiveReport,
     [switch]$PrintSummary
@@ -53,6 +55,15 @@ $RunArgs = @(
     "-MosaicRoot", $MosaicRoot,
     "-ScenarioName", $ScenarioName
 )
+if ($RealtimeBrakeFactor -gt 0.0) {
+    $RunArgs += @(
+        "-RealtimeBrakeFactor",
+        $RealtimeBrakeFactor.ToString(
+            "0.################",
+            [Globalization.CultureInfo]::InvariantCulture
+        )
+    )
+}
 if ($PrintDetailedLiveReport) {
     $RunArgs += "-PrintDetailedLiveReport"
 }

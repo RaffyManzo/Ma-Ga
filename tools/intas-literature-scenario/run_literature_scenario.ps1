@@ -3,6 +3,8 @@ param(
     [string]$MaterializedScenarioRoot,
     [string]$MosaicRoot = ".\tmp\mosaic-25.2",
     [string]$ScenarioName = "MaGaLiteratureBasedUrbanStudy",
+    [ValidateRange(0.0, 1000000.0)]
+    [double]$RealtimeBrakeFactor = 0.0,
     [switch]$PrintDetailedLiveReport,
     [ValidateSet(
         "BUILD",
@@ -48,6 +50,15 @@ $ResolvedMosaicRoot = Resolve-MaybeRelative -Path $MosaicRoot
 $MosaicBat = Join-Path $ResolvedMosaicRoot "mosaic.bat"
 $LogsRoot = Join-Path $ResolvedMosaicRoot "logs"
 $ScenarioDb = Join-Path $ResolvedScenarioRoot "application\intas_literature_urban.db"
+$RealtimeBrakeEnabled = $RealtimeBrakeFactor -gt 0.0
+$RealtimeBrakeArgument = if ($RealtimeBrakeEnabled) {
+    $RealtimeBrakeFactor.ToString(
+        "0.################",
+        [Globalization.CultureInfo]::InvariantCulture
+    )
+} else {
+    ""
+}
 
 if (-not (Test-Path -LiteralPath $ScenarioDb -PathType Leaf)) {
     throw "Refusing to run literature scenario without real MOSAIC DB: $ScenarioDb"
@@ -137,10 +148,20 @@ Get-ChildItem -LiteralPath $LogsRoot -Directory |
     Where-Object { $_.Name -like "*-$ScenarioName" } |
     ForEach-Object { $BeforeRuns[$_.Name] = $_.FullName }
 
+$MosaicArgs = @("-s", $ScenarioName)
+if ($RealtimeBrakeEnabled) {
+    $MosaicArgs += @("-b", $RealtimeBrakeArgument)
+}
+
+Write-Host "Native realtime brake enabled: $($RealtimeBrakeEnabled.ToString().ToLowerInvariant())"
+if ($RealtimeBrakeEnabled) {
+    Write-Host "Native realtime brake factor: $RealtimeBrakeArgument"
+}
+
 Push-Location $ResolvedMosaicRoot
 try {
-    Write-Host "Running: .\mosaic.bat -s $ScenarioName"
-    & .\mosaic.bat -s $ScenarioName
+    Write-Host "Running: .\mosaic.bat $($MosaicArgs -join ' ')"
+    & .\mosaic.bat @MosaicArgs
     if ($LASTEXITCODE -ne 0) {
         throw "MOSAIC run failed with exit code $LASTEXITCODE"
     }
@@ -196,3 +217,6 @@ Write-Host "Smoke validation Markdown: $(Join-Path $RuntimeDir 'literature_smoke
 Write-Host "Detailed live report TXT: $(Join-Path $RuntimeDir 'live-reporting\live_detailed_execution_report.txt')"
 Write-Host "Detailed live report Markdown: $(Join-Path $RuntimeDir 'live-reporting\live_detailed_execution_report.md')"
 Write-Host "Detailed live report JSON: $(Join-Path $RuntimeDir 'live-reporting\live_detailed_execution_report.json')"
+
+Write-Host "Native realtime brake enabled: $($RealtimeBrakeEnabled.ToString().ToLowerInvariant())"
+Write-Host "Native realtime brake factor: $RealtimeBrakeArgument"
