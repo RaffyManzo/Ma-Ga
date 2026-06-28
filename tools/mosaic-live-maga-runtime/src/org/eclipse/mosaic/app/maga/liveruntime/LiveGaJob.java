@@ -13,6 +13,7 @@ final class LiveGaJob {
     private final TemporalWindowState stateAtSubmission;
     private final double deltaTMaxAtSubmissionSeconds;
     private final long wallClockDeadlineNs;
+    private final LiveAdaptiveDeltaTMaxEstimator.Snapshot deltaTMaxSnapshotAtSubmission;
     private boolean timeoutDetectedBeforeCompletion;
     private long waitCapDetectedWallClockNs;
     private long waitCapDetectedSimulationTimeNs;
@@ -26,7 +27,8 @@ final class LiveGaJob {
             SystemSnapshot snapshot,
             TemporalWindowState stateAtSubmission,
             double deltaTMaxAtSubmissionSeconds,
-            long wallClockDeadlineNs
+            long wallClockDeadlineNs,
+            LiveAdaptiveDeltaTMaxEstimator.Snapshot deltaTMaxSnapshotAtSubmission
     ) {
         this.jobId = jobId;
         this.windowIndex = windowIndex;
@@ -37,6 +39,7 @@ final class LiveGaJob {
         this.stateAtSubmission = stateAtSubmission;
         this.deltaTMaxAtSubmissionSeconds = deltaTMaxAtSubmissionSeconds;
         this.wallClockDeadlineNs = wallClockDeadlineNs;
+        this.deltaTMaxSnapshotAtSubmission = deltaTMaxSnapshotAtSubmission;
     }
 
     String getJobId() {
@@ -73,6 +76,10 @@ final class LiveGaJob {
 
     long getWallClockDeadlineNs() {
         return wallClockDeadlineNs;
+    }
+
+    LiveAdaptiveDeltaTMaxEstimator.Snapshot getDeltaTMaxSnapshotAtSubmission() {
+        return deltaTMaxSnapshotAtSubmission;
     }
 
     boolean isTimeoutDetectedBeforeCompletion() {

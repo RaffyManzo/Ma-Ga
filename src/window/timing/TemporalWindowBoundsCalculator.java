@@ -71,10 +71,20 @@ public final class TemporalWindowBoundsCalculator {
                 adaptiveMaximum,
                 configuredMaximum,
                 fallbackWindowSeconds,
-                hasReferenceCoverage
+                hasReferenceCoverage,
+                operationalMetrics
         );
 
         boolean raisedToMinimum = selectedMaximum < minimum;
+        if (raisedToMinimum
+                && config.getMaximumBoundMode()
+                == TemporalMaximumBoundMode.LIVE_RUNTIME_OVERRIDE) {
+            throw new IllegalStateException(
+                    "BOUND_CONFLICT: live runtime maximum override is below temporal minimum"
+                            + " | overrideSeconds=" + selectedMaximum
+                            + " | minimumSeconds=" + minimum
+            );
+        }
         double maximum = Math.max(selectedMaximum, minimum);
 
         return new TemporalWindowBounds(
@@ -89,6 +99,22 @@ public final class TemporalWindowBoundsCalculator {
                 config.getMinimumBoundMode(),
                 config.getMaximumBoundMode(),
                 raisedToMinimum
+        );
+    }
+
+    public double computeMinimumWindowSeconds(
+            TemporalOperationalMetrics operationalMetrics
+    ) {
+        Objects.requireNonNull(
+                operationalMetrics,
+                "operationalMetrics must not be null."
+        );
+        TemporalOperationalMetrics metricsForMinimum = selectMetricsForMinimum(
+                operationalMetrics
+        );
+        return Math.max(
+                metricsForMinimum.getMinimumWindowSeconds(),
+                config.getEpsilonT()
         );
     }
 
@@ -111,11 +137,22 @@ public final class TemporalWindowBoundsCalculator {
             double adaptiveMaximum,
             double configuredMaximum,
             double fallbackWindowSeconds,
-            boolean hasReferenceCoverage
+            boolean hasReferenceCoverage,
+            TemporalOperationalMetrics operationalMetrics
     ) {
         if (config.getMaximumBoundMode()
                 == TemporalMaximumBoundMode.CONFIGURED_MAX) {
             return configuredMaximum;
+        }
+
+        if (config.getMaximumBoundMode()
+                == TemporalMaximumBoundMode.LIVE_RUNTIME_OVERRIDE) {
+            if (!operationalMetrics.hasMaximumWindowOverrideSeconds()) {
+                throw new IllegalStateException(
+                        "BOUND_CONFLICT: live runtime maximum override is missing."
+                );
+            }
+            return operationalMetrics.getMaximumWindowOverrideSeconds();
         }
 
         if (hasReferenceCoverage) {

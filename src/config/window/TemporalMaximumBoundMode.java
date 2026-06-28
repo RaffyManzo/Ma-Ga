@@ -22,5 +22,11 @@ public enum TemporalMaximumBoundMode {
     /**
      * Usa il limite adattivo basato su T_coverage_ref(k).
      */
-    COVERAGE_ADAPTIVE
+    COVERAGE_ADAPTIVE,
+
+    /**
+     * Usa un limite massimo runtime esplicito trasportato dalle metriche
+     * operative del job live.
+     */
+    LIVE_RUNTIME_OVERRIDE
 }

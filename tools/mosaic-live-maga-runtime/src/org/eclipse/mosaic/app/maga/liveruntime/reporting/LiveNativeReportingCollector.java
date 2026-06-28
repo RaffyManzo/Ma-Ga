@@ -80,6 +80,52 @@ public final class LiveNativeReportingCollector implements AutoCloseable {
             double deltaTMaxAtSubmissionSeconds,
             long wallClockDeadlineNs
     ) throws IOException {
+        recordSubmitted(
+                jobId,
+                windowIndex,
+                triggerType,
+                submissionSimulationTimeNs,
+                submissionWallClockNs,
+                snapshotId,
+                snapshotTimeSeconds,
+                taskCount,
+                candidateCount,
+                deltaTMaxAtSubmissionSeconds,
+                wallClockDeadlineNs,
+                "CONFIGURED_STATIC",
+                deltaTMaxAtSubmissionSeconds,
+                0,
+                0.0,
+                deltaTMaxAtSubmissionSeconds,
+                deltaTMaxAtSubmissionSeconds,
+                deltaTMaxAtSubmissionSeconds,
+                deltaTMaxAtSubmissionSeconds,
+                "CONFIGURED_STATIC"
+        );
+    }
+
+    public synchronized void recordSubmitted(
+            String jobId,
+            int windowIndex,
+            String triggerType,
+            long submissionSimulationTimeNs,
+            long submissionWallClockNs,
+            String snapshotId,
+            double snapshotTimeSeconds,
+            int taskCount,
+            int candidateCount,
+            double deltaTMaxAtSubmissionSeconds,
+            long wallClockDeadlineNs,
+            String deltaTMaxMode,
+            double adaptiveDeltaTMaxEstimateSeconds,
+            int adaptiveDeltaTMaxSampleCount,
+            double adaptiveDeltaTMaxP95Seconds,
+            double adaptiveDeltaTMaxTargetSeconds,
+            double adaptiveDeltaTMaxClampedSeconds,
+            double adaptiveDeltaTMaxPreviousSeconds,
+            double adaptiveDeltaTMaxUpdatedSeconds,
+            String adaptiveDeltaTMaxFallbackReason
+    ) throws IOException {
         LiveGaJobRecord record = new LiveGaJobRecord(
                 jobId,
                 windowIndex,
@@ -93,8 +139,44 @@ public final class LiveNativeReportingCollector implements AutoCloseable {
                 deltaTMaxAtSubmissionSeconds,
                 wallClockDeadlineNs
         );
+        record.applySubmissionDeltaTMaxTelemetry(
+                deltaTMaxMode,
+                adaptiveDeltaTMaxEstimateSeconds,
+                adaptiveDeltaTMaxSampleCount,
+                adaptiveDeltaTMaxP95Seconds,
+                adaptiveDeltaTMaxTargetSeconds,
+                adaptiveDeltaTMaxClampedSeconds,
+                adaptiveDeltaTMaxPreviousSeconds,
+                adaptiveDeltaTMaxUpdatedSeconds,
+                adaptiveDeltaTMaxFallbackReason
+        );
         recordsByJobId.put(jobId, record);
         incrementalWriter.writeEvent("SUBMITTED", record, submissionSimulationTimeNs);
+    }
+
+    public synchronized void recordPostCompletionDeltaTMaxTelemetry(
+            String jobId,
+            boolean sampleAccepted,
+            double sampleRuntimeSeconds,
+            int sampleCountAfterCompletion,
+            double p95AfterCompletionSeconds,
+            double targetAfterCompletionSeconds,
+            double clampedAfterCompletionSeconds,
+            double previousBeforeUpdateSeconds,
+            double updatedForNextSubmissionSeconds,
+            String fallbackReason
+    ) {
+        require(jobId).applyPostCompletionDeltaTMaxTelemetry(
+                sampleAccepted,
+                sampleRuntimeSeconds,
+                sampleCountAfterCompletion,
+                p95AfterCompletionSeconds,
+                targetAfterCompletionSeconds,
+                clampedAfterCompletionSeconds,
+                previousBeforeUpdateSeconds,
+                updatedForNextSubmissionSeconds,
+                fallbackReason
+        );
     }
 
     public synchronized void recordWaitCapReached(
@@ -414,7 +496,34 @@ public final class LiveNativeReportingCollector implements AutoCloseable {
                 summary.maxLocalContentionDelaySeconds,
                 summary.maxLocalDemandRatio,
                 summary.maxLocalCpuOverflowRatio,
-                summary.status
+                summary.status,
+                record.deltaTMaxMode,
+                record.adaptiveDeltaTMaxEstimateSeconds,
+                record.adaptiveDeltaTMaxSampleCount,
+                record.adaptiveDeltaTMaxP95Seconds,
+                record.adaptiveDeltaTMaxTargetSeconds,
+                record.adaptiveDeltaTMaxClampedSeconds,
+                record.adaptiveDeltaTMaxPreviousSeconds,
+                record.adaptiveDeltaTMaxUpdatedSeconds,
+                record.adaptiveDeltaTMaxFallbackReason,
+                record.submissionAdaptiveDeltaTMaxMode,
+                record.submissionAdaptiveDeltaTMaxEstimateSeconds,
+                record.submissionAdaptiveDeltaTMaxSampleCount,
+                record.submissionAdaptiveDeltaTMaxP95Seconds,
+                record.submissionAdaptiveDeltaTMaxTargetSeconds,
+                record.submissionAdaptiveDeltaTMaxClampedSeconds,
+                record.submissionAdaptiveDeltaTMaxPreviousSeconds,
+                record.submissionAdaptiveDeltaTMaxSelectedSeconds,
+                record.submissionAdaptiveDeltaTMaxFallbackReason,
+                record.postCompletionAdaptiveDeltaTMaxSampleAccepted,
+                record.postCompletionAdaptiveDeltaTMaxSampleRuntimeSeconds,
+                record.postCompletionAdaptiveDeltaTMaxSampleCountAfterCompletion,
+                record.postCompletionAdaptiveDeltaTMaxP95AfterCompletionSeconds,
+                record.postCompletionAdaptiveDeltaTMaxTargetAfterCompletionSeconds,
+                record.postCompletionAdaptiveDeltaTMaxClampedAfterCompletionSeconds,
+                record.postCompletionAdaptiveDeltaTMaxPreviousBeforeUpdateSeconds,
+                record.postCompletionAdaptiveDeltaTMaxUpdatedForNextSubmissionSeconds,
+                record.postCompletionAdaptiveDeltaTMaxFallbackReason
         );
     }
 }

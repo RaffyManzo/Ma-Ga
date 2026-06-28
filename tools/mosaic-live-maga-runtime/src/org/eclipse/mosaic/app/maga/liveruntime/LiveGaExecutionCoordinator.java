@@ -119,6 +119,12 @@ final class LiveGaExecutionCoordinator implements AutoCloseable {
         long submissionWallClockNs = System.nanoTime();
         LiveGaOverrunDeadlinePolicy.LiveGaDeadline deadline =
                 deadlinePolicy.computeDeadline(snapshot, temporalState, submissionWallClockNs);
+        LiveAdaptiveDeltaTMaxEstimator.Snapshot submissionDeltaTMaxSnapshot =
+                deadline.getDeltaTMaxSnapshot();
+        TemporalWindowState stateAtSubmission = temporalStateWithOperationalMetrics(
+                temporalState,
+                deadline.getMetricsAtSubmission()
+        );
         LiveGaJob job = new LiveGaJob(
                 reportingCollector == null ? "" : reportingCollector.nextJobId(),
                 temporalState.getWindowIndex(),
@@ -126,9 +132,10 @@ final class LiveGaExecutionCoordinator implements AutoCloseable {
                 submissionWallClockNs,
                 triggerType,
                 snapshot,
-                temporalState,
+                stateAtSubmission,
                 deadline.getDeltaTMaxAtSubmissionSeconds(),
-                deadline.getWallClockDeadlineNs()
+                deadline.getWallClockDeadlineNs(),
+                submissionDeltaTMaxSnapshot
         );
         inFlightJob = job;
         runtimeState = LiveGaExecutionState.GA_RUNNING;
@@ -147,7 +154,16 @@ final class LiveGaExecutionCoordinator implements AutoCloseable {
                     snapshot.getTasks().size(),
                     snapshot.getCandidateNodes().size(),
                     job.getDeltaTMaxAtSubmissionSeconds(),
-                    job.getWallClockDeadlineNs()
+                    job.getWallClockDeadlineNs(),
+                    job.getDeltaTMaxSnapshotAtSubmission().getMode().name(),
+                    job.getDeltaTMaxSnapshotAtSubmission().getEstimateSeconds(),
+                    job.getDeltaTMaxSnapshotAtSubmission().getSampleCount(),
+                    job.getDeltaTMaxSnapshotAtSubmission().getP95Seconds(),
+                    job.getDeltaTMaxSnapshotAtSubmission().getTargetSeconds(),
+                    job.getDeltaTMaxSnapshotAtSubmission().getClampedSeconds(),
+                    job.getDeltaTMaxSnapshotAtSubmission().getPreviousSeconds(),
+                    job.getDeltaTMaxSnapshotAtSubmission().getUpdatedSeconds(),
+                    job.getDeltaTMaxSnapshotAtSubmission().getFallbackReason()
             );
         }
         traceWriter.writeRuntime(
@@ -167,7 +183,13 @@ final class LiveGaExecutionCoordinator implements AutoCloseable {
                 false,
                 lastAppliedSnapshotId(),
                 "",
-                details(job, 0.0, 0.0)
+                details(
+                        job,
+                        0.0,
+                        0.0,
+                        job.getDeltaTMaxSnapshotAtSubmission(),
+                        null
+                )
         );
     }
 
@@ -204,6 +226,22 @@ final class LiveGaExecutionCoordinator implements AutoCloseable {
                 temporalState.getLastResult(),
                 temporalState.getLastOperationalMetrics(),
                 temporalState.getLastFinalPopulation()
+        );
+    }
+
+    private TemporalWindowState temporalStateWithOperationalMetrics(
+            TemporalWindowState source,
+            TemporalOperationalMetrics operationalMetrics
+    ) {
+        return new TemporalWindowState(
+                source.getWindowIndex(),
+                source.getCurrentTimeSeconds(),
+                source.getNextScheduledTimeSeconds(),
+                source.getCurrentWindowDurationSeconds(),
+                source.getLastSnapshot(),
+                source.getLastResult(),
+                operationalMetrics,
+                source.getLastFinalPopulation()
         );
     }
 
@@ -276,7 +314,7 @@ final class LiveGaExecutionCoordinator implements AutoCloseable {
                     false,
                     lastAppliedSnapshotId(),
                     completion.hasError() ? completion.getError().getMessage() : "TemporalWindowManager returned null",
-                    details(completion)
+                    details(completion, null)
             );
             return;
         }
@@ -285,8 +323,15 @@ final class LiveGaExecutionCoordinator implements AutoCloseable {
                 > config.getDeltaTMaxComparisonEpsilonSeconds()) {
             deltaTMaxMismatchViolations++;
         }
-        if (completion.isStale()) {
-            markStale(simulationTimeNs, completion);
+        boolean stale = completion.isStale();
+        LiveAdaptiveDeltaTMaxEstimator.Snapshot postCompletionDeltaTMaxSnapshot =
+                updateAdaptiveDeltaTMaxAfterTerminalClassification(completion);
+        if (stale) {
+            markStale(
+                    simulationTimeNs,
+                    completion,
+                    postCompletionDeltaTMaxSnapshot
+            );
             return;
         }
         runtimeState = LiveGaExecutionState.RESULT_READY_WITHIN_BOUND;
@@ -317,7 +362,7 @@ final class LiveGaExecutionCoordinator implements AutoCloseable {
                 false,
                 lastAppliedSnapshotId(),
                 "",
-                details(completion)
+                details(completion, postCompletionDeltaTMaxSnapshot)
         );
         LiveAppliedStrategy applied = strategyApplier.apply(completion.getStepResult(), simulationTimeNs);
         if (reportingCollector != null) {
@@ -347,13 +392,17 @@ final class LiveGaExecutionCoordinator implements AutoCloseable {
                 false,
                 lastAppliedSnapshotId(),
                 "",
-                details(completion)
+                details(completion, postCompletionDeltaTMaxSnapshot)
         );
         temporalState = temporalState.afterStep(completion.getStepResult());
         runtimeState = LiveGaExecutionState.IDLE;
     }
 
-    private void markStale(long simulationTimeNs, LiveGaCompletion completion) throws IOException {
+    private void markStale(
+            long simulationTimeNs,
+            LiveGaCompletion completion,
+            LiveAdaptiveDeltaTMaxEstimator.Snapshot postCompletionDeltaTMaxSnapshot
+    ) throws IOException {
         if (!completion.getJob().isTimeoutDetectedBeforeCompletion()) {
             waitCapReachedObserved = true;
             runtimeState = LiveGaExecutionState.WAIT_CAP_REACHED;
@@ -372,7 +421,7 @@ final class LiveGaExecutionCoordinator implements AutoCloseable {
                     completion.getWallClockRuntimeSeconds(),
                     completion.getDeltaTMaxSeconds(),
                     false,
-                    details(completion)
+                    details(completion, postCompletionDeltaTMaxSnapshot)
             );
             traceWriter.writeRuntime(
                     simulationTimeNs,
@@ -391,7 +440,7 @@ final class LiveGaExecutionCoordinator implements AutoCloseable {
                     false,
                     lastAppliedSnapshotId(),
                     "",
-                    details(completion)
+                    details(completion, postCompletionDeltaTMaxSnapshot)
             );
         }
 
@@ -417,7 +466,7 @@ final class LiveGaExecutionCoordinator implements AutoCloseable {
                 completion.getWallClockRuntimeSeconds(),
                 completion.getDeltaTMaxSeconds(),
                 true,
-                details(completion)
+                details(completion, postCompletionDeltaTMaxSnapshot)
         );
         traceWriter.writeRuntime(
                 simulationTimeNs,
@@ -436,7 +485,7 @@ final class LiveGaExecutionCoordinator implements AutoCloseable {
                 true,
                 lastAppliedSnapshotId(),
                 "",
-                details(completion)
+                details(completion, postCompletionDeltaTMaxSnapshot)
         );
 
         freshReoptimizationRequestedObserved = true;
@@ -465,7 +514,7 @@ final class LiveGaExecutionCoordinator implements AutoCloseable {
                 true,
                 lastAppliedSnapshotId(),
                 "",
-                details(completion)
+                details(completion, postCompletionDeltaTMaxSnapshot)
         );
     }
 
@@ -491,7 +540,13 @@ final class LiveGaExecutionCoordinator implements AutoCloseable {
                 false,
                 lastAppliedSnapshotId(),
                 "",
-                details(job, 0.0, 0.0)
+                details(
+                        job,
+                        0.0,
+                        0.0,
+                        job.getDeltaTMaxSnapshotAtSubmission(),
+                        null
+                )
         );
     }
 
@@ -539,15 +594,62 @@ final class LiveGaExecutionCoordinator implements AutoCloseable {
                 false,
                 lastAppliedSnapshotId(),
                 "",
-                details(job, 0.0, 0.0)
+                details(
+                        job,
+                        0.0,
+                        0.0,
+                        job.getDeltaTMaxSnapshotAtSubmission(),
+                        null
+                )
         );
     }
 
-    private LiveRuntimeTraceDetails details(LiveGaCompletion completion) {
+    private LiveAdaptiveDeltaTMaxEstimator.Snapshot updateAdaptiveDeltaTMaxAfterTerminalClassification(
+            LiveGaCompletion completion
+    ) throws IOException {
+        if (completion.hasError() || completion.getStepResult() == null) {
+            return null;
+        }
+        double deltaTMin = completion
+                .getStepResult()
+                .getAdaptiveWindowDecision()
+                .getBounds()
+                .getMinimumWindowSeconds();
+        LiveAdaptiveDeltaTMaxEstimator.Snapshot snapshot =
+                deadlinePolicy.recordCompletedRuntime(
+                        completion.getWallClockRuntimeSeconds(),
+                        deltaTMin
+                );
+        if (snapshot == null) {
+            return null;
+        }
+        if (reportingCollector != null) {
+            reportingCollector.recordPostCompletionDeltaTMaxTelemetry(
+                    completion.getJob().getJobId(),
+                    snapshot.isSampleAccepted(),
+                    snapshot.getSampleRuntimeSeconds(),
+                    snapshot.getSampleCount(),
+                    snapshot.getP95Seconds(),
+                    snapshot.getTargetSeconds(),
+                    snapshot.getClampedSeconds(),
+                    snapshot.getPreviousSeconds(),
+                    snapshot.getUpdatedSeconds(),
+                    snapshot.getFallbackReason()
+            );
+        }
+        return snapshot;
+    }
+
+    private LiveRuntimeTraceDetails details(
+            LiveGaCompletion completion,
+            LiveAdaptiveDeltaTMaxEstimator.Snapshot postCompletionDeltaTMaxSnapshot
+    ) {
         return details(
                 completion.getJob(),
                 completion.getDeltaTMaxSeconds(),
-                completion.getDeltaTMaxMismatchSeconds()
+                completion.getDeltaTMaxMismatchSeconds(),
+                completion.getJob().getDeltaTMaxSnapshotAtSubmission(),
+                postCompletionDeltaTMaxSnapshot
         );
     }
 
@@ -555,6 +657,22 @@ final class LiveGaExecutionCoordinator implements AutoCloseable {
             LiveGaJob job,
             double deltaTMaxFromCompletedStepSeconds,
             double deltaTMaxMismatchSeconds
+    ) {
+        return details(
+                job,
+                deltaTMaxFromCompletedStepSeconds,
+                deltaTMaxMismatchSeconds,
+                job == null ? null : job.getDeltaTMaxSnapshotAtSubmission(),
+                null
+        );
+    }
+
+    private LiveRuntimeTraceDetails details(
+            LiveGaJob job,
+            double deltaTMaxFromCompletedStepSeconds,
+            double deltaTMaxMismatchSeconds,
+            LiveAdaptiveDeltaTMaxEstimator.Snapshot submissionDeltaTMaxSnapshot,
+            LiveAdaptiveDeltaTMaxEstimator.Snapshot postCompletionDeltaTMaxSnapshot
     ) {
         if (job == null) {
             return LiveRuntimeTraceDetails.EMPTY;
@@ -568,7 +686,11 @@ final class LiveGaExecutionCoordinator implements AutoCloseable {
                 job.getWaitCapDetectedWallClockNs(),
                 job.getWaitCapDetectedSimulationTimeNs(),
                 bridge.getInvalidPoolBandwidthViolations(),
-                bridge.getFuturePoolViolations()
+                bridge.getFuturePoolViolations(),
+                submissionDeltaTMaxSnapshot == null
+                        ? job.getDeltaTMaxSnapshotAtSubmission()
+                        : submissionDeltaTMaxSnapshot,
+                postCompletionDeltaTMaxSnapshot
         );
     }
 

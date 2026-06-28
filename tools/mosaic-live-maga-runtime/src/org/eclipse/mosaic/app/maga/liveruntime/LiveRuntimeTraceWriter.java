@@ -57,10 +57,10 @@ final class LiveRuntimeTraceWriter implements AutoCloseable {
         this.bridgeSnapshotTraceWriter = open("live_bridge_snapshot_trace.csv");
         this.overrunTraceWriter = open("live_overrun_trace.csv");
         this.publishedSnapshotManifestWriter = open("live_published_snapshot_manifest.csv");
-        runtimeTraceWriter.write("profile,simulationTimeNs,windowIndex,runtimeState,triggerType,snapshotId,snapshotTimeSeconds,taskCount,candidateCount,gaSubmitted,gaCompleted,gaRuntimeWallClockSeconds,deltaTMaxSeconds,resultApplied,resultDiscardedAsStale,lastAppliedStrategySnapshotId,error,deltaTMaxAtSubmissionSeconds,deltaTMaxFromCompletedStepSeconds,deltaTMaxMismatchSeconds,wallClockDeadlineNs,timeoutDetectedBeforeCompletion,waitCapDetectedWallClockNs,waitCapDetectedSimulationTimeNs,invalidPoolBandwidthViolations,futurePoolViolations\n");
+        runtimeTraceWriter.write("profile,simulationTimeNs,windowIndex,runtimeState,triggerType,snapshotId,snapshotTimeSeconds,taskCount,candidateCount,gaSubmitted,gaCompleted,gaRuntimeWallClockSeconds,deltaTMaxSeconds,resultApplied,resultDiscardedAsStale,lastAppliedStrategySnapshotId,error,deltaTMaxAtSubmissionSeconds,deltaTMaxFromCompletedStepSeconds,deltaTMaxMismatchSeconds,wallClockDeadlineNs,timeoutDetectedBeforeCompletion,waitCapDetectedWallClockNs,waitCapDetectedSimulationTimeNs,invalidPoolBandwidthViolations,futurePoolViolations,deltaTMaxMode,adaptiveDeltaTMaxEstimateSeconds,adaptiveDeltaTMaxSampleCount,adaptiveDeltaTMaxP95Seconds,adaptiveDeltaTMaxTargetSeconds,adaptiveDeltaTMaxClampedSeconds,adaptiveDeltaTMaxPreviousSeconds,adaptiveDeltaTMaxUpdatedSeconds,adaptiveDeltaTMaxFallbackReason" + adaptiveDetailsHeader() + "\n");
         strategyTraceWriter.write("profile,simulationTimeNs,windowIndex,snapshotId,fitness,localAssignments,vehicleAssignments,edgeAssignments,cloudAssignments\n");
         bridgeSnapshotTraceWriter.write("profile,simulationTimeNs,snapshotResolved,snapshotId,snapshotTimeSeconds,vehicles,tasks,candidates,accessGateways,accessLinks,bandwidthPools,safeCellBuckets,invalidPoolBandwidthViolations,futurePoolViolations\n");
-        overrunTraceWriter.write("profile,simulationTimeNs,windowIndex,runtimeState,snapshotId,gaRuntimeWallClockSeconds,deltaTMaxSeconds,resultDiscardedAsStale,deltaTMaxAtSubmissionSeconds,deltaTMaxFromCompletedStepSeconds,deltaTMaxMismatchSeconds,wallClockDeadlineNs,timeoutDetectedBeforeCompletion,waitCapDetectedWallClockNs,waitCapDetectedSimulationTimeNs\n");
+        overrunTraceWriter.write("profile,simulationTimeNs,windowIndex,runtimeState,snapshotId,gaRuntimeWallClockSeconds,deltaTMaxSeconds,resultDiscardedAsStale,deltaTMaxAtSubmissionSeconds,deltaTMaxFromCompletedStepSeconds,deltaTMaxMismatchSeconds,wallClockDeadlineNs,timeoutDetectedBeforeCompletion,waitCapDetectedWallClockNs,waitCapDetectedSimulationTimeNs,deltaTMaxMode,adaptiveDeltaTMaxEstimateSeconds,adaptiveDeltaTMaxSampleCount,adaptiveDeltaTMaxP95Seconds,adaptiveDeltaTMaxTargetSeconds,adaptiveDeltaTMaxClampedSeconds,adaptiveDeltaTMaxPreviousSeconds,adaptiveDeltaTMaxUpdatedSeconds,adaptiveDeltaTMaxFallbackReason" + adaptiveDetailsHeader() + "\n");
         publishedSnapshotManifestWriter.write("profile,snapshotId,snapshotTimeSeconds,relativePath,vehicles,tasks,candidates,localCandidates,vehicleCandidates,edgeCandidates,cloudCandidates,accessLinks,bandwidthPools,candidateIds,poolIds,accessLinkIds,taskIds\n");
     }
 
@@ -185,6 +185,16 @@ final class LiveRuntimeTraceWriter implements AutoCloseable {
                 + "," + details.waitCapDetectedSimulationTimeNs
                 + "," + details.invalidPoolBandwidthViolations
                 + "," + details.futurePoolViolations
+                + "," + safe(details.deltaTMaxMode())
+                + "," + format(details.adaptiveDeltaTMaxEstimateSeconds())
+                + "," + details.adaptiveDeltaTMaxSampleCount()
+                + "," + format(details.adaptiveDeltaTMaxP95Seconds())
+                + "," + format(details.adaptiveDeltaTMaxTargetSeconds())
+                + "," + format(details.adaptiveDeltaTMaxClampedSeconds())
+                + "," + format(details.adaptiveDeltaTMaxPreviousSeconds())
+                + "," + format(details.adaptiveDeltaTMaxUpdatedSeconds())
+                + "," + safe(details.adaptiveDeltaTMaxFallbackReason())
+                + adaptiveDetailsRow(details)
                 + "\n");
         runtimeTraceWriter.flush();
     }
@@ -249,6 +259,16 @@ final class LiveRuntimeTraceWriter implements AutoCloseable {
                 + "," + details.timeoutDetectedBeforeCompletion
                 + "," + details.waitCapDetectedWallClockNs
                 + "," + details.waitCapDetectedSimulationTimeNs
+                + "," + safe(details.deltaTMaxMode())
+                + "," + format(details.adaptiveDeltaTMaxEstimateSeconds())
+                + "," + details.adaptiveDeltaTMaxSampleCount()
+                + "," + format(details.adaptiveDeltaTMaxP95Seconds())
+                + "," + format(details.adaptiveDeltaTMaxTargetSeconds())
+                + "," + format(details.adaptiveDeltaTMaxClampedSeconds())
+                + "," + format(details.adaptiveDeltaTMaxPreviousSeconds())
+                + "," + format(details.adaptiveDeltaTMaxUpdatedSeconds())
+                + "," + safe(details.adaptiveDeltaTMaxFallbackReason())
+                + adaptiveDetailsRow(details)
                 + "\n");
         overrunTraceWriter.flush();
     }
@@ -275,6 +295,48 @@ final class LiveRuntimeTraceWriter implements AutoCloseable {
 
     private static String safe(String value) {
         return value == null ? "" : value.replace(',', ';');
+    }
+
+    private static String adaptiveDetailsHeader() {
+        return ",submissionAdaptiveDeltaTMaxMode"
+                + ",submissionAdaptiveDeltaTMaxEstimateSeconds"
+                + ",submissionAdaptiveDeltaTMaxSampleCount"
+                + ",submissionAdaptiveDeltaTMaxP95Seconds"
+                + ",submissionAdaptiveDeltaTMaxTargetSeconds"
+                + ",submissionAdaptiveDeltaTMaxClampedSeconds"
+                + ",submissionAdaptiveDeltaTMaxPreviousSeconds"
+                + ",submissionAdaptiveDeltaTMaxSelectedSeconds"
+                + ",submissionAdaptiveDeltaTMaxFallbackReason"
+                + ",postCompletionAdaptiveDeltaTMaxSampleAccepted"
+                + ",postCompletionAdaptiveDeltaTMaxSampleRuntimeSeconds"
+                + ",postCompletionAdaptiveDeltaTMaxSampleCountAfterCompletion"
+                + ",postCompletionAdaptiveDeltaTMaxP95AfterCompletionSeconds"
+                + ",postCompletionAdaptiveDeltaTMaxTargetAfterCompletionSeconds"
+                + ",postCompletionAdaptiveDeltaTMaxClampedAfterCompletionSeconds"
+                + ",postCompletionAdaptiveDeltaTMaxPreviousBeforeUpdateSeconds"
+                + ",postCompletionAdaptiveDeltaTMaxUpdatedForNextSubmissionSeconds"
+                + ",postCompletionAdaptiveDeltaTMaxFallbackReason";
+    }
+
+    private static String adaptiveDetailsRow(LiveRuntimeTraceDetails details) {
+        return "," + safe(details.submissionAdaptiveDeltaTMaxMode())
+                + "," + format(details.submissionAdaptiveDeltaTMaxEstimateSeconds())
+                + "," + details.submissionAdaptiveDeltaTMaxSampleCount()
+                + "," + format(details.submissionAdaptiveDeltaTMaxP95Seconds())
+                + "," + format(details.submissionAdaptiveDeltaTMaxTargetSeconds())
+                + "," + format(details.submissionAdaptiveDeltaTMaxClampedSeconds())
+                + "," + format(details.submissionAdaptiveDeltaTMaxPreviousSeconds())
+                + "," + format(details.submissionAdaptiveDeltaTMaxSelectedSeconds())
+                + "," + safe(details.submissionAdaptiveDeltaTMaxFallbackReason())
+                + "," + details.postCompletionAdaptiveDeltaTMaxSampleAccepted()
+                + "," + format(details.postCompletionAdaptiveDeltaTMaxSampleRuntimeSeconds())
+                + "," + details.postCompletionAdaptiveDeltaTMaxSampleCountAfterCompletion()
+                + "," + format(details.postCompletionAdaptiveDeltaTMaxP95AfterCompletionSeconds())
+                + "," + format(details.postCompletionAdaptiveDeltaTMaxTargetAfterCompletionSeconds())
+                + "," + format(details.postCompletionAdaptiveDeltaTMaxClampedAfterCompletionSeconds())
+                + "," + format(details.postCompletionAdaptiveDeltaTMaxPreviousBeforeUpdateSeconds())
+                + "," + format(details.postCompletionAdaptiveDeltaTMaxUpdatedForNextSubmissionSeconds())
+                + "," + safe(details.postCompletionAdaptiveDeltaTMaxFallbackReason());
     }
 
     private void writePublishedSnapshot(SystemSnapshot snapshot) throws IOException {

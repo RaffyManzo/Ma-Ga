@@ -322,6 +322,33 @@ public final class TemporalWindowConfig {
         );
     }
 
+    public static TemporalWindowConfig liveRuntimeDeltaTMaxOverride(
+            double initialWindowSeconds,
+            double configuredGaRuntimeEstimateSeconds,
+            double adaptiveMaximumWindowSeconds
+    ) {
+        return new TemporalWindowConfig(
+                initialWindowSeconds,
+                0.0,
+                0.25,
+                0.65,
+                0.40,
+                0.25,
+                0.25,
+                0.25,
+                0.25,
+                0.60,
+                1.0,
+                1.0,
+                1.0E-6,
+                DEFAULT_STRATEGY_APPLICATION_SECONDS,
+                configuredGaRuntimeEstimateSeconds,
+                adaptiveMaximumWindowSeconds,
+                TemporalMinimumBoundMode.CONFIGURED_GA_ESTIMATE,
+                TemporalMaximumBoundMode.LIVE_RUNTIME_OVERRIDE
+        );
+    }
+
     public static TemporalWindowConfig fixedInterval(double fixedIntervalSeconds) {
         return fixedIntervalWithCollectionDelay(fixedIntervalSeconds, 0.0);
     }

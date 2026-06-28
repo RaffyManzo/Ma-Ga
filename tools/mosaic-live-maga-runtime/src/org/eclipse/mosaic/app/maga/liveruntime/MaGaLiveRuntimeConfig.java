@@ -14,6 +14,9 @@ public final class MaGaLiveRuntimeConfig {
 
     static final String CONFIG_FILE_NAME = "ma_ga_live_runtime_config.json";
     private static final long NANOSECONDS_PER_MILLISECOND = 1_000_000L;
+    private static final double CONFIGURED_REPLAY_DATA_COLLECTION_DELAY_SECONDS = 0.0;
+    private static final double CONFIGURED_REPLAY_STRATEGY_APPLICATION_SECONDS = 0.05;
+    private static final double CONFIGURED_REPLAY_EPSILON_SECONDS = 1.0E-6;
 
     String scenarioName;
     long coordinatorTickIntervalMs;
@@ -34,6 +37,15 @@ public final class MaGaLiveRuntimeConfig {
     boolean nativeLiveDetailedReportPrintToConsole;
     String gaParameterScalingMode;
     String experimentalVariant;
+    String deltaTMaxMode;
+    Double configuredInitialDeltaTMaxSeconds;
+    Double adaptiveDeltaTMaxMinimumSeconds;
+    Double adaptiveDeltaTMaxMaximumSeconds;
+    Integer adaptiveDeltaTMaxHistorySize;
+    Integer adaptiveDeltaTMaxWarmupSamples;
+    Double adaptiveDeltaTMaxSafetyMarginSeconds;
+    Double adaptiveDeltaTMaxMaximumStepUpSeconds;
+    Double adaptiveDeltaTMaxMaximumStepDownSeconds;
 
     public static MaGaLiveRuntimeConfig load(File configurationPath) {
         if (configurationPath == null) {
@@ -103,6 +115,28 @@ public final class MaGaLiveRuntimeConfig {
         return MaGaExperimentalVariant.parse(experimentalVariant, null);
     }
 
+    public LiveDeltaTMaxMode getDeltaTMaxMode() {
+        return LiveDeltaTMaxMode.valueOf(deltaTMaxMode);
+    }
+
+    public LiveAdaptiveDeltaTMaxEstimator.Config getAdaptiveDeltaTMaxConfig() {
+        if (getDeltaTMaxMode() != LiveDeltaTMaxMode.LIVE_ADAPTIVE) {
+            throw new IllegalStateException(
+                    "Adaptive deltaTMax config is only available in LIVE_ADAPTIVE mode."
+            );
+        }
+        return new LiveAdaptiveDeltaTMaxEstimator.Config(
+                configuredInitialDeltaTMaxSeconds,
+                adaptiveDeltaTMaxMinimumSeconds,
+                adaptiveDeltaTMaxMaximumSeconds,
+                adaptiveDeltaTMaxHistorySize,
+                adaptiveDeltaTMaxWarmupSamples,
+                adaptiveDeltaTMaxSafetyMarginSeconds,
+                adaptiveDeltaTMaxMaximumStepUpSeconds,
+                adaptiveDeltaTMaxMaximumStepDownSeconds
+        );
+    }
+
     public String getScenarioName() {
         return scenarioName == null || scenarioName.isBlank()
                 ? "MaGaLiveMagaRuntimeStudy"
@@ -137,6 +171,19 @@ public final class MaGaLiveRuntimeConfig {
                 );
             }
         }
+        if (deltaTMaxMode == null || deltaTMaxMode.isBlank()) {
+            deltaTMaxMode = LiveDeltaTMaxMode.CONFIGURED_STATIC.name();
+        } else {
+            String normalized = deltaTMaxMode.trim().toUpperCase(Locale.ROOT);
+            try {
+                deltaTMaxMode = LiveDeltaTMaxMode.valueOf(normalized).name();
+            } catch (IllegalArgumentException e) {
+                throw new IllegalArgumentException(
+                        source + ": deltaTMaxMode must be CONFIGURED_STATIC or LIVE_ADAPTIVE",
+                        e
+                );
+            }
+        }
         experimentalVariant = MaGaExperimentalVariant.parse(experimentalVariant, source).name();
         requirePositive(coordinatorTickIntervalMs, "coordinatorTickIntervalMs", source);
         requirePositive(initialOptimizationDelayMs, "initialOptimizationDelayMs", source);
@@ -163,6 +210,102 @@ public final class MaGaLiveRuntimeConfig {
         if (diagnosticArtificialGaDelayMs < 0) {
             throw new IllegalArgumentException(source + ": diagnosticArtificialGaDelayMs must be >= 0");
         }
+        if (getDeltaTMaxMode() == LiveDeltaTMaxMode.LIVE_ADAPTIVE) {
+            validateAdaptiveDeltaTMaxConfig(source);
+        }
+    }
+
+    private void validateAdaptiveDeltaTMaxConfig(String source) {
+        requirePresent(configuredInitialDeltaTMaxSeconds,
+                "configuredInitialDeltaTMaxSeconds", source);
+        requirePresent(adaptiveDeltaTMaxMinimumSeconds,
+                "adaptiveDeltaTMaxMinimumSeconds", source);
+        requirePresent(adaptiveDeltaTMaxMaximumSeconds,
+                "adaptiveDeltaTMaxMaximumSeconds", source);
+        requirePresent(adaptiveDeltaTMaxHistorySize,
+                "adaptiveDeltaTMaxHistorySize", source);
+        requirePresent(adaptiveDeltaTMaxWarmupSamples,
+                "adaptiveDeltaTMaxWarmupSamples", source);
+        requirePresent(adaptiveDeltaTMaxSafetyMarginSeconds,
+                "adaptiveDeltaTMaxSafetyMarginSeconds", source);
+        requirePresent(adaptiveDeltaTMaxMaximumStepUpSeconds,
+                "adaptiveDeltaTMaxMaximumStepUpSeconds", source);
+        requirePresent(adaptiveDeltaTMaxMaximumStepDownSeconds,
+                "adaptiveDeltaTMaxMaximumStepDownSeconds", source);
+
+        requirePositive(configuredInitialDeltaTMaxSeconds,
+                "configuredInitialDeltaTMaxSeconds", source);
+        requireFiniteAndNonNegative(adaptiveDeltaTMaxMinimumSeconds,
+                "adaptiveDeltaTMaxMinimumSeconds", source);
+        requirePositive(adaptiveDeltaTMaxMaximumSeconds,
+                "adaptiveDeltaTMaxMaximumSeconds", source);
+        requireFiniteAndNonNegative(adaptiveDeltaTMaxSafetyMarginSeconds,
+                "adaptiveDeltaTMaxSafetyMarginSeconds", source);
+        requirePositive(adaptiveDeltaTMaxMaximumStepUpSeconds,
+                "adaptiveDeltaTMaxMaximumStepUpSeconds", source);
+        requirePositive(adaptiveDeltaTMaxMaximumStepDownSeconds,
+                "adaptiveDeltaTMaxMaximumStepDownSeconds", source);
+
+        if (adaptiveDeltaTMaxHistorySize < 1) {
+            throw new IllegalArgumentException(
+                    source + ": adaptiveDeltaTMaxHistorySize must be >= 1"
+            );
+        }
+        if (adaptiveDeltaTMaxWarmupSamples < 1
+                || adaptiveDeltaTMaxWarmupSamples > adaptiveDeltaTMaxHistorySize) {
+            throw new IllegalArgumentException(
+                    source + ": adaptiveDeltaTMaxWarmupSamples must be in [1, adaptiveDeltaTMaxHistorySize]"
+            );
+        }
+        if (adaptiveDeltaTMaxMinimumSeconds > adaptiveDeltaTMaxMaximumSeconds) {
+            throw new IllegalArgumentException(
+                    source
+                            + ": BOUND_CONFLICT adaptiveDeltaTMaxMinimumSeconds exceeds adaptiveDeltaTMaxMaximumSeconds"
+                            + " | adaptiveDeltaTMaxMinimumSeconds="
+                            + adaptiveDeltaTMaxMinimumSeconds
+                            + " | adaptiveDeltaTMaxMaximumSeconds="
+                            + adaptiveDeltaTMaxMaximumSeconds
+            );
+        }
+        if (configuredInitialDeltaTMaxSeconds < adaptiveDeltaTMaxMinimumSeconds) {
+            throw new IllegalArgumentException(
+                    source + ": configuredInitialDeltaTMaxSeconds must be >= adaptiveDeltaTMaxMinimumSeconds"
+            );
+        }
+        if (configuredInitialDeltaTMaxSeconds > adaptiveDeltaTMaxMaximumSeconds) {
+            throw new IllegalArgumentException(
+                    source + ": configuredInitialDeltaTMaxSeconds must be <= adaptiveDeltaTMaxMaximumSeconds"
+            );
+        }
+        double configuredTemporalMinimumSeconds =
+                CONFIGURED_REPLAY_DATA_COLLECTION_DELAY_SECONDS
+                        + configuredGaRuntimeEstimateSeconds
+                        + CONFIGURED_REPLAY_STRATEGY_APPLICATION_SECONDS
+                        + CONFIGURED_REPLAY_EPSILON_SECONDS;
+        double effectiveMinimumSeconds = Math.max(
+                configuredTemporalMinimumSeconds,
+                adaptiveDeltaTMaxMinimumSeconds
+        );
+        if (effectiveMinimumSeconds > adaptiveDeltaTMaxMaximumSeconds) {
+            throw new IllegalArgumentException(
+                    source
+                            + ": BOUND_CONFLICT effective minimum exceeds adaptive maximum"
+                            + " | configuredTemporalMinimumSeconds="
+                            + configuredTemporalMinimumSeconds
+                            + " | adaptiveDeltaTMaxMinimumSeconds="
+                            + adaptiveDeltaTMaxMinimumSeconds
+                            + " | effectiveMinimumSeconds="
+                            + effectiveMinimumSeconds
+                            + " | adaptiveDeltaTMaxMaximumSeconds="
+                            + adaptiveDeltaTMaxMaximumSeconds
+            );
+        }
+    }
+
+    private static void requirePresent(Object value, String field, String source) {
+        if (value == null) {
+            throw new IllegalArgumentException(source + ": " + field + " is required when deltaTMaxMode is LIVE_ADAPTIVE");
+        }
     }
 
     private static void requirePositive(long value, String field, String source) {
@@ -174,6 +317,12 @@ public final class MaGaLiveRuntimeConfig {
     private static void requirePositive(double value, String field, String source) {
         if (!Double.isFinite(value) || value <= 0.0) {
             throw new IllegalArgumentException(source + ": " + field + " must be finite and > 0");
+        }
+    }
+
+    private static void requireFiniteAndNonNegative(double value, String field, String source) {
+        if (!Double.isFinite(value) || value < 0.0) {
+            throw new IllegalArgumentException(source + ": " + field + " must be finite and >= 0");
         }
     }
 }

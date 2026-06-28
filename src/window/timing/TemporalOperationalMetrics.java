@@ -20,6 +20,7 @@ public final class TemporalOperationalMetrics {
     private final double strategyApplicationSeconds;
     private final double epsilonSeconds;
     private final double observedGaRuntimeSeconds;
+    private final Double maximumWindowOverrideSeconds;
 
     public TemporalOperationalMetrics(
             double dataCollectionSeconds,
@@ -32,7 +33,8 @@ public final class TemporalOperationalMetrics {
                 gaRuntimeEstimateSeconds,
                 strategyApplicationSeconds,
                 epsilonSeconds,
-                gaRuntimeEstimateSeconds
+                gaRuntimeEstimateSeconds,
+                null
         );
     }
 
@@ -42,6 +44,24 @@ public final class TemporalOperationalMetrics {
             double strategyApplicationSeconds,
             double epsilonSeconds,
             double observedGaRuntimeSeconds
+    ) {
+        this(
+                dataCollectionSeconds,
+                gaRuntimeEstimateSeconds,
+                strategyApplicationSeconds,
+                epsilonSeconds,
+                observedGaRuntimeSeconds,
+                null
+        );
+    }
+
+    private TemporalOperationalMetrics(
+            double dataCollectionSeconds,
+            double gaRuntimeEstimateSeconds,
+            double strategyApplicationSeconds,
+            double epsilonSeconds,
+            double observedGaRuntimeSeconds,
+            Double maximumWindowOverrideSeconds
     ) {
         this.dataCollectionSeconds = validateFiniteAndNonNegative(
                 "dataCollectionSeconds",
@@ -63,6 +83,13 @@ public final class TemporalOperationalMetrics {
                 "observedGaRuntimeSeconds",
                 observedGaRuntimeSeconds
         );
+        if (maximumWindowOverrideSeconds != null) {
+            validatePositive(
+                    "maximumWindowOverrideSeconds",
+                    maximumWindowOverrideSeconds
+            );
+        }
+        this.maximumWindowOverrideSeconds = maximumWindowOverrideSeconds;
     }
 
     public static TemporalOperationalMetrics estimated(
@@ -76,7 +103,8 @@ public final class TemporalOperationalMetrics {
                 defaultGaRuntimeEstimateSeconds,
                 strategyApplicationSeconds,
                 epsilonSeconds,
-                defaultGaRuntimeEstimateSeconds
+                defaultGaRuntimeEstimateSeconds,
+                null
         );
     }
 
@@ -91,7 +119,8 @@ public final class TemporalOperationalMetrics {
                 observedGaRuntimeSeconds,
                 strategyApplicationSeconds,
                 epsilonSeconds,
-                observedGaRuntimeSeconds
+                observedGaRuntimeSeconds,
+                null
         );
     }
 
@@ -103,7 +132,21 @@ public final class TemporalOperationalMetrics {
                 newGaRuntimeEstimateSeconds,
                 strategyApplicationSeconds,
                 epsilonSeconds,
-                observedGaRuntimeSeconds
+                observedGaRuntimeSeconds,
+                maximumWindowOverrideSeconds
+        );
+    }
+
+    public TemporalOperationalMetrics withMaximumWindowOverrideSeconds(
+            double newMaximumWindowOverrideSeconds
+    ) {
+        return new TemporalOperationalMetrics(
+                dataCollectionSeconds,
+                gaRuntimeEstimateSeconds,
+                strategyApplicationSeconds,
+                epsilonSeconds,
+                observedGaRuntimeSeconds,
+                newMaximumWindowOverrideSeconds
         );
     }
 
@@ -127,6 +170,19 @@ public final class TemporalOperationalMetrics {
         return observedGaRuntimeSeconds;
     }
 
+    public boolean hasMaximumWindowOverrideSeconds() {
+        return maximumWindowOverrideSeconds != null;
+    }
+
+    public double getMaximumWindowOverrideSeconds() {
+        if (maximumWindowOverrideSeconds == null) {
+            throw new IllegalStateException(
+                    "maximumWindowOverrideSeconds is not available."
+            );
+        }
+        return maximumWindowOverrideSeconds;
+    }
+
     public double getMinimumWindowSeconds() {
         return dataCollectionSeconds
                 + gaRuntimeEstimateSeconds
@@ -147,12 +203,23 @@ public final class TemporalOperationalMetrics {
         return value;
     }
 
+    private static double validatePositive(String fieldName, double value) {
+        if (!Double.isFinite(value)) {
+            throw new IllegalArgumentException(fieldName + " must be finite.");
+        }
+        if (value <= 0.0) {
+            throw new IllegalArgumentException(fieldName + " must be > 0.");
+        }
+        return value;
+    }
+
     @Override
     public String toString() {
         return "TemporalOperationalMetrics{" +
                 "dataCollectionSeconds=" + dataCollectionSeconds +
                 ", gaRuntimeEstimateSeconds=" + gaRuntimeEstimateSeconds +
                 ", observedGaRuntimeSeconds=" + observedGaRuntimeSeconds +
+                ", maximumWindowOverrideSeconds=" + maximumWindowOverrideSeconds +
                 ", strategyApplicationSeconds=" + strategyApplicationSeconds +
                 ", epsilonSeconds=" + epsilonSeconds +
                 ", minimumWindowSeconds=" + getMinimumWindowSeconds() +

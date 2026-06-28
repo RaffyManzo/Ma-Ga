@@ -54,11 +54,28 @@ public class MaGaLiveRuntimeCoordinatorApp extends AbstractApplication<ServerOpe
                 : mosaicSystemStateSource;
         strategyApplier = new LiveStrategyApplier();
 
-        TemporalWindowConfig temporalConfig = TemporalWindowConfig.configuredBoundsForReplay(
-                runtimeConfig.getTemporalInitialWindowSeconds(),
-                runtimeConfig.getConfiguredGaRuntimeEstimateSeconds(),
-                runtimeConfig.getConfiguredMaxWindowSeconds()
-        );
+        LiveAdaptiveDeltaTMaxEstimator.Config adaptiveDeltaTMaxConfig =
+                runtimeConfig.getDeltaTMaxMode() == LiveDeltaTMaxMode.LIVE_ADAPTIVE
+                        ? runtimeConfig.getAdaptiveDeltaTMaxConfig()
+                        : null;
+        TemporalWindowConfig temporalConfig =
+                runtimeConfig.getDeltaTMaxMode() == LiveDeltaTMaxMode.LIVE_ADAPTIVE
+                        ? TemporalWindowConfig.liveRuntimeDeltaTMaxOverride(
+                        runtimeConfig.getTemporalInitialWindowSeconds(),
+                        runtimeConfig.getConfiguredGaRuntimeEstimateSeconds(),
+                        adaptiveDeltaTMaxConfig.getAdaptiveMaximumSeconds()
+                )
+                        : TemporalWindowConfig.configuredBoundsForReplay(
+                        runtimeConfig.getTemporalInitialWindowSeconds(),
+                        runtimeConfig.getConfiguredGaRuntimeEstimateSeconds(),
+                        runtimeConfig.getConfiguredMaxWindowSeconds()
+                );
+        LiveAdaptiveDeltaTMaxEstimator adaptiveDeltaTMaxEstimator =
+                runtimeConfig.getDeltaTMaxMode() == LiveDeltaTMaxMode.LIVE_ADAPTIVE
+                        ? new LiveAdaptiveDeltaTMaxEstimator(
+                        adaptiveDeltaTMaxConfig
+                )
+                        : null;
         GaParameterScalingMode scalingMode = runtimeConfig.getGaParameterScalingMode();
         maGaConfig = experimentalVariant.applyTo(MaGaConfig.defaultConfig(scalingMode));
         PopulationReuseDecisionPolicy reuseDecisionPolicy =
@@ -109,7 +126,12 @@ public class MaGaLiveRuntimeCoordinatorApp extends AbstractApplication<ServerOpe
                 maGaConfig.getGeneticAlgorithmConfig().getPopulationSize()
         );
         LiveGaOverrunDeadlinePolicy deadlinePolicy =
-                new LiveGaOverrunDeadlinePolicy(temporalConfig, maGaConfig.getMobilityConfig());
+                new LiveGaOverrunDeadlinePolicy(
+                        temporalConfig,
+                        maGaConfig.getMobilityConfig(),
+                        runtimeConfig.getDeltaTMaxMode(),
+                        adaptiveDeltaTMaxEstimator
+                );
         executionCoordinator = new LiveGaExecutionCoordinator(
                 runtimeConfig,
                 manager,
@@ -127,6 +149,7 @@ public class MaGaLiveRuntimeCoordinatorApp extends AbstractApplication<ServerOpe
                         + "|profile=" + runtimeConfig.profileName()
                         + "|experimentalVariant=" + experimentalVariant
                         + "|gaParameterScalingMode=" + scalingMode
+                        + "|deltaTMaxMode=" + runtimeConfig.getDeltaTMaxMode()
                         + "|bridgeDescription=" + bridge.getDescription()
                         + "|optimizationSourceDescription=" + systemStateSource.getDescription()
                         + "|sourceMode=" + systemStateSource.getMode()
@@ -226,6 +249,7 @@ public class MaGaLiveRuntimeCoordinatorApp extends AbstractApplication<ServerOpe
                         + "|profile=" + runtimeConfig.profileName()
                         + "|experimentalVariant=" + runtimeConfig.getExperimentalVariant()
                         + "|gaParameterScalingMode=" + runtimeConfig.getGaParameterScalingMode()
+                        + "|deltaTMaxMode=" + runtimeConfig.getDeltaTMaxMode()
                         + "|snapshotsRequested=" + bridge.getSnapshotsRequested()
                         + "|snapshotsResolved=" + bridge.getSnapshotsResolved()
                         + "|snapshotEmptyResponses=" + bridge.getEmptyResponses()
