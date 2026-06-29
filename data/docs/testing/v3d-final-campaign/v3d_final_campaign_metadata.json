@@ -1,0 +1,30 @@
+﻿{
+    "schemaVersion":  "1.0",
+    "status":  "PLANNED_NOT_EXECUTED",
+    "branch":  "testing/v3d-final-campaign",
+    "baselineCommit":  "7a5d9aa9bf00338e060854b1b89e125bc02da029",
+    "baselinePackageSHA256":  "C710A8780DABE3D8360CBE11F278F63802E6F699ED636CDFAC3B6F4DF661D5D3",
+    "runtimeJarSHA256":  "8645EE981E5D4696BFB6EEE8A2F2AC9F4F16B73E72C67AFFFD26B9BDB844EC36",
+    "pacingFactor":  1,
+    "seedSet":  [
+                    104729,
+                    130363,
+                    155921,
+                    181081,
+                    207547
+                ],
+    "requiredRuns":  68,
+    "groupCounts":  {
+                        "G01":  1,
+                        "G02":  45,
+                        "G03":  2,
+                        "G04":  5,
+                        "G05":  15
+                    },
+    "ablation":  {
+                     "included":  false,
+                     "status":  "PENDING_V3D_COMPATIBILITY_AUDIT"
+                 },
+    "simulationExecuted":  false,
+    "commitCreated":  false
+}
