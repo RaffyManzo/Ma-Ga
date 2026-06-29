@@ -1,0 +1,321 @@
+{
+  "schemaVersion": "1.0",
+  "campaignId": "v3d-final-paced-campaign",
+  "campaignBranch": "testing/v3d-final-campaign",
+  "baselineCommit": "739c3eae45130d0ff812a5398e7aaccb1df84ecc",
+  "scenarioName": "MaGaLiteratureBasedUrbanStudy",
+  "expectedMaterializationCount": 66,
+  "expectedConfigCount": 14,
+  "expectedTestCount": 68,
+  "expectedRunCount": 68,
+  "groupOrder": [
+    "G01",
+    "G02",
+    "G03",
+    "G04",
+    "G05"
+  ],
+  "groupExpectedRuns": {
+    "G01": 1,
+    "G02": 45,
+    "G03": 2,
+    "G04": 5,
+    "G05": 15
+  },
+  "paths": {
+    "sourceMatrix": "data/docs/testing/v3d-final-campaign/v3d_final_campaign_matrix.csv",
+    "scenarioInstancePlan": "data/docs/testing/v3d-final-campaign/v3d_materialization_plan.csv",
+    "scenarioConfigurationMapping": "data/docs/testing/v3d-final-campaign/v3d_configuration_mapping.csv",
+    "testIdGroupMapping": "data/docs/testing/v3d-final-campaign/v3d_test_plan.csv",
+    "executionPlan": "data/docs/testing/v3d-final-campaign/v3d_execution_plan.csv",
+    "auditSchema": "data/docs/testing/v3d-final-campaign/v3d_batch_audit_schema.md",
+    "campaignScenarioRoot": "tmp/materialized-literature-scenarios/v3d-final-campaign",
+    "archiveRoot": "tmp/archive/v3d-final-campaign",
+    "preparationAuditRoot": "tmp/v3d-final-campaign-state/preparation-audits",
+    "stateRoot": "tmp/v3d-final-campaign-state",
+    "resultsRoot": "tmp/v3d-final-campaign-results",
+    "reportsRoot": "tmp/v3d-final-campaign-results/reports",
+    "canonicalScenarioRoot": "data/mosaic-scenarios/MaGaLiteratureBasedUrbanStudy",
+    "canonicalScenarioOutputConfig": "data/mosaic-scenarios/MaGaLiveMagaRuntimeStudy/output/output_config.xml",
+    "canonicalMobilityProfile": "tools/intas-literature-scenario/config/synthetic_mobility_profile.json",
+    "canonicalBuilder": "tools/intas-literature-scenario/build_intas_literature_scenario.py",
+    "canonicalSourceValidator": "tools/intas-literature-scenario/validate_literature_configuration.py",
+    "canonicalMaterializedValidator": "tools/intas-literature-scenario/validate_materialized_literature_scenario.py",
+    "legacyMaterializer": "tools/intas-literature-scenario/final_campaign/materialize_final_campaign.py",
+    "legacyValidator": "tools/intas-literature-scenario/final_campaign/validate_final_campaign.py",
+    "runScenarioScript": "tools/intas-literature-scenario/run_literature_scenario.ps1",
+    "runtimeJar": "tools/mosaic-live-maga-runtime/out/maga-live-maga-runtime.jar",
+    "deployScenarioScript": "tools/intas-literature-scenario/deploy_materialized_literature_scenario.ps1",
+    "runtimeArtifactValidatorScript": "tools/mosaic-live-maga-runtime/validate_runtime_artifact.ps1",
+    "runSummarizerScript": "tools/mosaic-live-maga-runtime/summarize-run.ps1",
+    "smokeRunValidatorScript": "tools/intas-literature-scenario/validate_literature_smoke_run.ps1",
+    "adHocDiagnosticJar": "tools/mosaic-adhoc-radio-diagnostic/out/maga-adhoc-radio-diagnostic.jar"
+  },
+  "runtimeArtifact": {
+    "mode": "RECOVERED_VALIDATED_ARTIFACT",
+    "sizeBytes": 557911,
+    "sha256": "8645EE981E5D4696BFB6EEE8A2F2AC9F4F16B73E72C67AFFFD26B9BDB844EC36"
+  },
+  "planningSourceSHA256": "37A32E3278350709B9E070586716CE348DA136530DAFF69ADD68B6C19CFB46BB",
+  "pacing": {
+    "implementation": "MOSAIC_NATIVE_REALTIME_BRAKE",
+    "factor": 1.0
+  },
+  "seedPolicy": {
+    "mobilitySeed": "matrix Seed",
+    "workloadSeedOffset": 1000003,
+    "pairedSeedsAcrossConfigurations": true
+  },
+  "executionPolicy": {
+    "sequential": true,
+    "singleEntryPoint": true,
+    "failSoftPerRun": true,
+    "automaticRetry": false,
+    "resumeSkipsTerminalRuns": true,
+    "perGroupReports": true,
+    "cumulativeReport": true,
+    "abortOnUnsafeResidualProcesses": true,
+    "minimumFreeDiskBytes": 5368709120,
+    "requiredExecutables": [
+      "git",
+      "powershell.exe",
+      "py"
+    ]
+  },
+  "durationProfiles": {
+    "smoke": {
+      "durationSeconds": 180,
+      "durationLabel": "smoke"
+    },
+    "nominal": {
+      "durationSeconds": 300,
+      "durationLabel": "nominal"
+    },
+    "extended": {
+      "durationSeconds": 600,
+      "durationLabel": "extended"
+    }
+  },
+  "workloadProfiles": {
+    "WL-E": {
+      "arrivalRateTasksPerSecondPerActiveVehicle": 1.0,
+      "LIGHT": 0.75,
+      "MEDIUM": 0.2,
+      "HEAVY": 0.05
+    },
+    "WL-I": {
+      "arrivalRateTasksPerSecondPerActiveVehicle": 1.0,
+      "LIGHT": 0.5,
+      "MEDIUM": 0.35,
+      "HEAVY": 0.15
+    },
+    "WL-S": {
+      "arrivalRateTasksPerSecondPerActiveVehicle": 1.0,
+      "LIGHT": 0.25,
+      "MEDIUM": 0.3,
+      "HEAVY": 0.45
+    },
+    "WL-SPARSE": {
+      "arrivalRateTasksPerSecondPerActiveVehicle": 0.05,
+      "LIGHT": 0.75,
+      "MEDIUM": 0.2,
+      "HEAVY": 0.05
+    },
+    "WL-SMOKE": {
+      "preserveSmokeWrapperBehavior": true,
+      "arrivalRateTasksPerSecondPerActiveVehicle": 0.02,
+      "LIGHT": 0.5,
+      "MEDIUM": 0.35,
+      "HEAVY": 0.15
+    }
+  },
+  "routeFamilies": [
+    "DUAL_RSU_SWITCH",
+    "BOTH_RSU_NO_SWITCH",
+    "RSU_0_ONLY",
+    "RSU_1_ONLY",
+    "BACKGROUND"
+  ],
+  "directRouteProfiles": {
+    "CFG-M-BACKGROUND": {
+      "density": "nominal",
+      "vehicleTotal": 50,
+      "dominantFamily": "BACKGROUND",
+      "classificationFlags": [
+        "DIRECTED_ENGINEERING_TEST_PROFILE",
+        "NOT_LITERATURE_CALIBRATED",
+        "NOT_PART_OF_MAIN_FACTORIAL_RESULTS"
+      ],
+      "counts": {
+        "DUAL_RSU_SWITCH": 5,
+        "BOTH_RSU_NO_SWITCH": 4,
+        "RSU_0_ONLY": 3,
+        "RSU_1_ONLY": 3,
+        "BACKGROUND": 35
+      }
+    },
+    "CFG-M-RSU0": {
+      "density": "nominal",
+      "vehicleTotal": 50,
+      "dominantFamily": "RSU_0_ONLY",
+      "classificationFlags": [
+        "DIRECTED_ENGINEERING_TEST_PROFILE",
+        "NOT_LITERATURE_CALIBRATED",
+        "NOT_PART_OF_MAIN_FACTORIAL_RESULTS"
+      ],
+      "counts": {
+        "DUAL_RSU_SWITCH": 5,
+        "BOTH_RSU_NO_SWITCH": 4,
+        "RSU_0_ONLY": 35,
+        "RSU_1_ONLY": 2,
+        "BACKGROUND": 4
+      }
+    },
+    "CFG-M-RSU1": {
+      "density": "nominal",
+      "vehicleTotal": 50,
+      "dominantFamily": "RSU_1_ONLY",
+      "classificationFlags": [
+        "DIRECTED_ENGINEERING_TEST_PROFILE",
+        "NOT_LITERATURE_CALIBRATED",
+        "NOT_PART_OF_MAIN_FACTORIAL_RESULTS"
+      ],
+      "counts": {
+        "DUAL_RSU_SWITCH": 5,
+        "BOTH_RSU_NO_SWITCH": 4,
+        "RSU_0_ONLY": 2,
+        "RSU_1_ONLY": 35,
+        "BACKGROUND": 4
+      }
+    },
+    "CFG-M-SWITCH": {
+      "density": "nominal",
+      "vehicleTotal": 50,
+      "dominantFamily": "DUAL_RSU_SWITCH",
+      "classificationFlags": [
+        "DIRECTED_ENGINEERING_TEST_PROFILE",
+        "NOT_LITERATURE_CALIBRATED",
+        "NOT_PART_OF_MAIN_FACTORIAL_RESULTS"
+      ],
+      "counts": {
+        "DUAL_RSU_SWITCH": 35,
+        "BOTH_RSU_NO_SWITCH": 5,
+        "RSU_0_ONLY": 3,
+        "RSU_1_ONLY": 3,
+        "BACKGROUND": 4
+      }
+    },
+    "CFG-M-V2V": {
+      "density": "high_density",
+      "vehicleTotal": 80,
+      "dominantFamily": "DUAL_RSU_SWITCH",
+      "classificationFlags": [
+        "DIRECTED_ENGINEERING_TEST_PROFILE",
+        "NOT_LITERATURE_CALIBRATED",
+        "NOT_PART_OF_MAIN_FACTORIAL_RESULTS"
+      ],
+      "counts": {
+        "DUAL_RSU_SWITCH": 32,
+        "BOTH_RSU_NO_SWITCH": 6,
+        "RSU_0_ONLY": 5,
+        "RSU_1_ONLY": 5,
+        "BACKGROUND": 32
+      }
+    },
+    "CFG-R-V2VBW": {
+      "density": "high_density",
+      "vehicleTotal": 80,
+      "dominantFamily": "DUAL_RSU_SWITCH",
+      "classificationFlags": [
+        "DIRECTED_ENGINEERING_TEST_PROFILE",
+        "NOT_LITERATURE_CALIBRATED",
+        "NOT_PART_OF_MAIN_FACTORIAL_RESULTS"
+      ],
+      "counts": {
+        "DUAL_RSU_SWITCH": 32,
+        "BOTH_RSU_NO_SWITCH": 6,
+        "RSU_0_ONLY": 5,
+        "RSU_1_ONLY": 5,
+        "BACKGROUND": 32
+      }
+    }
+  },
+  "baselineResources": {
+    "localCpuCyclesPerSecond": 1000000000.0,
+    "remoteVehicleCpuCyclesPerSecond": 1000000000.0,
+    "edgeCpuCyclesPerSecond": 5000000000.0,
+    "cloudCpuCyclesPerSecond": 100000000000.0,
+    "cellCapacityBitsPerSecond": 49200000.0,
+    "cellRttSeconds": 0.0522,
+    "v2vNominalBandwidthBitsPerSecond": 4700000.0,
+    "v2vSinglehopRadiusMeters": 250.0
+  },
+  "defaultResourceMultipliers": {
+    "localCpu": 1.0,
+    "remoteVehicleCpu": 1.0,
+    "edgeCpu": 1.0,
+    "cloudCpu": 1.0,
+    "cellBandwidth": 1.0,
+    "cellRtt": 1.0,
+    "v2vBandwidth": 1.0,
+    "v2vRange": 1.0
+  },
+  "specialConfigs": {},
+  "statusValues": [
+    "MATERIALIZED_VALIDATED",
+    "MATERIALIZED_WITH_WARNINGS",
+    "FAILED_MATERIALIZATION",
+    "FAILED_VALIDATION",
+    "BLOCKED"
+  ],
+  "terminalRunStatuses": [
+    "PASSED",
+    "FAILED_PREFLIGHT",
+    "FAILED_TIMEOUT",
+    "FAILED_EXECUTION",
+    "FAILED_POSTPROCESS",
+    "FAILED_VALIDATION",
+    "FAILED_CLEANUP"
+  ],
+  "frozenCommit": "739c3eae45130d0ff812a5398e7aaccb1df84ecc",
+  "pilotMaterializationIds": [],
+  "reproMaterializationIds": [],
+  "runtimePolicy": {
+    "policyId": "V3D_LIVE_ADAPTIVE_FRESHNESS_AWARE",
+    "validatedReferenceConfigSHA256": "A5693E8225A7F97DF0448576F5F1224B7235D83DC7AB2C36845ED65A57F8790F",
+    "requiredValues": {
+      "scenarioName": "MaGaLiteratureBasedUrbanStudy",
+      "initialOptimizationDelayMs": 1000,
+      "gaPollingIntervalMs": 50,
+      "singleInFlightGaOnly": true,
+      "discardLateResult": true,
+      "keepLastAppliedStrategyWhileRunning": true,
+      "freshReoptimizationAfterTimeout": true,
+      "runtimeTraceEnabled": true,
+      "diagnosticArtificialGaDelayMs": 0,
+      "temporalInitialWindowSeconds": 1.0,
+      "configuredGaRuntimeEstimateSeconds": 0.01,
+      "configuredMaxWindowSeconds": 0.2,
+      "deltaTMaxComparisonEpsilonSeconds": 1e-09,
+      "publishedSnapshotCopyLimit": 32,
+      "nativeLiveDetailedReportingEnabled": true,
+      "nativeLiveDetailedReportPrintToConsole": false,
+      "gaParameterScalingMode": "STATIC",
+      "gaWallClockBudgetMode": "LIVE_ADAPTIVE",
+      "configuredInitialGaWallClockBudgetSeconds": 0.2,
+      "adaptiveGaWallClockBudgetMinimumSeconds": 0.1,
+      "adaptiveGaWallClockBudgetMaximumSeconds": 1.5,
+      "adaptiveGaWallClockBudgetHistorySize": 20,
+      "adaptiveGaWallClockBudgetWarmupSamples": 3,
+      "adaptiveGaWallClockBudgetSafetyMarginSeconds": 0.1,
+      "adaptiveGaWallClockBudgetMaximumStepUpSeconds": 0.25,
+      "adaptiveGaWallClockBudgetMaximumStepDownSeconds": 0.1,
+      "maxSnapshotAgeSimulationSeconds": 2.0,
+      "cooperativeGaBudgetStopEnabled": true
+    },
+    "coordinatorTickIntervalMsByWorkload": {
+      "default": 100,
+      "WL-SMOKE": 500
+    }
+  }
+}
