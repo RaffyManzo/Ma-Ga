@@ -1,0 +1,36 @@
+﻿{
+    "schemaVersion":  "1.0",
+    "status":  "PASS_V3D_NATIVE_PACING_VALIDATED_SINGLE_PILOT",
+    "branch":  "experiment/v3d-simulation-pacing",
+    "commit":  "9de6ea7f190bf0100c8f4b793f8c9e71b79586bc",
+    "evidence":  {
+                     "file":  "v3d-paced-pilot-20260629-020307.zip",
+                     "sha256":  "C35E6C43A66A7006186DB29F51BAEC55B9C60EB29A5F4C4E95E3C04B32B92E62",
+                     "manifestEntries":  61
+                 },
+    "pacing":  {
+                   "implementation":  "MOSAIC_NATIVE_REALTIME_BRAKE",
+                   "factor":  1,
+                   "simulatedSeconds":  300,
+                   "mosaicWallClockSeconds":  326.524,
+                   "endToEndWallClockSeconds":  345.15,
+                   "simulatedToMosaicWallClockRatio":  0.91876860506425251
+               },
+    "results":  {
+                    "completedJobs":  154,
+                    "applied":  140,
+                    "stale":  14,
+                    "staleRatioPercent":  9.090909,
+                    "staleWallClock":  7,
+                    "staleSimulationAge":  0,
+                    "staleBoth":  7,
+                    "longestStaleSequence":  4,
+                    "lastAppliedSimulationSeconds":  299.1,
+                    "finalGapSeconds":  0.89999999999997726
+                },
+    "scope":  {
+                  "javaModified":  false,
+                  "coreMaGaModified":  false,
+                  "statisticalPerformanceClaim":  false
+              }
+}
