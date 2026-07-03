@@ -249,14 +249,12 @@ public final class MaGaOptimizer {
          * il risultato restituito senza reinserire il costo nel ciclo interno.
          */
         bestOverall = repairOperator.repairChromosome(bestOverall, snapshot);
-        bestOverall.setFitness(
-                fitnessEvaluator.evaluateFast(bestOverall, evaluationContext)
-        );
 
         EvaluationBreakdown bestEvaluation = fitnessEvaluator.evaluateDetailed(
                 bestOverall,
                 evaluationContext
         );
+        bestOverall.setFitness(bestEvaluation.getFitness());
         List<Chromosome> finalPopulation = prepareFinalPopulationForResult(
                 population,
                 bestOverall
