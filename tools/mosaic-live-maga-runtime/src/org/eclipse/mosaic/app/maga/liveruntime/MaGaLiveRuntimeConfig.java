@@ -33,6 +33,10 @@ public final class MaGaLiveRuntimeConfig {
     int publishedSnapshotCopyLimit;
     boolean nativeLiveDetailedReportingEnabled;
     boolean nativeLiveDetailedReportPrintToConsole;
+    Boolean advancedMobilityDiagnosticsEnabled;
+    Integer advancedDiagnosticsFlushBatchSize;
+    String advancedDiagnosticsRunId;
+    Long advancedDiagnosticsSeed;
     String gaParameterScalingMode;
     String experimentalVariant;
 
@@ -104,6 +108,18 @@ public final class MaGaLiveRuntimeConfig {
     public int getPublishedSnapshotCopyLimit() { return publishedSnapshotCopyLimit; }
     public boolean isNativeLiveDetailedReportingEnabled() { return nativeLiveDetailedReportingEnabled; }
     public boolean isNativeLiveDetailedReportPrintToConsole() { return nativeLiveDetailedReportPrintToConsole; }
+    public boolean isAdvancedMobilityDiagnosticsEnabled() {
+        return Boolean.TRUE.equals(advancedMobilityDiagnosticsEnabled);
+    }
+    public int getAdvancedDiagnosticsFlushBatchSize() {
+        return advancedDiagnosticsFlushBatchSize;
+    }
+    public String getAdvancedDiagnosticsRunId() {
+        return advancedDiagnosticsRunId;
+    }
+    public Long getAdvancedDiagnosticsSeed() {
+        return advancedDiagnosticsSeed;
+    }
     public boolean isCooperativeGaBudgetStopEnabled() { return cooperativeGaBudgetStopEnabled; }
     public double getMaxSnapshotAgeSimulationSeconds() { return maxSnapshotAgeSimulationSeconds; }
     public double getConfiguredInitialGaWallClockBudgetSeconds() {
@@ -182,6 +198,17 @@ public final class MaGaLiveRuntimeConfig {
                     source + ": publishedSnapshotCopyLimit must be >= 1"
             );
         }
+        if (advancedDiagnosticsFlushBatchSize < 1
+                || advancedDiagnosticsFlushBatchSize > 4096) {
+            throw new IllegalArgumentException(
+                    source + ": advancedDiagnosticsFlushBatchSize must be in [1,4096]"
+            );
+        }
+        if (advancedDiagnosticsSeed != null && advancedDiagnosticsSeed < 0L) {
+            throw new IllegalArgumentException(
+                    source + ": advancedDiagnosticsSeed must be >= 0 when provided"
+            );
+        }
         if (!singleInFlightGaOnly || !discardLateResult
                 || !keepLastAppliedStrategyWhileRunning
                 || !freshReoptimizationAfterTimeout) {
@@ -209,6 +236,18 @@ public final class MaGaLiveRuntimeConfig {
                 || !scenarioName.matches("^[A-Za-z0-9_.-]+$")) {
             throw new IllegalArgumentException(source + ": scenarioName is invalid");
         }
+        if (advancedMobilityDiagnosticsEnabled == null) {
+            advancedMobilityDiagnosticsEnabled = Boolean.FALSE;
+        }
+        if (advancedDiagnosticsFlushBatchSize == null) {
+            advancedDiagnosticsFlushBatchSize = 32;
+        }
+        if (advancedDiagnosticsRunId == null || advancedDiagnosticsRunId.isBlank()) {
+            advancedDiagnosticsRunId = scenarioName;
+        } else {
+            advancedDiagnosticsRunId = advancedDiagnosticsRunId.trim();
+        }
+
         gaParameterScalingMode = normalizeEnum(
                 gaParameterScalingMode, GaParameterScalingMode.ADAPTIVE.name(),
                 source, "gaParameterScalingMode", "STATIC or ADAPTIVE"

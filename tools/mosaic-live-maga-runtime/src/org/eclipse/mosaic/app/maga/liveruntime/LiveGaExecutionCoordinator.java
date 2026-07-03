@@ -2,6 +2,7 @@ package org.eclipse.mosaic.app.maga.liveruntime;
 
 import ga.core.GaExecutionBudget;
 import model.snapshot.SystemSnapshot;
+import org.eclipse.mosaic.app.maga.liveruntime.reporting.LiveAdvancedDiagnosticsCollector;
 import org.eclipse.mosaic.app.maga.liveruntime.reporting.LiveNativeReportingCollector;
 import org.eclipse.mosaic.app.maga.liveruntime.reporting.LiveStaleStrategyWriter;
 import window.core.TemporalWindowManager;
@@ -28,6 +29,7 @@ final class LiveGaExecutionCoordinator implements AutoCloseable {
     private final LiveGaOverrunDeadlinePolicy deadlinePolicy;
     private final LiveNativeReportingCollector reportingCollector;
     private final LiveStaleStrategyWriter staleStrategyWriter;
+    private final LiveAdvancedDiagnosticsCollector advancedDiagnosticsCollector;
     private final ExecutorService executor = Executors.newSingleThreadExecutor();
 
     private TemporalWindowState temporalState;
@@ -54,7 +56,8 @@ final class LiveGaExecutionCoordinator implements AutoCloseable {
             LiveRuntimeTraceWriter traceWriter,
             LiveGaOverrunDeadlinePolicy deadlinePolicy,
             LiveNativeReportingCollector reportingCollector,
-            LiveStaleStrategyWriter staleStrategyWriter
+            LiveStaleStrategyWriter staleStrategyWriter,
+            LiveAdvancedDiagnosticsCollector advancedDiagnosticsCollector
     ) {
         this.config = config;
         this.manager = manager;
@@ -64,6 +67,7 @@ final class LiveGaExecutionCoordinator implements AutoCloseable {
         this.deadlinePolicy = deadlinePolicy;
         this.reportingCollector = reportingCollector;
         this.staleStrategyWriter = staleStrategyWriter;
+        this.advancedDiagnosticsCollector = advancedDiagnosticsCollector;
     }
 
     void onTick(
@@ -381,6 +385,14 @@ final class LiveGaExecutionCoordinator implements AutoCloseable {
                 details(completion, postCompletionDeltaTMaxSnapshot)
         );
         LiveAppliedStrategy applied = strategyApplier.apply(completion.getStepResult(), simulationTimeNs);
+        if (advancedDiagnosticsCollector != null) {
+            advancedDiagnosticsCollector.recordAppliedStrategy(
+                    completion.getJob().getJobId(),
+                    completion.getStepResult(),
+                    applied,
+                    simulationTimeNs
+            );
+        }
         if (reportingCollector != null) {
             reportingCollector.recordApplied(
                     completion.getJob().getJobId(),
@@ -464,6 +476,19 @@ final class LiveGaExecutionCoordinator implements AutoCloseable {
 
         staleResultDiscardedObserved = true;
         gaJobsDiscardedAsStale++;
+        if (advancedDiagnosticsCollector != null) {
+            advancedDiagnosticsCollector.recordStaleClassification(
+                    completion.getJob().getJobId(),
+                    completion.getStepResult(),
+                    staleReason,
+                    simulationTimeNs,
+                    completion.getWallClockRuntimeSeconds(),
+                    completion.getJob().getGaWallClockBudgetAtSubmissionSeconds(),
+                    completion.getJob().getTemporalMaximumAtSubmissionSeconds(),
+                    completion.getJob().getMaxSnapshotAgeSimulationSeconds(),
+                    strategyApplier.getLastAppliedStrategy()
+            );
+        }
         if (staleStrategyWriter != null) {
             staleStrategyWriter.writeStale(
                     completion.getJob().getJobId(),

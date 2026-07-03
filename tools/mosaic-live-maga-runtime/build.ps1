@@ -241,7 +241,12 @@ $ExpectedClassFiles = @(
     "org\eclipse\mosaic\app\maga\liveruntime\LiveStaleReason.class",
     "org\eclipse\mosaic\app\maga\liveruntime\LiveAssignmentDecision.class",
     "org\eclipse\mosaic\app\maga\liveruntime\reporting\LiveStaleStrategyWriter.class",
-    "org\eclipse\mosaic\app\maga\liveruntime\reporting\LiveStaleStrategyWriter`$1.class"
+    "org\eclipse\mosaic\app\maga\liveruntime\reporting\LiveStaleStrategyWriter`$1.class",
+    "org\eclipse\mosaic\app\maga\liveruntime\reporting\LiveAdvancedDiagnosticsCollector.class",
+    "org\eclipse\mosaic\app\maga\liveruntime\reporting\LiveAdvancedDiagnosticsCollector`$MutableVehicleObservation.class",
+    "org\eclipse\mosaic\app\maga\liveruntime\reporting\LiveAdvancedDiagnosticsCollector`$VehicleObservation.class",
+    "org\eclipse\mosaic\app\maga\liveruntime\reporting\LiveAdvancedDiagnosticsEvent.class",
+    "org\eclipse\mosaic\app\maga\liveruntime\reporting\LiveAdvancedDiagnosticsWriter.class"
 )
 
 try {
@@ -296,10 +301,10 @@ try {
     }
     Assert-NoJavacInternalFailure -Output $JavacResult.Combined
 
-    # Expected class count after V3-C adds the cooperative GA budget,
-    # explicit stale reasons, full assignment snapshots, and stale-strategy
-    # reporting. Fitness, repair, chromosome and genetic operators are unchanged.
-    $ExpectedFrozenClassCount = 273
+    # Expected class count after V3-C and the G04 advanced diagnostics
+    # observability-only extension. Fitness, repair, chromosome, genetic
+    # operators, temporal policy and offloading decisions are unchanged.
+    $ExpectedFrozenClassCount = 278
     $ActualClassCount = (Get-ChildItem -LiteralPath $StagingClassesDir -Recurse -Filter "*.class" -File).Count
     if ($ActualClassCount -ne $ExpectedFrozenClassCount) {
         throw "Unexpected class count: expected=$ExpectedFrozenClassCount actual=$ActualClassCount"

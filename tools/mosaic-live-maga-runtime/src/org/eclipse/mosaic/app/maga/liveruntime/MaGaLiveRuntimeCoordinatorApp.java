@@ -5,6 +5,7 @@ import config.ga.GaParameterScalingMode;
 import config.window.TemporalWindowConfig;
 import ga.core.MaGaOptimizer;
 import org.eclipse.mosaic.app.maga.livestate.LiveStateLayerRuntimeFacade;
+import org.eclipse.mosaic.app.maga.liveruntime.reporting.LiveAdvancedDiagnosticsCollector;
 import org.eclipse.mosaic.app.maga.liveruntime.reporting.LiveDetailedReportWriter;
 import org.eclipse.mosaic.app.maga.liveruntime.reporting.LiveNativeReportingCollector;
 import org.eclipse.mosaic.app.maga.liveruntime.reporting.LiveStaleStrategyWriter;
@@ -39,6 +40,7 @@ public class MaGaLiveRuntimeCoordinatorApp extends AbstractApplication<ServerOpe
     private LiveRuntimeTraceWriter traceWriter;
     private LiveNativeReportingCollector reportingCollector;
     private LiveStaleStrategyWriter staleStrategyWriter;
+    private LiveAdvancedDiagnosticsCollector advancedDiagnosticsCollector;
     private LiveGaExecutionCoordinator executionCoordinator;
     private MaGaConfig maGaConfig;
     private Path runDirectory;
@@ -104,6 +106,23 @@ public class MaGaLiveRuntimeCoordinatorApp extends AbstractApplication<ServerOpe
                     ? traceWriter.getOutputDir()
                     : reportingCollector.getReportingDir();
             staleStrategyWriter = new LiveStaleStrategyWriter(staleReportingDir);
+            if (runtimeConfig.isAdvancedMobilityDiagnosticsEnabled()) {
+                try {
+                    advancedDiagnosticsCollector = new LiveAdvancedDiagnosticsCollector(
+                            staleReportingDir,
+                            runtimeConfig.getAdvancedDiagnosticsRunId(),
+                            runtimeConfig.getAdvancedDiagnosticsSeed(),
+                            runtimeConfig.getAdvancedDiagnosticsFlushBatchSize()
+                    );
+                } catch (IOException diagnosticError) {
+                    advancedDiagnosticsCollector = null;
+                    System.err.println(
+                            "G04_ADVANCED_DIAGNOSTICS_STARTUP_DISABLED_FAIL_SOFT"
+                                    + "|type=" + diagnosticError.getClass().getName()
+                                    + "|message=" + diagnosticError.getMessage()
+                    );
+                }
+            }
         } catch (IOException e) {
             throw new IllegalStateException("Unable to open live MA-GA runtime traces", e);
         }
@@ -143,7 +162,8 @@ public class MaGaLiveRuntimeCoordinatorApp extends AbstractApplication<ServerOpe
                 traceWriter,
                 deadlinePolicy,
                 reportingCollector,
-                staleStrategyWriter
+                staleStrategyWriter,
+                advancedDiagnosticsCollector
         );
 
         getLog().infoSimTime(
@@ -174,6 +194,13 @@ public class MaGaLiveRuntimeCoordinatorApp extends AbstractApplication<ServerOpe
         LiveStateLayerRuntimeFacade.RuntimeSnapshot runtimeSnapshot =
                 stateFacade.buildSnapshotAt(tickTimeNs);
         try {
+            if (advancedDiagnosticsCollector != null
+                    && runtimeSnapshot.getSnapshot().isPresent()) {
+                advancedDiagnosticsCollector.observeSnapshot(
+                        runtimeSnapshot.getSnapshot().get(),
+                        tickTimeNs
+                );
+            }
             traceWriter.writeBridgeSnapshot(tickTimeNs, runtimeSnapshot);
             runtimeSnapshot.getSnapshot().ifPresent(
                     snapshot -> bridge.publishSnapshot(snapshot, runtimeSnapshot.getAudit())
@@ -209,6 +236,9 @@ public class MaGaLiveRuntimeCoordinatorApp extends AbstractApplication<ServerOpe
             if (executionCoordinator != null) {
                 executionCoordinator.finishOnShutdown(shutdownTimeNs);
                 executionCoordinator.close();
+            }
+            if (advancedDiagnosticsCollector != null) {
+                advancedDiagnosticsCollector.close();
             }
             if (reportingCollector != null) {
                 LiveDetailedReportWriter.LiveDetailedReportArtifacts artifacts =
