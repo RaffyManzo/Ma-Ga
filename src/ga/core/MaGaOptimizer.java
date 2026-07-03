@@ -158,7 +158,6 @@ public final class MaGaOptimizer {
                 snapshot,
                 initialPopulation
         );
-        evaluatePopulation(population, snapshot);
 
         GenerationStat initialStat = computeGenerationStat(0, population);
         generationHistory.add(initialStat);
@@ -275,10 +274,13 @@ public final class MaGaOptimizer {
             List<Chromosome> initialPopulation
     ) {
         if (initialPopulation == null || initialPopulation.isEmpty()) {
-            return populationInitializer.createInitialPopulation(
-                    snapshot,
-                    gaConfig.getPopulationSize()
-            );
+            List<Chromosome> created =
+                    populationInitializer.createInitialPopulation(
+                            snapshot,
+                            gaConfig.getPopulationSize()
+                    );
+            evaluatePopulation(created, snapshot);
+            return created;
         }
 
         List<Chromosome> prepared = new ArrayList<>();
@@ -293,10 +295,13 @@ public final class MaGaOptimizer {
         }
 
         if (prepared.isEmpty()) {
-            return populationInitializer.createInitialPopulation(
-                    snapshot,
-                    gaConfig.getPopulationSize()
-            );
+            List<Chromosome> created =
+                    populationInitializer.createInitialPopulation(
+                            snapshot,
+                            gaConfig.getPopulationSize()
+                    );
+            evaluatePopulation(created, snapshot);
+            return created;
         }
 
         if (prepared.size() > gaConfig.getPopulationSize()) {
