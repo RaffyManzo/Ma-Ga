@@ -1,6 +1,9 @@
 package ga.fitness;
 
+import model.bandwidth.BandwidthPoolResolver;
 import model.node.NodeCandidate;
+import model.node.NodeType;
+import model.snapshot.BandwidthPoolSnapshot;
 import model.snapshot.SystemSnapshot;
 import model.snapshot.TaskInstance;
 import model.snapshot.VehicleSnapshot;
@@ -28,6 +31,10 @@ public final class FitnessEvaluationContext {
     private final Map<String, TaskInstance> taskById;
     private final Map<String, VehicleSnapshot> vehicleById;
     private final Map<String, NodeCandidate> candidateById;
+    private final Map<String, Double> executionNodeAvailableCpuById;
+    private final Map<String, Double> candidateAvailableBandwidthById;
+    private final Map<String, Double> poolAvailableBandwidthById;
+    private final Map<String, BandwidthPoolSnapshot> poolByCandidateId;
 
     private FitnessEvaluationContext(SystemSnapshot snapshot) {
         this.snapshot = Objects.requireNonNull(
@@ -54,6 +61,23 @@ public final class FitnessEvaluationContext {
         );
         this.candidateById = Collections.unmodifiableMap(
                 indexCandidates(candidates)
+        );
+        this.executionNodeAvailableCpuById = Collections.unmodifiableMap(
+                indexExecutionNodeCpu(candidates)
+        );
+        this.candidateAvailableBandwidthById = Collections.unmodifiableMap(
+                indexCandidateBandwidth(candidates)
+        );
+        this.poolAvailableBandwidthById = Collections.unmodifiableMap(
+                indexPoolBandwidth(
+                        requireList(
+                                snapshot.getBandwidthPools(),
+                                "snapshot.bandwidthPools"
+                        )
+                )
+        );
+        this.poolByCandidateId = Collections.unmodifiableMap(
+                indexCandidatePools(snapshot, candidates)
         );
     }
 
@@ -91,6 +115,22 @@ public final class FitnessEvaluationContext {
         return candidateById;
     }
 
+    Map<String, Double> getExecutionNodeAvailableCpuById() {
+        return executionNodeAvailableCpuById;
+    }
+
+    Map<String, Double> getCandidateAvailableBandwidthById() {
+        return candidateAvailableBandwidthById;
+    }
+
+    Map<String, Double> getPoolAvailableBandwidthById() {
+        return poolAvailableBandwidthById;
+    }
+
+    BandwidthPoolSnapshot getPoolByCandidateId(String candidateId) {
+        return poolByCandidateId.get(candidateId);
+    }
+
     private static Map<String, TaskInstance> indexTasks(
             List<TaskInstance> tasks
     ) {
@@ -117,6 +157,72 @@ public final class FitnessEvaluationContext {
         Map<String, NodeCandidate> result = new HashMap<>();
         for (NodeCandidate candidate : candidates) {
             result.put(candidate.getCandidateId(), candidate);
+        }
+        return result;
+    }
+
+    private static Map<String, Double> indexExecutionNodeCpu(
+            List<NodeCandidate> candidates
+    ) {
+        Map<String, Double> result = new HashMap<>();
+        for (NodeCandidate candidate : candidates) {
+            if (candidate.getType() == NodeType.LOCAL) {
+                continue;
+            }
+            result.putIfAbsent(
+                    candidate.getExecutionNodeId(),
+                    candidate.getAvailableCpu()
+            );
+        }
+        return result;
+    }
+
+    private static Map<String, Double> indexCandidateBandwidth(
+            List<NodeCandidate> candidates
+    ) {
+        Map<String, Double> result = new HashMap<>();
+        for (NodeCandidate candidate : candidates) {
+            if (candidate.getType() == NodeType.LOCAL) {
+                continue;
+            }
+            result.put(
+                    candidate.getCandidateId(),
+                    candidate.getAvailableBandwidth()
+            );
+        }
+        return result;
+    }
+
+    private static Map<String, Double> indexPoolBandwidth(
+            List<BandwidthPoolSnapshot> pools
+    ) {
+        Map<String, Double> result = new HashMap<>();
+        for (BandwidthPoolSnapshot pool : pools) {
+            result.put(pool.getPoolId(), pool.getAvailableBandwidth());
+        }
+        return result;
+    }
+
+    private static Map<String, BandwidthPoolSnapshot> indexCandidatePools(
+            SystemSnapshot snapshot,
+            List<NodeCandidate> candidates
+    ) {
+        BandwidthPoolResolver resolver = new BandwidthPoolResolver();
+        Map<String, BandwidthPoolSnapshot> result = new HashMap<>();
+
+        for (NodeCandidate candidate : candidates) {
+            if (candidate.getType() == NodeType.LOCAL) {
+                continue;
+            }
+
+            try {
+                result.put(
+                        candidate.getCandidateId(),
+                        resolver.resolve(snapshot, candidate)
+                );
+            } catch (IllegalArgumentException ignored) {
+                // La fitness applica la penalita' di soluzione invalida.
+            }
         }
         return result;
     }

@@ -291,7 +291,7 @@ public final class PopulationAdapter {
                     repairOperator.repairChromosome(copied, currentSnapshot);
 
             repairedChromosome.setFitness(
-                    fitnessEvaluator.evaluate(
+                    fitnessEvaluator.evaluateFast(
                             repairedChromosome,
                             evaluationContext
                     )
@@ -417,7 +417,7 @@ public final class PopulationAdapter {
             }
 
             chromosome.setFitness(
-                    fitnessEvaluator.evaluate(chromosome, evaluationContext)
+                    fitnessEvaluator.evaluateFast(chromosome, evaluationContext)
             );
         }
     }

@@ -14,7 +14,6 @@ import ga.fitness.breakdown.MobilityPenaltyBreakdown;
 import ga.fitness.local.LocalCpuContentionEvaluator;
 import ga.fitness.local.LocalCpuContentionEvaluator.Evaluation;
 import ga.fitness.local.LocalCpuContentionEvaluator.TaskResult;
-import model.bandwidth.BandwidthPoolResolver;
 import model.genetic.Chromosome;
 import model.genetic.Gene;
 import model.mobility.CoverageEstimator;
@@ -57,13 +56,14 @@ import java.util.Objects;
  */
 public final class FitnessEvaluator {
     private static final double EPSILON = 1.0E-9;
+    private static final double RELATIVE_CPU_TOLERANCE = 1.0E-9;
+    private static final double ABSOLUTE_CPU_TOLERANCE = 1.0E-6;
     private static final double INVALID_SOLUTION_PENALTY = 1.0E9;
     private static final double HARD_DEADLINE_VIOLATION_PENALTY = 1.0E12;
 
     private final MaGaConfig config;
     private final CoverageEstimator coverageEstimator;
     private final OffloadingTimeModel offloadingTimeModel;
-    private final BandwidthPoolResolver bandwidthPoolResolver;
     private final LocalCpuContentionEvaluator localCpuContentionEvaluator;
 
     public FitnessEvaluator(MaGaConfig config) {
@@ -91,7 +91,6 @@ public final class FitnessEvaluator {
                 "coverageEstimator must not be null."
         );
         this.offloadingTimeModel = new OffloadingTimeModel();
-        this.bandwidthPoolResolver = new BandwidthPoolResolver();
         this.localCpuContentionEvaluator =
                 new LocalCpuContentionEvaluator();
     }
@@ -102,15 +101,191 @@ public final class FitnessEvaluator {
     }
 
     public double evaluate(Chromosome chromosome, SystemSnapshot snapshot) {
-        return evaluate(chromosome, createContext(snapshot));
+        return evaluateFast(chromosome, createContext(snapshot));
     }
 
-    /** Valutazione che riusa un contesto già costruito per lo snapshot. */
+    /** Valutazione scalare compatibile con l'API storica. */
     public double evaluate(
             Chromosome chromosome,
             FitnessEvaluationContext context
     ) {
-        return evaluateDetailed(chromosome, context).getFitness();
+        return evaluateFast(chromosome, context);
+    }
+
+    /** Valutazione scalare senza costruire breakdown diagnostici. */
+    public double evaluateFast(
+            Chromosome chromosome,
+            SystemSnapshot snapshot
+    ) {
+        return evaluateFast(chromosome, createContext(snapshot));
+    }
+
+    /**
+     * Valutazione scalare con contesto snapshot-scoped.
+     *
+     * <p>Condivide con la valutazione dettagliata il calcolo del singolo gene,
+     * ma evita le strutture diagnostiche usate soltanto nel reporting.</p>
+     */
+    public double evaluateFast(
+            Chromosome chromosome,
+            FitnessEvaluationContext context
+    ) {
+        Objects.requireNonNull(
+                chromosome,
+                "chromosome must not be null."
+        );
+        Objects.requireNonNull(context, "context must not be null.");
+
+        SystemSnapshot snapshot = context.getSnapshot();
+        List<TaskInstance> tasks = context.getTasks();
+        List<Gene> genes = requireList(
+                chromosome.getGenes(),
+                "chromosome.genes"
+        );
+
+        Map<String, TaskInstance> taskById = context.getTaskById();
+        Map<String, VehicleSnapshot> vehicleById = context.getVehicleById();
+        Map<String, NodeCandidate> candidateById = context.getCandidateById();
+        Map<String, Gene> geneByTaskId = indexGenes(genes);
+
+        double invalidPenalty = computeCardinalityPenalty(tasks, genes);
+        invalidPenalty += computeUnknownGeneTaskPenalty(geneByTaskId, taskById);
+
+        Evaluation localContention = localCpuContentionEvaluator.evaluate(
+                tasks,
+                geneByTaskId,
+                candidateById,
+                vehicleById
+        );
+
+        Map<String, Double> cpuUsedByExecutionNode = new HashMap<>();
+        Map<String, Double> bandwidthUsedByCandidate = new HashMap<>();
+        Map<String, Double> bandwidthUsedByPool = new HashMap<>();
+        Map<String, Double> maxLocalDemandRatioByVehicle = new HashMap<>();
+
+        double completionTime = 0.0;
+        double communicationLatencySum = 0.0;
+        double mobilityPenalty = 0.0;
+        double constraintPenalty = 0.0;
+        double hardDeadlinePenalty = 0.0;
+
+        for (TaskInstance task : tasks) {
+            Gene gene = geneByTaskId.get(task.getTaskId());
+            if (gene == null) {
+                invalidPenalty += INVALID_SOLUTION_PENALTY;
+                continue;
+            }
+
+            NodeCandidate candidate = candidateById.get(
+                    gene.getSelectedCandidateId()
+            );
+            VehicleSnapshot sourceVehicle = vehicleById.get(
+                    task.getSourceVehicleId()
+            );
+
+            if (candidate == null || sourceVehicle == null) {
+                invalidPenalty += INVALID_SOLUTION_PENALTY;
+                continue;
+            }
+            if (!candidate.isValidForSourceVehicle(
+                    task.getSourceVehicleId()
+            )) {
+                invalidPenalty += INVALID_SOLUTION_PENALTY;
+                continue;
+            }
+
+            TaskResult taskContention = localContention.getTaskResult(
+                    task.getTaskId()
+            );
+            GeneEvaluationData geneEvaluation = evaluateGeneData(
+                    snapshot,
+                    task,
+                    gene,
+                    candidate,
+                    sourceVehicle,
+                    taskContention
+            );
+
+            completionTime = Math.max(
+                    completionTime,
+                    geneEvaluation.completionTimeSeconds
+            );
+            communicationLatencySum +=
+                    geneEvaluation.communicationLatencySeconds;
+            mobilityPenalty += geneEvaluation.mobilityPenalty;
+            constraintPenalty += geneEvaluation.constraintPenalty;
+            hardDeadlinePenalty += computeHardDeadlinePenalty(
+                    geneEvaluation
+            );
+
+            if (candidate.getType() != NodeType.LOCAL) {
+                addUsage(
+                        cpuUsedByExecutionNode,
+                        candidate.getExecutionNodeId(),
+                        geneEvaluation.allocatedCpu
+                );
+                addUsage(
+                        bandwidthUsedByCandidate,
+                        candidate.getCandidateId(),
+                        geneEvaluation.allocatedBandwidth
+                );
+
+                BandwidthPoolSnapshot pool =
+                        context.getPoolByCandidateId(
+                                candidate.getCandidateId()
+                        );
+                if (pool == null
+                        || !context.getPoolAvailableBandwidthById()
+                                .containsKey(pool.getPoolId())) {
+                    invalidPenalty += INVALID_SOLUTION_PENALTY;
+                } else {
+                    addUsage(
+                            bandwidthUsedByPool,
+                            pool.getPoolId(),
+                            geneEvaluation.allocatedBandwidth
+                    );
+                }
+            }
+
+            if (geneEvaluation.localCpuCycles > EPSILON) {
+                double demandRatio = taskContention == null
+                        ? 0.0
+                        : taskContention.getDemandRatio();
+                addMaximumNonNegative(
+                        maxLocalDemandRatioByVehicle,
+                        task.getSourceVehicleId(),
+                        demandRatio
+                );
+            }
+        }
+
+        double resourcePenalty = computeFastResourcePenalty(
+                context,
+                cpuUsedByExecutionNode,
+                bandwidthUsedByCandidate,
+                bandwidthUsedByPool,
+                maxLocalDemandRatioByVehicle
+        );
+        double totalResourceAndConstraintPenalty =
+                resourcePenalty + constraintPenalty + invalidPenalty;
+
+        FitnessWeights weights = config.getFitnessWeights();
+        NormalizationConfig normalization = config.getNormalizationConfig();
+
+        double normalizedCompletionTime =
+                completionTime / normalization.getTRef();
+        double normalizedCommunicationLatency =
+                communicationLatencySum / normalization.getLRef();
+        double normalizedMobilityPenalty =
+                mobilityPenalty / normalization.getPmobRef();
+        double normalizedResourcePenalty =
+                totalResourceAndConstraintPenalty / normalization.getPresRef();
+
+        return hardDeadlinePenalty
+                + weights.getWT() * normalizedCompletionTime
+                + weights.getWL() * normalizedCommunicationLatency
+                + weights.getWM() * normalizedMobilityPenalty
+                + weights.getWR() * normalizedResourcePenalty;
     }
 
     public EvaluationBreakdown evaluateDetailed(
@@ -198,7 +373,7 @@ public final class FitnessEvaluator {
                 continue;
             }
 
-            GeneEvaluationBreakdown geneBreakdown = evaluateGene(
+            GeneEvaluationData geneEvaluation = evaluateGeneData(
                     snapshot,
                     task,
                     gene,
@@ -206,6 +381,8 @@ public final class FitnessEvaluator {
                     sourceVehicle,
                     localContention.getTaskResult(task.getTaskId())
             );
+            GeneEvaluationBreakdown geneBreakdown =
+                    geneEvaluation.toBreakdown();
             geneBreakdowns.add(geneBreakdown);
 
             completionTime = Math.max(
@@ -236,11 +413,13 @@ public final class FitnessEvaluator {
                     );
                 }
 
-                try {
-                    BandwidthPoolSnapshot pool = bandwidthPoolResolver.resolve(
-                            snapshot,
-                            candidate
-                    );
+                BandwidthPoolSnapshot pool =
+                        context.getPoolByCandidateId(
+                                candidate.getCandidateId()
+                        );
+                if (pool == null) {
+                    invalidPenalty += INVALID_SOLUTION_PENALTY;
+                } else {
                     BandwidthPoolUsageBreakdown poolUsage =
                             bandwidthUsageByPool.get(pool.getPoolId());
                     if (poolUsage == null) {
@@ -250,8 +429,6 @@ public final class FitnessEvaluator {
                                 geneBreakdown.getAllocatedBandwidth()
                         );
                     }
-                } catch (IllegalArgumentException ex) {
-                    invalidPenalty += INVALID_SOLUTION_PENALTY;
                 }
             }
 
@@ -335,7 +512,7 @@ public final class FitnessEvaluator {
         );
     }
 
-    private GeneEvaluationBreakdown evaluateGene(
+    private GeneEvaluationData evaluateGeneData(
             SystemSnapshot snapshot,
             TaskInstance task,
             Gene gene,
@@ -389,7 +566,7 @@ public final class FitnessEvaluator {
                     penalties
             );
 
-            return new GeneEvaluationBreakdown(
+            return new GeneEvaluationData(
                     task.getTaskId(),
                     task.getSourceVehicleId(),
                     candidate.getCandidateId(),
@@ -418,7 +595,13 @@ public final class FitnessEvaluator {
                     ),
                     coverageTimeSeconds,
                     true,
-                    MobilityPenaltyBreakdown.zero(mobilityLinkMetrics)
+                    mobilityLinkMetrics,
+                    0.0,
+                    mobilityLinkMetrics.getLinkInstability(),
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0
             );
         }
 
@@ -464,15 +647,48 @@ public final class FitnessEvaluator {
                         timeBreakdown.getRemotePartTimeSeconds()
                 );
 
-        MobilityPenaltyBreakdown mobilityBreakdown =
-                computeMobilityPenaltyBreakdown(
-                        candidate,
-                        mobilityLinkMetrics,
-                        completionTime,
-                        penalties
-                );
+        double linkInstability = mobilityLinkMetrics.getLinkInstability();
+        double coverageRisk;
+        double handoverRisk;
+        double weightedCoverageRisk;
+        double weightedLinkInstability;
+        double weightedHandoverRisk;
 
-        double mobilityPenalty = mobilityBreakdown.getTotalMobilityPenalty();
+        if (!isStrictlyPositive(completionTime)) {
+            coverageRisk = 0.0;
+            handoverRisk = 0.0;
+            weightedCoverageRisk = 0.0;
+            weightedLinkInstability = 0.0;
+            weightedHandoverRisk = 0.0;
+        } else {
+            if (!isStrictlyPositive(coverageTimeSeconds)) {
+                coverageRisk = 1.0;
+                handoverRisk = 1.0;
+            } else {
+                coverageRisk = Math.max(
+                        0.0,
+                        1.0 - coverageTimeSeconds / completionTime
+                );
+                handoverRisk = Math.min(
+                        1.0,
+                        completionTime / coverageTimeSeconds
+                );
+            }
+
+            weightedCoverageRisk = nonNegativeFinite(
+                    penalties.getCoverageRiskWeight() * coverageRisk
+            );
+            weightedLinkInstability = nonNegativeFinite(
+                    penalties.getLinkInstabilityWeight() * linkInstability
+            );
+            weightedHandoverRisk = nonNegativeFinite(
+                    penalties.getHandoverRiskWeight() * handoverRisk
+            );
+        }
+        double mobilityPenalty = weightedCoverageRisk
+                + weightedLinkInstability
+                + weightedHandoverRisk;
+
         double deadlinePenalty = computeDeadlinePenalty(
                 completionTime,
                 task.getDeadlineSeconds(),
@@ -484,7 +700,7 @@ public final class FitnessEvaluator {
         boolean coverageSufficient = coverageTimeSeconds > 0.0
                 && coverageTimeSeconds >= completionTime;
 
-        return new GeneEvaluationBreakdown(
+        return new GeneEvaluationData(
                 task.getTaskId(),
                 task.getSourceVehicleId(),
                 candidate.getCandidateId(),
@@ -513,7 +729,13 @@ public final class FitnessEvaluator {
                 ),
                 coverageTimeSeconds,
                 coverageSufficient,
-                mobilityBreakdown
+                mobilityLinkMetrics,
+                coverageRisk,
+                linkInstability,
+                handoverRisk,
+                weightedCoverageRisk,
+                weightedLinkInstability,
+                weightedHandoverRisk
         );
     }
 
@@ -608,6 +830,108 @@ public final class FitnessEvaluator {
             );
         }
         return result;
+    }
+
+    private double computeFastResourcePenalty(
+            FitnessEvaluationContext context,
+            Map<String, Double> cpuUsedByExecutionNode,
+            Map<String, Double> bandwidthUsedByCandidate,
+            Map<String, Double> bandwidthUsedByPool,
+            Map<String, Double> maxLocalDemandRatioByVehicle
+    ) {
+        PenaltyConfig penalties = config.getPenaltyConfig();
+        double totalPenalty = 0.0;
+
+        for (Map.Entry<String, Double> entry
+                : context.getExecutionNodeAvailableCpuById().entrySet()) {
+            double used = cpuUsedByExecutionNode.getOrDefault(
+                    entry.getKey(),
+                    0.0
+            );
+            totalPenalty += penalties.getCpuOveruseWeight()
+                    * computeCpuOverflowRatio(used, entry.getValue());
+        }
+
+        for (Map.Entry<String, Double> entry
+                : context.getCandidateAvailableBandwidthById().entrySet()) {
+            double used = bandwidthUsedByCandidate.getOrDefault(
+                    entry.getKey(),
+                    0.0
+            );
+            totalPenalty += penalties.getBandwidthOveruseWeight()
+                    * computeBandwidthOverflowRatio(used, entry.getValue());
+        }
+
+        for (Map.Entry<String, Double> entry
+                : context.getPoolAvailableBandwidthById().entrySet()) {
+            double used = bandwidthUsedByPool.getOrDefault(
+                    entry.getKey(),
+                    0.0
+            );
+            totalPenalty += penalties.getBandwidthOveruseWeight()
+                    * computeBandwidthOverflowRatio(used, entry.getValue());
+        }
+
+        for (double maxDemandRatio
+                : maxLocalDemandRatioByVehicle.values()) {
+            totalPenalty += penalties.getCpuOveruseWeight()
+                    * Math.max(0.0, maxDemandRatio - 1.0);
+        }
+
+        return totalPenalty;
+    }
+
+    private double computeCpuOverflowRatio(
+            double usedCpu,
+            double availableCpu
+    ) {
+        if (availableCpu <= EPSILON) {
+            return usedCpu > EPSILON ? 1.0 : 0.0;
+        }
+
+        double tolerance = Math.max(
+                ABSOLUTE_CPU_TOLERANCE,
+                availableCpu * RELATIVE_CPU_TOLERANCE
+        );
+        double overflow = usedCpu - availableCpu;
+        if (overflow <= tolerance) {
+            return 0.0;
+        }
+        return overflow / availableCpu;
+    }
+
+    private double computeBandwidthOverflowRatio(
+            double usedBandwidth,
+            double availableBandwidth
+    ) {
+        if (availableBandwidth <= EPSILON) {
+            return usedBandwidth > 0.0 ? 1.0 : 0.0;
+        }
+        return Math.max(
+                0.0,
+                (usedBandwidth - availableBandwidth) / availableBandwidth
+        );
+    }
+
+    private void addUsage(
+            Map<String, Double> usageById,
+            String id,
+            double value
+    ) {
+        double current = usageById.getOrDefault(id, 0.0);
+        usageById.put(id, current + Math.max(0.0, value));
+    }
+
+    private void addMaximumNonNegative(
+            Map<String, Double> maximumById,
+            String id,
+            double value
+    ) {
+        double safeValue = nonNegativeFinite(value);
+        maximumById.put(
+                id,
+                Math.max(maximumById.getOrDefault(id, 0.0), safeValue)
+        );
     }
 
     private double computeResourcePenalty(
@@ -720,6 +1044,27 @@ public final class FitnessEvaluator {
      * un ordinamento utile anche quando tutte le alternative sono degradate.</p>
      */
     private double computeHardDeadlinePenalty(
+            GeneEvaluationData geneEvaluation
+    ) {
+        if (geneEvaluation.deadlineRespected) {
+            return 0.0;
+        }
+
+        double violation = Math.max(
+                0.0,
+                geneEvaluation.completionTimeSeconds
+                        - geneEvaluation.deadlineSeconds
+        );
+        double violationRatio = isStrictlyPositive(
+                geneEvaluation.deadlineSeconds
+        )
+                ? safeDivide(violation, geneEvaluation.deadlineSeconds)
+                : 0.0;
+
+        return HARD_DEADLINE_VIOLATION_PENALTY + violationRatio;
+    }
+
+    private double computeHardDeadlinePenalty(
             List<GeneEvaluationBreakdown> geneBreakdowns
     ) {
         double penalty = 0.0;
@@ -806,10 +1151,165 @@ public final class FitnessEvaluator {
         return numerator / denominator;
     }
 
+    private double nonNegativeFinite(double value) {
+        if (!Double.isFinite(value)) {
+            return 0.0;
+        }
+        return Math.max(0.0, value);
+    }
+
     private double clamp(double value, double min, double max) {
         if (!Double.isFinite(value)) {
             return min;
         }
         return Math.max(min, Math.min(max, value));
     }
+
+    /** Valori scalari condivisi dai percorsi fast e detailed. */
+    private static final class GeneEvaluationData {
+        private final String taskId;
+        private final String sourceVehicleId;
+        private final String selectedCandidateId;
+        private final String executionNodeId;
+        private final NodeType nodeType;
+        private final DecisionType decisionType;
+        private final double offloadingRatio;
+        private final double allocatedCpu;
+        private final double allocatedBandwidth;
+        private final double localCpuCycles;
+        private final double independentLocalExecutionTimeSeconds;
+        private final double localExecutionTimeSeconds;
+        private final double uploadTimeSeconds;
+        private final double remoteExecutionTimeSeconds;
+        private final double downloadTimeSeconds;
+        private final double propagationDelaySeconds;
+        private final double remotePartTimeSeconds;
+        private final double completionTimeSeconds;
+        private final double communicationLatencySeconds;
+        private final double mobilityPenalty;
+        private final double constraintPenalty;
+        private final double deadlineSeconds;
+        private final boolean deadlineRespected;
+        private final double coverageTimeSeconds;
+        private final boolean coverageSufficient;
+        private final MobilityLinkMetrics mobilityLinkMetrics;
+        private final double coverageRisk;
+        private final double linkInstability;
+        private final double handoverRisk;
+        private final double weightedCoverageRisk;
+        private final double weightedLinkInstability;
+        private final double weightedHandoverRisk;
+
+        private GeneEvaluationData(
+                String taskId,
+                String sourceVehicleId,
+                String selectedCandidateId,
+                String executionNodeId,
+                NodeType nodeType,
+                DecisionType decisionType,
+                double offloadingRatio,
+                double allocatedCpu,
+                double allocatedBandwidth,
+                double localCpuCycles,
+                double independentLocalExecutionTimeSeconds,
+                double localExecutionTimeSeconds,
+                double uploadTimeSeconds,
+                double remoteExecutionTimeSeconds,
+                double downloadTimeSeconds,
+                double propagationDelaySeconds,
+                double remotePartTimeSeconds,
+                double completionTimeSeconds,
+                double communicationLatencySeconds,
+                double mobilityPenalty,
+                double constraintPenalty,
+                double deadlineSeconds,
+                boolean deadlineRespected,
+                double coverageTimeSeconds,
+                boolean coverageSufficient,
+                MobilityLinkMetrics mobilityLinkMetrics,
+                double coverageRisk,
+                double linkInstability,
+                double handoverRisk,
+                double weightedCoverageRisk,
+                double weightedLinkInstability,
+                double weightedHandoverRisk
+        ) {
+            this.taskId = taskId;
+            this.sourceVehicleId = sourceVehicleId;
+            this.selectedCandidateId = selectedCandidateId;
+            this.executionNodeId = executionNodeId;
+            this.nodeType = nodeType;
+            this.decisionType = decisionType;
+            this.offloadingRatio = offloadingRatio;
+            this.allocatedCpu = allocatedCpu;
+            this.allocatedBandwidth = allocatedBandwidth;
+            this.localCpuCycles = localCpuCycles;
+            this.independentLocalExecutionTimeSeconds =
+                    independentLocalExecutionTimeSeconds;
+            this.localExecutionTimeSeconds = localExecutionTimeSeconds;
+            this.uploadTimeSeconds = uploadTimeSeconds;
+            this.remoteExecutionTimeSeconds = remoteExecutionTimeSeconds;
+            this.downloadTimeSeconds = downloadTimeSeconds;
+            this.propagationDelaySeconds = propagationDelaySeconds;
+            this.remotePartTimeSeconds = remotePartTimeSeconds;
+            this.completionTimeSeconds = completionTimeSeconds;
+            this.communicationLatencySeconds = communicationLatencySeconds;
+            this.mobilityPenalty = mobilityPenalty;
+            this.constraintPenalty = constraintPenalty;
+            this.deadlineSeconds = deadlineSeconds;
+            this.deadlineRespected = deadlineRespected;
+            this.coverageTimeSeconds = coverageTimeSeconds;
+            this.coverageSufficient = coverageSufficient;
+            this.mobilityLinkMetrics = mobilityLinkMetrics;
+            this.coverageRisk = coverageRisk;
+            this.linkInstability = linkInstability;
+            this.handoverRisk = handoverRisk;
+            this.weightedCoverageRisk = weightedCoverageRisk;
+            this.weightedLinkInstability = weightedLinkInstability;
+            this.weightedHandoverRisk = weightedHandoverRisk;
+        }
+
+        private GeneEvaluationBreakdown toBreakdown() {
+            MobilityPenaltyBreakdown mobilityBreakdown =
+                    new MobilityPenaltyBreakdown(
+                            mobilityLinkMetrics,
+                            coverageRisk,
+                            linkInstability,
+                            handoverRisk,
+                            weightedCoverageRisk,
+                            weightedLinkInstability,
+                            weightedHandoverRisk
+                    );
+
+            return new GeneEvaluationBreakdown(
+                    taskId,
+                    sourceVehicleId,
+                    selectedCandidateId,
+                    executionNodeId,
+                    nodeType,
+                    decisionType,
+                    offloadingRatio,
+                    allocatedCpu,
+                    allocatedBandwidth,
+                    localCpuCycles,
+                    independentLocalExecutionTimeSeconds,
+                    localExecutionTimeSeconds,
+                    uploadTimeSeconds,
+                    remoteExecutionTimeSeconds,
+                    downloadTimeSeconds,
+                    propagationDelaySeconds,
+                    remotePartTimeSeconds,
+                    completionTimeSeconds,
+                    communicationLatencySeconds,
+                    mobilityPenalty,
+                    constraintPenalty,
+                    deadlineSeconds,
+                    deadlineRespected,
+                    coverageTimeSeconds,
+                    coverageSufficient,
+                    mobilityBreakdown
+            );
+        }
+    }
+
 }

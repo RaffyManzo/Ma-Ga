@@ -217,7 +217,7 @@ public final class MaGaOptimizer {
                             snapshot,
                             mutationResult.getMutatedTaskIds()
                     );
-                    child.setFitness(fitnessEvaluator.evaluate(child, evaluationContext));
+                    child.setFitness(fitnessEvaluator.evaluateFast(child, evaluationContext));
                     nextPopulation.add(child);
                 }
 
@@ -250,7 +250,7 @@ public final class MaGaOptimizer {
          */
         bestOverall = repairOperator.repairChromosome(bestOverall, snapshot);
         bestOverall.setFitness(
-                fitnessEvaluator.evaluate(bestOverall, evaluationContext)
+                fitnessEvaluator.evaluateFast(bestOverall, evaluationContext)
         );
 
         EvaluationBreakdown bestEvaluation = fitnessEvaluator.evaluateDetailed(
@@ -298,7 +298,7 @@ public final class MaGaOptimizer {
             Chromosome copied = copyChromosome(chromosome);
             Chromosome repaired = repairOperator.repairChromosome(copied, snapshot);
             repaired.setFitness(
-                    fitnessEvaluator.evaluate(repaired, evaluationContext)
+                    fitnessEvaluator.evaluateFast(repaired, evaluationContext)
             );
             prepared.add(repaired);
         }
@@ -361,7 +361,7 @@ public final class MaGaOptimizer {
     ) {
         for (Chromosome chromosome : population) {
             chromosome.setFitness(
-                    fitnessEvaluator.evaluate(chromosome, evaluationContext)
+                    fitnessEvaluator.evaluateFast(chromosome, evaluationContext)
             );
         }
     }
