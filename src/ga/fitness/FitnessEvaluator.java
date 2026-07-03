@@ -96,40 +96,53 @@ public final class FitnessEvaluator {
                 new LocalCpuContentionEvaluator();
     }
 
+    /** Costruisce gli indici immutabili riutilizzabili nello stesso snapshot. */
+    public FitnessEvaluationContext createContext(SystemSnapshot snapshot) {
+        return FitnessEvaluationContext.from(snapshot);
+    }
+
     public double evaluate(Chromosome chromosome, SystemSnapshot snapshot) {
-        return evaluateDetailed(chromosome, snapshot).getFitness();
+        return evaluate(chromosome, createContext(snapshot));
+    }
+
+    /** Valutazione che riusa un contesto già costruito per lo snapshot. */
+    public double evaluate(
+            Chromosome chromosome,
+            FitnessEvaluationContext context
+    ) {
+        return evaluateDetailed(chromosome, context).getFitness();
     }
 
     public EvaluationBreakdown evaluateDetailed(
             Chromosome chromosome,
             SystemSnapshot snapshot
     ) {
+        return evaluateDetailed(chromosome, createContext(snapshot));
+    }
+
+    /** Valutazione dettagliata con indici snapshot-scoped riutilizzabili. */
+    public EvaluationBreakdown evaluateDetailed(
+            Chromosome chromosome,
+            FitnessEvaluationContext context
+    ) {
         Objects.requireNonNull(
                 chromosome,
                 "chromosome must not be null."
         );
-        Objects.requireNonNull(snapshot, "snapshot must not be null.");
+        Objects.requireNonNull(context, "context must not be null.");
 
-        List<TaskInstance> tasks = requireList(
-                snapshot.getTasks(),
-                "snapshot.tasks"
-        );
-        List<VehicleSnapshot> vehicles = requireList(
-                snapshot.getVehicles(),
-                "snapshot.vehicles"
-        );
-        List<NodeCandidate> candidates = requireList(
-                snapshot.getCandidateNodes(),
-                "snapshot.candidateNodes"
-        );
+        SystemSnapshot snapshot = context.getSnapshot();
+        List<TaskInstance> tasks = context.getTasks();
+        List<VehicleSnapshot> vehicles = context.getVehicles();
+        List<NodeCandidate> candidates = context.getCandidates();
         List<Gene> genes = requireList(
                 chromosome.getGenes(),
                 "chromosome.genes"
         );
 
-        Map<String, TaskInstance> taskById = indexTasks(tasks);
-        Map<String, VehicleSnapshot> vehicleById = indexVehicles(vehicles);
-        Map<String, NodeCandidate> candidateById = indexCandidates(candidates);
+        Map<String, TaskInstance> taskById = context.getTaskById();
+        Map<String, VehicleSnapshot> vehicleById = context.getVehicleById();
+        Map<String, NodeCandidate> candidateById = context.getCandidateById();
         Map<String, Gene> geneByTaskId = indexGenes(genes);
 
         double invalidPenalty = computeCardinalityPenalty(tasks, genes);
@@ -762,34 +775,6 @@ public final class FitnessEvaluator {
             }
         }
         return penalty;
-    }
-
-    private Map<String, TaskInstance> indexTasks(List<TaskInstance> tasks) {
-        Map<String, TaskInstance> result = new HashMap<>();
-        for (TaskInstance task : tasks) {
-            result.put(task.getTaskId(), task);
-        }
-        return result;
-    }
-
-    private Map<String, VehicleSnapshot> indexVehicles(
-            List<VehicleSnapshot> vehicles
-    ) {
-        Map<String, VehicleSnapshot> result = new HashMap<>();
-        for (VehicleSnapshot vehicle : vehicles) {
-            result.put(vehicle.getVehicleId(), vehicle);
-        }
-        return result;
-    }
-
-    private Map<String, NodeCandidate> indexCandidates(
-            List<NodeCandidate> candidates
-    ) {
-        Map<String, NodeCandidate> result = new HashMap<>();
-        for (NodeCandidate candidate : candidates) {
-            result.put(candidate.getCandidateId(), candidate);
-        }
-        return result;
     }
 
     private Map<String, Gene> indexGenes(List<Gene> genes) {

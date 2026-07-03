@@ -3,6 +3,7 @@ package ga.core;
 import config.MaGaConfig;
 import config.ga.GeneticAlgorithmConfig;
 import config.mobility.MobilityConfig;
+import ga.fitness.FitnessEvaluationContext;
 import ga.fitness.FitnessEvaluator;
 import ga.fitness.breakdown.EvaluationBreakdown;
 import ga.operators.CrossoverOperator;
@@ -129,6 +130,8 @@ public final class MaGaOptimizer {
         );
         this.gaConfig = config.resolveGeneticAlgorithmConfig(snapshot);
         validateSnapshot(snapshot);
+        FitnessEvaluationContext evaluationContext =
+                fitnessEvaluator.createContext(snapshot);
 
         List<GenerationStat> generationHistory = new ArrayList<>();
         if (snapshot.getTasks().isEmpty()) {
@@ -136,7 +139,7 @@ public final class MaGaOptimizer {
             empty.setFitness(0.0);
             EvaluationBreakdown evaluation = fitnessEvaluator.evaluateDetailed(
                     empty,
-                    snapshot
+                    evaluationContext
             );
             List<Chromosome> finalPopulation = new ArrayList<>();
             finalPopulation.add(copyChromosome(empty));
@@ -156,7 +159,8 @@ public final class MaGaOptimizer {
 
         List<Chromosome> population = prepareInitialPopulation(
                 snapshot,
-                initialPopulation
+                initialPopulation,
+                evaluationContext
         );
 
         GenerationStat initialStat = computeGenerationStat(0, population);
@@ -213,7 +217,7 @@ public final class MaGaOptimizer {
                             snapshot,
                             mutationResult.getMutatedTaskIds()
                     );
-                    child.setFitness(fitnessEvaluator.evaluate(child, snapshot));
+                    child.setFitness(fitnessEvaluator.evaluate(child, evaluationContext));
                     nextPopulation.add(child);
                 }
 
@@ -245,11 +249,13 @@ public final class MaGaOptimizer {
          * il risultato restituito senza reinserire il costo nel ciclo interno.
          */
         bestOverall = repairOperator.repairChromosome(bestOverall, snapshot);
-        bestOverall.setFitness(fitnessEvaluator.evaluate(bestOverall, snapshot));
+        bestOverall.setFitness(
+                fitnessEvaluator.evaluate(bestOverall, evaluationContext)
+        );
 
         EvaluationBreakdown bestEvaluation = fitnessEvaluator.evaluateDetailed(
                 bestOverall,
-                snapshot
+                evaluationContext
         );
         List<Chromosome> finalPopulation = prepareFinalPopulationForResult(
                 population,
@@ -271,7 +277,8 @@ public final class MaGaOptimizer {
 
     private List<Chromosome> prepareInitialPopulation(
             SystemSnapshot snapshot,
-            List<Chromosome> initialPopulation
+            List<Chromosome> initialPopulation,
+            FitnessEvaluationContext evaluationContext
     ) {
         if (initialPopulation == null || initialPopulation.isEmpty()) {
             List<Chromosome> created =
@@ -279,7 +286,7 @@ public final class MaGaOptimizer {
                             snapshot,
                             gaConfig.getPopulationSize()
                     );
-            evaluatePopulation(created, snapshot);
+            evaluatePopulation(created, evaluationContext);
             return created;
         }
 
@@ -290,7 +297,9 @@ public final class MaGaOptimizer {
             }
             Chromosome copied = copyChromosome(chromosome);
             Chromosome repaired = repairOperator.repairChromosome(copied, snapshot);
-            repaired.setFitness(fitnessEvaluator.evaluate(repaired, snapshot));
+            repaired.setFitness(
+                    fitnessEvaluator.evaluate(repaired, evaluationContext)
+            );
             prepared.add(repaired);
         }
 
@@ -300,7 +309,7 @@ public final class MaGaOptimizer {
                             snapshot,
                             gaConfig.getPopulationSize()
                     );
-            evaluatePopulation(created, snapshot);
+            evaluatePopulation(created, evaluationContext);
             return created;
         }
 
@@ -317,7 +326,7 @@ public final class MaGaOptimizer {
             int missing = gaConfig.getPopulationSize() - prepared.size();
             List<Chromosome> randomChromosomes =
                     populationInitializer.createInitialPopulation(snapshot, missing);
-            evaluatePopulation(randomChromosomes, snapshot);
+            evaluatePopulation(randomChromosomes, evaluationContext);
             prepared.addAll(randomChromosomes);
         }
         return prepared;
@@ -348,10 +357,12 @@ public final class MaGaOptimizer {
 
     private void evaluatePopulation(
             List<Chromosome> population,
-            SystemSnapshot snapshot
+            FitnessEvaluationContext evaluationContext
     ) {
         for (Chromosome chromosome : population) {
-            chromosome.setFitness(fitnessEvaluator.evaluate(chromosome, snapshot));
+            chromosome.setFitness(
+                    fitnessEvaluator.evaluate(chromosome, evaluationContext)
+            );
         }
     }
 

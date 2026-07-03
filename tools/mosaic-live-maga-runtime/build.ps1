@@ -237,6 +237,7 @@ $ExpectedClassFiles = @(
     "window\core\TemporalWindowManager.class",
     "ga\core\MaGaOptimizer.class",
     "ga\core\GaExecutionBudget.class",
+    "ga\fitness\FitnessEvaluationContext.class",
     "ga\fitness\local\LocalCpuContentionEvaluator.class",
     "org\eclipse\mosaic\app\maga\liveruntime\LiveStaleReason.class",
     "org\eclipse\mosaic\app\maga\liveruntime\LiveAssignmentDecision.class",
@@ -296,10 +297,10 @@ try {
     }
     Assert-NoJavacInternalFailure -Output $JavacResult.Combined
 
-    # Expected class count after V3-C adds the cooperative GA budget,
-    # explicit stale reasons, full assignment snapshots, and stale-strategy
-    # reporting. Fitness, repair, chromosome and genetic operators are unchanged.
-    $ExpectedFrozenClassCount = 273
+    # Expected class count after the snapshot-scoped fitness evaluation context.
+    # The context adds one class without changing fitness, repair, chromosome,
+    # genetic operators or runtime policy.
+    $ExpectedFrozenClassCount = 274
     $ActualClassCount = (Get-ChildItem -LiteralPath $StagingClassesDir -Recurse -Filter "*.class" -File).Count
     if ($ActualClassCount -ne $ExpectedFrozenClassCount) {
         throw "Unexpected class count: expected=$ExpectedFrozenClassCount actual=$ActualClassCount"

@@ -2,6 +2,7 @@ package window.population;
 
 import config.MaGaConfig;
 import config.window.TemporalWindowConfig;
+import ga.fitness.FitnessEvaluationContext;
 import ga.fitness.FitnessEvaluator;
 import ga.operators.PopulationInitializer;
 import ga.operators.RepairOperator;
@@ -139,14 +140,25 @@ public final class PopulationAdapter {
             );
         }
 
+        FitnessEvaluationContext evaluationContext =
+                fitnessEvaluator.createContext(currentSnapshot);
+
         // Prima esecuzione: non esiste memoria genetica precedente.
         if (reuseMode == PopulationReuseMode.FIRST_RUN) {
-            return createFreshPopulation(currentSnapshot, targetPopulationSize);
+            return createFreshPopulation(
+                    currentSnapshot,
+                    targetPopulationSize,
+                    evaluationContext
+            );
         }
 
         // Cold start: lo scenario è troppo diverso per riusare P_final(k-1).
         if (reuseMode == PopulationReuseMode.COLD_START) {
-            return createFreshPopulation(currentSnapshot, targetPopulationSize);
+            return createFreshPopulation(
+                    currentSnapshot,
+                    targetPopulationSize,
+                    evaluationContext
+            );
         }
 
         /*
@@ -166,7 +178,8 @@ public final class PopulationAdapter {
         List<Chromosome> repairedPreviousPopulation =
                 repairAndSortPreviousPopulation(
                         previousFinalPopulation,
-                        currentSnapshot
+                        currentSnapshot,
+                        evaluationContext
                 );
 
         /*
@@ -177,7 +190,11 @@ public final class PopulationAdapter {
          * il gestore temporale non fallisce solo perché manca P_final(k-1).
          */
         if (repairedPreviousPopulation.isEmpty()) {
-            return createFreshPopulation(currentSnapshot, targetPopulationSize);
+            return createFreshPopulation(
+                    currentSnapshot,
+                    targetPopulationSize,
+                    evaluationContext
+            );
         }
 
         // Warm start: conserva più informazione genetica possibile.
@@ -185,8 +202,9 @@ public final class PopulationAdapter {
             return buildWarmStartPopulation(
                     repairedPreviousPopulation,
                     currentSnapshot,
-                    targetPopulationSize
-                );
+                    targetPopulationSize,
+                    evaluationContext
+            );
         }
 
         // Partial restart: mantiene solo una quota dei migliori cromosomi.
@@ -194,7 +212,8 @@ public final class PopulationAdapter {
             return buildPartialRestartPopulation(
                     repairedPreviousPopulation,
                     currentSnapshot,
-                    targetPopulationSize
+                    targetPopulationSize,
+                    evaluationContext
             );
         }
 
@@ -202,7 +221,11 @@ public final class PopulationAdapter {
          * Questo ramo non dovrebbe essere raggiunto, ma rende il metodo robusto
          * nel caso in cui in futuro vengano aggiunte nuove modalità all'enum.
          */
-        return createFreshPopulation(currentSnapshot, targetPopulationSize);
+        return createFreshPopulation(
+                currentSnapshot,
+                targetPopulationSize,
+                evaluationContext
+        );
     }
 
     /**
@@ -214,7 +237,8 @@ public final class PopulationAdapter {
      */
     private List<Chromosome> createFreshPopulation(
             SystemSnapshot snapshot,
-            int targetPopulationSize
+            int targetPopulationSize,
+            FitnessEvaluationContext evaluationContext
     ) {
         List<Chromosome> freshPopulation =
                 populationInitializer.createInitialPopulation(
@@ -222,7 +246,7 @@ public final class PopulationAdapter {
                         targetPopulationSize
                 );
 
-        evaluatePopulation(freshPopulation, snapshot);
+        evaluatePopulation(freshPopulation, evaluationContext);
         return freshPopulation;
     }
 
@@ -247,7 +271,8 @@ public final class PopulationAdapter {
      */
     private List<Chromosome> repairAndSortPreviousPopulation(
             List<Chromosome> previousFinalPopulation,
-            SystemSnapshot currentSnapshot
+            SystemSnapshot currentSnapshot,
+            FitnessEvaluationContext evaluationContext
     ) {
         List<Chromosome> repaired = new ArrayList<>();
 
@@ -268,7 +293,7 @@ public final class PopulationAdapter {
             repairedChromosome.setFitness(
                     fitnessEvaluator.evaluate(
                             repairedChromosome,
-                            currentSnapshot
+                            evaluationContext
                     )
             );
 
@@ -288,7 +313,8 @@ public final class PopulationAdapter {
     private List<Chromosome> buildWarmStartPopulation(
             List<Chromosome> repairedPreviousPopulation,
             SystemSnapshot currentSnapshot,
-            int targetPopulationSize
+            int targetPopulationSize,
+            FitnessEvaluationContext evaluationContext
     ) {
         List<Chromosome> result = new ArrayList<>();
 
@@ -304,7 +330,8 @@ public final class PopulationAdapter {
         fillWithFreshChromosomes(
                 result,
                 currentSnapshot,
-                targetPopulationSize
+                targetPopulationSize,
+                evaluationContext
         );
 
         return result;
@@ -319,7 +346,8 @@ public final class PopulationAdapter {
     private List<Chromosome> buildPartialRestartPopulation(
             List<Chromosome> repairedPreviousPopulation,
             SystemSnapshot currentSnapshot,
-            int targetPopulationSize
+            int targetPopulationSize,
+            FitnessEvaluationContext evaluationContext
     ) {
         List<Chromosome> result = new ArrayList<>();
 
@@ -335,7 +363,8 @@ public final class PopulationAdapter {
         fillWithFreshChromosomes(
                 result,
                 currentSnapshot,
-                targetPopulationSize
+                targetPopulationSize,
+                evaluationContext
         );
 
         return result;
@@ -380,7 +409,7 @@ public final class PopulationAdapter {
      */
     private void evaluatePopulation(
             List<Chromosome> population,
-            SystemSnapshot snapshot
+            FitnessEvaluationContext evaluationContext
     ) {
         for (Chromosome chromosome : population) {
             if (chromosome == null || chromosome.getGenes() == null) {
@@ -388,7 +417,7 @@ public final class PopulationAdapter {
             }
 
             chromosome.setFitness(
-                    fitnessEvaluator.evaluate(chromosome, snapshot)
+                    fitnessEvaluator.evaluate(chromosome, evaluationContext)
             );
         }
     }
@@ -402,7 +431,8 @@ public final class PopulationAdapter {
     private void fillWithFreshChromosomes(
             List<Chromosome> result,
             SystemSnapshot currentSnapshot,
-            int targetPopulationSize
+            int targetPopulationSize,
+            FitnessEvaluationContext evaluationContext
     ) {
         int missing = targetPopulationSize - result.size();
 
@@ -414,7 +444,8 @@ public final class PopulationAdapter {
         List<Chromosome> freshChromosomes =
                 createFreshPopulation(
                         currentSnapshot,
-                        missing
+                        missing,
+                        evaluationContext
                 );
 
         result.addAll(freshChromosomes);
