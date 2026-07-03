@@ -36,6 +36,8 @@ import java.util.Random;
  */
 public final class MaGaOptimizer {
     private static final int DEFAULT_TOURNAMENT_SIZE = 3;
+    private static final long UNKNOWN_GENERATION_ESTIMATE_NANOS = -1L;
+    private static final long MIN_FINALIZATION_RESERVE_NANOS = 1_000_000L;
 
     private final MaGaConfig config;
     private GeneticAlgorithmConfig gaConfig;
@@ -169,6 +171,8 @@ public final class MaGaOptimizer {
         double initialBestFitness = bestOverall.getFitness();
         int stallCounter = 0;
         int generationsExecuted = 0;
+        long estimatedGenerationDurationNanos =
+                UNKNOWN_GENERATION_ESTIMATE_NANOS;
         StopReason stopReason = StopReason.MAX_GENERATIONS_REACHED;
 
         if (executionBudget.isExhausted()) {
@@ -182,7 +186,15 @@ public final class MaGaOptimizer {
                     stopReason = StopReason.TIME_BUDGET_BEST_SO_FAR;
                     break;
                 }
+                if (shouldStopBeforeNextGeneration(
+                        executionBudget,
+                        estimatedGenerationDurationNanos
+                )) {
+                    stopReason = StopReason.TIME_BUDGET_BEST_SO_FAR;
+                    break;
+                }
 
+                long generationStartedAtNanos = System.nanoTime();
                 List<Chromosome> nextPopulation = new ArrayList<>();
                 nextPopulation.addAll(
                         elitismOperator.selectElite(
@@ -237,6 +249,12 @@ public final class MaGaOptimizer {
                     stallCounter++;
                 }
 
+                estimatedGenerationDurationNanos =
+                        updateGenerationDurationEstimate(
+                                estimatedGenerationDurationNanos,
+                                System.nanoTime() - generationStartedAtNanos
+                        );
+
                 if (stallCounter >= gaConfig.getStallGenerations()) {
                     stopReason = StopReason.STAGNATION_REACHED;
                     break;
@@ -271,6 +289,64 @@ public final class MaGaOptimizer {
                 generationHistory,
                 finalPopulation
         );
+    }
+
+
+    /**
+     * Decide se il tempo residuo noto è insufficiente per completare
+     * prudentemente un'altra generazione e finalizzare il best-so-far.
+     */
+    private boolean shouldStopBeforeNextGeneration(
+            GaExecutionBudget executionBudget,
+            long estimatedGenerationDurationNanos
+    ) {
+        if (estimatedGenerationDurationNanos <= 0L) {
+            return false;
+        }
+
+        long remainingNanos = executionBudget.remainingNanos();
+        if (remainingNanos == Long.MAX_VALUE) {
+            return false;
+        }
+
+        long generationSafetyMargin =
+                Math.max(1L, estimatedGenerationDurationNanos / 5L);
+        long finalizationReserve = Math.max(
+                MIN_FINALIZATION_RESERVE_NANOS,
+                estimatedGenerationDurationNanos / 20L
+        );
+        long requiredNanos = saturatedAdd(
+                estimatedGenerationDurationNanos,
+                generationSafetyMargin
+        );
+        requiredNanos = saturatedAdd(requiredNanos, finalizationReserve);
+        return remainingNanos < requiredNanos;
+    }
+
+    /**
+     * Aggiorna una stima conservativa: aumenta subito quando una generazione
+     * rallenta e decresce gradualmente quando le generazioni diventano più
+     * economiche.
+     */
+    private long updateGenerationDurationEstimate(
+            long currentEstimateNanos,
+            long observedDurationNanos
+    ) {
+        long observed = Math.max(1L, observedDurationNanos);
+        if (currentEstimateNanos <= 0L) {
+            return observed;
+        }
+
+        long smoothed = currentEstimateNanos
+                + (observed - currentEstimateNanos) / 4L;
+        return Math.max(observed, Math.max(1L, smoothed));
+    }
+
+    private long saturatedAdd(long left, long right) {
+        if (left >= Long.MAX_VALUE - right) {
+            return Long.MAX_VALUE;
+        }
+        return left + right;
     }
 
     private List<Chromosome> prepareInitialPopulation(

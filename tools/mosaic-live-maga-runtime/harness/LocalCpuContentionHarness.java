@@ -40,6 +40,9 @@ public final class LocalCpuContentionHarness {
         verifyPartialOffloadingLocalShare();
         verifyFitnessUsesContendedCompletion();
         verifyRepairRelievesLocalViolation();
+        verifyAdaptiveRepairPreservesInvariants();
+        verifyAdaptiveRepairDeterminism();
+        verifyForcedFallbackMatchesLegacy();
         verifyLocalOnlyInvariant();
         verifyDeterminism();
 
@@ -363,6 +366,224 @@ public final class LocalCpuContentionHarness {
                 "repair must remove local CPU overflow");
         require(!evaluation.hasDeadlineViolations(),
                 "repair must remove local deadline violation");
+    }
+
+    private static void verifyAdaptiveRepairPreservesInvariants() {
+        SystemSnapshot snapshot = remoteCapableSnapshot(
+                List.of(
+                        task("task_a", "veh_0", 650_000_000.0, 0.9),
+                        task("task_b", "veh_0", 600_000_000.0, 1.1),
+                        task("task_c", "veh_0", 550_000_000.0, 1.3),
+                        task("task_d", "veh_0", 500_000_000.0, 1.5)
+                )
+        );
+        Chromosome original = new Chromosome(
+                List.of(
+                        localGene("task_a", "veh_0"),
+                        localGene("task_b", "veh_0"),
+                        localGene("task_c", "veh_0"),
+                        localGene("task_d", "veh_0")
+                )
+        );
+
+        Chromosome adaptive = repairWithMode(
+                "adaptive",
+                false,
+                original,
+                snapshot
+        );
+        Chromosome legacy = repairWithMode(
+                "legacy",
+                false,
+                original,
+                snapshot
+        );
+
+        LocalCpuContentionEvaluator evaluator =
+                new LocalCpuContentionEvaluator();
+        LocalCpuContentionEvaluator.Evaluation adaptiveEvaluation =
+                evaluator.evaluate(snapshot, adaptive);
+        LocalCpuContentionEvaluator.Evaluation legacyEvaluation =
+                evaluator.evaluate(snapshot, legacy);
+
+        require(
+                !adaptiveEvaluation.hasCpuOverflow(),
+                "adaptive repair must remove local CPU overflow"
+        );
+        require(
+                !adaptiveEvaluation.hasDeadlineViolations(),
+                "adaptive repair must remove local deadline violations"
+        );
+        require(
+                !legacyEvaluation.hasCpuOverflow(),
+                "legacy control must remove local CPU overflow"
+        );
+        require(
+                !legacyEvaluation.hasDeadlineViolations(),
+                "legacy control must remove local deadline violations"
+        );
+        require(
+                adaptive.getGenes().size() == original.getGenes().size(),
+                "adaptive repair must preserve chromosome size"
+        );
+        require(
+                adaptive.getGenes().stream().allMatch(
+                        gene -> gene.getTaskId() != null
+                                && gene.getSelectedCandidateId() != null
+                ),
+                "adaptive repair must return complete genes"
+        );
+    }
+
+    private static void verifyAdaptiveRepairDeterminism() {
+        SystemSnapshot snapshot = remoteCapableSnapshot(
+                List.of(
+                        task("task_a", "veh_0", 700_000_000.0, 1.0),
+                        task("task_b", "veh_0", 650_000_000.0, 1.0),
+                        task("task_c", "veh_0", 600_000_000.0, 1.2)
+                )
+        );
+        Chromosome original = new Chromosome(
+                List.of(
+                        localGene("task_a", "veh_0"),
+                        localGene("task_b", "veh_0"),
+                        localGene("task_c", "veh_0")
+                )
+        );
+
+        Chromosome first = repairWithMode(
+                "adaptive",
+                false,
+                original,
+                snapshot
+        );
+        Chromosome second = repairWithMode(
+                "adaptive",
+                false,
+                original,
+                snapshot
+        );
+
+        requireSameGenes(
+                first,
+                second,
+                "adaptive repair determinism"
+        );
+    }
+
+    private static void verifyForcedFallbackMatchesLegacy() {
+        SystemSnapshot snapshot = remoteCapableSnapshot(
+                List.of(
+                        task("task_a", "veh_0", 600_000_000.0, 1.0),
+                        task("task_b", "veh_0", 600_000_000.0, 1.0)
+                )
+        );
+        Chromosome original = new Chromosome(
+                List.of(
+                        localGene("task_a", "veh_0"),
+                        localGene("task_b", "veh_0")
+                )
+        );
+
+        Chromosome legacy = repairWithMode(
+                "legacy",
+                false,
+                original,
+                snapshot
+        );
+        Chromosome forcedFallback = repairWithMode(
+                "adaptive",
+                true,
+                original,
+                snapshot
+        );
+
+        requireSameGenes(
+                legacy,
+                forcedFallback,
+                "forced adaptive fallback"
+        );
+    }
+
+    private static Chromosome repairWithMode(
+            String mode,
+            boolean forceFallback,
+            Chromosome chromosome,
+            SystemSnapshot snapshot
+    ) {
+        String modeProperty = "maga.repair.localContentionMode";
+        String fallbackProperty = "maga.repair.forceAdaptiveFallback";
+        String previousMode = System.getProperty(modeProperty);
+        String previousFallback = System.getProperty(fallbackProperty);
+
+        try {
+            System.setProperty(modeProperty, mode);
+            if (forceFallback) {
+                System.setProperty(fallbackProperty, "true");
+            } else {
+                System.clearProperty(fallbackProperty);
+            }
+            return new RepairOperator().repairChromosome(
+                    chromosome,
+                    snapshot
+            );
+        } finally {
+            restoreProperty(modeProperty, previousMode);
+            restoreProperty(fallbackProperty, previousFallback);
+        }
+    }
+
+    private static void restoreProperty(
+            String propertyName,
+            String previousValue
+    ) {
+        if (previousValue == null) {
+            System.clearProperty(propertyName);
+        } else {
+            System.setProperty(propertyName, previousValue);
+        }
+    }
+
+    private static void requireSameGenes(
+            Chromosome left,
+            Chromosome right,
+            String message
+    ) {
+        require(
+                left.getGenes().size() == right.getGenes().size(),
+                message + " size"
+        );
+
+        for (int index = 0; index < left.getGenes().size(); index++) {
+            Gene leftGene = left.getGenes().get(index);
+            Gene rightGene = right.getGenes().get(index);
+
+            require(
+                    leftGene.getTaskId().equals(rightGene.getTaskId()),
+                    message + " task " + index
+            );
+            require(
+                    leftGene.getSelectedCandidateId().equals(
+                            rightGene.getSelectedCandidateId()
+                    ),
+                    message + " candidate " + index
+            );
+            requireClose(
+                    leftGene.getOffloadingRatio(),
+                    rightGene.getOffloadingRatio(),
+                    message + " ratio " + index
+            );
+            requireClose(
+                    leftGene.getAllocatedCpu(),
+                    rightGene.getAllocatedCpu(),
+                    message + " cpu " + index
+            );
+            requireClose(
+                    leftGene.getAllocatedBandwidth(),
+                    rightGene.getAllocatedBandwidth(),
+                    message + " bandwidth " + index
+            );
+        }
     }
 
     private static void verifyLocalOnlyInvariant() {

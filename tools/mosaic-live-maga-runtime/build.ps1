@@ -298,10 +298,10 @@ try {
     }
     Assert-NoJavacInternalFailure -Output $JavacResult.Combined
 
-    # Expected class count after the scalar fast fitness path.
-    # GeneEvaluationData is a private lightweight carrier shared by the fast
-    # and detailed paths; it does not change the fitness definition.
-    $ExpectedFrozenClassCount = 275
+    # Expected class count after the unified REPAIR_ADAPTIVE path.
+    # The increase from 279 to 280 is intentional: GaExecutionBudget now
+    # exposes a deadline-aware implementation with measurable remaining time.
+    $ExpectedFrozenClassCount = 280
     $ActualClassCount = (Get-ChildItem -LiteralPath $StagingClassesDir -Recurse -Filter "*.class" -File).Count
     if ($ActualClassCount -ne $ExpectedFrozenClassCount) {
         throw "Unexpected class count: expected=$ExpectedFrozenClassCount actual=$ActualClassCount"

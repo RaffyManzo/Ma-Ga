@@ -13,6 +13,17 @@ public interface GaExecutionBudget {
 
     boolean isExhausted();
 
+    /**
+     * Restituisce il tempo residuo noto in nanosecondi.
+     *
+     * <p>{@link Long#MAX_VALUE} indica che il budget non espone una scadenza
+     * misurabile. Il metodo è {@code default} per mantenere compatibili i
+     * budget esistenti espressi come lambda.</p>
+     */
+    default long remainingNanos() {
+        return Long.MAX_VALUE;
+    }
+
     static GaExecutionBudget unlimited() {
         return () -> false;
     }
@@ -21,6 +32,17 @@ public interface GaExecutionBudget {
         if (deadlineNanoTime <= 0L) {
             throw new IllegalArgumentException("deadlineNanoTime must be > 0.");
         }
-        return () -> System.nanoTime() >= deadlineNanoTime;
+        return new GaExecutionBudget() {
+            @Override
+            public boolean isExhausted() {
+                return System.nanoTime() >= deadlineNanoTime;
+            }
+
+            @Override
+            public long remainingNanos() {
+                long remaining = deadlineNanoTime - System.nanoTime();
+                return remaining > 0L ? remaining : 0L;
+            }
+        };
     }
 }

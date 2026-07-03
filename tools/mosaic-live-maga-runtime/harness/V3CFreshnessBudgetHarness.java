@@ -44,6 +44,7 @@ public final class V3CFreshnessBudgetHarness {
         testDistinctStaleReasons();
         testWallClockBoundarySemantics();
         testCooperativeBestSoFar();
+        testPredictiveGenerationAdmission();
         testFullStaleStrategyReporting(outputRoot.resolve("stale-reporting"));
         testCanonicalMainReporting(outputRoot.resolve("canonical-reporting"));
         System.out.println("V3C_FRESHNESS_BUDGET_HARNESS_PASSED");
@@ -230,6 +231,42 @@ public final class V3CFreshnessBudgetHarness {
         require(!result.getFinalPopulation().isEmpty(), "final population present");
     }
 
+
+    private static void testPredictiveGenerationAdmission() {
+        MaGaOptimizer optimizer = new MaGaOptimizer(
+                MaGaConfig.defaultConfig(GaParameterScalingMode.STATIC)
+        );
+        AtomicInteger remainingChecks = new AtomicInteger();
+        GaExecutionBudget budget = new GaExecutionBudget() {
+            @Override
+            public boolean isExhausted() {
+                return false;
+            }
+
+            @Override
+            public long remainingNanos() {
+                remainingChecks.incrementAndGet();
+                return 1L;
+            }
+        };
+
+        MaGaResult result = optimizer.optimizeDetailed(
+                snapshot("predictive-budget", 1.0),
+                null,
+                budget
+        );
+
+        require(result.getStopReason() == StopReason.TIME_BUDGET_BEST_SO_FAR,
+                "predictive stop reason");
+        require(result.getGenerationsExecuted() == 1,
+                "one complete generation retained before predictive stop");
+        require(remainingChecks.get() >= 1,
+                "remaining time inspected before another generation");
+        require(result.getBestChromosome() != null,
+                "predictive best-so-far present");
+        require(!result.getFinalPopulation().isEmpty(),
+                "predictive final population remains complete");
+    }
 
     private static void testFullStaleStrategyReporting(Path outputRoot) throws IOException {
         SystemSnapshot snapshot = snapshot("stale-report", 1.0);
