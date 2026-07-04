@@ -34,6 +34,7 @@ public final class LiveStateLayerRuntimeFacade {
     private final SnapshotValidator snapshotValidator;
     private final LocalCandidateInvariantValidator localCandidateValidator;
     private LiveSeededPoissonWorkloadGenerator workloadGenerator;
+    private List<TaskExclusionRecord> lastLifecycleExclusions = new ArrayList<>();
 
     private LiveStateLayerRuntimeFacade(MaGaLiveStateConfig config) {
         this.config = config;
@@ -80,6 +81,13 @@ public final class LiveStateLayerRuntimeFacade {
     }
 
     public int removeExpiredTasks(long tickTimeNs) {
+        lastLifecycleExclusions = exclusionRecords(
+                cache.expiredTasksDueAt(tickTimeNs),
+                tickTimeNs,
+                "LIFECYCLE_FILTER",
+                "DEADLINE_REACHED_BEFORE_SNAPSHOT",
+                "REMOVED"
+        );
         return cache.removeExpiredTasks(tickTimeNs);
     }
 
@@ -115,6 +123,10 @@ public final class LiveStateLayerRuntimeFacade {
 
     public RuntimeSnapshot buildSnapshotAt(long tickTimeNs) {
         LiveStateSnapshotView view = cache.snapshotAtOrBefore(tickTimeNs);
+        int vehiclesInCache = cache.vehicleCacheSize();
+        int tasksInCache = cache.taskDefinitionCacheSize();
+        int activeTasks = cache.activeTaskCacheSize();
+        int pendingTasks = view.getPendingTasks().size();
         List<LiveCellBandwidthBucket> safeBuckets = config.hasCellDiagnosticAccounting()
                 ? cellAccounting.latestSafeBuckets(tickTimeNs, config.getCellDiagnosticAccounting())
                 : new ArrayList<LiveCellBandwidthBucket>();
@@ -126,6 +138,21 @@ public final class LiveStateLayerRuntimeFacade {
         List<VehicleSnapshot> vehicles = vehicles(view);
         Set<String> vehicleIds = vehicleIds(vehicles);
         List<TaskInstance> tasks = tasks(view, vehicleIds);
+        List<TaskExclusionRecord> taskExclusions = new ArrayList<>(lastLifecycleExclusions);
+        taskExclusions.addAll(sourceVehicleExclusions(view, vehicleIds, tickTimeNs));
+        TaskFlowDiagnostics diagnostics = new TaskFlowDiagnostics(
+                vehiclesInCache,
+                vehicles.size(),
+                tasksInCache,
+                pendingTasks,
+                activeTasks,
+                pendingTasks,
+                tasks.size(),
+                pendingTasks,
+                tasks.size(),
+                tasks.size(),
+                taskExclusions
+        );
         List<NodeCandidate> localCandidates = localCandidates(localAndV2v.getLocalCandidates(), vehicleIds);
         List<NodeCandidate> v2vCandidates = v2vCandidates(localAndV2v.getV2vCandidates(), vehicleIds);
         Set<String> v2vPoolIds = poolIdsFromCandidates(v2vCandidates);
@@ -172,7 +199,8 @@ public final class LiveStateLayerRuntimeFacade {
                     accessLinks.size(),
                     bandwidthPools.size(),
                     safeBuckets.size(),
-                    audit
+                    audit,
+                    diagnostics
             );
         }
 
@@ -188,7 +216,7 @@ public final class LiveStateLayerRuntimeFacade {
         );
         snapshotValidator.validate(snapshot);
         localCandidateValidator.validate(snapshot);
-        return RuntimeSnapshot.resolved(snapshot, tickTimeNs, safeBuckets.size(), audit);
+        return RuntimeSnapshot.resolved(snapshot, tickTimeNs, safeBuckets.size(), audit, diagnostics);
     }
 
     private List<VehicleSnapshot> vehicles(LiveStateSnapshotView view) {
@@ -224,6 +252,65 @@ public final class LiveStateLayerRuntimeFacade {
             ));
         }
         return rows;
+    }
+
+    private List<TaskExclusionRecord> sourceVehicleExclusions(
+            LiveStateSnapshotView view,
+            Set<String> vehicleIds,
+            long tickTimeNs
+    ) {
+        List<TaskExclusionRecord> rows = new ArrayList<>();
+        for (LiveTaskState task : view.getPendingTasks()) {
+            if (vehicleIds.contains(task.getSourceVehicleId())) {
+                continue;
+            }
+            rows.add(exclusionRecord(
+                    task,
+                    tickTimeNs,
+                    "SOURCE_VEHICLE_FILTER",
+                    "SOURCE_VEHICLE_NOT_IN_SNAPSHOT",
+                    task.getStatus().name()
+            ));
+        }
+        return rows;
+    }
+
+    private List<TaskExclusionRecord> exclusionRecords(
+            List<LiveTaskState> tasks,
+            long tickTimeNs,
+            String stage,
+            String reason,
+            String state
+    ) {
+        List<TaskExclusionRecord> rows = new ArrayList<>();
+        for (LiveTaskState task : tasks) {
+            rows.add(exclusionRecord(task, tickTimeNs, stage, reason, state));
+        }
+        return rows;
+    }
+
+    private static TaskExclusionRecord exclusionRecord(
+            LiveTaskState task,
+            long tickTimeNs,
+            String stage,
+            String reason,
+            String state
+    ) {
+        double currentSimulationTime = tickTimeNs / NANOSECONDS_PER_SECOND;
+        double activationTime = task.getActivationTimeNs() / NANOSECONDS_PER_SECOND;
+        double absoluteDeadline = activationTime + task.getDeadlineSeconds();
+        return new TaskExclusionRecord(
+                task.getTaskId(),
+                task.getSourceVehicleId(),
+                activationTime,
+                absoluteDeadline,
+                currentSimulationTime,
+                currentSimulationTime - activationTime,
+                absoluteDeadline - currentSimulationTime,
+                state,
+                stage,
+                reason
+        );
     }
 
     private List<NodeCandidate> localCandidates(
@@ -491,6 +578,7 @@ public final class LiveStateLayerRuntimeFacade {
         private final int bandwidthPools;
         private final int safeCellBuckets;
         private final LivePublishedSnapshotAudit audit;
+        private final TaskFlowDiagnostics diagnostics;
 
         private RuntimeSnapshot(
                 long tickTimeNs,
@@ -502,7 +590,8 @@ public final class LiveStateLayerRuntimeFacade {
                 int accessLinks,
                 int bandwidthPools,
                 int safeCellBuckets,
-                LivePublishedSnapshotAudit audit
+                LivePublishedSnapshotAudit audit,
+                TaskFlowDiagnostics diagnostics
         ) {
             this.tickTimeNs = tickTimeNs;
             this.snapshot = snapshot;
@@ -514,13 +603,15 @@ public final class LiveStateLayerRuntimeFacade {
             this.bandwidthPools = bandwidthPools;
             this.safeCellBuckets = safeCellBuckets;
             this.audit = audit;
+            this.diagnostics = diagnostics;
         }
 
         static RuntimeSnapshot resolved(
                 SystemSnapshot snapshot,
                 long tickTimeNs,
                 int safeCellBuckets,
-                LivePublishedSnapshotAudit audit
+                LivePublishedSnapshotAudit audit,
+                TaskFlowDiagnostics diagnostics
         ) {
             return new RuntimeSnapshot(
                     tickTimeNs,
@@ -532,7 +623,8 @@ public final class LiveStateLayerRuntimeFacade {
                     snapshot.getAccessLinks().size(),
                     snapshot.getBandwidthPools().size(),
                     safeCellBuckets,
-                    audit
+                    audit,
+                    diagnostics
             );
         }
 
@@ -545,7 +637,8 @@ public final class LiveStateLayerRuntimeFacade {
                 int accessLinks,
                 int bandwidthPools,
                 int safeCellBuckets,
-                LivePublishedSnapshotAudit audit
+                LivePublishedSnapshotAudit audit,
+                TaskFlowDiagnostics diagnostics
         ) {
             return new RuntimeSnapshot(
                     tickTimeNs,
@@ -557,7 +650,8 @@ public final class LiveStateLayerRuntimeFacade {
                     accessLinks,
                     bandwidthPools,
                     safeCellBuckets,
-                    audit
+                    audit,
+                    diagnostics
             );
         }
 
@@ -599,6 +693,171 @@ public final class LiveStateLayerRuntimeFacade {
 
         public LivePublishedSnapshotAudit getAudit() {
             return audit;
+        }
+
+        public TaskFlowDiagnostics getDiagnostics() {
+            return diagnostics;
+        }
+    }
+
+    public static final class TaskFlowDiagnostics {
+        private final int vehiclesInCache;
+        private final int vehiclesInSnapshot;
+        private final int tasksInCache;
+        private final int pendingTasks;
+        private final int activeTasks;
+        private final int tasksAfterLifecycleFilter;
+        private final int tasksWithValidSourceVehicle;
+        private final int tasksInPreview;
+        private final int tasksInSystemSnapshot;
+        private final int tasksPassedToTemporalWindowManager;
+        private final List<TaskExclusionRecord> taskExclusions;
+
+        TaskFlowDiagnostics(
+                int vehiclesInCache,
+                int vehiclesInSnapshot,
+                int tasksInCache,
+                int pendingTasks,
+                int activeTasks,
+                int tasksAfterLifecycleFilter,
+                int tasksWithValidSourceVehicle,
+                int tasksInPreview,
+                int tasksInSystemSnapshot,
+                int tasksPassedToTemporalWindowManager,
+                List<TaskExclusionRecord> taskExclusions
+        ) {
+            this.vehiclesInCache = vehiclesInCache;
+            this.vehiclesInSnapshot = vehiclesInSnapshot;
+            this.tasksInCache = tasksInCache;
+            this.pendingTasks = pendingTasks;
+            this.activeTasks = activeTasks;
+            this.tasksAfterLifecycleFilter = tasksAfterLifecycleFilter;
+            this.tasksWithValidSourceVehicle = tasksWithValidSourceVehicle;
+            this.tasksInPreview = tasksInPreview;
+            this.tasksInSystemSnapshot = tasksInSystemSnapshot;
+            this.tasksPassedToTemporalWindowManager = tasksPassedToTemporalWindowManager;
+            this.taskExclusions = Collections.unmodifiableList(new ArrayList<>(taskExclusions));
+        }
+
+        public int getVehiclesInCache() {
+            return vehiclesInCache;
+        }
+
+        public int getVehiclesInSnapshot() {
+            return vehiclesInSnapshot;
+        }
+
+        public int getTasksInCache() {
+            return tasksInCache;
+        }
+
+        public int getPendingTasks() {
+            return pendingTasks;
+        }
+
+        public int getActiveTasks() {
+            return activeTasks;
+        }
+
+        public int getTasksAfterLifecycleFilter() {
+            return tasksAfterLifecycleFilter;
+        }
+
+        public int getTasksWithValidSourceVehicle() {
+            return tasksWithValidSourceVehicle;
+        }
+
+        public int getTasksInPreview() {
+            return tasksInPreview;
+        }
+
+        public int getTasksInSystemSnapshot() {
+            return tasksInSystemSnapshot;
+        }
+
+        public int getTasksPassedToTemporalWindowManager() {
+            return tasksPassedToTemporalWindowManager;
+        }
+
+        public List<TaskExclusionRecord> getTaskExclusions() {
+            return taskExclusions;
+        }
+    }
+
+    public static final class TaskExclusionRecord {
+        private final String taskId;
+        private final String sourceVehicleId;
+        private final double activationTime;
+        private final double absoluteDeadline;
+        private final double currentSimulationTime;
+        private final double taskAge;
+        private final double remainingTimeToDeadline;
+        private final String currentState;
+        private final String exclusionStage;
+        private final String exclusionReason;
+
+        TaskExclusionRecord(
+                String taskId,
+                String sourceVehicleId,
+                double activationTime,
+                double absoluteDeadline,
+                double currentSimulationTime,
+                double taskAge,
+                double remainingTimeToDeadline,
+                String currentState,
+                String exclusionStage,
+                String exclusionReason
+        ) {
+            this.taskId = taskId;
+            this.sourceVehicleId = sourceVehicleId;
+            this.activationTime = activationTime;
+            this.absoluteDeadline = absoluteDeadline;
+            this.currentSimulationTime = currentSimulationTime;
+            this.taskAge = taskAge;
+            this.remainingTimeToDeadline = remainingTimeToDeadline;
+            this.currentState = currentState;
+            this.exclusionStage = exclusionStage;
+            this.exclusionReason = exclusionReason;
+        }
+
+        public String getTaskId() {
+            return taskId;
+        }
+
+        public String getSourceVehicleId() {
+            return sourceVehicleId;
+        }
+
+        public double getActivationTime() {
+            return activationTime;
+        }
+
+        public double getAbsoluteDeadline() {
+            return absoluteDeadline;
+        }
+
+        public double getCurrentSimulationTime() {
+            return currentSimulationTime;
+        }
+
+        public double getTaskAge() {
+            return taskAge;
+        }
+
+        public double getRemainingTimeToDeadline() {
+            return remainingTimeToDeadline;
+        }
+
+        public String getCurrentState() {
+            return currentState;
+        }
+
+        public String getExclusionStage() {
+            return exclusionStage;
+        }
+
+        public String getExclusionReason() {
+            return exclusionReason;
         }
     }
 

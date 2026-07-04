@@ -2,6 +2,7 @@ package window.core;
 
 import config.mobility.MobilityConfig;
 import config.window.TemporalWindowConfig;
+import ga.diagnostics.GaRuntimeDiagnostics;
 import ga.core.MaGaOptimizer;
 import ga.core.MaGaResult;
 import model.genetic.Chromosome;
@@ -237,13 +238,28 @@ public final class TemporalWindowManager {
                 );
 
         PopulationReuseMode reuseMode = reuseDecision.getAppliedMode();
+        GaRuntimeDiagnostics.stage("POPULATION_ADAPTATION");
+        long populationAdaptationStartNs = System.nanoTime();
         List<Chromosome> initialPopulation = populationAdapter.adaptPopulation(
                 state.getLastFinalPopulation(),
                 optimizationSnapshot,
                 reuseMode,
                 targetPopulationSize
         );
+        long populationAdaptationElapsedNs =
+                System.nanoTime() - populationAdaptationStartNs;
+        GaRuntimeDiagnostics.addPopulationAdaptationNs(
+                populationAdaptationElapsedNs
+        );
+        GaRuntimeDiagnostics.recordStage(
+                "populationAdaptation",
+                -1,
+                -1,
+                populationAdaptationElapsedNs,
+                initialPopulation.size()
+        );
 
+        GaRuntimeDiagnostics.stage("OPTIMIZER");
         long startNs = System.nanoTime();
         MaGaResult maGaResult = optimizer.optimizeDetailed(
                 optimizationSnapshot,

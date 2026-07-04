@@ -1,5 +1,6 @@
 package ga.operators;
 
+import ga.diagnostics.GaRuntimeDiagnostics;
 import model.genetic.Chromosome;
 import model.genetic.Gene;
 import model.node.NodeCandidate;
@@ -94,17 +95,38 @@ public final class PopulationInitializer {
         List<Chromosome> population = new ArrayList<>();
 
         for (int i = 0; i < populationSize; i++) {
+            GaRuntimeDiagnostics.chromosomeIndex(i);
             InitializationProfile profile =
                     selectProfile(i, populationSize);
 
+            long createStartNs = System.nanoTime();
             Chromosome chromosome = createChromosome(
                     snapshot,
                     profile
             );
+            long createElapsedNs = System.nanoTime() - createStartNs;
+            GaRuntimeDiagnostics.addInitialChromosomeCreationNs(createElapsedNs);
+            GaRuntimeDiagnostics.recordStage(
+                    "initialChromosomeCreation",
+                    -1,
+                    i,
+                    createElapsedNs,
+                    snapshot.getTasks().size()
+            );
 
+            long repairStartNs = System.nanoTime();
             chromosome = repairOperator.repairChromosome(
                     chromosome,
                     snapshot
+            );
+            long repairElapsedNs = System.nanoTime() - repairStartNs;
+            GaRuntimeDiagnostics.addInitialRepairNs(repairElapsedNs);
+            GaRuntimeDiagnostics.recordStage(
+                    "initialRepair",
+                    -1,
+                    i,
+                    repairElapsedNs,
+                    1L
             );
 
             population.add(chromosome);

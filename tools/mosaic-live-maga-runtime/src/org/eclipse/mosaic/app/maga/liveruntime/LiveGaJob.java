@@ -1,6 +1,7 @@
 package org.eclipse.mosaic.app.maga.liveruntime;
 
 import model.snapshot.SystemSnapshot;
+import org.eclipse.mosaic.app.maga.livestate.LiveStateLayerRuntimeFacade;
 import window.state.TemporalWindowState;
 
 final class LiveGaJob {
@@ -8,11 +9,13 @@ final class LiveGaJob {
     private final int windowIndex;
     private final long submissionSimulationTimeNs;
     private final long submissionWallClockNs;
+    private final long submissionWallClockEpochMillis;
     private final String triggerType;
     private final SystemSnapshot snapshot;
     private final TemporalWindowState stateAtSubmission;
     private final double deltaTMaxAtSubmissionSeconds;
     private final long wallClockDeadlineNs;
+    private final LiveStateLayerRuntimeFacade.TaskFlowDiagnostics taskFlowDiagnostics;
     private boolean timeoutDetectedBeforeCompletion;
     private long waitCapDetectedWallClockNs;
     private long waitCapDetectedSimulationTimeNs;
@@ -22,21 +25,25 @@ final class LiveGaJob {
             int windowIndex,
             long submissionSimulationTimeNs,
             long submissionWallClockNs,
+            long submissionWallClockEpochMillis,
             String triggerType,
             SystemSnapshot snapshot,
             TemporalWindowState stateAtSubmission,
             double deltaTMaxAtSubmissionSeconds,
-            long wallClockDeadlineNs
+            long wallClockDeadlineNs,
+            LiveStateLayerRuntimeFacade.TaskFlowDiagnostics taskFlowDiagnostics
     ) {
         this.jobId = jobId;
         this.windowIndex = windowIndex;
         this.submissionSimulationTimeNs = submissionSimulationTimeNs;
         this.submissionWallClockNs = submissionWallClockNs;
+        this.submissionWallClockEpochMillis = submissionWallClockEpochMillis;
         this.triggerType = triggerType;
         this.snapshot = snapshot;
         this.stateAtSubmission = stateAtSubmission;
         this.deltaTMaxAtSubmissionSeconds = deltaTMaxAtSubmissionSeconds;
         this.wallClockDeadlineNs = wallClockDeadlineNs;
+        this.taskFlowDiagnostics = taskFlowDiagnostics;
     }
 
     String getJobId() {
@@ -53,6 +60,10 @@ final class LiveGaJob {
 
     long getSubmissionWallClockNs() {
         return submissionWallClockNs;
+    }
+
+    long getSubmissionWallClockEpochMillis() {
+        return submissionWallClockEpochMillis;
     }
 
     String getTriggerType() {
@@ -73,6 +84,10 @@ final class LiveGaJob {
 
     long getWallClockDeadlineNs() {
         return wallClockDeadlineNs;
+    }
+
+    LiveStateLayerRuntimeFacade.TaskFlowDiagnostics getTaskFlowDiagnostics() {
+        return taskFlowDiagnostics;
     }
 
     boolean isTimeoutDetectedBeforeCompletion() {

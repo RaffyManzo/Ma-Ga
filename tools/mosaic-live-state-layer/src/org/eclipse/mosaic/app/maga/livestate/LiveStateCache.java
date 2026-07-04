@@ -143,6 +143,33 @@ final class LiveStateCache {
         return removed;
     }
 
+    List<LiveTaskState> expiredTasksDueAt(long tickTimeNs) {
+        List<LiveTaskState> expired = new ArrayList<>();
+        for (LiveTaskState task : taskDefinitions.values()) {
+            long deadlineDurationNs = Math.round(
+                    task.getDeadlineSeconds() * NANOSECONDS_PER_SECOND
+            );
+            long deadlineTimeNs = task.getActivationTimeNs() + deadlineDurationNs;
+            if (deadlineTimeNs <= tickTimeNs) {
+                expired.add(task);
+            }
+        }
+        expired.sort(Comparator.comparing(LiveTaskState::getTaskId, LiveStateCache::naturalCompare));
+        return expired;
+    }
+
+    int vehicleCacheSize() {
+        return vehicles.size();
+    }
+
+    int taskDefinitionCacheSize() {
+        return taskDefinitions.size();
+    }
+
+    int activeTaskCacheSize() {
+        return activeTasks.size();
+    }
+
     void markTasksExported(List<LiveTaskState> tasks) {
         for (LiveTaskState task : tasks) {
             activeTasks.computeIfPresent(

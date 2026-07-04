@@ -294,7 +294,7 @@ try {
     # Expected class count after the local CPU contention correction.
     # The correction adds LocalCpuContentionEvaluator and deterministic
     # immutable nested result types, plus two local-repair support classes.
-    $ExpectedFrozenClassCount = 261
+    $ExpectedFrozenClassCount = 280
     $ActualClassCount = (Get-ChildItem -LiteralPath $StagingClassesDir -Recurse -Filter "*.class" -File).Count
     if ($ActualClassCount -ne $ExpectedFrozenClassCount) {
         throw "Unexpected class count: expected=$ExpectedFrozenClassCount actual=$ActualClassCount"

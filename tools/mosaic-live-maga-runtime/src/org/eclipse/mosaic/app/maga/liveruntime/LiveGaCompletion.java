@@ -7,7 +7,9 @@ final class LiveGaCompletion {
     private final TemporalStepResult stepResult;
     private final Throwable error;
     private final long completionWallClockNs;
+    private final long completionWallClockEpochMillis;
     private final double wallClockRuntimeSeconds;
+    private final double threadCpuMillis;
     private final double deltaTMaxSeconds;
     private final double deltaTMaxMismatchSeconds;
 
@@ -16,7 +18,9 @@ final class LiveGaCompletion {
             TemporalStepResult stepResult,
             Throwable error,
             long completionWallClockNs,
+            long completionWallClockEpochMillis,
             double wallClockRuntimeSeconds,
+            double threadCpuMillis,
             double deltaTMaxSeconds,
             double deltaTMaxMismatchSeconds
     ) {
@@ -24,7 +28,9 @@ final class LiveGaCompletion {
         this.stepResult = stepResult;
         this.error = error;
         this.completionWallClockNs = completionWallClockNs;
+        this.completionWallClockEpochMillis = completionWallClockEpochMillis;
         this.wallClockRuntimeSeconds = wallClockRuntimeSeconds;
+        this.threadCpuMillis = threadCpuMillis;
         this.deltaTMaxSeconds = deltaTMaxSeconds;
         this.deltaTMaxMismatchSeconds = deltaTMaxMismatchSeconds;
     }
@@ -33,7 +39,9 @@ final class LiveGaCompletion {
             LiveGaJob job,
             TemporalStepResult stepResult,
             long completionWallClockNs,
-            double wallClockRuntimeSeconds
+            long completionWallClockEpochMillis,
+            double wallClockRuntimeSeconds,
+            double threadCpuMillis
     ) {
         double deltaTMax = stepResult == null || stepResult.getAdaptiveWindowDecision() == null
                 ? 0.0
@@ -44,7 +52,9 @@ final class LiveGaCompletion {
                 stepResult,
                 null,
                 completionWallClockNs,
+                completionWallClockEpochMillis,
                 wallClockRuntimeSeconds,
+                threadCpuMillis,
                 deltaTMax,
                 mismatch
         );
@@ -54,14 +64,18 @@ final class LiveGaCompletion {
             LiveGaJob job,
             Throwable error,
             long completionWallClockNs,
-            double wallClockRuntimeSeconds
+            long completionWallClockEpochMillis,
+            double wallClockRuntimeSeconds,
+            double threadCpuMillis
     ) {
         return new LiveGaCompletion(
                 job,
                 null,
                 error,
                 completionWallClockNs,
+                completionWallClockEpochMillis,
                 wallClockRuntimeSeconds,
+                threadCpuMillis,
                 0.0,
                 job == null ? 0.0 : job.getDeltaTMaxAtSubmissionSeconds()
         );
@@ -83,8 +97,16 @@ final class LiveGaCompletion {
         return completionWallClockNs;
     }
 
+    long getCompletionWallClockEpochMillis() {
+        return completionWallClockEpochMillis;
+    }
+
     double getWallClockRuntimeSeconds() {
         return wallClockRuntimeSeconds;
+    }
+
+    double getThreadCpuMillis() {
+        return threadCpuMillis;
     }
 
     double getDeltaTMaxSeconds() {

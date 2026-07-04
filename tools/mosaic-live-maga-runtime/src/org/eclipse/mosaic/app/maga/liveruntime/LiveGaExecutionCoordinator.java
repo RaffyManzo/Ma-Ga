@@ -1,6 +1,8 @@
 package org.eclipse.mosaic.app.maga.liveruntime;
 
 import model.snapshot.SystemSnapshot;
+import ga.diagnostics.GaRuntimeDiagnostics;
+import org.eclipse.mosaic.app.maga.livestate.LiveStateLayerRuntimeFacade;
 import org.eclipse.mosaic.app.maga.liveruntime.reporting.LiveNativeReportingCollector;
 import window.core.TemporalWindowManager;
 import window.state.TemporalStepResult;
@@ -25,6 +27,8 @@ final class LiveGaExecutionCoordinator implements AutoCloseable {
     private final LiveRuntimeTraceWriter traceWriter;
     private final LiveGaOverrunDeadlinePolicy deadlinePolicy;
     private final LiveNativeReportingCollector reportingCollector;
+    private final LiveTaskFlowDiagnosticWriter taskFlowDiagnosticWriter;
+    private final LiveGaRuntimeHotspotDiagnosticWriter hotspotDiagnosticWriter;
     private final ExecutorService executor = Executors.newSingleThreadExecutor();
 
     private TemporalWindowState temporalState;
@@ -50,7 +54,9 @@ final class LiveGaExecutionCoordinator implements AutoCloseable {
             LiveStrategyApplier strategyApplier,
             LiveRuntimeTraceWriter traceWriter,
             LiveGaOverrunDeadlinePolicy deadlinePolicy,
-            LiveNativeReportingCollector reportingCollector
+            LiveNativeReportingCollector reportingCollector,
+            LiveTaskFlowDiagnosticWriter taskFlowDiagnosticWriter,
+            LiveGaRuntimeHotspotDiagnosticWriter hotspotDiagnosticWriter
     ) {
         this.config = config;
         this.manager = manager;
@@ -59,13 +65,27 @@ final class LiveGaExecutionCoordinator implements AutoCloseable {
         this.traceWriter = traceWriter;
         this.deadlinePolicy = deadlinePolicy;
         this.reportingCollector = reportingCollector;
+        this.taskFlowDiagnosticWriter = taskFlowDiagnosticWriter;
+        this.hotspotDiagnosticWriter = hotspotDiagnosticWriter;
     }
 
     void onTick(
             long simulationTimeNs,
-            Optional<SystemSnapshot> maybeSnapshot
+            LiveStateLayerRuntimeFacade.RuntimeSnapshot runtimeSnapshot,
+            int generatedTasks,
+            int expiredTasks
     ) throws IOException {
+        Optional<SystemSnapshot> maybeSnapshot = runtimeSnapshot.getSnapshot();
         if (inFlightFuture != null && !inFlightFuture.isDone()) {
+            if (hotspotDiagnosticWriter != null) {
+                hotspotDiagnosticWriter.recordWorkerBusyTick(
+                        simulationTimeNs,
+                        inFlightJob,
+                        maybeSnapshot.isPresent(),
+                        generatedTasks,
+                        expiredTasks
+                );
+            }
             detectTimeoutWhileRunning(simulationTimeNs);
             if (strategyApplier.hasLastAppliedStrategy()) {
                 lastAppliedStrategyPreservedWhileRunning = true;
@@ -81,7 +101,7 @@ final class LiveGaExecutionCoordinator implements AutoCloseable {
         if (!shouldSubmit(simulationTimeNs, snapshot)) {
             return;
         }
-        submit(simulationTimeNs, snapshot, triggerType(simulationTimeNs));
+        submit(simulationTimeNs, snapshot, triggerType(simulationTimeNs), runtimeSnapshot.getDiagnostics());
     }
 
     private boolean shouldSubmit(long simulationTimeNs, SystemSnapshot snapshot) {
@@ -110,13 +130,19 @@ final class LiveGaExecutionCoordinator implements AutoCloseable {
         return "SCHEDULED_WINDOW_EXPIRATION";
     }
 
-    private void submit(long simulationTimeNs, SystemSnapshot snapshot, String triggerType) throws IOException {
+    private void submit(
+            long simulationTimeNs,
+            SystemSnapshot snapshot,
+            String triggerType,
+            LiveStateLayerRuntimeFacade.TaskFlowDiagnostics diagnostics
+    ) throws IOException {
         if (inFlightFuture != null && !inFlightFuture.isDone()) {
             parallelGaViolations++;
             return;
         }
         temporalState = alignTemporalStateToLiveSnapshot(snapshot);
         long submissionWallClockNs = System.nanoTime();
+        long submissionWallClockEpochMillis = System.currentTimeMillis();
         LiveGaOverrunDeadlinePolicy.LiveGaDeadline deadline =
                 deadlinePolicy.computeDeadline(snapshot, temporalState, submissionWallClockNs);
         LiveGaJob job = new LiveGaJob(
@@ -124,16 +150,21 @@ final class LiveGaExecutionCoordinator implements AutoCloseable {
                 temporalState.getWindowIndex(),
                 simulationTimeNs,
                 submissionWallClockNs,
+                submissionWallClockEpochMillis,
                 triggerType,
                 snapshot,
                 temporalState,
                 deadline.getDeltaTMaxAtSubmissionSeconds(),
-                deadline.getWallClockDeadlineNs()
+                deadline.getWallClockDeadlineNs(),
+                diagnostics
         );
         inFlightJob = job;
         runtimeState = LiveGaExecutionState.GA_RUNNING;
         freshReoptimizationRequested = false;
         gaJobsSubmitted++;
+        if (hotspotDiagnosticWriter != null) {
+            hotspotDiagnosticWriter.recordSubmitted(job);
+        }
         inFlightFuture = executor.submit(() -> executeJob(job));
         if (reportingCollector != null) {
             reportingCollector.recordSubmitted(
@@ -208,21 +239,59 @@ final class LiveGaExecutionCoordinator implements AutoCloseable {
     }
 
     private LiveGaCompletion executeJob(LiveGaJob job) {
+        long cpuStartNs = GaRuntimeDiagnostics.cpuTimeNs();
+        GaRuntimeDiagnostics.beginJob(
+                hotspotDiagnosticWriter == null
+                        ? new GaRuntimeDiagnostics.JobDescriptor("", "", "", job.getJobId())
+                        : hotspotDiagnosticWriter.descriptor(job.getJobId()),
+                hotspotDiagnosticWriter
+        );
         try {
             if (config.getDiagnosticArtificialGaDelayMs() > 0) {
                 Thread.sleep(config.getDiagnosticArtificialGaDelayMs());
             }
             TemporalStepResult stepResult = manager.executeNextStepOrNull(job.getStateAtSubmission());
             long completionWallClockNs = System.nanoTime();
+            long completionWallClockEpochMillis = System.currentTimeMillis();
             double runtimeSeconds =
                     (completionWallClockNs - job.getSubmissionWallClockNs()) / NANOSECONDS_PER_SECOND;
-            return LiveGaCompletion.success(job, stepResult, completionWallClockNs, runtimeSeconds);
+            double threadCpuMillis = elapsedCpuMillis(cpuStartNs, GaRuntimeDiagnostics.cpuTimeNs());
+            return LiveGaCompletion.success(
+                    job,
+                    stepResult,
+                    completionWallClockNs,
+                    completionWallClockEpochMillis,
+                    runtimeSeconds,
+                    threadCpuMillis
+            );
         } catch (Throwable error) {
             long completionWallClockNs = System.nanoTime();
+            long completionWallClockEpochMillis = System.currentTimeMillis();
             double runtimeSeconds =
                     (completionWallClockNs - job.getSubmissionWallClockNs()) / NANOSECONDS_PER_SECOND;
-            return LiveGaCompletion.failure(job, error, completionWallClockNs, runtimeSeconds);
+            double threadCpuMillis = elapsedCpuMillis(cpuStartNs, GaRuntimeDiagnostics.cpuTimeNs());
+            return LiveGaCompletion.failure(
+                    job,
+                    error,
+                    completionWallClockNs,
+                    completionWallClockEpochMillis,
+                    runtimeSeconds,
+                    threadCpuMillis
+            );
+        } finally {
+            GaRuntimeDiagnostics.Context context = GaRuntimeDiagnostics.current();
+            if (context != null) {
+                context.heartbeat(true);
+            }
+            GaRuntimeDiagnostics.clearJob();
         }
+    }
+
+    private double elapsedCpuMillis(long startNs, long endNs) {
+        if (startNs < 0L || endNs < 0L || endNs < startNs) {
+            return -1.0;
+        }
+        return (endNs - startNs) / 1_000_000.0;
     }
 
     private void pollCompletion(long simulationTimeNs) throws IOException {
@@ -233,7 +302,14 @@ final class LiveGaExecutionCoordinator implements AutoCloseable {
         try {
             completion = inFlightFuture.get();
         } catch (Exception e) {
-            completion = LiveGaCompletion.failure(inFlightJob, e, System.nanoTime(), 0.0);
+            completion = LiveGaCompletion.failure(
+                    inFlightJob,
+                    e,
+                    System.nanoTime(),
+                    System.currentTimeMillis(),
+                    0.0,
+                    -1.0
+            );
         }
         inFlightFuture = null;
         inFlightJob = null;
@@ -258,6 +334,16 @@ final class LiveGaExecutionCoordinator implements AutoCloseable {
                     );
                 }
             }
+            if (hotspotDiagnosticWriter != null && completion.getJob() != null) {
+                hotspotDiagnosticWriter.recordCompletion(
+                        completion,
+                        simulationTimeNs,
+                        false,
+                        false,
+                        true,
+                        false
+                );
+            }
             runtimeState = LiveGaExecutionState.IDLE;
             traceWriter.writeRuntime(
                     simulationTimeNs,
@@ -278,6 +364,14 @@ final class LiveGaExecutionCoordinator implements AutoCloseable {
                     completion.hasError() ? completion.getError().getMessage() : "TemporalWindowManager returned null",
                     details(completion)
             );
+            if (taskFlowDiagnosticWriter != null) {
+                taskFlowDiagnosticWriter.writeInvocation(
+                        simulationTimeNs,
+                        completion,
+                        completion.hasError() ? "FAILED" : "NULL_STEP_RESULT",
+                        new LiveStrategyApplier.AssignmentCounts(0, 0, 0, 0)
+                );
+            }
             return;
         }
 
@@ -320,11 +414,34 @@ final class LiveGaExecutionCoordinator implements AutoCloseable {
                 details(completion)
         );
         LiveAppliedStrategy applied = strategyApplier.apply(completion.getStepResult(), simulationTimeNs);
+        if (taskFlowDiagnosticWriter != null) {
+            taskFlowDiagnosticWriter.writeInvocation(
+                    simulationTimeNs,
+                    completion,
+                    "APPLIED",
+                    new LiveStrategyApplier.AssignmentCounts(
+                            applied.getLocalAssignments(),
+                            applied.getVehicleAssignments(),
+                            applied.getEdgeAssignments(),
+                            applied.getCloudAssignments()
+                    )
+            );
+        }
         if (reportingCollector != null) {
             reportingCollector.recordApplied(
                     completion.getJob().getJobId(),
                     completion.getStepResult(),
                     simulationTimeNs
+            );
+        }
+        if (hotspotDiagnosticWriter != null) {
+            hotspotDiagnosticWriter.recordCompletion(
+                    completion,
+                    simulationTimeNs,
+                    true,
+                    false,
+                    false,
+                    false
             );
         }
         gaJobsApplied++;
@@ -406,6 +523,24 @@ final class LiveGaExecutionCoordinator implements AutoCloseable {
                     completion.getWallClockRuntimeSeconds(),
                     completion.getDeltaTMaxSeconds(),
                     completion.getDeltaTMaxMismatchSeconds()
+            );
+        }
+        if (hotspotDiagnosticWriter != null) {
+            hotspotDiagnosticWriter.recordCompletion(
+                    completion,
+                    simulationTimeNs,
+                    false,
+                    true,
+                    false,
+                    false
+            );
+        }
+        if (taskFlowDiagnosticWriter != null) {
+            taskFlowDiagnosticWriter.writeInvocation(
+                    simulationTimeNs,
+                    completion,
+                    "STALE_DISCARDED",
+                    LiveStrategyApplier.countAssignments(completion.getStepResult())
             );
         }
         runtimeState = LiveGaExecutionState.STALE_RESULT_DISCARDED;
@@ -502,6 +637,9 @@ final class LiveGaExecutionCoordinator implements AutoCloseable {
         }
         if (!job.detectTimeoutIfDeadlineReached(System.nanoTime(), simulationTimeNs)) {
             return;
+        }
+        if (hotspotDiagnosticWriter != null) {
+            hotspotDiagnosticWriter.recordBudgetExceeded(job, simulationTimeNs);
         }
         if (reportingCollector != null) {
             reportingCollector.recordWaitCapReached(
@@ -638,6 +776,17 @@ final class LiveGaExecutionCoordinator implements AutoCloseable {
                     simulationTimeNs,
                     System.nanoTime()
             );
+        }
+        if (inFlightFuture != null && !inFlightFuture.isDone()
+                && inFlightJob != null && hotspotDiagnosticWriter != null) {
+            hotspotDiagnosticWriter.recordShutdownInFlight(
+                    inFlightJob,
+                    simulationTimeNs
+            );
+        }
+        if (inFlightFuture != null && !inFlightFuture.isDone()
+                && inFlightJob != null && taskFlowDiagnosticWriter != null) {
+            taskFlowDiagnosticWriter.writeShutdownInFlight(simulationTimeNs, inFlightJob);
         }
         pollCompletion(simulationTimeNs);
     }

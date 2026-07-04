@@ -4,6 +4,7 @@ import config.MaGaConfig;
 import config.fitness.FitnessWeights;
 import config.fitness.NormalizationConfig;
 import config.fitness.PenaltyConfig;
+import ga.diagnostics.GaRuntimeDiagnostics;
 import ga.fitness.breakdown.BandwidthPoolUsageBreakdown;
 import ga.fitness.breakdown.EvaluationBreakdown;
 import ga.fitness.breakdown.ExecutionNodeResourceUsageBreakdown;
@@ -104,6 +105,13 @@ public final class FitnessEvaluator {
             Chromosome chromosome,
             SystemSnapshot snapshot
     ) {
+        long totalStartNs = System.nanoTime();
+        FitnessTiming timing = new FitnessTiming();
+        GaRuntimeDiagnostics.Context diagnosticContext =
+                GaRuntimeDiagnostics.current();
+        int generationIndex = diagnosticContext == null
+                ? -1
+                : diagnosticContext.lastKnownGeneration();
         Objects.requireNonNull(
                 chromosome,
                 "chromosome must not be null."
@@ -127,6 +135,7 @@ public final class FitnessEvaluator {
                 "chromosome.genes"
         );
 
+        long structuralStartNs = System.nanoTime();
         Map<String, TaskInstance> taskById = indexTasks(tasks);
         Map<String, VehicleSnapshot> vehicleById = indexVehicles(vehicles);
         Map<String, NodeCandidate> candidateById = indexCandidates(candidates);
@@ -147,12 +156,15 @@ public final class FitnessEvaluator {
                 bandwidthUsageByPool = initializeBandwidthPoolUsage(snapshot);
         Map<String, LocalResourceUsageBreakdown>
                 localUsageByVehicle = initializeLocalUsage(vehicles);
+        timing.structuralNs += System.nanoTime() - structuralStartNs;
+        long localContentionStartNs = System.nanoTime();
         Evaluation localContention = localCpuContentionEvaluator.evaluate(
                 tasks,
                 geneByTaskId,
                 candidateById,
                 vehicleById
         );
+        timing.localContentionNs += System.nanoTime() - localContentionStartNs;
 
         List<GeneEvaluationBreakdown> geneBreakdowns = new ArrayList<>();
         double completionTime = 0.0;
@@ -185,14 +197,31 @@ public final class FitnessEvaluator {
                 continue;
             }
 
+            long geneStartNs = System.nanoTime();
             GeneEvaluationBreakdown geneBreakdown = evaluateGene(
                     snapshot,
                     task,
                     gene,
                     candidate,
                     sourceVehicle,
-                    localContention.getTaskResult(task.getTaskId())
+                    localContention.getTaskResult(task.getTaskId()),
+                    timing
             );
+            long geneElapsedNs = System.nanoTime() - geneStartNs;
+            if (candidate.getType() == NodeType.LOCAL) {
+                timing.localGeneBranchNs += geneElapsedNs;
+                timing.localGenes++;
+            } else {
+                timing.remoteGeneBranchNs += geneElapsedNs;
+                if (candidate.getType() == NodeType.VEHICLE) {
+                    timing.vehicleGenes++;
+                } else if (candidate.getType() == NodeType.EDGE) {
+                    timing.edgeGenes++;
+                } else if (candidate.getType() == NodeType.CLOUD) {
+                    timing.cloudGenes++;
+                }
+            }
+            timing.taskGeneVisits++;
             geneBreakdowns.add(geneBreakdown);
 
             completionTime = Math.max(
@@ -224,10 +253,12 @@ public final class FitnessEvaluator {
                 }
 
                 try {
+                    long poolStartNs = System.nanoTime();
                     BandwidthPoolSnapshot pool = bandwidthPoolResolver.resolve(
                             snapshot,
                             candidate
                     );
+                    timing.bandwidthPoolNs += System.nanoTime() - poolStartNs;
                     BandwidthPoolUsageBreakdown poolUsage =
                             bandwidthUsageByPool.get(pool.getPoolId());
                     if (poolUsage == null) {
@@ -270,17 +301,21 @@ public final class FitnessEvaluator {
          * comunicative dei singoli task, non come media.
          */
         double totalCommunicationLatency = communicationLatencySum;
+        long resourceStartNs = System.nanoTime();
         double resourcePenalty = computeResourcePenalty(
                 cpuUsageByExecutionNode,
                 bandwidthUsageByCandidate,
                 bandwidthUsageByPool,
                 localUsageByVehicle
         );
+        timing.resourcePenaltyNs += System.nanoTime() - resourceStartNs;
         double totalResourceAndConstraintPenalty =
                 resourcePenalty + constraintPenalty + invalidPenalty;
+        long deadlinePenaltyStartNs = System.nanoTime();
         double hardDeadlinePenalty = computeHardDeadlinePenalty(
                 geneBreakdowns
         );
+        timing.deadlinePenaltyNs += System.nanoTime() - deadlinePenaltyStartNs;
 
         FitnessWeights weights = config.getFitnessWeights();
         NormalizationConfig normalization = config.getNormalizationConfig();
@@ -305,7 +340,7 @@ public final class FitnessEvaluator {
          * compatibilità. La diagnostica dei pool viene stampata dal printer
          * gerarchico leggendo snapshot e cromosoma finale.
          */
-        return new EvaluationBreakdown(
+        EvaluationBreakdown result = new EvaluationBreakdown(
                 fitness,
                 completionTime,
                 totalCommunicationLatency,
@@ -320,6 +355,30 @@ public final class FitnessEvaluator {
                 new ArrayList<>(bandwidthUsageByCandidate.values()),
                 new ArrayList<>(localUsageByVehicle.values())
         );
+        GaRuntimeDiagnostics.recordFitness(new GaRuntimeDiagnostics.FitnessRecord(
+                diagnosticContext == null
+                        ? new GaRuntimeDiagnostics.JobDescriptor("", "", "", "")
+                        : diagnosticContext.descriptor(),
+                generationIndex,
+                -1,
+                1L,
+                GaRuntimeDiagnostics.millis(System.nanoTime() - totalStartNs),
+                GaRuntimeDiagnostics.millis(timing.localGeneBranchNs),
+                GaRuntimeDiagnostics.millis(timing.remoteGeneBranchNs),
+                GaRuntimeDiagnostics.millis(timing.communicationNs),
+                GaRuntimeDiagnostics.millis(timing.mobilityNs),
+                GaRuntimeDiagnostics.millis(timing.resourcePenaltyNs),
+                GaRuntimeDiagnostics.millis(timing.deadlinePenaltyNs),
+                GaRuntimeDiagnostics.millis(timing.localContentionNs),
+                GaRuntimeDiagnostics.millis(timing.bandwidthPoolNs),
+                GaRuntimeDiagnostics.millis(timing.structuralNs),
+                timing.localGenes,
+                timing.vehicleGenes,
+                timing.edgeGenes,
+                timing.cloudGenes,
+                timing.taskGeneVisits
+        ));
+        return result;
     }
 
     private GeneEvaluationBreakdown evaluateGene(
@@ -328,7 +387,8 @@ public final class FitnessEvaluator {
             Gene gene,
             NodeCandidate candidate,
             VehicleSnapshot sourceVehicle,
-            TaskResult localContention
+            TaskResult localContention,
+            FitnessTiming timing
     ) {
         PenaltyConfig penalties = config.getPenaltyConfig();
         double constraintPenalty = 0.0;
@@ -345,18 +405,22 @@ public final class FitnessEvaluator {
             localCpu = EPSILON;
         }
 
+        long mobilityStartNs = System.nanoTime();
         MobilityLinkMetrics mobilityLinkMetrics =
                 coverageEstimator.estimateLinkMetrics(
                         snapshot,
                         task,
                         candidate
                 );
+        timing.mobilityNs += System.nanoTime() - mobilityStartNs;
         double coverageTimeSeconds =
                 mobilityLinkMetrics.getCoverageTimeSeconds();
 
         if (candidate.getType() == NodeType.LOCAL) {
+            long localStartNs = System.nanoTime();
             OffloadingTimeBreakdown timeBreakdown =
                     offloadingTimeModel.evaluateLocal(task, localCpu);
+            timing.localExecutionNs += System.nanoTime() - localStartNs;
 
             if (Math.abs(p) > EPSILON) {
                 constraintPenalty += Math.abs(p)
@@ -370,11 +434,13 @@ public final class FitnessEvaluator {
                     independentLocalTime
             );
             double completionTime = contendedLocalTime;
+            long deadlineStartNs = System.nanoTime();
             double deadlinePenalty = computeDeadlinePenalty(
                     completionTime,
                     task.getDeadlineSeconds(),
                     penalties
             );
+            timing.deadlinePenaltyNs += System.nanoTime() - deadlineStartNs;
 
             return new GeneEvaluationBreakdown(
                     task.getTaskId(),
@@ -426,6 +492,7 @@ public final class FitnessEvaluator {
             allocatedBandwidth = EPSILON;
         }
 
+        long remoteStartNs = System.nanoTime();
         OffloadingTimeBreakdown timeBreakdown =
                 offloadingTimeModel.evaluateRemote(
                         task,
@@ -435,6 +502,9 @@ public final class FitnessEvaluator {
                         allocatedCpu,
                         allocatedBandwidth
                 );
+        long remoteElapsedNs = System.nanoTime() - remoteStartNs;
+        timing.remoteExecutionNs += remoteElapsedNs;
+        timing.communicationNs += remoteElapsedNs;
 
         double independentLocalTime =
                 timeBreakdown.getLocalExecutionTimeSeconds();
@@ -460,11 +530,13 @@ public final class FitnessEvaluator {
                 );
 
         double mobilityPenalty = mobilityBreakdown.getTotalMobilityPenalty();
+        long deadlineStartNs = System.nanoTime();
         double deadlinePenalty = computeDeadlinePenalty(
                 completionTime,
                 task.getDeadlineSeconds(),
                 penalties
         );
+        timing.deadlinePenaltyNs += System.nanoTime() - deadlineStartNs;
         DecisionType decisionType = p >= 1.0 - EPSILON
                 ? DecisionType.FULL_OFFLOADING
                 : DecisionType.PARTIAL_OFFLOADING;
@@ -826,5 +898,24 @@ public final class FitnessEvaluator {
             return min;
         }
         return Math.max(min, Math.min(max, value));
+    }
+
+    private static final class FitnessTiming {
+        private long localExecutionNs;
+        private long remoteExecutionNs;
+        private long communicationNs;
+        private long mobilityNs;
+        private long resourcePenaltyNs;
+        private long deadlinePenaltyNs;
+        private long localContentionNs;
+        private long bandwidthPoolNs;
+        private long structuralNs;
+        private long localGeneBranchNs;
+        private long remoteGeneBranchNs;
+        private long localGenes;
+        private long vehicleGenes;
+        private long edgeGenes;
+        private long cloudGenes;
+        private long taskGeneVisits;
     }
 }

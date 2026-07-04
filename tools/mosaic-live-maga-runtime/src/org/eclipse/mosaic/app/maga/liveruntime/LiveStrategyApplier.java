@@ -19,6 +19,25 @@ final class LiveStrategyApplier {
     private int cloudAssignments;
 
     LiveAppliedStrategy apply(TemporalStepResult stepResult, long simulationTimeNs) {
+        AssignmentCounts counts = countAssignments(stepResult);
+        lastAppliedStrategy = new LiveAppliedStrategy(
+                simulationTimeNs,
+                stepResult.getSnapshot().getSnapshotId(),
+                stepResult.getMaGaResult().getFinalBestFitness(),
+                counts.getLocalAssignments(),
+                counts.getVehicleAssignments(),
+                counts.getEdgeAssignments(),
+                counts.getCloudAssignments()
+        );
+        strategyApplications++;
+        localAssignments += counts.getLocalAssignments();
+        vehicleAssignments += counts.getVehicleAssignments();
+        edgeAssignments += counts.getEdgeAssignments();
+        cloudAssignments += counts.getCloudAssignments();
+        return lastAppliedStrategy;
+    }
+
+    static AssignmentCounts countAssignments(TemporalStepResult stepResult) {
         Map<String, NodeType> candidateTypes = new HashMap<>();
         for (NodeCandidate candidate : stepResult.getSnapshot().getCandidateNodes()) {
             candidateTypes.put(candidate.getCandidateId(), candidate.getType());
@@ -43,22 +62,7 @@ final class LiveStrategyApplier {
                 }
             }
         }
-
-        lastAppliedStrategy = new LiveAppliedStrategy(
-                simulationTimeNs,
-                stepResult.getSnapshot().getSnapshotId(),
-                stepResult.getMaGaResult().getFinalBestFitness(),
-                local,
-                vehicle,
-                edge,
-                cloud
-        );
-        strategyApplications++;
-        localAssignments += local;
-        vehicleAssignments += vehicle;
-        edgeAssignments += edge;
-        cloudAssignments += cloud;
-        return lastAppliedStrategy;
+        return new AssignmentCounts(local, vehicle, edge, cloud);
     }
 
     LiveAppliedStrategy getLastAppliedStrategy() {
@@ -87,5 +91,40 @@ final class LiveStrategyApplier {
 
     int getCloudAssignments() {
         return cloudAssignments;
+    }
+
+    static final class AssignmentCounts {
+        private final int localAssignments;
+        private final int vehicleAssignments;
+        private final int edgeAssignments;
+        private final int cloudAssignments;
+
+        AssignmentCounts(
+                int localAssignments,
+                int vehicleAssignments,
+                int edgeAssignments,
+                int cloudAssignments
+        ) {
+            this.localAssignments = localAssignments;
+            this.vehicleAssignments = vehicleAssignments;
+            this.edgeAssignments = edgeAssignments;
+            this.cloudAssignments = cloudAssignments;
+        }
+
+        int getLocalAssignments() {
+            return localAssignments;
+        }
+
+        int getVehicleAssignments() {
+            return vehicleAssignments;
+        }
+
+        int getEdgeAssignments() {
+            return edgeAssignments;
+        }
+
+        int getCloudAssignments() {
+            return cloudAssignments;
+        }
     }
 }

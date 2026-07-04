@@ -36,6 +36,8 @@ public class MaGaLiveRuntimeCoordinatorApp extends AbstractApplication<ServerOpe
     private SystemStateSource systemStateSource;
     private LiveStrategyApplier strategyApplier;
     private LiveRuntimeTraceWriter traceWriter;
+    private LiveTaskFlowDiagnosticWriter taskFlowDiagnosticWriter;
+    private LiveGaRuntimeHotspotDiagnosticWriter hotspotDiagnosticWriter;
     private LiveNativeReportingCollector reportingCollector;
     private LiveGaExecutionCoordinator executionCoordinator;
     private MaGaConfig maGaConfig;
@@ -72,6 +74,17 @@ public class MaGaLiveRuntimeCoordinatorApp extends AbstractApplication<ServerOpe
                     runDirectory,
                     runtimeConfig.profileName(),
                     runtimeConfig.getPublishedSnapshotCopyLimit()
+            );
+            taskFlowDiagnosticWriter = new LiveTaskFlowDiagnosticWriter(
+                    traceWriter.getOutputDir(),
+                    getOs().getConfigurationPath().toPath(),
+                    runtimeConfig
+            );
+            hotspotDiagnosticWriter = new LiveGaRuntimeHotspotDiagnosticWriter(
+                    traceWriter.getOutputDir(),
+                    diagnosticValue("maga.diagnostic.runId", "MAGA_DIAGNOSTIC_RUN_ID"),
+                    diagnosticValue("maga.diagnostic.configurationId", "MAGA_DIAGNOSTIC_CONFIGURATION_ID"),
+                    diagnosticValue("maga.diagnostic.seed", "MAGA_DIAGNOSTIC_SEED")
             );
             if (runtimeConfig.isNativeLiveDetailedReportingEnabled()) {
                 reportingCollector = new LiveNativeReportingCollector(
@@ -117,7 +130,9 @@ public class MaGaLiveRuntimeCoordinatorApp extends AbstractApplication<ServerOpe
                 strategyApplier,
                 traceWriter,
                 deadlinePolicy,
-                reportingCollector
+                reportingCollector,
+                taskFlowDiagnosticWriter,
+                hotspotDiagnosticWriter
         );
 
         getLog().infoSimTime(
@@ -148,10 +163,20 @@ public class MaGaLiveRuntimeCoordinatorApp extends AbstractApplication<ServerOpe
                 stateFacade.buildSnapshotAt(tickTimeNs);
         try {
             traceWriter.writeBridgeSnapshot(tickTimeNs, runtimeSnapshot);
+            if (taskFlowDiagnosticWriter != null) {
+                taskFlowDiagnosticWriter.writeTaskExclusions(
+                        runtimeSnapshot.getDiagnostics().getTaskExclusions()
+                );
+            }
             runtimeSnapshot.getSnapshot().ifPresent(
                     snapshot -> bridge.publishSnapshot(snapshot, runtimeSnapshot.getAudit())
             );
-            executionCoordinator.onTick(tickTimeNs, runtimeSnapshot.getSnapshot());
+            executionCoordinator.onTick(
+                    tickTimeNs,
+                    runtimeSnapshot,
+                    generatedTasks,
+                    expiredTasks
+            );
         } catch (IOException e) {
             throw new IllegalStateException("Unable to write live MA-GA runtime trace", e);
         }
@@ -211,6 +236,20 @@ public class MaGaLiveRuntimeCoordinatorApp extends AbstractApplication<ServerOpe
                     throw new IllegalStateException("Unable to close native live reporting", e);
                 }
             }
+            if (taskFlowDiagnosticWriter != null) {
+                try {
+                    taskFlowDiagnosticWriter.close();
+                } catch (IOException e) {
+                    throw new IllegalStateException("Unable to close task flow diagnostics", e);
+                }
+            }
+            if (hotspotDiagnosticWriter != null) {
+                try {
+                    hotspotDiagnosticWriter.close();
+                } catch (IOException e) {
+                    throw new IllegalStateException("Unable to close G03 hotspot diagnostics", e);
+                }
+            }
             if (traceWriter != null) {
                 try {
                     traceWriter.close();
@@ -242,6 +281,18 @@ public class MaGaLiveRuntimeCoordinatorApp extends AbstractApplication<ServerOpe
 
     private void scheduleNext(long delayNs) {
         getOs().getEventManager().addEvent(new Event(getOs().getSimulationTime() + delayNs, this));
+    }
+
+    private String diagnosticValue(String propertyName, String environmentName) {
+        String propertyValue = System.getProperty(propertyName);
+        if (propertyValue != null && !propertyValue.isBlank()) {
+            return propertyValue;
+        }
+        String environmentValue = System.getenv(environmentName);
+        if (environmentValue != null && !environmentValue.isBlank()) {
+            return environmentValue;
+        }
+        return "UNKNOWN";
     }
 
     private Path resolveRunDirectory() {

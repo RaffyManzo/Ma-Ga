@@ -6,6 +6,7 @@ import ga.constraints.DeadlineEvaluation;
 import ga.constraints.DeadlineRepairCatalog;
 import ga.constraints.DeadlineRepairCatalog.DeadlineRepairProfile;
 import ga.constraints.SnapshotRepairContext;
+import ga.diagnostics.GaRuntimeDiagnostics;
 import ga.fitness.local.LocalCpuContentionEvaluator;
 import ga.fitness.local.LocalCpuContentionEvaluator.Evaluation;
 import ga.fitness.local.LocalCpuContentionEvaluator.TaskResult;
@@ -178,79 +179,122 @@ public final class RepairOperator {
     ) {
         Objects.requireNonNull(snapshot, "snapshot must not be null.");
 
+        GaRuntimeDiagnostics.RepairScope repairScope =
+                GaRuntimeDiagnostics.beginRepair(
+                        initialTargetedTaskIds == null ? "FULL" : "INCREMENTAL"
+                );
         SnapshotRepairContext context = contextFor(snapshot);
         DeadlineRepairCatalog catalog = catalogFor(context);
         Chromosome current = chromosome;
         Set<String> targetedTaskIds = initialTargetedTaskIds;
 
-        for (int pass = 0; pass < MAX_REPAIR_PASSES; pass++) {
-            current = repairGenes(
-                    current,
-                    snapshot,
-                    context,
-                    catalog,
-                    targetedTaskIds
-            );
+        try {
+            for (int pass = 0; pass < MAX_REPAIR_PASSES; pass++) {
+                repairScope.pass();
+                long geneRepairStartNs = System.nanoTime();
+                current = repairGenes(
+                        current,
+                        snapshot,
+                        context,
+                        catalog,
+                        targetedTaskIds,
+                        repairScope
+                );
+                repairScope.geneRepairNs(System.nanoTime() - geneRepairStartNs);
 
-            LocalContentionRepairResult localContentionResult =
-                    repairLocalCpuContention(
-                            current,
-                            snapshot,
-                            context,
-                            catalog
-                    );
-            current = localContentionResult.getChromosome();
+                long localContentionStartNs = System.nanoTime();
+                LocalContentionRepairResult localContentionResult =
+                        repairLocalCpuContention(
+                                current,
+                                snapshot,
+                                context,
+                                catalog,
+                                repairScope
+                        );
+                repairScope.localContentionNs(
+                        System.nanoTime() - localContentionStartNs
+                );
+                current = localContentionResult.getChromosome();
+                if (localContentionResult.isChanged()) {
+                    repairScope.localOverflowRepair();
+                    repairScope.changed();
+                }
 
-            CpuAggregateRepairResult cpuAggregateResult =
-                    cpuAggregateRepairOperator.repairChromosomeDetailed(
-                            current,
-                            snapshot,
-                            context
-                    );
-            current = cpuAggregateResult.getChromosome();
+                long cpuStartNs = System.nanoTime();
+                CpuAggregateRepairResult cpuAggregateResult =
+                        cpuAggregateRepairOperator.repairChromosomeDetailed(
+                                current,
+                                snapshot,
+                                context
+                        );
+                repairScope.cpuAggregateNs(System.nanoTime() - cpuStartNs);
+                current = cpuAggregateResult.getChromosome();
+                if (cpuAggregateResult.isChanged()) {
+                    repairScope.cpuCapacityRepair();
+                    repairScope.changed();
+                }
 
-            BandwidthAggregateRepairResult bandwidthAggregateResult =
-                    bandwidthAggregateRepairOperator.repairChromosomeDetailed(
-                            current,
-                            snapshot,
-                            context
-                    );
-            current = bandwidthAggregateResult.getChromosome();
+                long bandwidthStartNs = System.nanoTime();
+                BandwidthAggregateRepairResult bandwidthAggregateResult =
+                        bandwidthAggregateRepairOperator.repairChromosomeDetailed(
+                                current,
+                                snapshot,
+                                context
+                        );
+                repairScope.bandwidthAggregateNs(
+                        System.nanoTime() - bandwidthStartNs
+                );
+                current = bandwidthAggregateResult.getChromosome();
+                if (bandwidthAggregateResult.isChanged()) {
+                    repairScope.bandwidthRepair();
+                    repairScope.changed();
+                }
 
-            BandwidthPoolAggregateRepairResult bandwidthPoolAggregateResult =
-                    bandwidthPoolAggregateRepairOperator
-                            .repairChromosomeDetailed(
-                                    current,
-                                    snapshot,
-                                    context
-                            );
-            current = bandwidthPoolAggregateResult.getChromosome();
+                long bandwidthPoolStartNs = System.nanoTime();
+                BandwidthPoolAggregateRepairResult bandwidthPoolAggregateResult =
+                        bandwidthPoolAggregateRepairOperator
+                                .repairChromosomeDetailed(
+                                        current,
+                                        snapshot,
+                                        context
+                                );
+                repairScope.bandwidthPoolAggregateNs(
+                        System.nanoTime() - bandwidthPoolStartNs
+                );
+                current = bandwidthPoolAggregateResult.getChromosome();
+                if (bandwidthPoolAggregateResult.isChanged()) {
+                    repairScope.bandwidthRepair();
+                    repairScope.changed();
+                }
 
-            if (!localContentionResult.isChanged()
-                    && !cpuAggregateResult.isChanged()
-                    && !bandwidthAggregateResult.isChanged()
-                    && !bandwidthPoolAggregateResult.isChanged()) {
-                return current;
+                if (!localContentionResult.isChanged()
+                        && !cpuAggregateResult.isChanged()
+                        && !bandwidthAggregateResult.isChanged()
+                        && !bandwidthPoolAggregateResult.isChanged()) {
+                    return current;
+                }
+
+                targetedTaskIds = new LinkedHashSet<>();
+                targetedTaskIds.addAll(
+                        localContentionResult.getAffectedTaskIds()
+                );
+                targetedTaskIds.addAll(cpuAggregateResult.getAffectedTaskIds());
+                targetedTaskIds.addAll(
+                        bandwidthAggregateResult.getAffectedTaskIds()
+                );
+                targetedTaskIds.addAll(
+                        bandwidthPoolAggregateResult.getAffectedTaskIds()
+                );
+
+                if (targetedTaskIds.isEmpty()) {
+                    return current;
+                }
             }
 
-            targetedTaskIds = new LinkedHashSet<>();
-            targetedTaskIds.addAll(
-                    localContentionResult.getAffectedTaskIds()
-            );
-            targetedTaskIds.addAll(cpuAggregateResult.getAffectedTaskIds());
-            targetedTaskIds.addAll(
-                    bandwidthAggregateResult.getAffectedTaskIds()
-            );
-            targetedTaskIds.addAll(
-                    bandwidthPoolAggregateResult.getAffectedTaskIds()
-            );
-
-            if (targetedTaskIds.isEmpty()) {
-                return current;
-            }
+            return current;
+        } finally {
+            repairScope.finish();
         }
-
-        return current;
     }
 
 
@@ -267,7 +311,8 @@ public final class RepairOperator {
             Chromosome chromosome,
             SystemSnapshot snapshot,
             SnapshotRepairContext context,
-            DeadlineRepairCatalog catalog
+            DeadlineRepairCatalog catalog,
+            GaRuntimeDiagnostics.RepairScope repairScope
     ) {
         if (chromosome == null || chromosome.getGenes() == null) {
             return LocalContentionRepairResult.unchanged(chromosome);
@@ -293,10 +338,12 @@ public final class RepairOperator {
                             current,
                             evaluation,
                             context,
-                            catalog
+                            catalog,
+                            repairScope
                     );
 
             if (replacement == null) {
+                repairScope.unrepairedViolation();
                 break;
             }
 
@@ -322,7 +369,8 @@ public final class RepairOperator {
             Chromosome chromosome,
             Evaluation evaluation,
             SnapshotRepairContext context,
-            DeadlineRepairCatalog catalog
+            DeadlineRepairCatalog catalog,
+            GaRuntimeDiagnostics.RepairScope repairScope
     ) {
         Map<String, Gene> geneByTaskId = indexGenes(chromosome);
         LocalContentionReplacement best = null;
@@ -363,6 +411,7 @@ public final class RepairOperator {
 
                 for (NodeCandidate candidate
                         : context.getCandidatesForTask(task)) {
+                    repairScope.candidateSearch();
                     if (candidate == null
                             || candidate.getType() == NodeType.LOCAL) {
                         continue;
@@ -385,6 +434,7 @@ public final class RepairOperator {
                     ratios.sort(Double::compareTo);
 
                     for (double ratio : ratios) {
+                        repairScope.candidateComparison();
                         Gene replacement;
                         try {
                             DeadlineRepairProfile profile =
@@ -697,7 +747,8 @@ public final class RepairOperator {
             SystemSnapshot snapshot,
             SnapshotRepairContext context,
             DeadlineRepairCatalog catalog,
-            Set<String> targetedTaskIds
+            Set<String> targetedTaskIds,
+            GaRuntimeDiagnostics.RepairScope repairScope
     ) {
         Map<String, Gene> geneByTaskId = indexGenes(chromosome);
         List<Gene> repairedGenes = new ArrayList<>();
@@ -710,13 +761,24 @@ public final class RepairOperator {
 
             if (gene == null) {
                 gene = createFallbackGene(task, context);
+                repairScope.fallbackAssignment();
             }
 
             repairedGenes.add(
                     mustRepair
-                            ? repairGene(gene, task, snapshot, context, catalog)
+                            ? repairGene(
+                                    gene,
+                                    task,
+                                    snapshot,
+                                    context,
+                                    catalog,
+                                    repairScope
+                            )
                             : gene
             );
+            if (mustRepair) {
+                repairScope.repairedGenes(1L);
+            }
         }
 
         Chromosome repaired = new Chromosome(repairedGenes);
@@ -734,7 +796,7 @@ public final class RepairOperator {
     ) {
         Objects.requireNonNull(snapshot, "snapshot must not be null.");
         SnapshotRepairContext context = contextFor(snapshot);
-        return repairGene(gene, task, snapshot, context, catalogFor(context));
+        return repairGene(gene, task, snapshot, context, catalogFor(context), null);
     }
 
     /** Ripara un gene usando indici e catalogo dello snapshot corrente. */
@@ -743,7 +805,8 @@ public final class RepairOperator {
             TaskInstance task,
             SystemSnapshot snapshot,
             SnapshotRepairContext context,
-            DeadlineRepairCatalog catalog
+            DeadlineRepairCatalog catalog,
+            GaRuntimeDiagnostics.RepairScope repairScope
     ) {
         Objects.requireNonNull(gene, "gene must not be null.");
         Objects.requireNonNull(task, "task must not be null.");
@@ -758,6 +821,9 @@ public final class RepairOperator {
                         task.getSourceVehicleId()
                 )) {
             candidate = localCandidate;
+            if (repairScope != null) {
+                repairScope.structuralRepair();
+            }
         }
 
         VehicleSnapshot sourceVehicle = context.getVehicleById(
@@ -801,6 +867,9 @@ public final class RepairOperator {
                     allocatedBandwidth,
                     context
             )) {
+                if (repairScope != null) {
+                    repairScope.mobilityRepair();
+                }
                 NodeCandidate replacement =
                         findCoverageSustainableRemoteCandidate(
                                 task,
@@ -853,7 +922,8 @@ public final class RepairOperator {
                 context,
                 catalog,
                 sourceVehicle,
-                localCandidate
+                localCandidate,
+                repairScope
         );
     }
 
@@ -874,7 +944,8 @@ public final class RepairOperator {
             SnapshotRepairContext context,
             DeadlineRepairCatalog catalog,
             VehicleSnapshot sourceVehicle,
-            NodeCandidate localCandidate
+            NodeCandidate localCandidate,
+            GaRuntimeDiagnostics.RepairScope repairScope
     ) {
         DeadlineEvaluation currentEvaluation =
                 deadlineConstraintEvaluator.evaluate(
@@ -885,6 +956,9 @@ public final class RepairOperator {
 
         if (currentEvaluation.isDeadlineRespected()) {
             return currentGene;
+        }
+        if (repairScope != null) {
+            repairScope.deadlineRepair();
         }
 
         NodeCandidate currentCandidate = context.getCandidateById(
@@ -902,7 +976,8 @@ public final class RepairOperator {
                             currentGene.getAllocatedCpu(),
                             currentGene.getAllocatedBandwidth(),
                             context,
-                            catalog
+                            catalog,
+                            repairScope
                     );
 
             if (repairedOnCurrentCandidate != null) {
@@ -919,7 +994,8 @@ public final class RepairOperator {
                                 : currentCandidate.getCandidateId(),
                         currentGene,
                         context,
-                        catalog
+                        catalog,
+                        repairScope
                 );
 
         if (repairedOnAlternativeRemote != null) {
@@ -939,7 +1015,8 @@ public final class RepairOperator {
                 localGene,
                 currentGene,
                 context,
-                catalog
+                catalog,
+                repairScope
         );
     }
 
@@ -949,12 +1026,16 @@ public final class RepairOperator {
             String excludedCandidateId,
             Gene currentGene,
             SnapshotRepairContext context,
-            DeadlineRepairCatalog catalog
+            DeadlineRepairCatalog catalog,
+            GaRuntimeDiagnostics.RepairScope repairScope
     ) {
         Gene bestGene = null;
         DeadlineEvaluation bestEvaluation = null;
 
         for (NodeCandidate candidate : context.getCandidatesForTask(task)) {
+            if (repairScope != null) {
+                repairScope.candidateSearch();
+            }
             if (candidate.getType() == NodeType.LOCAL) {
                 continue;
             }
@@ -970,7 +1051,8 @@ public final class RepairOperator {
                     currentGene.getAllocatedCpu(),
                     currentGene.getAllocatedBandwidth(),
                     context,
-                    catalog
+                    catalog,
+                    repairScope
             );
 
             if (candidateGene == null) {
@@ -1003,7 +1085,8 @@ public final class RepairOperator {
             double preferredCpu,
             double preferredBandwidth,
             SnapshotRepairContext context,
-            DeadlineRepairCatalog catalog
+            DeadlineRepairCatalog catalog,
+            GaRuntimeDiagnostics.RepairScope repairScope
     ) {
         Gene bestGene = null;
         double bestPressure = Double.POSITIVE_INFINITY;
@@ -1015,6 +1098,9 @@ public final class RepairOperator {
                 sourceVehicle,
                 preferredRatio
         )) {
+            if (repairScope != null) {
+                repairScope.candidateComparison();
+            }
             Gene preservedResourcesGene = new Gene(
                     task.getTaskId(),
                     candidate.getCandidateId(),
@@ -1087,7 +1173,8 @@ public final class RepairOperator {
             Gene localGene,
             Gene currentGene,
             SnapshotRepairContext context,
-            DeadlineRepairCatalog catalog
+            DeadlineRepairCatalog catalog,
+            GaRuntimeDiagnostics.RepairScope repairScope
     ) {
         Gene bestGene = localGene;
         DeadlineEvaluation bestEvaluation =
@@ -1098,6 +1185,9 @@ public final class RepairOperator {
                 );
 
         for (NodeCandidate candidate : context.getCandidatesForTask(task)) {
+            if (repairScope != null) {
+                repairScope.candidateSearch();
+            }
             if (candidate.getType() == NodeType.LOCAL) {
                 continue;
             }
@@ -1108,6 +1198,9 @@ public final class RepairOperator {
                     sourceVehicle,
                     currentGene.getOffloadingRatio()
             )) {
+                if (repairScope != null) {
+                    repairScope.candidateComparison();
+                }
                 DeadlineRepairProfile profile = catalog.getProfile(
                         task,
                         candidate,
